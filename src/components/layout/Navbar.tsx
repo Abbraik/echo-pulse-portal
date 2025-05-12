@@ -11,10 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTheme } from '@/hooks/use-theme';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,7 +44,9 @@ const Navbar = () => {
     <nav
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-navy-900/80 backdrop-blur-lg shadow-lg'
+          ? resolvedTheme === 'dark' 
+            ? 'bg-navy-900/80 backdrop-blur-lg shadow-lg' 
+            : 'bg-white/80 backdrop-blur-lg shadow-lg'
           : 'bg-transparent'
       }`}
     >
@@ -51,7 +55,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <NavLink to="/" className="flex items-center space-x-2">
               <span className="text-2xl font-extrabold text-teal-500">PDS</span>
-              <span className="hidden md:block text-sm font-medium text-gray-300">
+              <span className="hidden md:block text-sm font-medium text-gray-300 dark:text-gray-300 light:text-gray-600">
                 Population Dynamics System
               </span>
             </NavLink>
@@ -67,7 +71,9 @@ const Navbar = () => {
                     `px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                       isActive
                         ? 'bg-teal-500/20 text-teal-300'
-                        : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                        : resolvedTheme === 'dark'
+                          ? 'text-gray-300 hover:bg-white/5 hover:text-white'
+                          : 'text-gray-600 hover:bg-black/5 hover:text-gray-900'
                     }`
                   }
                 >
@@ -81,16 +87,16 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full hover:bg-white/5"
+              className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5"
             >
-              <Bell size={18} className="text-gray-300" />
+              <Bell size={18} className="text-gray-300 dark:text-gray-300 light:text-gray-600" />
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="rounded-full hover:bg-white/5 flex items-center space-x-1"
+                  className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5 flex items-center space-x-1"
                 >
                   <div className="h-8 w-8 rounded-full bg-teal-600/30 flex items-center justify-center">
                     <User size={16} />
@@ -98,14 +104,22 @@ const Navbar = () => {
                   <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="glass-panel-dark w-56 mt-2">
+              <DropdownMenuContent className={`w-56 mt-2 ${
+                resolvedTheme === 'dark' 
+                  ? 'glass-panel-dark' 
+                  : 'bg-white border-gray-200 shadow-md'
+              }`}>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem className="cursor-pointer hover:bg-white/5">Profile</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer hover:bg-white/5">Settings</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer hover:bg-white/5">Support</DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem className="text-red-400 cursor-pointer hover:bg-white/5">
+                <DropdownMenuSeparator className={
+                  resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-200'
+                } />
+                <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">Profile</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">Settings</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">Support</DropdownMenuItem>
+                <DropdownMenuSeparator className={
+                  resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-200'
+                } />
+                <DropdownMenuItem className="text-red-400 cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -114,7 +128,7 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden rounded-full hover:bg-white/5"
+              className="md:hidden rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5"
             >
               <Menu size={20} />
             </Button>
