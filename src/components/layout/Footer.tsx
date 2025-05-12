@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { HelpCircle, BookOpen, MessageSquare } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 
+// Update the type to include all possible status values
 type SystemStatusType = 'operational' | 'degraded' | 'outage';
 
 const Footer = () => {
