@@ -1,182 +1,142 @@
 
-import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Check, ArrowUpRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { AlertTriangle, Bell, CheckCircle, Info, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface Alert {
-  id: string;
-  title: string;
-  description: string;
-  severity: 'high' | 'medium' | 'low';
-  timestamp: string;
-  isNew?: boolean;
-}
+import { Alert } from '../../api/dashboard';
+import { getAlerts } from '../../api/dashboard';
 
 const AlertStream: React.FC = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [expandedAlertId, setExpandedAlertId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
+  const [readAlerts, setReadAlerts] = useState<string[]>([]);
+  
   useEffect(() => {
-    // Simulated API call
-    setTimeout(() => {
-      setAlerts([
-        {
-          id: 'alert1',
-          title: 'Health Access Gap Detected',
-          description: 'Rural areas showing 23% below target for healthcare accessibility. Recommend reallocation of mobile clinics.',
-          severity: 'high',
-          timestamp: '12 minutes ago',
-          isNew: true,
-        },
-        {
-          id: 'alert2',
-          title: 'Education Coordination Opportunity',
-          description: 'Cross-sector initiative potential between schools and community organizations for after-school programs.',
-          severity: 'medium',
-          timestamp: '2 hours ago',
-        },
-        {
-          id: 'alert3',
-          title: 'Economic Equilibrium Shift',
-          description: 'Small business sector showing instability in northwest region. May require intervention.',
-          severity: 'medium',
-          timestamp: '4 hours ago',
-        },
-      ]);
-      setLoading(false);
-    }, 1200);
+    getAlerts().then(setAlerts);
+    
+    // Simulate receiving new alerts periodically
+    const interval = setInterval(() => {
+      // Random chance to add a new alert
+      if (Math.random() > 0.7) {
+        const types: Alert['type'][] = ['warning', 'info', 'error', 'success'];
+        const randomType = types[Math.floor(Math.random() * types.length)];
+        const messages = [
+          'Population model update required',
+          'Resource allocation threshold reached',
+          'Data synchronization completed',
+          'System maintenance scheduled',
+          'Anomaly detected in pattern recognition'
+        ];
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        
+        const newAlert: Alert = {
+          id: Date.now().toString(),
+          type: randomType,
+          message: randomMessage,
+          timestamp: new Date().toISOString(),
+          isNew: true
+        };
+        
+        setAlerts(prev => [newAlert, ...prev.slice(0, 8)]);
+        
+        // Remove "isNew" flag after animation
+        setTimeout(() => {
+          setAlerts(prev => 
+            prev.map(alert => 
+              alert.id === newAlert.id ? { ...alert, isNew: false } : alert
+            )
+          );
+        }, 3000);
+      }
+    }, 15000);
+    
+    return () => clearInterval(interval);
   }, []);
 
-  const toggleAlert = (alertId: string) => {
-    if (expandedAlertId === alertId) {
-      setExpandedAlertId(null);
-    } else {
-      setExpandedAlertId(alertId);
+  const getAlertIcon = (type: Alert['type']) => {
+    switch (type) {
+      case 'warning': return <AlertTriangle className="text-amber-400" size={18} />;
+      case 'error': return <AlertTriangle className="text-red-400" size={18} />;
+      case 'info': return <Info className="text-blue-400" size={18} />;
+      case 'success': return <CheckCircle className="text-emerald-400" size={18} />;
+      default: return <Info className="text-gray-400" size={18} />;
     }
   };
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high':
-        return 'text-red-500 bg-red-500/10';
-      case 'medium':
-        return 'text-amber-500 bg-amber-500/10';
-      case 'low':
-        return 'text-green-500 bg-green-500/10';
-      default:
-        return 'text-blue-500 bg-blue-500/10';
+  
+  const getAlertBgClass = (type: Alert['type']) => {
+    switch (type) {
+      case 'warning': return 'bg-amber-500/10 border-amber-500/30';
+      case 'error': return 'bg-red-500/10 border-red-500/30';
+      case 'info': return 'bg-blue-500/10 border-blue-500/30';
+      case 'success': return 'bg-emerald-500/10 border-emerald-500/30';
+      default: return 'bg-gray-500/10 border-gray-500/30';
     }
   };
-
-  if (loading) {
-    return (
-      <div className="glass-panel p-6 h-64 animate-pulse">
-        <div className="h-6 w-1/3 bg-gray-700/30 rounded mb-6"></div>
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="mb-3 flex items-start">
-            <div className="w-6 h-6 rounded-full bg-gray-700/30 mr-3"></div>
-            <div className="flex-1">
-              <div className="h-4 bg-gray-700/30 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-gray-700/30 rounded w-1/2"></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
+  
+  const dismissAlert = (id: string) => {
+    setReadAlerts(prev => [...prev, id]);
+    setTimeout(() => {
+      setAlerts(prev => prev.filter(alert => alert.id !== id));
+    }, 300);
+  };
+  
   return (
-    <div className="glass-panel p-6">
-      <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
-        <AlertTriangle size={18} className="mr-2 text-amber-500" />
-        Active Alerts
-      </h2>
-
-      <div className="space-y-3">
+    <div className="glass-panel p-4 h-full">
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex items-center gap-2">
+          <Bell size={18} className="text-blue-400" />
+          <h3 className="text-lg font-medium">Alerts & Notifications</h3>
+        </div>
+        <span className="text-xs text-gray-400 bg-gray-700/30 px-2 py-1 rounded-full">
+          {alerts.length} active
+        </span>
+      </div>
+      
+      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1 scrollbar-thin">
         <AnimatePresence>
-          {alerts.map((alert) => (
+          {alerts.map(alert => (
             <motion.div
               key={alert.id}
-              layout
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, height: 0 }}
-              className="relative rounded-lg overflow-hidden"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ 
+                opacity: 1, 
+                x: 0,
+                scale: alert.isNew ? [1, 1.03, 1] : 1,
+                transition: { 
+                  duration: 0.3,
+                  scale: { duration: 0.5 }
+                }
+              }}
+              exit={{ opacity: 0, x: -50 }}
+              className={`${getAlertBgClass(alert.type)} rounded-lg border p-3 flex items-start justify-between ${
+                readAlerts.includes(alert.id) ? 'opacity-50' : ''
+              } ${alert.isNew ? 'ring-1 ring-teal-500 shadow-lg' : ''}`}
             >
-              {/* Alert container */}
-              <motion.div
-                className={`rounded-lg border border-white/10 p-3 cursor-pointer hover:bg-white/5 transition-colors ${
-                  expandedAlertId === alert.id ? 'bg-white/5' : ''
-                }`}
-                onClick={() => toggleAlert(alert.id)}
-                layout
-              >
-                {/* Alert header */}
-                <div className="flex items-start">
-                  <div
-                    className={`p-1.5 rounded-full mr-3 ${getSeverityColor(alert.severity)}`}
-                  >
-                    <AlertTriangle size={14} />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-medium text-sm">{alert.title}</h3>
-                      {alert.isNew && (
-                        <span className="text-xs px-1.5 py-0.5 bg-teal-500/20 text-teal-400 rounded-full">
-                          New
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-400 mt-0.5">{alert.timestamp}</p>
-                  </div>
+              <div className="flex gap-3">
+                <div className="mt-0.5">
+                  {getAlertIcon(alert.type)}
                 </div>
-
-                {/* Expanded content */}
-                <AnimatePresence>
-                  {expandedAlertId === alert.id && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="pt-3 mt-3 border-t border-white/10"
-                    >
-                      <p className="text-sm text-gray-300 mb-4">{alert.description}</p>
-                      <div className="flex space-x-2">
-                        <button className="text-xs flex items-center px-3 py-1.5 rounded-lg bg-teal-500/20 text-teal-400 hover:bg-teal-500/30 transition-colors">
-                          <Check size={12} className="mr-1" />
-                          Acknowledge
-                        </button>
-                        <button className="text-xs flex items-center px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                          <ArrowUpRight size={12} className="mr-1" />
-                          View Details
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+                <div>
+                  <p className="text-sm font-medium">{alert.message}</p>
+                  <p className="text-xs text-gray-400">
+                    {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => dismissAlert(alert.id)}
+                className="text-gray-400 hover:text-gray-300"
+              >
+                <X size={14} />
+              </button>
             </motion.div>
           ))}
         </AnimatePresence>
+        
+        {alerts.length === 0 && (
+          <div className="h-24 flex items-center justify-center text-gray-400 text-sm">
+            No active alerts
+          </div>
+        )}
       </div>
-
-      {alerts.length > 0 && (
-        <div className="mt-4 text-center">
-          <button className="text-sm text-teal-400 hover:text-teal-300 transition-colors">
-            View All Alerts
-          </button>
-        </div>
-      )}
-
-      {alerts.length === 0 && (
-        <div className="text-center py-8 text-gray-400">
-          <AlertTriangle size={24} className="mx-auto opacity-50 mb-2" />
-          <p>No active alerts</p>
-        </div>
-      )}
     </div>
   );
 };

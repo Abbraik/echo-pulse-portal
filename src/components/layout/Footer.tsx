@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom';
 import { HelpCircle, BookOpen, MessageSquare } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 
+type SystemStatusType = 'operational' | 'degraded' | 'outage';
+
 const Footer = () => {
   const { resolvedTheme } = useTheme();
   const appVersion = "v4.0.0"; // Mock version number
-  const systemStatus = "operational"; // Mock status: operational, degraded, outage
+  const systemStatus: SystemStatusType = "operational"; // Mock status: operational, degraded, outage
 
   const getStatusColor = () => {
     switch (systemStatus) {

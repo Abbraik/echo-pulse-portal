@@ -1,0 +1,68 @@
+
+/* HomePage specific styles */
+.pulse-animation {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+.ticker-animation {
+  animation: tickerMove 20s linear infinite;
+}
+
+@keyframes tickerMove {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(-100%); }
+}
+
+.parallax-card {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.parallax-card-content {
+  transform: translateZ(20px);
+}
+
+.glow-effect {
+  box-shadow: 0 0 15px rgba(20, 184, 166, 0.5);
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(20, 184, 166, 0.5); }
+  100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.8); }
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+.timeline-scrubber {
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
+.timeline-scrubber::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(20, 184, 166, 1);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.timeline-scrubber::-webkit-slider-thumb:hover {
+  background: rgba(20, 184, 166, 0.8);
+  transform: scale(1.2);
+}

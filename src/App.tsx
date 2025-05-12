@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/hooks/use-theme";
 import { AnimatePresence } from "framer-motion";
 import MainLayout from "./components/layout/MainLayout";
 import Index from "./pages/Index";
+import HomePage from "./pages/HomePage";
 import Think from "./pages/Think";
 import Act from "./pages/Act";
 import Monitor from "./pages/Monitor";
@@ -34,6 +35,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<Index />} />
+                <Route path="/home" element={<HomePage />} />
                 <Route path="/think" element={<Think />} />
                 <Route path="/act" element={<Act />} />
                 <Route path="/monitor" element={<Monitor />} />
