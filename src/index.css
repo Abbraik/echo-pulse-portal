@@ -112,7 +112,9 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-lg dark:bg-white/10 dark:border-white/20 light:bg-secondary/40 light:border-black/5;
+    @apply backdrop-blur-lg rounded-2xl shadow-lg;
+    @apply dark:bg-white/10 dark:border dark:border-white/20;
+    @apply bg-secondary/40 border border-black/5;
   }
   
   .glass-panel-dark {
