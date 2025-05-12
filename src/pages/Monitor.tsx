@@ -2,6 +2,7 @@
 import React from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Monitor, BarChart2, AlertTriangle, Map } from 'lucide-react';
+import Gauge from '@/components/ui/custom/Gauge';
 
 const MonitorPage: React.FC = () => {
   return (
