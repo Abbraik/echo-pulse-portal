@@ -14,11 +14,18 @@ import Monitor from "./pages/Monitor";
 import Innovate from "./pages/Innovate";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="system">
+    <ThemeProvider defaultTheme="system" storageKey="pds-ui-theme">
       <TooltipProvider>
         <Toaster />
         <Sonner />
