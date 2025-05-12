@@ -2,17 +2,48 @@
 import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Layout } from 'lucide-react';
+import SystemFramingStudio from '@/components/think/SystemFramingStudio';
+import DeiForesightTab from '@/components/think/DeiForesightTab';
+import EquilibriumSolverTab from '@/components/think/EquilibriumSolverTab';
+import SensitivityTab from '@/components/think/SensitivityTab';
+import StrategyGeneratorTab from '@/components/think/StrategyGeneratorTab';
+import AiAdvisorSidebar from '@/components/think/AiAdvisorSidebar';
+import FooterCTA from '@/components/think/FooterCTA';
 
-// These components would need to be created as they're imported but not defined
+// Mock data
+const mockCLD = { nodes: [], links: [] };
+const mockSNA = { nodes: [], edges: [] };
+const mockDEIMetrics = { diversity: 78, equity: 65, inclusion: 82 };
+const mockScenarios = [
+  { id: 1, name: "Baseline", probability: 0.4 },
+  { id: 2, name: "Optimistic", probability: 0.2 },
+  { id: 3, name: "Pessimistic", probability: 0.4 }
+];
+const mockBands = [
+  { name: "Low", min: 0, max: 30 },
+  { name: "Medium", min: 30, max: 70 },
+  { name: "High", min: 70, max: 100 }
+];
+const mockSensitivity = [
+  { parameter: "Growth Rate", sensitivity: 0.8 },
+  { parameter: "Adoption Rate", sensitivity: 0.6 },
+  { parameter: "Churn", sensitivity: 0.4 }
+];
+const mockObjectives = [
+  { id: 1, name: "Increase Diversity", priority: "High" },
+  { id: 2, name: "Reduce Inequity", priority: "Medium" },
+  { id: 3, name: "Enhance Inclusion", priority: "High" }
+];
+
+const tabs = [
+  { key: 'dei', label: 'DEI & Foresight' },
+  { key: 'solver', label: 'Equilibrium Solver' },
+  { key: 'sensitivity', label: 'Sensitivity Analysis' },
+  { key: 'strategy', label: 'Initial Strategy' }
+];
+
 const ThinkPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('dei');
-
-  const tabs = [
-    { key: 'dei', label: 'DEI & Foresight' },
-    { key: 'solver', label: 'Equilibrium Solver' },
-    { key: 'sensitivity', label: 'Sensitivity Analysis' },
-    { key: 'strategy', label: 'Initial Strategy' }
-  ];
 
   return (
     <AnimatedPage>
@@ -35,9 +66,10 @@ const ThinkPage: React.FC = () => {
         {/* System Framing Studio */}
         <div className="lg:col-span-3 glass-panel p-6">
           <h2 className="text-xl font-semibold mb-4 text-left">System Framing Studio</h2>
-          <div className="aspect-video bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10">
-            <p className="text-gray-400">Interactive System Map</p>
-          </div>
+          <SystemFramingStudio
+            cldData={mockCLD}
+            snaData={mockSNA}
+          />
           <div className="mt-4 flex justify-between">
             <div className="flex space-x-2">
               <button className="px-3 py-1.5 text-sm bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors">2D View</button>
@@ -73,58 +105,24 @@ const ThinkPage: React.FC = () => {
           {/* Tab Content */}
           <div className="glass-panel p-6 flex-grow">
             {activeTab === 'dei' && (
-              <>
-                <h2 className="text-xl font-semibold mb-4 text-left">DEI & Foresight</h2>
-                <div className="h-48 bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10">
-                  <p className="text-gray-400">Diversity, Equity & Inclusion Analysis</p>
-                </div>
-              </>
+              <DeiForesightTab metrics={mockDEIMetrics} scenarios={mockScenarios} />
             )}
             
             {activeTab === 'solver' && (
-              <>
-                <h2 className="text-xl font-semibold mb-4 text-left">Equilibrium Solver</h2>
-                <div className="h-48 bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10">
-                  <p className="text-gray-400">System Balance Analysis Tools</p>
-                </div>
-              </>
+              <EquilibriumSolverTab initialBands={mockBands} />
             )}
             
             {activeTab === 'sensitivity' && (
-              <>
-                <h2 className="text-xl font-semibold mb-4 text-left">Sensitivity Analysis</h2>
-                <div className="h-48 bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10">
-                  <p className="text-gray-400">Parameter Testing Framework</p>
-                </div>
-              </>
+              <SensitivityTab parameters={mockSensitivity} />
             )}
             
             {activeTab === 'strategy' && (
-              <>
-                <h2 className="text-xl font-semibold mb-4 text-left">Initial Strategy</h2>
-                <div className="h-48 bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10">
-                  <p className="text-gray-400">Strategy Generation Tools</p>
-                </div>
-              </>
+              <StrategyGeneratorTab objectives={mockObjectives} />
             )}
           </div>
           
           {/* AI Advisor Section */}
-          <div className="glass-panel p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-teal-400">AI ADVISOR</h3>
-              <button className="p-1 rounded bg-teal-500/20 text-teal-400 hover:bg-teal-500/30">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M12 8v4"></path>
-                  <path d="M12 16h.01"></path>
-                </svg>
-              </button>
-            </div>
-            <div className="text-xs text-gray-400 bg-navy-800/30 p-2 rounded-lg border border-white/10">
-              I notice you're analyzing population dynamics. Consider adding demographic transitions as a key variable in your system model.
-            </div>
-          </div>
+          <AiAdvisorSidebar className="glass-panel p-4" />
         </div>
       </div>
     </AnimatedPage>
