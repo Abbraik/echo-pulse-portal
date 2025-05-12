@@ -29,10 +29,11 @@ const mockSensitivity = [
   { parameter: "Adoption Rate", sensitivity: 0.6 },
   { parameter: "Churn", sensitivity: 0.4 }
 ];
+// Fixed the priority types to be specific string literals
 const mockObjectives = [
-  { id: 1, name: "Increase Diversity", priority: "High" },
-  { id: 2, name: "Reduce Inequity", priority: "Medium" },
-  { id: 3, name: "Enhance Inclusion", priority: "High" }
+  { id: 1, name: "Increase Diversity", priority: "High" as const },
+  { id: 2, name: "Reduce Inequity", priority: "Medium" as const },
+  { id: 3, name: "Enhance Inclusion", priority: "High" as const }
 ];
 
 const tabs = [
