@@ -73,7 +73,7 @@ const HomePage: React.FC = () => {
         
         {/* Zone launchpad section */}
         <ZoneLaunchpad />
-      </div>
+      </main>
       
       <Footer />
     </div>
