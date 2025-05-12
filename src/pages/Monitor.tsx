@@ -24,23 +24,36 @@ const MonitorPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="glass-panel p-6">
           <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
-            <Gauge size={18} className="mr-2 text-amber-500" />
+            {/* Replace Gauge icon with actual Lucide icon */}
+            <Monitor size={18} className="mr-2 text-amber-500" />
             Overview Gauges
           </h2>
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
+            {[
+              { value: 78, label: "Metric 1", color: "amber" },
+              { value: 64, label: "Metric 2", color: "amber" },
+              { value: 89, label: "Metric 3", color: "amber" }
+            ].map((metric, i) => (
               <div key={i} className="p-4 border border-white/10 rounded-lg bg-white/5">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center mr-4">
-                    <div className="w-8 h-8 rounded-full bg-amber-500/30"></div>
+                  <div className="w-24 flex justify-center">
+                    <Gauge 
+                      value={metric.value} 
+                      size="sm" 
+                      label={metric.label}
+                      color="amber" 
+                    />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 ml-4">
                     <div className="flex justify-between">
-                      <h3 className="text-sm font-medium">Metric {i}</h3>
-                      <span className="text-amber-400 text-sm font-bold">78%</span>
+                      <h3 className="text-sm font-medium">{metric.label}</h3>
+                      <span className="text-amber-400 text-sm font-bold">{metric.value}%</span>
                     </div>
                     <div className="h-1 w-full bg-white/10 rounded-full mt-1">
-                      <div className="h-1 bg-amber-500 rounded-full" style={{width: '78%'}}></div>
+                      <div 
+                        className="h-1 bg-amber-500 rounded-full" 
+                        style={{width: `${metric.value}%`}}
+                      ></div>
                     </div>
                   </div>
                 </div>
