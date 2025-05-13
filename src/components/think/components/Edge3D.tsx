@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { Line, Html } from '@react-three/drei';
 import { Edge, Node } from '../types/system-framing-types';
-import { THREE } from '../three-imports';
+import * as THREE from 'three';
 
 interface Edge3DProps {
   edge: Edge;
@@ -42,7 +42,7 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
     }
     
     return {
-      points: [sourcePoint, targetPoint] as any, // Use type assertion to bypass type checking issues
+      points: [sourcePoint, targetPoint],
       midPoint: mid,
       color: edgeColor
     };
@@ -50,7 +50,6 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
   
   return (
     <group>
-      {/* Use @react-three/drei Line component */}
       <Line
         points={points}
         color={color}
