@@ -1,7 +1,6 @@
 
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
 import { Line } from '@react-three/drei';
 
 interface LoopTubeProps {
@@ -12,8 +11,6 @@ interface LoopTubeProps {
 }
 
 const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted }) => {
-  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
-  
   // Determine color based on loop type
   const color = type === 'reinforcing' ? '#14B8A6' : '#F97316'; // teal or orange
   
@@ -25,14 +22,14 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
     const midZ = (fromPos[2] + toPos[2]) / 2;
     
     return [
-      new THREE.Vector3(...fromPos),
-      new THREE.Vector3(midX, midY + 1.5, midZ), // Elevated midpoint
-      new THREE.Vector3(...toPos)
-    ];
+      fromPos,
+      [midX, midY + 1.5, midZ], // Elevated midpoint
+      toPos
+    ] as const;
   }, [fromPos, toPos]);
   
   // Create animation state
-  const [dashOffset, setDashOffset] = React.useState(0);
+  const [dashOffset, setDashOffset] = useState(0);
   
   // Animate flow direction
   useFrame(({ clock }) => {

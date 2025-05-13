@@ -25,7 +25,7 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  const meshRef = useRef<THREE.Mesh>(null!);
+  const meshRef = useRef<THREE.Mesh>(null);
 
   // Calculate size based on actor weight
   const size = 0.4 + weight * 0.4;

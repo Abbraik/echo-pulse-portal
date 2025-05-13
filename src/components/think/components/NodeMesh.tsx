@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -23,8 +23,8 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  const meshRef = useRef<THREE.Mesh>(null!);
-  
+  const meshRef = useRef<THREE.Mesh>(null);
+
   // Calculate size based on value (50-100 range maps to 1.0-1.5 size)
   const size = 1 + (value - 50) / 100;
   
