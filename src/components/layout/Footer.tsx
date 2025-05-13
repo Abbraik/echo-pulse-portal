@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { HelpCircle, BookOpen, MessageSquare } from 'lucide-react';
@@ -13,12 +12,10 @@ const Footer = () => {
   const systemStatus: SystemStatusType = "operational"; // Mock status: operational, degraded, outage
 
   const getStatusColor = () => {
-    switch (systemStatus) {
-      case "operational": return "bg-green-500";
-      case "degraded": return "bg-amber-500";
-      case "outage": return "bg-red-500";
-      default: return "bg-gray-500";
-    }
+    if (systemStatus === "operational") return "bg-green-500";
+    if (systemStatus === "degraded") return "bg-amber-500";
+    if (systemStatus === "outage") return "bg-red-500";
+    return "bg-gray-500";
   };
 
   return (
