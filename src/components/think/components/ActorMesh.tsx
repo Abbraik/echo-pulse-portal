@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -25,8 +25,8 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  // Use a generic ref to avoid the strict typing issue
-  const meshRef = React.useRef<THREE.Mesh>(null!);
+  // Using useRef without type assertion to avoid type conflicts
+  const meshRef = useRef(null);
 
   // Calculate size based on actor weight
   const size = 0.4 + weight * 0.4;
