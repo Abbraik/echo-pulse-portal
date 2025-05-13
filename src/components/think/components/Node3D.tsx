@@ -18,18 +18,28 @@ const Node3D: React.FC<Node3DProps> = ({ node, selectedNode, onSelect }) => {
   return (
     <group position={[node.position?.x || 0, 0, node.position?.y || 0]}>
       <mesh
-        onClick={() => onSelect(node)}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect(node);
+        }}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHovered(true);
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation();
+          setHovered(false);
+        }}
         scale={hovered || isSelected ? 1.1 : 1}
       >
         <sphereGeometry args={[size, 32, 32]} />
-        <meshPhysicalMaterial 
-          color={node.color} 
-          transmission={0.8}
+        <meshStandardMaterial 
+          color={node.color}
+          transparent
+          opacity={0.8}
           roughness={0.1}
           metalness={0.5}
-          emissive={hovered || isSelected ? node.color : '#000000'}
+          emissive={hovered || isSelected ? node.color : "#000000"}
           emissiveIntensity={hovered || isSelected ? 0.5 : 0}
         />
       </mesh>
