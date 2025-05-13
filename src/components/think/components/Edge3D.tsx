@@ -17,15 +17,15 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
   
   // Pre-compute all the necessary values
   const { points, midPoint, color } = useMemo(() => {
-    // Create points for the line using array format
-    const sourcePoint = [sourceNode.position?.x || 0, 0, sourceNode.position?.y || 0];
-    const targetPoint = [targetNode.position?.x || 0, 0, targetNode.position?.y || 0];
+    // Create points for the line using the format expected by Line component
+    const sourcePoint = new THREE.Vector3(sourceNode.position?.x || 0, 0, sourceNode.position?.y || 0);
+    const targetPoint = new THREE.Vector3(targetNode.position?.x || 0, 0, targetNode.position?.y || 0);
     
     // Calculate midpoint for label positioning
     const mid = {
-      x: (sourcePoint[0] + targetPoint[0]) / 2,
+      x: (sourceNode.position?.x + targetNode.position?.x) / 2,
       y: 1.5, // Fixed height for midpoint
-      z: (sourcePoint[2] + targetPoint[2]) / 2
+      z: (sourceNode.position?.y + targetNode.position?.y) / 2
     };
     
     // Determine edge color
@@ -42,7 +42,7 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
     }
     
     return {
-      points: [sourcePoint, targetPoint] as [number[], number[]],
+      points: [sourcePoint, targetPoint],
       midPoint: mid,
       color: edgeColor
     };
