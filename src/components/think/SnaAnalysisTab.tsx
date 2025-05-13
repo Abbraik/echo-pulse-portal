@@ -317,7 +317,7 @@ const SnaAnalysisTab: React.FC = () => {
               <CollapsibleContent>
                 <p className="text-xs text-gray-300">
                   Measures how interconnected neighboring nodes are. Higher values indicate tight collaboration clusters.
-                  Too high (>0.8) may signal echo chambers; too low (<0.2) suggests weak community formation.
+                  Too high ({">"} 0.8) may signal echo chambers; too low ({"<"} 0.2) suggests weak community formation.
                 </p>
               </CollapsibleContent>
             </Collapsible>
