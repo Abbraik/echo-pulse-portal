@@ -1,16 +1,19 @@
 
 import React, { useState, useRef } from 'react';
-import { LayoutGrid, Save, RotateCcw, Plus } from 'lucide-react';
+import { LayoutGrid, Save, RotateCcw, Plus, Layers } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Import types and mock data
 import { SystemFramingStudioProps, Node, mockNodes, mockEdges } from './types/system-framing-types';
+import { mockCLDData, mockSNAData } from './mocks/three-dimensional-data';
 
 // Import components
 import CytoscapeView from './components/CytoscapeView';
 import SparklineChart from './components/SparklineChart';
+import IsometricMap from './components/IsometricMap';
 
 const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaData }) => {
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const cyRef = useRef<any>(null);
@@ -33,25 +36,53 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
     // In a real app, this would open a node creation dialog
   };
 
+  const handleNodeClick = (node: Node) => {
+    setSelectedNode(node);
+    setIsPopupOpen(true);
+  };
+
   // Handler for cytoscape node click
   const handleCyNodeClick = (nodeId: string) => {
     const node = mockNodes.find(n => n.id === nodeId);
     if (node) {
-      setSelectedNode(node);
-      setIsPopupOpen(true);
+      handleNodeClick(node);
+    }
+  };
+
+  // Handler for 3D node selection
+  const handle3DNodeSelect = (nodeId: string) => {
+    const node = mockNodes.find(n => n.id === nodeId);
+    if (node) {
+      handleNodeClick(node);
     }
   };
 
   return (
     <div className="flex flex-col">
-      {/* Toolbar */}
+      {/* Mode toggle and toolbar */}
       <div className="flex justify-between mb-4">
         <div className="flex space-x-2">
           <button
-            className="px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center bg-teal-500/70 text-white"
+            onClick={() => setViewMode('2d')}
+            className={`px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center ${
+              viewMode === '2d' 
+                ? 'bg-teal-500/70 text-white' 
+                : 'bg-white/5 text-gray-300 hover:bg-white/10'
+            }`}
           >
             <LayoutGrid size={16} className="mr-1.5" />
-            System View
+            2D View
+          </button>
+          <button
+            onClick={() => setViewMode('3d')}
+            className={`px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center ${
+              viewMode === '3d' 
+                ? 'bg-teal-500/70 text-white' 
+                : 'bg-white/5 text-gray-300 hover:bg-white/10'
+            }`}
+          >
+            <Layers size={16} className="mr-1.5" />
+            3D View
           </button>
         </div>
         <button 
@@ -65,12 +96,20 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
 
       {/* Main visualization area */}
       <div className="aspect-video bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10 mb-4">
-        <CytoscapeView 
-          nodes={mockNodes} 
-          edges={mockEdges} 
-          onNodeClick={handleCyNodeClick} 
-          cyRef={cyRef} 
-        />
+        {viewMode === '2d' ? (
+          <CytoscapeView 
+            nodes={mockNodes} 
+            edges={mockEdges} 
+            onNodeClick={handleCyNodeClick} 
+            cyRef={cyRef} 
+          />
+        ) : (
+          <IsometricMap 
+            cldData={mockCLDData} 
+            snaData={mockSNAData} 
+            onSelect={handle3DNodeSelect}
+          />
+        )}
       </div>
 
       {/* Bottom actions bar */}
