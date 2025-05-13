@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
+import CreateScenarioModal from './CreateScenarioModal';
 
 interface SubIndicator {
   name: string;
@@ -35,6 +36,8 @@ interface DeiForesightTabProps {
 }
 
 const DeiForesightTab: React.FC<DeiForesightTabProps> = ({ metrics, scenarios }) => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  
   const renderSparkline = (data: number[], color: string = 'bg-teal-500') => {
     const max = Math.max(...data);
     const min = Math.min(...data);
@@ -58,7 +61,16 @@ const DeiForesightTab: React.FC<DeiForesightTabProps> = ({ metrics, scenarios })
   
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4 text-left">NDI Pillars & Sub-Indicators</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold text-left">NDI Pillars & Sub-Indicators</h2>
+        <button 
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-1 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-400 hover:to-teal-500 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-all button-glow"
+        >
+          <Plus size={16} />
+          New Scenario
+        </button>
+      </div>
       
       {/* Pillar metrics grid */}
       <div className="grid grid-cols-2 gap-4 mb-6">
@@ -194,11 +206,20 @@ const DeiForesightTab: React.FC<DeiForesightTabProps> = ({ metrics, scenarios })
         ))}
         
         {/* New Scenario Card */}
-        <div className="min-w-[200px] bg-gradient-to-br from-teal-800/30 to-blue-800/30 p-4 rounded-lg border border-teal-500/30 flex flex-col items-center justify-center transform hover:scale-[1.02] transition-transform cursor-pointer animate-pulse">
+        <div 
+          onClick={() => setIsCreateModalOpen(true)}
+          className="min-w-[200px] bg-gradient-to-br from-teal-800/30 to-blue-800/30 p-4 rounded-lg border border-teal-500/30 flex flex-col items-center justify-center transform hover:scale-[1.02] transition-transform cursor-pointer"
+        >
           <Plus size={24} className="mb-2 text-teal-400" />
           <span className="text-teal-400 font-medium">New Scenario</span>
         </div>
       </div>
+
+      {/* Create Scenario Modal */}
+      <CreateScenarioModal 
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </div>
   );
 };
