@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Layers, LayoutGrid, Save, RotateCcw, Plus, Info, X } from 'lucide-react';
 import CytoScape from 'react-cytoscapejs';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Html, Line } from '@react-three/drei';
+import { OrbitControls, Html } from '@react-three/drei';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { THREE } from './three-imports';
 
@@ -230,18 +230,7 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
   const midZ = (source[2] + target[2]) / 2;
   const midpoint = [midX, 1.5, midZ]; // Raise the midpoint to create an arc
   
-  // Generate curve points as array of [x, y, z] tuples instead of Vector3 objects
-  const points = [];
-  const segments = 20;
-  for (let i = 0; i <= segments; i++) {
-    const t = i / segments;
-    // Quadratic Bezier curve
-    const x = (1-t)*(1-t)*source[0] + 2*(1-t)*t*midpoint[0] + t*t*target[0];
-    const y = (1-t)*(1-t)*source[1] + 2*(1-t)*t*midpoint[1] + t*t*target[1];
-    const z = (1-t)*(1-t)*source[2] + 2*(1-t)*t*midpoint[2] + t*t*target[2];
-    points.push([x, y, z] as [number, number, number]);
-  }
-  
+  // Generate points for visualization - simplified approach
   let color;
   switch (edge.type) {
     case 'reinforcing':
@@ -253,14 +242,24 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
     default:
       color = '#94A3B8'; // gray for auxiliary
   }
-  
+
+  // Draw a simple line instead of using the Line component
   return (
-    <>
-      <Line 
-        points={points}
-        color={color}
-        lineWidth={2}
-      />
+    <group>
+      <lineSegments>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([
+              source[0], source[1], source[2],
+              target[0], target[1], target[2]
+            ])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial color={color} />
+      </lineSegments>
       
       {edge.label && (
         <Html position={[midpoint[0], midpoint[1] + 0.5, midpoint[2]]} center>
@@ -271,7 +270,7 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
           </div>
         </Html>
       )}
-    </>
+    </group>
   );
 };
 
