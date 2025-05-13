@@ -19,9 +19,6 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
   // Calculate line thickness based on weight
   const thickness = 0.5 + weight * 2;
   
-  // Create points array directly with position arrays
-  const points = [sourcePos, targetPos];
-  
   // Use ref for animation
   const opacityRef = useRef(0.2);
   
@@ -36,7 +33,7 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
   
   return (
     <Line
-      points={points}
+      points={[sourcePos, targetPos]}
       color={isHighlighted ? '#94A3B8' : '#64748B'}
       lineWidth={thickness}
       transparent

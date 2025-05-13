@@ -14,16 +14,15 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
   // Determine color based on loop type
   const color = type === 'reinforcing' ? '#14B8A6' : '#F97316'; // teal or orange
   
-  // Create curve points as an array of position arrays
-  const curvePoints = [
-    fromPos,
-    [
-      (fromPos[0] + toPos[0]) / 2,
-      (fromPos[1] + toPos[1]) / 2 + 1.5,
-      (fromPos[2] + toPos[2]) / 2
-    ] as [number, number, number],
-    toPos
+  // Calculate middle point
+  const midPoint: [number, number, number] = [
+    (fromPos[0] + toPos[0]) / 2,
+    (fromPos[1] + toPos[1]) / 2 + 1.5,
+    (fromPos[2] + toPos[2]) / 2
   ];
+  
+  // Create curve points
+  const curvePoints = [fromPos, midPoint, toPos];
   
   // Use ref for animation
   const dashRef = useRef(0);
