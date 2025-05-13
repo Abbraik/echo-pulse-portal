@@ -222,15 +222,14 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
   
   if (!sourceNode || !targetNode || !sourceNode.position || !targetNode.position) return null;
   
-  const source = [sourceNode.position.x || 0, 0, sourceNode.position.y || 0];
-  const target = [targetNode.position.x || 0, 0, targetNode.position.y || 0];
+  const source = new THREE.Vector3(sourceNode.position.x || 0, 0, sourceNode.position.y || 0);
+  const target = new THREE.Vector3(targetNode.position.x || 0, 0, targetNode.position.y || 0);
   
   // Calculate midpoint for the curve
-  const midX = (source[0] + target[0]) / 2;
-  const midZ = (source[2] + target[2]) / 2;
-  const midpoint = [midX, 1.5, midZ]; // Raise the midpoint to create an arc
+  const midX = (source.x + target.x) / 2;
+  const midZ = (source.z + target.z) / 2;
+  const midPoint = new THREE.Vector3(midX, 1.5, midZ);
   
-  // Generate points for visualization - simplified approach
   let color;
   switch (edge.type) {
     case 'reinforcing':
@@ -242,27 +241,26 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
     default:
       color = '#94A3B8'; // gray for auxiliary
   }
-
-  // Draw a simple line instead of using the Line component
+  
   return (
     <group>
-      <lineSegments>
+      <line>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
             count={2}
             array={new Float32Array([
-              source[0], source[1], source[2],
-              target[0], target[1], target[2]
+              source.x, source.y, source.z,
+              target.x, target.y, target.z
             ])}
             itemSize={3}
           />
         </bufferGeometry>
-        <lineBasicMaterial color={color} />
-      </lineSegments>
+        <lineBasicMaterial color={color} linewidth={2} />
+      </line>
       
       {edge.label && (
-        <Html position={[midpoint[0], midpoint[1] + 0.5, midpoint[2]]} center>
+        <Html position={[midPoint.x, midPoint.y + 0.5, midPoint.z]} center>
           <div className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${
             edge.type === 'reinforcing' ? 'bg-teal-500/80' : 'bg-orange-500/80'
           } text-white`}>

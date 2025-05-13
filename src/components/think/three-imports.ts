@@ -1,6 +1,7 @@
 
+// Import the entire THREE namespace
 import * as THREE from 'three';
 
-// Export the entire THREE namespace
+// Export THREE as a namespace and as default
 export { THREE };
 export default THREE;
