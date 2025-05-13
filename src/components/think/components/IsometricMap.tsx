@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, SoftShadows } from '@react-three/drei';
+import { OrbitControls, SoftShadows, Grid } from '@react-three/drei';
 import NodeMesh from './NodeMesh';
 import LoopTube from './LoopTube';
 import ActorMesh from './ActorMesh';
@@ -49,7 +49,7 @@ const IsometricMap: React.FC<IsometricMapProps> = ({ cldData, snaData, onSelect 
 
   return (
     <div className="w-full h-full">
-      <Canvas shadows orthographic camera={{ position: [10, 10, 10], zoom: 30 }}>
+      <Canvas shadows camera={{ position: [10, 10, 10], zoom: 30 }} orthographic>
         {/* Background gradient */}
         <color attach="background" args={['#1E293B']} />
 
@@ -84,17 +84,20 @@ const IsometricMap: React.FC<IsometricMapProps> = ({ cldData, snaData, onSelect 
         {cldData.loops.map((loop, index) => {
           const fromPos = positionLookup[loop.from];
           const toPos = positionLookup[loop.to];
-          return (
-            <LoopTube
-              key={`${loop.from}-${loop.to}`}
-              fromPos={fromPos}
-              toPos={toPos}
-              type={loop.type}
-              isHighlighted={
-                hoveredNodeId === loop.from || hoveredNodeId === loop.to
-              }
-            />
-          );
+          if (fromPos && toPos) {
+            return (
+              <LoopTube
+                key={`${loop.from}-${loop.to}`}
+                fromPos={fromPos}
+                toPos={toPos}
+                type={loop.type}
+                isHighlighted={
+                  hoveredNodeId === loop.from || hoveredNodeId === loop.to
+                }
+              />
+            );
+          }
+          return null;
         })}
 
         {/* Actor nodes */}
@@ -114,15 +117,21 @@ const IsometricMap: React.FC<IsometricMapProps> = ({ cldData, snaData, onSelect 
 
         {/* Actor edges to related stocks */}
         {snaData.actors.map((actor) =>
-          actor.links.map((linkId) => (
-            <ActorEdge
-              key={`${actor.id}-${linkId}`}
-              sourcePos={actor.position}
-              targetPos={positionLookup[linkId]}
-              weight={actor.weight}
-              isHighlighted={hoveredActorId === actor.id}
-            />
-          ))
+          actor.links.map((linkId) => {
+            const targetPos = positionLookup[linkId];
+            if (targetPos) {
+              return (
+                <ActorEdge
+                  key={`${actor.id}-${linkId}`}
+                  sourcePos={actor.position}
+                  targetPos={targetPos}
+                  weight={actor.weight}
+                  isHighlighted={hoveredActorId === actor.id}
+                />
+              );
+            }
+            return null;
+          })
         )}
 
         {/* Camera controls */}
@@ -136,7 +145,7 @@ const IsometricMap: React.FC<IsometricMapProps> = ({ cldData, snaData, onSelect 
         />
 
         {/* Grid helper */}
-        <gridHelper args={[20, 20, '#475569', '#334155']} position={[0, -0.01, 0]} />
+        <Grid args={[20, 20, '#475569', '#334155']} position={[0, -0.01, 0]} />
       </Canvas>
     </div>
   );

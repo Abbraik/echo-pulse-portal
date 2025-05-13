@@ -1,7 +1,8 @@
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
+import * as THREE from 'three';
 
 interface ActorEdgeProps {
   sourcePos: [number, number, number];
@@ -21,18 +22,21 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
   
   // Create a straight line between source and target
   const points = useMemo(() => {
-    return [sourcePos, targetPos];
+    return [
+      new THREE.Vector3(...sourcePos),
+      new THREE.Vector3(...targetPos)
+    ];
   }, [sourcePos, targetPos]);
   
-  // Track animation state
-  const [opacity, setOpacity] = useState(0.2);
+  // Use mutable object for opacity animation
+  const opacityRef = useMemo(() => ({ value: 0.2 }), []);
   
   // Animate pulse effect
   useFrame(({ clock }) => {
     if (isHighlighted) {
-      setOpacity(0.6 + Math.sin(clock.getElapsedTime() * 4) * 0.4);
+      opacityRef.value = 0.6 + Math.sin(clock.getElapsedTime() * 4) * 0.4;
     } else {
-      setOpacity(0.2);
+      opacityRef.value = 0.2;
     }
   });
   
@@ -42,7 +46,7 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
       color={isHighlighted ? '#94A3B8' : '#64748B'}
       lineWidth={thickness}
       transparent
-      opacity={opacity}
+      opacity={opacityRef.value}
     />
   );
 };

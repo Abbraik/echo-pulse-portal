@@ -1,7 +1,7 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
+import { Html, Octahedron } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface ActorMeshProps {
@@ -25,9 +25,9 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  // Using useRef without type assertion to avoid type conflicts
-  const meshRef = useRef(null);
-
+  // Use meshRef as a group ref for animation
+  const groupRef = useRef<THREE.Group>(null);
+  
   // Calculate size based on actor weight
   const size = 0.4 + weight * 0.4;
 
@@ -47,18 +47,18 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
 
   // Animate hover effect
   useFrame((state) => {
-    if (!meshRef.current) return;
+    if (!groupRef.current) return;
     
     if (isHovered) {
       // Float up and down
       const floatY = position[1] + Math.sin(state.clock.elapsedTime * 3) * 0.1;
-      meshRef.current.position.y = floatY;
+      groupRef.current.position.y = floatY;
       
       // Slowly rotate
-      meshRef.current.rotation.y += 0.01;
+      groupRef.current.rotation.y += 0.01;
     } else {
       // Smoothly return to original position
-      meshRef.current.position.lerp(
+      groupRef.current.position.lerp(
         new THREE.Vector3(position[0], position[1], position[2]),
         0.1
       );
@@ -66,27 +66,26 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   });
 
   return (
-    <group>
+    <group ref={groupRef} position={position}>
       <mesh
-        ref={meshRef}
-        position={position}
         castShadow
         onPointerOver={onHover}
         onPointerOut={onBlur}
         onClick={onClick}
       >
-        <octahedronGeometry args={[size, 0]} />
-        <meshStandardMaterial
-          color={getActorColor()}
-          roughness={0.4}
-          metalness={0.6}
-          emissive={getActorColor()}
-          emissiveIntensity={isHovered ? 0.8 : 0.3}
-        />
+        <Octahedron args={[size, 0]}>
+          <meshStandardMaterial
+            color={getActorColor()}
+            roughness={0.4}
+            metalness={0.6}
+            emissive={getActorColor()}
+            emissiveIntensity={isHovered ? 0.8 : 0.3}
+          />
+        </Octahedron>
       </mesh>
       
       {/* Actor label */}
-      <Html position={[position[0], position[1] + 0.7, position[2]]}>
+      <Html position={[0, 0.7, 0]}>
         <div className="text-center pointer-events-none select-none">
           <span className="text-white text-xs font-bold px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
             {id}

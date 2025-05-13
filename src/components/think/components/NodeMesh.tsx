@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
+import { Html, Icosahedron } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface NodeMeshProps {
@@ -23,8 +23,8 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  // Using useRef without type assertion to avoid type conflicts
-  const meshRef = useRef(null);
+  // Use groupRef for animations
+  const groupRef = useRef<THREE.Group>(null);
 
   // Calculate size based on value (50-100 range maps to 1.0-1.5 size)
   const size = 1 + (value - 50) / 100;
@@ -47,13 +47,13 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
 
   // Pulse animation on hover
   useFrame((state) => {
-    if (!meshRef.current) return;
+    if (!groupRef.current) return;
     if (isHovered) {
       const pulseScale = 1 + Math.sin(state.clock.elapsedTime * 5) * 0.03;
-      meshRef.current.scale.setScalar(size * pulseScale);
+      groupRef.current.scale.setScalar(size * pulseScale);
     } else {
       // Smooth transition back to normal size
-      meshRef.current.scale.lerp(
+      groupRef.current.scale.lerp(
         new THREE.Vector3(size, size, size),
         0.1
       );
@@ -61,30 +61,29 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
   });
 
   return (
-    <group>
+    <group ref={groupRef} position={position} scale={[size, size, size]}>
       <mesh
-        ref={meshRef}
-        position={position}
         castShadow
         receiveShadow
         onPointerOver={onHover}
         onPointerOut={onBlur}
         onClick={onClick}
       >
-        <icosahedronGeometry args={[0.8, 1]} />
-        <meshPhysicalMaterial
-          color={getNodeColor()}
-          transmission={0.3}
-          thickness={1.5}
-          roughness={0.3}
-          metalness={0.2}
-          emissive={getNodeColor()}
-          emissiveIntensity={isHovered ? 0.5 : 0.2}
-        />
+        <Icosahedron args={[0.8, 1]}>
+          <meshPhysicalMaterial
+            color={getNodeColor()}
+            transmission={0.3}
+            thickness={1.5}
+            roughness={0.3}
+            metalness={0.2}
+            emissive={getNodeColor()}
+            emissiveIntensity={isHovered ? 0.5 : 0.2}
+          />
+        </Icosahedron>
       </mesh>
       
       {/* Node label */}
-      <Html position={[position[0], position[1] - 1.2, position[2]]}>
+      <Html position={[0, -1.2, 0]}>
         <div className="text-center pointer-events-none select-none">
           <span className="text-white text-xs font-medium px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm">
             {id.charAt(0).toUpperCase() + id.slice(1)}
