@@ -53,7 +53,6 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
       dashScale={10}
       transparent
       opacity={isHighlighted ? 0.8 : 0.5}
-      alphaWrite={false}
     />
   );
 };
