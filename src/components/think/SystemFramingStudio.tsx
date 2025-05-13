@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Layers, LayoutGrid, Save, RotateCcw, Plus, Info, X } from 'lucide-react';
 import CytoScape from 'react-cytoscapejs';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Html } from '@react-three/drei';
+import { OrbitControls, Html, Line } from '@react-three/drei';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { THREE } from './three-imports';
 
@@ -242,9 +242,6 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
     points.push(new THREE.Vector3(x, y, z));
   }
   
-  // Create a curve from the points - explicitly typing as any to bypass type mismatch
-  const curve = new THREE.CatmullRomCurve3(points) as unknown as THREE.Curve<THREE.Vector3>;
-  
   let color;
   switch (edge.type) {
     case 'reinforcing':
@@ -259,10 +256,11 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
   
   return (
     <>
-      <mesh>
-        <tubeGeometry args={[curve, 64, 0.1, 8, false]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
+      <Line 
+        points={points}
+        color={color}
+        lineWidth={2}
+      />
       
       {edge.label && (
         <Html position={[midpoint[0], midpoint[1] + 0.5, midpoint[2]]} center>
