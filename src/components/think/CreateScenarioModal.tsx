@@ -8,6 +8,7 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { ScenarioLineChart } from './components/ScenarioLineChart';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Parameter {
   id: string;
@@ -26,6 +27,7 @@ interface CreateScenarioModalProps {
 }
 
 const CreateScenarioModal: React.FC<CreateScenarioModalProps> = ({ open, onClose }) => {
+  const isMobile = useIsMobile();
   const [scenarioName, setScenarioName] = useState('');
   const [description, setDescription] = useState('');
   const [nameError, setNameError] = useState('');
@@ -124,13 +126,13 @@ const CreateScenarioModal: React.FC<CreateScenarioModalProps> = ({ open, onClose
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
       <DialogOverlay className="bg-navy-900/50 backdrop-blur-sm" />
-      <DialogContent className="max-w-[600px] p-0 bg-white/15 backdrop-blur-3xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
-        <div className="p-8">
+      <DialogContent className={`max-h-[90vh] overflow-y-auto ${isMobile ? 'w-[95vw] p-4' : 'max-w-[600px] p-0'} bg-white/15 backdrop-blur-3xl border border-white/20 rounded-3xl shadow-2xl`}>
+        <div className={`${isMobile ? 'p-4' : 'p-8'}`}>
           {/* Header */}
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h2 className="text-2xl font-extrabold text-teal-400">Create New Scenario</h2>
-              <p className="text-gray-200">Define parameter adjustments and preview impacts.</p>
+              <h2 className="text-xl md:text-2xl font-extrabold text-teal-400">Create New Scenario</h2>
+              <p className="text-sm md:text-base text-gray-200">Define parameter adjustments and preview impacts.</p>
             </div>
             <button 
               onClick={onClose} 
@@ -141,9 +143,9 @@ const CreateScenarioModal: React.FC<CreateScenarioModalProps> = ({ open, onClose
             </button>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             {/* Scenario Details */}
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               <div>
                 <div className="relative">
                   <Input
@@ -164,16 +166,16 @@ const CreateScenarioModal: React.FC<CreateScenarioModalProps> = ({ open, onClose
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe the scenario's context and purpose"
-                className="bg-white/10 border border-white/20 text-white focus:ring-teal-400 min-h-[80px]"
+                className="bg-white/10 border border-white/20 text-white focus:ring-teal-400 min-h-[60px] md:min-h-[80px]"
               />
             </div>
             
             {/* Parameters Grid */}
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {/* Population Dynamics */}
-              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-4">
-                <h3 className="text-teal-300 font-semibold mb-3">Population Dynamics</h3>
-                <div className="space-y-4">
+              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-3 md:p-4">
+                <h3 className="text-teal-300 text-sm md:text-base font-semibold mb-2 md:mb-3">Population Dynamics</h3>
+                <div className="space-y-3 md:space-y-4">
                   {getParametersByPillar('population').map((param) => (
                     <ParameterSlider 
                       key={param.id}
@@ -185,9 +187,9 @@ const CreateScenarioModal: React.FC<CreateScenarioModalProps> = ({ open, onClose
               </div>
               
               {/* Resource Efficiency */}
-              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-4">
-                <h3 className="text-teal-300 font-semibold mb-3">Resource Efficiency</h3>
-                <div className="space-y-4">
+              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-3 md:p-4">
+                <h3 className="text-teal-300 text-sm md:text-base font-semibold mb-2 md:mb-3">Resource Efficiency</h3>
+                <div className="space-y-3 md:space-y-4">
                   {getParametersByPillar('resources').map((param) => (
                     <ParameterSlider 
                       key={param.id}
@@ -199,9 +201,9 @@ const CreateScenarioModal: React.FC<CreateScenarioModalProps> = ({ open, onClose
               </div>
               
               {/* Goods & Services Stability */}
-              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-4">
-                <h3 className="text-teal-300 font-semibold mb-3">Goods & Services Stability</h3>
-                <div className="space-y-4">
+              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-3 md:p-4">
+                <h3 className="text-teal-300 text-sm md:text-base font-semibold mb-2 md:mb-3">Goods & Services Stability</h3>
+                <div className="space-y-3 md:space-y-4">
                   {getParametersByPillar('goods').map((param) => (
                     <ParameterSlider 
                       key={param.id}
@@ -213,9 +215,9 @@ const CreateScenarioModal: React.FC<CreateScenarioModalProps> = ({ open, onClose
               </div>
               
               {/* Social Cohesion */}
-              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-4">
-                <h3 className="text-teal-300 font-semibold mb-3">Social Cohesion</h3>
-                <div className="space-y-4">
+              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-3 md:p-4">
+                <h3 className="text-teal-300 text-sm md:text-base font-semibold mb-2 md:mb-3">Social Cohesion</h3>
+                <div className="space-y-3 md:space-y-4">
                   {getParametersByPillar('social').map((param) => (
                     <ParameterSlider 
                       key={param.id}
@@ -228,15 +230,15 @@ const CreateScenarioModal: React.FC<CreateScenarioModalProps> = ({ open, onClose
             </div>
             
             {/* Live Preview Chart */}
-            <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-4">
-              <h3 className="text-teal-300 font-semibold mb-3">Impact Preview</h3>
-              <div className="h-[180px]">
+            <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-3 md:p-4">
+              <h3 className="text-teal-300 text-sm md:text-base font-semibold mb-2 md:mb-3">Impact Preview</h3>
+              <div className="h-[150px] md:h-[180px]">
                 <ScenarioLineChart data={chartData} />
               </div>
             </div>
             
             {/* Action Buttons */}
-            <div className="sticky bottom-0 bg-navy-800/80 backdrop-blur-lg -mx-8 -mb-8 p-4 flex justify-end space-x-3 border-t border-white/10">
+            <div className="sticky bottom-0 bg-navy-800/80 backdrop-blur-lg -mx-4 md:-mx-8 -mb-4 md:-mb-8 p-4 flex justify-end space-x-3 border-t border-white/10">
               <Button
                 type="button"
                 variant="outline"
@@ -268,6 +270,7 @@ interface ParameterSliderProps {
 
 const ParameterSlider: React.FC<ParameterSliderProps> = ({ parameter, onChange }) => {
   const { id, name, value, min, max, step, unit } = parameter;
+  const isMobile = useIsMobile();
   
   const handleSliderChange = (newValue: number[]) => {
     onChange(id, newValue[0]);
@@ -282,10 +285,10 @@ const ParameterSlider: React.FC<ParameterSliderProps> = ({ parameter, onChange }
   
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-      <div className="sm:w-1/3">
-        <label htmlFor={id} className="text-sm text-gray-300">{name}</label>
+      <div className={isMobile ? "w-full" : "sm:w-1/3"}>
+        <label htmlFor={id} className="text-xs md:text-sm text-gray-300">{name}</label>
       </div>
-      <div className="flex-1 flex items-center gap-3">
+      <div className="flex-1 flex items-center gap-2 md:gap-3">
         <div className="flex-1">
           <Slider 
             id={id}
@@ -297,7 +300,7 @@ const ParameterSlider: React.FC<ParameterSliderProps> = ({ parameter, onChange }
             className="h-2"
           />
         </div>
-        <div className="w-24 flex items-center">
+        <div className="flex items-center">
           <input
             type="number"
             value={value}
@@ -305,7 +308,7 @@ const ParameterSlider: React.FC<ParameterSliderProps> = ({ parameter, onChange }
             min={min}
             max={max}
             step={step}
-            className="w-16 h-8 bg-white/10 border border-white/20 rounded px-2 text-white text-right text-sm"
+            className="w-14 md:w-16 h-7 md:h-8 bg-white/10 border border-white/20 rounded px-1 md:px-2 text-white text-right text-xs md:text-sm"
           />
           <span className="ml-1 text-xs text-gray-400">{unit}</span>
         </div>
