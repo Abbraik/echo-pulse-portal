@@ -1,10 +1,10 @@
 
 import * as THREE from 'three';
 
-// Export the THREE namespace for consistency
+// Export THREE as a namespace
 export { THREE };
 
-// Also export common types directly to ensure type consistency across the app
+// Export Vector2 and Vector3 constructors directly
 export const Vector3 = THREE.Vector3;
 export const Vector2 = THREE.Vector2;
 
