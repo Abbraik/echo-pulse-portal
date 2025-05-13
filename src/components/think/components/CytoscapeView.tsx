@@ -62,18 +62,15 @@ const CytoscapeView: React.FC<CytoscapeViewProps> = ({ nodes, edges, onNodeClick
       selector: 'edge',
       style: {
         'width': 3,
-        'line-color': (ele: any) => ele.data('type') === 'reinforcing' ? '#14B8A6' : 
-                               ele.data('type') === 'balancing' ? '#F97316' : '#94A3B8',
-        'target-arrow-color': (ele: any) => ele.data('type') === 'reinforcing' ? '#14B8A6' : 
-                               ele.data('type') === 'balancing' ? '#F97316' : '#94A3B8',
+        'line-color': 'mapData(type, "reinforcing", "balancing", "#14B8A6", "#F97316")',
+        'target-arrow-color': 'mapData(type, "reinforcing", "balancing", "#14B8A6", "#F97316")',
         'target-arrow-shape': 'triangle',
         'curve-style': 'bezier',
         'control-point-step-size': 40,
         'label': 'data(label)',
         'font-size': '12px',
         'color': '#ffffff',
-        'text-outline-color': (ele: any) => ele.data('type') === 'reinforcing' ? '#14B8A6' : 
-                               ele.data('type') === 'balancing' ? '#F97316' : '#94A3B8',
+        'text-outline-color': 'mapData(type, "reinforcing", "balancing", "#14B8A6", "#F97316")',
         'text-outline-width': '2px',
         'text-outline-opacity': 0.8,
         'text-background-opacity': 1,

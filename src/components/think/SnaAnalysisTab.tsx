@@ -217,7 +217,7 @@ const SnaAnalysisTab: React.FC = () => {
       // Register event handlers
       cy.on('tap', 'node', handleNodeClick);
       
-      // Use proper CSS-compatible styling for node hover effect
+      // Use proper method for styling nodes on hover
       cy.on('mouseover', 'node', function(e: any) {
         e.target.style('border-width', '2px');
         e.target.style('border-color', '#fff');
@@ -246,7 +246,7 @@ const SnaAnalysisTab: React.FC = () => {
           elements={elements}
           style={{ width: '100%', height: '100%' }}
           cy={(cy) => { cyRef.current = cy; }}
-          {...cytoConfig}
+          stylesheet={cytoConfig.style}
         />
       </div>
       
@@ -314,7 +314,7 @@ const SnaAnalysisTab: React.FC = () => {
               <CollapsibleContent>
                 <p className="text-xs text-gray-300">
                   Measures how interconnected neighboring nodes are. Higher values indicate tight collaboration clusters.
-                  Too high ({">"} 0.8) may signal echo chambers; too low ({"<"} 0.2) suggests weak community formation.
+                  Too high (&gt; 0.8) may signal echo chambers; too low (&lt; 0.2) suggests weak community formation.
                 </p>
               </CollapsibleContent>
             </Collapsible>
