@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Layout, Layers } from 'lucide-react';
@@ -141,55 +140,50 @@ const ThinkPage: React.FC = () => {
         </div>
       </motion.header>
       
-      {/* Main Split-Screen Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        {/* Left Column - System Framing Studio (60% on desktop) */}
-        <div className="lg:col-span-3 space-y-6">
-          <div className="glass-panel p-6">
-            <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
-              <Layout className="mr-2" size={20} />
-              System Framing Studio
-            </h2>
-            <SystemFramingStudio
-              cldData={mockCLD}
-              snaData={mockSNA}
-            />
-          </div>
+      {/* Main Content Layout - Now a vertical stack */}
+      <div className="flex flex-col space-y-6">
+        {/* System Framing Studio (Full Width) */}
+        <div className="glass-panel p-6">
+          <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
+            <Layout className="mr-2" size={20} />
+            System Framing Studio
+          </h2>
+          <SystemFramingStudio
+            cldData={mockCLD}
+            snaData={mockSNA}
+          />
         </div>
         
-        {/* Right Column - Tabs & AI Advisor (40% on desktop) */}
-        <div className="lg:col-span-2 flex flex-col space-y-6">
-          {/* Tabbed Content */}
-          <div className="glass-panel p-6">
-            <Tabs defaultValue="dei" className="w-full">
-              <TabsList className="grid grid-cols-4 mb-6">
-                <TabsTrigger value="dei">DEI & Foresight</TabsTrigger>
-                <TabsTrigger value="solver">Equilibrium</TabsTrigger>
-                <TabsTrigger value="sensitivity">Sensitivity</TabsTrigger>
-                <TabsTrigger value="strategy">Strategy</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="dei" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-                <DeiForesightTab metrics={mockDEIMetrics} scenarios={mockScenarios} />
-              </TabsContent>
-              
-              <TabsContent value="solver" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-                <EquilibriumSolverTab initialBands={mockBands} />
-              </TabsContent>
-              
-              <TabsContent value="sensitivity" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-                <SensitivityTab parameters={mockSensitivity} />
-              </TabsContent>
-              
-              <TabsContent value="strategy" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-                <StrategyGeneratorTab objectives={mockObjectives} />
-              </TabsContent>
-            </Tabs>
-          </div>
-          
-          {/* AI Advisor Sidebar */}
-          <AiAdvisorSidebar className="glass-panel p-4" />
+        {/* Full-Width Tabbed Analysis Tools Panel */}
+        <div className="glass-panel p-6 flex-1">
+          <Tabs defaultValue="dei" className="w-full">
+            <TabsList className="grid grid-cols-4 mb-6">
+              <TabsTrigger value="dei">DEI & Foresight</TabsTrigger>
+              <TabsTrigger value="solver">Equilibrium</TabsTrigger>
+              <TabsTrigger value="sensitivity">Sensitivity</TabsTrigger>
+              <TabsTrigger value="strategy">Strategy</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="dei" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+              <DeiForesightTab metrics={mockDEIMetrics} scenarios={mockScenarios} />
+            </TabsContent>
+            
+            <TabsContent value="solver" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+              <EquilibriumSolverTab initialBands={mockBands} />
+            </TabsContent>
+            
+            <TabsContent value="sensitivity" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+              <SensitivityTab parameters={mockSensitivity} />
+            </TabsContent>
+            
+            <TabsContent value="strategy" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+              <StrategyGeneratorTab objectives={mockObjectives} />
+            </TabsContent>
+          </Tabs>
         </div>
+        
+        {/* AI Advisor - Now a full-width component */}
+        <AiAdvisorSidebar className="glass-panel p-4" />
       </div>
 
       {/* Footer CTA */}
