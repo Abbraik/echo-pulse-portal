@@ -21,11 +21,12 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
     const midY = (fromPos[1] + toPos[1]) / 2;
     const midZ = (fromPos[2] + toPos[2]) / 2;
     
+    // Return points in the format expected by Line component
     return [
       fromPos,
-      [midX, midY + 1.5, midZ], // Elevated midpoint
+      [midX, midY + 1.5, midZ] as [number, number, number],
       toPos
-    ] as const;
+    ];
   }, [fromPos, toPos]);
   
   // Create animation state

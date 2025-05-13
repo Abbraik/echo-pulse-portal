@@ -1,7 +1,6 @@
 
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
 import { Line } from '@react-three/drei';
 
 interface ActorEdgeProps {
@@ -22,14 +21,11 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
   
   // Create a straight line between source and target
   const points = useMemo(() => {
-    return [
-      sourcePos,
-      targetPos
-    ];
+    return [sourcePos, targetPos];
   }, [sourcePos, targetPos]);
   
   // Track animation state
-  const [opacity, setOpacity] = React.useState(0.2);
+  const [opacity, setOpacity] = useState(0.2);
   
   // Animate pulse effect
   useFrame(({ clock }) => {
