@@ -230,8 +230,8 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
   const midZ = (source[2] + target[2]) / 2;
   const midpoint = [midX, 1.5, midZ]; // Raise the midpoint to create an arc
   
-  // Generate curve points
-  const points: THREE.Vector3[] = [];
+  // Generate curve points as array of [x, y, z] tuples instead of Vector3 objects
+  const points = [];
   const segments = 20;
   for (let i = 0; i <= segments; i++) {
     const t = i / segments;
@@ -239,7 +239,7 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
     const x = (1-t)*(1-t)*source[0] + 2*(1-t)*t*midpoint[0] + t*t*target[0];
     const y = (1-t)*(1-t)*source[1] + 2*(1-t)*t*midpoint[1] + t*t*target[1];
     const z = (1-t)*(1-t)*source[2] + 2*(1-t)*t*midpoint[2] + t*t*target[2];
-    points.push(new THREE.Vector3(x, y, z));
+    points.push([x, y, z] as [number, number, number]);
   }
   
   let color;
