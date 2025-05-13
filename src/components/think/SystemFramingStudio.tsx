@@ -18,7 +18,7 @@ const mockSNAData = {
   nodes: [
     { 
       id: 'gov1', 
-      type: 'government', 
+      type: 'government' as const, 
       label: 'Central Government', 
       degree: 5, 
       betweenness: 0.42, 
@@ -27,7 +27,7 @@ const mockSNAData = {
     },
     { 
       id: 'gov2', 
-      type: 'government', 
+      type: 'government' as const, 
       label: 'Local Authority', 
       degree: 4, 
       betweenness: 0.28, 
@@ -36,7 +36,7 @@ const mockSNAData = {
     },
     { 
       id: 'corp1', 
-      type: 'private', 
+      type: 'private' as const, 
       label: 'Multinational Corp', 
       degree: 3, 
       betweenness: 0.15, 
@@ -45,7 +45,7 @@ const mockSNAData = {
     },
     { 
       id: 'corp2', 
-      type: 'private', 
+      type: 'private' as const, 
       label: 'Local Business', 
       degree: 2, 
       betweenness: 0.08, 
@@ -54,7 +54,7 @@ const mockSNAData = {
     },
     { 
       id: 'ngo1', 
-      type: 'ngo', 
+      type: 'ngo' as const, 
       label: 'International NGO', 
       degree: 3, 
       betweenness: 0.22, 
@@ -63,7 +63,7 @@ const mockSNAData = {
     },
     { 
       id: 'ngo2', 
-      type: 'ngo', 
+      type: 'ngo' as const, 
       label: 'Community Group', 
       degree: 2, 
       betweenness: 0.06, 
@@ -72,14 +72,14 @@ const mockSNAData = {
     },
     { 
       id: 'acad1', 
-      type: 'academic', 
+      type: 'academic' as const, 
       label: 'University', 
       degree: 4, 
       betweenness: 0.18, 
       closeness: 0.62,
       color: '#f59e0b'
     },
-  ],
+  ] as Actor[],
   edges: [
     { source: 'gov1', target: 'corp1', weight: 0.8 },
     { source: 'gov1', target: 'ngo1', weight: 0.6 },

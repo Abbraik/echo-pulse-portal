@@ -34,7 +34,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
     }))
   ];
 
-  function getNodeColor(type: string): string {
+  function getNodeColor(type: "government" | "private" | "ngo" | "academic"): string {
     switch (type) {
       case 'government':
         return '#14b8a6'; // teal-500
