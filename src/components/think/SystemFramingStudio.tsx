@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { LayoutGrid, Save, RotateCcw, Plus } from 'lucide-react';
+import { Save, RotateCcw, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Import types and mock data
@@ -60,7 +60,7 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
         </button>
       </div>
 
-      {/* Main visualization area - 2D view only */}
+      {/* Main visualization area - 2D view */}
       <div className="aspect-video bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10 mb-4">
         <CytoscapeView 
           nodes={mockNodes} 

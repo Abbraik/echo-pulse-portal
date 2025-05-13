@@ -12,7 +12,7 @@ export interface Node {
   type: 'stock' | 'subIndicator' | 'auxiliary';
   color: string;
   size?: number;
-  position?: { x: number; y: number; z?: number };
+  position?: { x: number; y: number };
   subIndicators?: SubIndicator[];
 }
 
@@ -46,7 +46,7 @@ export const mockNodes: Node[] = [
     label: 'Population Size & Characteristics',
     type: 'stock',
     color: '#14B8A6', // teal-500
-    position: { x: 0, y: 0, z: 0 },
+    position: { x: 0, y: 0 },
     subIndicators: [
       { name: 'Fertility Rate', value: 2.1, unit: 'births/woman', history: [2.3, 2.2, 2.15, 2.1, 2.05] },
       { name: 'Age-Dependency Ratio', value: 52, unit: '%', history: [58, 56, 54, 53, 52] },
@@ -59,7 +59,7 @@ export const mockNodes: Node[] = [
     label: 'Resource-Market Efficiency',
     type: 'stock',
     color: '#60A5FA', // blue-400
-    position: { x: 200, y: 0, z: 0 },
+    position: { x: 200, y: 0 },
     subIndicators: [
       { name: 'Resource Market Supply/Demand Ratio', value: 0.89, unit: '', history: [0.82, 0.84, 0.86, 0.88, 0.89] },
       { name: 'Energy Per Capita', value: 4.2, unit: 'MWh', history: [4.5, 4.4, 4.3, 4.25, 4.2] },
@@ -71,7 +71,7 @@ export const mockNodes: Node[] = [
     label: 'Goods & Services Market Stability',
     type: 'stock',
     color: '#64748B', // slate-500
-    position: { x: 200, y: 200, z: 0 },
+    position: { x: 200, y: 200 },
     subIndicators: [
       { name: 'Supply/Demand Balance', value: 0.95, unit: '', history: [0.88, 0.90, 0.92, 0.94, 0.95] },
       { name: 'Global Market Integration', value: 68, unit: '%', history: [60, 62, 64, 66, 68] },
@@ -83,7 +83,7 @@ export const mockNodes: Node[] = [
     label: 'Social Cohesion',
     type: 'stock',
     color: '#1E40AF', // blue-800
-    position: { x: 0, y: 200, z: 0 },
+    position: { x: 0, y: 200 },
     subIndicators: [
       { name: 'Education Attainment', value: 74, unit: '%', history: [68, 70, 71, 73, 74] },
       { name: 'Health Coverage', value: 82, unit: '%', history: [75, 77, 79, 81, 82] },
