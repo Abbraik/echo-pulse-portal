@@ -4,7 +4,7 @@ import CytoScape from 'react-cytoscapejs';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import THREE from './three-imports';
+import { THREE } from './three-imports';
 
 interface SubIndicator {
   name: string;
@@ -231,7 +231,7 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
   const midpoint = [midX, 1.5, midZ]; // Raise the midpoint to create an arc
   
   // Generate curve points
-  const points = [];
+  const points: THREE.Vector3[] = [];
   const segments = 20;
   for (let i = 0; i <= segments; i++) {
     const t = i / segments;
@@ -242,7 +242,8 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
     points.push(new THREE.Vector3(x, y, z));
   }
   
-  const curve = new THREE.CatmullRomCurve3(points);
+  // Create a curve from the points - explicitly typing as any to bypass type mismatch
+  const curve = new THREE.CatmullRomCurve3(points) as unknown as THREE.Curve<THREE.Vector3>;
   
   let color;
   switch (edge.type) {
