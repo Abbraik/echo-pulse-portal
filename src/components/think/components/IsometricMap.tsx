@@ -6,7 +6,6 @@ import NodeMesh from './NodeMesh';
 import LoopTube from './LoopTube';
 import ActorMesh from './ActorMesh';
 import ActorEdge from './ActorEdge';
-import NodeInfoPopup from './NodeInfoPopup';
 
 interface CLDData {
   stocks: {

@@ -1,8 +1,7 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html, Octahedron } from '@react-three/drei';
-import * as THREE from 'three';
 
 interface ActorMeshProps {
   id: string;
@@ -25,7 +24,7 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  // Use state instead of ref for position animation
+  // Use state for animation values
   const [floatY, setFloatY] = useState(position[1]);
   const [rotation, setRotation] = useState(0);
   
@@ -56,7 +55,7 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
       setRotation(prev => prev + 0.01);
     } else {
       // Smoothly return to original position
-      setFloatY(prev => THREE.MathUtils.lerp(prev, position[1], 0.1));
+      setFloatY(prev => prev * 0.9 + position[1] * 0.1);
     }
   });
 

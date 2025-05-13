@@ -14,8 +14,7 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
   // Determine color based on loop type
   const color = type === 'reinforcing' ? '#14B8A6' : '#F97316'; // teal or orange
   
-  // Create curve points as an array of arrays
-  // This avoids the Vector3 type mismatch
+  // Create curve points as an array of position arrays
   const curvePoints = [
     fromPos,
     [
@@ -27,16 +26,16 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
   ];
   
   // Use ref for animation
-  const dashRef = useRef({ offset: 0 });
+  const dashRef = useRef(0);
   
   // Animate flow direction
   useFrame((state) => {
     if (type === 'reinforcing') {
       // Flow in the direction of reinforcement
-      dashRef.current.offset = -state.clock.getElapsedTime() * 0.5;
+      dashRef.current = -state.clock.getElapsedTime() * 0.5;
     } else {
       // Flow in the opposite direction for balancing
-      dashRef.current.offset = state.clock.getElapsedTime() * 0.5;
+      dashRef.current = state.clock.getElapsedTime() * 0.5;
     }
   });
 
@@ -47,7 +46,7 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
       lineWidth={5}
       dashed
       dashSize={0.1}
-      dashOffset={dashRef.current.offset}
+      dashOffset={dashRef.current}
       dashScale={10}
       opacity={isHighlighted ? 0.8 : 0.5}
       transparent

@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html, Icosahedron } from '@react-three/drei';
 
@@ -22,7 +22,7 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  // Use state instead of ref for scale animation
+  // Use state for scale animation
   const [scale, setScale] = useState(1 + (value - 50) / 100);
   
   // Colors based on node types (derived from id)
@@ -45,13 +45,11 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
   useFrame((state) => {
     if (isHovered) {
       const pulseScale = 1 + Math.sin(state.clock.elapsedTime * 5) * 0.03;
-      setScale(baseScale => (1 + (value - 50) / 100) * pulseScale);
+      setScale((1 + (value - 50) / 100) * pulseScale);
     } else {
       // Smooth transition back to normal size
-      setScale(baseScale => {
-        const targetScale = 1 + (value - 50) / 100;
-        return targetScale * 0.1 + baseScale * 0.9; // Simple lerp
-      });
+      const targetScale = 1 + (value - 50) / 100;
+      setScale(prevScale => targetScale * 0.1 + prevScale * 0.9); // Simple lerp
     }
   });
 
@@ -65,7 +63,7 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
         onPointerOver={onHover}
         onPointerOut={onBlur}
         onClick={onClick}
-        scale={[scale, scale, scale]}
+        scale={scale}
       >
         <Icosahedron args={[0.8, 1]}>
           <meshPhysicalMaterial
