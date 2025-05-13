@@ -49,15 +49,16 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
   });
   
   return (
-    <line geometry={geometry}>
+    <primitive object={new THREE.Line(geometry, 
       <lineBasicMaterial
-        ref={materialRef}
+        attach="material" 
+        ref={materialRef as any}
         color="#64748B"
         transparent
         opacity={0.2}
         linewidth={thickness}
       />
-    </line>
+    )} />
   );
 };
 

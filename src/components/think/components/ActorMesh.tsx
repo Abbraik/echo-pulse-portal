@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -25,7 +25,7 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<THREE.Mesh>(null!);
 
   // Calculate size based on actor weight
   const size = 0.4 + weight * 0.4;
