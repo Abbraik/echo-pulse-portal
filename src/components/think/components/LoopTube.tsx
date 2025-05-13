@@ -66,9 +66,17 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
         dashSize={0.1}
         gapSize={0.1}
         opacity={opacity}
-        transparent
+        transparent={true}
         linewidth={1}
-        dashOffset={dashOffset}
+        scale={1} // Adding scale property instead of dashOffset
+        onBeforeCompile={(shader) => {
+          // We can manipulate the dashOffset via shader
+          shader.uniforms.dashOffset = { value: dashOffset };
+          shader.fragmentShader = shader.fragmentShader.replace(
+            'uniform float dashOffset;',
+            'uniform float dashOffset;\nvarying float vLineDistance;'
+          );
+        }}
       />
     </line>
   );

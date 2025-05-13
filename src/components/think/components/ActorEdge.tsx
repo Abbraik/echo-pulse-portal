@@ -1,6 +1,7 @@
 
 import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 
 interface ActorEdgeProps {
   sourcePos: [number, number, number];
@@ -35,9 +36,9 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
 
   // Create points for line
   const points = [
-    sourcePos,
-    targetPos
-  ].map(p => new THREE.Vector3(p[0], p[1], p[2]));
+    new THREE.Vector3(sourcePos[0], sourcePos[1], sourcePos[2]),
+    new THREE.Vector3(targetPos[0], targetPos[1], targetPos[2])
+  ];
   
   return (
     <line ref={lineRef}>
@@ -52,7 +53,7 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
       <lineBasicMaterial 
         color={isHighlighted ? '#94A3B8' : '#64748B'}
         linewidth={thickness}
-        transparent
+        transparent={true}
         opacity={opacity}
       />
     </line>
