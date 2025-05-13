@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Html } from '@react-three/drei/core/Html';
+import { Html } from '@react-three/drei';
 import { Node } from '../types/system-framing-types';
 import NodePopup from './NodePopup';
 

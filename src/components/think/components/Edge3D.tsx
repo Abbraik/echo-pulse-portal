@@ -1,7 +1,6 @@
 
 import React, { useMemo } from 'react';
-import { Line } from '@react-three/drei/core/Line';
-import { Html } from '@react-three/drei/core/Html';
+import { Line, Html } from '@react-three/drei';
 import { Edge, Node } from '../types/system-framing-types';
 import { THREE } from '../three-imports';
 
@@ -18,7 +17,7 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
   
   // Pre-compute all the necessary values
   const { points, midPoint, color } = useMemo(() => {
-    // Create points for the line using array format which is compatible with Line component
+    // Create points for the line using array format
     const sourcePoint = [sourceNode.position?.x || 0, 0, sourceNode.position?.y || 0];
     const targetPoint = [targetNode.position?.x || 0, 0, targetNode.position?.y || 0];
     
@@ -43,7 +42,7 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
     }
     
     return {
-      points: [sourcePoint, targetPoint], // Using array format that Line accepts
+      points: [sourcePoint, targetPoint] as [number[], number[]],
       midPoint: mid,
       color: edgeColor
     };
