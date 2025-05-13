@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Layout } from 'lucide-react';
+import { Layout, Layers } from 'lucide-react';
 import SystemFramingStudio from '@/components/think/SystemFramingStudio';
 import DeiForesightTab from '@/components/think/DeiForesightTab';
 import EquilibriumSolverTab from '@/components/think/EquilibriumSolverTab';
@@ -9,122 +9,192 @@ import SensitivityTab from '@/components/think/SensitivityTab';
 import StrategyGeneratorTab from '@/components/think/StrategyGeneratorTab';
 import AiAdvisorSidebar from '@/components/think/AiAdvisorSidebar';
 import FooterCTA from '@/components/think/FooterCTA';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion } from 'framer-motion';
 
-// Mock data
+// Mock data - in a real app, this would come from API calls
 const mockCLD = { nodes: [], links: [] };
 const mockSNA = { nodes: [], edges: [] };
-const mockDEIMetrics = { diversity: 78, equity: 65, inclusion: 82 };
+const mockDEIMetrics = { 
+  pillars: {
+    population: {
+      value: 78,
+      subIndicators: [
+        { name: 'Fertility Rate', value: 2.1 },
+        { name: 'Age-Dependency Ratio', value: 52 },
+        { name: 'Migration Volatility', value: 18 },
+        { name: 'Population Growth Stability', value: 76 }
+      ]
+    },
+    resources: {
+      value: 65,
+      subIndicators: [
+        { name: 'Water Consumption per Capita', value: 130 },
+        { name: 'Energy Use per GDP', value: 68 },
+        { name: 'Agricultural Yield Index', value: 72 }
+      ]
+    },
+    goods: {
+      value: 82,
+      subIndicators: [
+        { name: 'Manufacturing Output Growth', value: 3.2 },
+        { name: 'Service Sector Resilience Index', value: 79 },
+        { name: 'Supply-Chain Robustness', value: 81 }
+      ]
+    },
+    social: {
+      value: 71,
+      subIndicators: [
+        { name: 'Education Attainment Rate', value: 74 },
+        { name: 'Health Service Coverage', value: 82 },
+        { name: 'Social Cohesion Index', value: 68 }
+      ]
+    }
+  }
+};
+
 const mockScenarios = [
-  { id: 1, name: "Baseline", probability: 0.4 },
-  { id: 2, name: "Optimistic", probability: 0.2 },
-  { id: 3, name: "Pessimistic", probability: 0.4 }
-];
-const mockBands = [
-  { name: "Low", min: 0, max: 30 },
-  { name: "Medium", min: 30, max: 70 },
-  { name: "High", min: 70, max: 100 }
-];
-const mockSensitivity = [
-  { parameter: "Growth Rate", sensitivity: 0.8 },
-  { parameter: "Adoption Rate", sensitivity: 0.6 },
-  { parameter: "Churn", sensitivity: 0.4 }
-];
-// Fixed the priority types to be specific string literals
-const mockObjectives = [
-  { id: 1, name: "Increase Diversity", priority: "High" as const },
-  { id: 2, name: "Reduce Inequity", priority: "Medium" as const },
-  { id: 3, name: "Enhance Inclusion", priority: "High" as const }
+  { id: 1, name: "Baseline", date: "2025-01-01", probability: 0.4, sparkline: [65, 68, 72, 78, 76] },
+  { id: 2, name: "Optimistic", date: "2025-02-15", probability: 0.2, sparkline: [65, 70, 75, 82, 88] },
+  { id: 3, name: "Pessimistic", date: "2025-03-10", probability: 0.4, sparkline: [65, 62, 58, 55, 52] },
 ];
 
-const tabs = [
-  { key: 'dei', label: 'DEI & Foresight' },
-  { key: 'solver', label: 'Equilibrium Solver' },
-  { key: 'sensitivity', label: 'Sensitivity Analysis' },
-  { key: 'strategy', label: 'Initial Strategy' }
+const mockBands = [
+  { name: "Population", min: 75, max: 85 },
+  { name: "Resources", min: 60, max: 80 },
+  { name: "Goods & Services", min: 70, max: 90 },
+  { name: "Social Outcomes", min: 65, max: 85 },
+];
+
+const mockSensitivity = [
+  { parameter: "Water Tariff", delta: 8, impact: 34 },
+  { parameter: "Migration Policy", delta: 5, impact: 28 },
+  { parameter: "Educational Investment", delta: 12, impact: 25 },
+  { parameter: "Energy Subsidies", delta: -7, impact: 22 },
+  { parameter: "Healthcare Access", delta: 9, impact: 20 },
+  { parameter: "Supply Chain Resilience", delta: 6, impact: 18 },
+  { parameter: "Agricultural Support", delta: 10, impact: 15 },
+  { parameter: "Manufacturing Incentives", delta: 4, impact: 12 },
+];
+
+// Fixed the priority types to be specific string literals
+const mockObjectives = [
+  { id: 1, name: "Increase Water Efficiency", description: "Reduce water consumption per capita by 15% through smart irrigation and usage monitoring", priority: "High" as const, delta: 15, timeline: "2030", leveragePoint: "Parameters" },
+  { id: 2, name: "Balance Age Demographics", description: "Implement policies to address aging population and support working-age groups", priority: "Medium" as const, delta: 8, timeline: "2035", leveragePoint: "Feedback Loops" },
+  { id: 3, name: "Strengthen Social Cohesion", description: "Enhance community engagement and inclusive growth initiatives", priority: "High" as const, delta: 12, timeline: "2028", leveragePoint: "Information Flows" },
 ];
 
 const ThinkPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('dei');
+  const [hideHeader, setHideHeader] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Handle scroll behavior for header
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+        setHideHeader(true);
+      } else {
+        setHideHeader(false);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Handle mouse near top to reveal header
+    const handleMouseNearTop = (e: MouseEvent) => {
+      if (e.clientY < 20 && hideHeader) {
+        setHideHeader(false);
+      }
+    };
+    
+    window.addEventListener('mousemove', handleMouseNearTop);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseNearTop);
+    };
+  }, [lastScrollY, hideHeader]);
 
   return (
     <AnimatedPage>
-      <header className="mb-8">
-        <div className="glass-panel p-6 flex items-center space-x-4">
-          <div className="p-3 rounded-xl bg-blue-500/20 text-blue-400">
-            <Layout size={24} />
-          </div>
-          <div className="text-left">
-            <h1 className="text-3xl font-extrabold">THINK Zone</h1>
-            <p className="text-gray-400">
-              Analyze systems, model relationships, and identify patterns
-            </p>
+      {/* Top Navigation Bar */}
+      <motion.header 
+        className="sticky top-0 z-50 w-full glass-panel py-3 px-6 mb-8 border-b border-white/20"
+        initial={{ y: 0 }}
+        animate={{ y: hideHeader ? -100 : 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="p-2 rounded-xl bg-teal-500/20 text-teal-400">
+              <Layers size={24} />
+            </div>
+            <div className="text-left">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">THINK 🔍: Diagnose & Plan</h1>
+              <p className="text-sm md:text-base text-gray-400">
+                Analyze systems, model relationships, and develop strategies
+              </p>
+            </div>
           </div>
         </div>
-      </header>
+      </motion.header>
       
-      {/* Main Split-Screen */}
+      {/* Main Split-Screen Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        {/* System Framing Studio */}
-        <div className="lg:col-span-3 glass-panel p-6">
-          <h2 className="text-xl font-semibold mb-4 text-left">System Framing Studio</h2>
-          <SystemFramingStudio
-            cldData={mockCLD}
-            snaData={mockSNA}
-          />
-          <div className="mt-4 flex justify-between">
-            <div className="flex space-x-2">
-              <button className="px-3 py-1.5 text-sm bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors">2D View</button>
-              <button className="px-3 py-1.5 text-sm bg-white/5 text-gray-300 rounded-lg hover:bg-white/10 transition-colors">3D View</button>
-            </div>
-            <div>
-              <button className="px-3 py-1.5 text-sm bg-white/5 text-gray-300 rounded-lg hover:bg-white/10 transition-colors">Save</button>
-            </div>
+        {/* Left Column - System Framing Studio (60% on desktop) */}
+        <div className="lg:col-span-3 space-y-6">
+          <div className="glass-panel p-6">
+            <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
+              <Layout className="mr-2" size={20} />
+              System Framing Studio
+            </h2>
+            <SystemFramingStudio
+              cldData={mockCLD}
+              snaData={mockSNA}
+            />
           </div>
         </div>
         
-        {/* Tabs Section */}
+        {/* Right Column - Tabs & AI Advisor (40% on desktop) */}
         <div className="lg:col-span-2 flex flex-col space-y-6">
-          {/* Tab Navigation */}
-          <div className="glass-panel p-4">
-            <nav className="flex space-x-2">
-              {tabs.map(tab => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                    activeTab === tab.key 
-                      ? 'bg-teal-500/70 text-white' 
-                      : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
+          {/* Tabbed Content */}
+          <div className="glass-panel p-6">
+            <Tabs defaultValue="dei" className="w-full">
+              <TabsList className="grid grid-cols-4 mb-6">
+                <TabsTrigger value="dei">DEI & Foresight</TabsTrigger>
+                <TabsTrigger value="solver">Equilibrium</TabsTrigger>
+                <TabsTrigger value="sensitivity">Sensitivity</TabsTrigger>
+                <TabsTrigger value="strategy">Strategy</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="dei" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+                <DeiForesightTab metrics={mockDEIMetrics} scenarios={mockScenarios} />
+              </TabsContent>
+              
+              <TabsContent value="solver" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+                <EquilibriumSolverTab initialBands={mockBands} />
+              </TabsContent>
+              
+              <TabsContent value="sensitivity" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+                <SensitivityTab parameters={mockSensitivity} />
+              </TabsContent>
+              
+              <TabsContent value="strategy" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+                <StrategyGeneratorTab objectives={mockObjectives} />
+              </TabsContent>
+            </Tabs>
           </div>
           
-          {/* Tab Content */}
-          <div className="glass-panel p-6 flex-grow">
-            {activeTab === 'dei' && (
-              <DeiForesightTab metrics={mockDEIMetrics} scenarios={mockScenarios} />
-            )}
-            
-            {activeTab === 'solver' && (
-              <EquilibriumSolverTab initialBands={mockBands} />
-            )}
-            
-            {activeTab === 'sensitivity' && (
-              <SensitivityTab parameters={mockSensitivity} />
-            )}
-            
-            {activeTab === 'strategy' && (
-              <StrategyGeneratorTab objectives={mockObjectives} />
-            )}
-          </div>
-          
-          {/* AI Advisor Section */}
+          {/* AI Advisor Sidebar */}
           <AiAdvisorSidebar className="glass-panel p-4" />
         </div>
+      </div>
+
+      {/* Footer CTA */}
+      <div className="mt-8">
+        <FooterCTA />
       </div>
     </AnimatedPage>
   );

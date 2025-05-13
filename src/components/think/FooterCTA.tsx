@@ -1,18 +1,26 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 const FooterCTA: React.FC = () => {
   return (
-    <div className="bg-gradient-to-r from-teal-500/20 to-blue-500/20 backdrop-blur-md border-t border-white/10 p-4 mt-8">
-      <div className="container mx-auto flex flex-col md:flex-row items-center justify-between">
-        <div className="text-left mb-4 md:mb-0">
-          <h3 className="text-lg font-semibold text-white">Ready to implement your insights?</h3>
-          <p className="text-gray-300 text-sm">Move to the Act zone to create actionable plans.</p>
-        </div>
-        <button className="px-6 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors shadow-lg">
-          Go to Act Zone
-        </button>
+    <div className="glass-panel py-4 px-6 mt-8 flex items-center justify-between">
+      <div className="text-sm text-gray-400">© 2025 Population Dynamics System</div>
+      
+      <div className="flex space-x-6">
+        <button className="text-sm text-gray-400 hover:text-white transition-colors">Help</button>
+        <button className="text-sm text-gray-400 hover:text-white transition-colors">Documentation</button>
+        <button className="text-sm text-gray-400 hover:text-white transition-colors">Feedback</button>
       </div>
+      
+      <Link 
+        to="/act" 
+        className="flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-teal-500 to-blue-500 text-white hover:shadow-lg hover:shadow-teal-500/20 transform transition-all hover:-translate-y-0.5"
+      >
+        <span className="mr-2">Go to ACT Zone</span>
+        <ArrowRight size={16} />
+      </Link>
     </div>
   );
 };
