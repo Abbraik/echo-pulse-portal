@@ -1,8 +1,8 @@
 
 import * as THREE from 'three';
 
-// Re-export THREE namespace to ensure compatibility with drei
+// Export THREE namespace as a named export for use with drei
 export { THREE };
 
-// Also export for default imports
+// Also export as default for direct imports
 export default THREE;
