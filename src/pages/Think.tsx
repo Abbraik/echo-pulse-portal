@@ -12,8 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
 
 // Mock data - in a real app, this would come from API calls
-const mockCLD = { nodes: [], links: [] };
+const mockCLD = { nodes: [], edges: [] }; // Changed 'links' to 'edges' to match the CLDData interface
 const mockSNA = { nodes: [], edges: [] };
+
 const mockDEIMetrics = { 
   pillars: {
     population: {
