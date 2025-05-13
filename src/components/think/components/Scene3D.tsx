@@ -5,6 +5,7 @@ import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei
 import { Node, Edge } from '../types/system-framing-types';
 import Node3D from './Node3D';
 import Edge3D from './Edge3D';
+import * as THREE from 'three';
 
 interface Scene3DProps {
   nodes: Node[];

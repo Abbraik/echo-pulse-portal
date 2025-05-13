@@ -42,7 +42,7 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
     }
     
     return {
-      points: [sourcePoint, targetPoint],
+      points: [sourcePoint, targetPoint] as [THREE.Vector3, THREE.Vector3],
       midPoint: mid,
       color: edgeColor
     };
