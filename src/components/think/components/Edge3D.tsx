@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import { Line, Html } from '@react-three/drei';
 import { Edge, Node } from '../types/system-framing-types';
+import { Vector3 } from 'three';
 
 interface Edge3DProps {
   edge: Edge;
@@ -16,15 +17,15 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
   
   // Pre-compute all the necessary values
   const { points, midPoint, color } = useMemo(() => {
-    // Create points for the line
-    const source = [sourceNode.position?.x || 0, 0, sourceNode.position?.y || 0];
-    const target = [targetNode.position?.x || 0, 0, targetNode.position?.y || 0];
+    // Create points for the line - explicitly defining as Vector3 array for type safety
+    const sourcePoint = new Vector3(sourceNode.position?.x || 0, 0, sourceNode.position?.y || 0);
+    const targetPoint = new Vector3(targetNode.position?.x || 0, 0, targetNode.position?.y || 0);
     
     // Calculate midpoint for label positioning
     const mid = {
-      x: (source[0] + target[0]) / 2,
+      x: (sourcePoint.x + targetPoint.x) / 2,
       y: 1.5, // Fixed height for midpoint
-      z: (source[2] + target[2]) / 2
+      z: (sourcePoint.z + targetPoint.z) / 2
     };
     
     // Determine edge color
@@ -41,7 +42,7 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
     }
     
     return {
-      points: [source, target],
+      points: [sourcePoint, targetPoint], // Using Vector3 objects which are compatible with the Line component
       midPoint: mid,
       color: edgeColor
     };
