@@ -1,11 +1,10 @@
 
 import * as THREE from 'three';
 
-// Export THREE as a namespace
+// Export THREE namespace only
 export { THREE };
 
-// Export Vector2 and Vector3 constructors directly
-export const Vector3 = THREE.Vector3;
-export const Vector2 = THREE.Vector2;
+// We're no longer exporting Vector types directly to avoid type conflicts
+// between THREE.Vector3 and @react-three/fiber's Vector3
 
 export default THREE;

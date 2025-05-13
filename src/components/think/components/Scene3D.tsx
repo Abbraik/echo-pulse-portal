@@ -1,7 +1,9 @@
 
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei/controls/OrbitControls';
+import { Environment } from '@react-three/drei/core/Environment';
+import { PerspectiveCamera } from '@react-three/drei/core/PerspectiveCamera';
 import { Node, Edge } from '../types/system-framing-types';
 import Node3D from './Node3D';
 import Edge3D from './Edge3D';
