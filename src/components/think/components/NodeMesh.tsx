@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html, Icosahedron } from '@react-three/drei';
+import { Html } from '@react-three/drei';
 
 interface NodeMeshProps {
   id: string;
@@ -65,17 +65,16 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
         onClick={onClick}
         scale={scale}
       >
-        <Icosahedron args={[0.8, 1]}>
-          <meshPhysicalMaterial
-            color={nodeColor}
-            transmission={0.3}
-            thickness={1.5}
-            roughness={0.3}
-            metalness={0.2}
-            emissive={nodeColor}
-            emissiveIntensity={isHovered ? 0.5 : 0.2}
-          />
-        </Icosahedron>
+        <icosahedronGeometry args={[0.8, 1]} />
+        <meshPhysicalMaterial
+          color={nodeColor}
+          transmission={0.3}
+          thickness={1.5}
+          roughness={0.3}
+          metalness={0.2}
+          emissive={nodeColor}
+          emissiveIntensity={isHovered ? 0.5 : 0.2}
+        />
       </mesh>
       
       {/* Node label */}

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html, Octahedron } from '@react-three/drei';
+import { Html } from '@react-three/drei';
 
 interface ActorMeshProps {
   id: string;
@@ -70,15 +70,14 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
         onPointerOut={onBlur}
         onClick={onClick}
       >
-        <Octahedron args={[size, 0]}>
-          <meshStandardMaterial
-            color={actorColor}
-            roughness={0.4}
-            metalness={0.6}
-            emissive={actorColor}
-            emissiveIntensity={isHovered ? 0.8 : 0.3}
-          />
-        </Octahedron>
+        <octahedronGeometry args={[size, 0]} />
+        <meshStandardMaterial
+          color={actorColor}
+          roughness={0.4}
+          metalness={0.6}
+          emissive={actorColor}
+          emissiveIntensity={isHovered ? 0.8 : 0.3}
+        />
       </mesh>
       
       {/* Actor label */}

@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 
@@ -19,15 +19,15 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
   // Calculate line thickness based on weight
   const thickness = 0.5 + weight * 2;
   
-  // Use ref for animation
-  const opacityRef = useRef(0.2);
+  // Use useState instead of useRef for animation value to trigger re-renders
+  const [opacity, setOpacity] = useState(0.2);
   
-  // Animate pulse effect
+  // Animate pulse effect using useFrame
   useFrame(({ clock }) => {
     if (isHighlighted) {
-      opacityRef.current = 0.6 + Math.sin(clock.getElapsedTime() * 4) * 0.4;
+      setOpacity(0.6 + Math.sin(clock.getElapsedTime() * 4) * 0.4);
     } else {
-      opacityRef.current = 0.2;
+      setOpacity(0.2);
     }
   });
   
@@ -37,7 +37,7 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
       color={isHighlighted ? '#94A3B8' : '#64748B'}
       lineWidth={thickness}
       transparent
-      opacity={opacityRef.current}
+      opacity={opacity}
     />
   );
 };

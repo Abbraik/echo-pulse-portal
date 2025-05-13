@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { CatmullRomLine } from '@react-three/drei';
 
@@ -24,17 +24,17 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
   // Create curve points
   const curvePoints = [fromPos, midPoint, toPos];
   
-  // Use ref for animation
-  const dashRef = useRef(0);
+  // Use state for animation instead of ref
+  const [dashOffset, setDashOffset] = useState(0);
   
   // Animate flow direction
   useFrame((state) => {
     if (type === 'reinforcing') {
       // Flow in the direction of reinforcement
-      dashRef.current = -state.clock.getElapsedTime() * 0.5;
+      setDashOffset(-state.clock.getElapsedTime() * 0.5);
     } else {
       // Flow in the opposite direction for balancing
-      dashRef.current = state.clock.getElapsedTime() * 0.5;
+      setDashOffset(state.clock.getElapsedTime() * 0.5);
     }
   });
 
@@ -45,7 +45,7 @@ const LoopTube: React.FC<LoopTubeProps> = ({ fromPos, toPos, type, isHighlighted
       lineWidth={5}
       dashed
       dashSize={0.1}
-      dashOffset={dashRef.current}
+      dashOffset={dashOffset}
       dashScale={10}
       opacity={isHighlighted ? 0.8 : 0.5}
       transparent
