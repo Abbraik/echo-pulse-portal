@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Layout, Layers } from 'lucide-react';
+import { Layout, Layers, Network } from 'lucide-react';
 import SystemFramingStudio from '@/components/think/SystemFramingStudio';
 import DeiForesightTab from '@/components/think/DeiForesightTab';
 import EquilibriumSolverTab from '@/components/think/EquilibriumSolverTab';
 import SensitivityTab from '@/components/think/SensitivityTab';
 import StrategyGeneratorTab from '@/components/think/StrategyGeneratorTab';
+import SnaAnalysisTab from '@/components/think/SnaAnalysisTab';
 import AiAdvisorSidebar from '@/components/think/AiAdvisorSidebar';
 import FooterCTA from '@/components/think/FooterCTA';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -159,11 +160,15 @@ const ThinkPage: React.FC = () => {
         {/* Full-Width Tabbed Analysis Tools Panel */}
         <div className="glass-panel p-6 flex-1">
           <Tabs defaultValue="dei" className="w-full">
-            <TabsList className="grid grid-cols-4 mb-6">
+            <TabsList className="grid grid-cols-5 mb-6">
               <TabsTrigger value="dei">DEI & Foresight</TabsTrigger>
               <TabsTrigger value="solver">Equilibrium</TabsTrigger>
               <TabsTrigger value="sensitivity">Sensitivity</TabsTrigger>
               <TabsTrigger value="strategy">Strategy</TabsTrigger>
+              <TabsTrigger value="sna" className="flex items-center justify-center gap-1">
+                <Network size={16} />
+                <span>SNA Analysis</span>
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="dei" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
@@ -180,6 +185,10 @@ const ThinkPage: React.FC = () => {
             
             <TabsContent value="strategy" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
               <StrategyGeneratorTab objectives={mockObjectives} />
+            </TabsContent>
+
+            <TabsContent value="sna" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+              <SnaAnalysisTab />
             </TabsContent>
           </Tabs>
         </div>
