@@ -6,6 +6,7 @@ export interface Actor {
   degree: number;
   betweenness: number;
   closeness: number;
+  color?: string;
 }
 
 export interface Connection {

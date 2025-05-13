@@ -1,19 +1,120 @@
 
 import React, { useState, useRef } from 'react';
-import { Save, RotateCcw, Plus } from 'lucide-react';
+import { Save, RotateCcw, Plus, Network } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Import types and mock data
 import { SystemFramingStudioProps, Node, mockNodes, mockEdges } from './types/system-framing-types';
+import { Actor, Connection, SNAMetrics } from './types/sna-types';
 
 // Import components
 import CytoscapeView from './components/CytoscapeView';
 import SparklineChart from './components/SparklineChart';
+import NetworkView from './components/NetworkView';
+
+// Mock data for the SNA analysis
+const mockSNAData = {
+  nodes: [
+    { 
+      id: 'gov1', 
+      type: 'government', 
+      label: 'Central Government', 
+      degree: 5, 
+      betweenness: 0.42, 
+      closeness: 0.78,
+      color: '#14b8a6'
+    },
+    { 
+      id: 'gov2', 
+      type: 'government', 
+      label: 'Local Authority', 
+      degree: 4, 
+      betweenness: 0.28, 
+      closeness: 0.65,
+      color: '#14b8a6'
+    },
+    { 
+      id: 'corp1', 
+      type: 'private', 
+      label: 'Multinational Corp', 
+      degree: 3, 
+      betweenness: 0.15, 
+      closeness: 0.52,
+      color: '#3b82f6'
+    },
+    { 
+      id: 'corp2', 
+      type: 'private', 
+      label: 'Local Business', 
+      degree: 2, 
+      betweenness: 0.08, 
+      closeness: 0.44,
+      color: '#3b82f6'
+    },
+    { 
+      id: 'ngo1', 
+      type: 'ngo', 
+      label: 'International NGO', 
+      degree: 3, 
+      betweenness: 0.22, 
+      closeness: 0.56,
+      color: '#a855f7'
+    },
+    { 
+      id: 'ngo2', 
+      type: 'ngo', 
+      label: 'Community Group', 
+      degree: 2, 
+      betweenness: 0.06, 
+      closeness: 0.42,
+      color: '#a855f7'
+    },
+    { 
+      id: 'acad1', 
+      type: 'academic', 
+      label: 'University', 
+      degree: 4, 
+      betweenness: 0.18, 
+      closeness: 0.62,
+      color: '#f59e0b'
+    },
+  ],
+  edges: [
+    { source: 'gov1', target: 'corp1', weight: 0.8 },
+    { source: 'gov1', target: 'ngo1', weight: 0.6 },
+    { source: 'gov1', target: 'gov2', weight: 0.9 },
+    { source: 'gov1', target: 'acad1', weight: 0.5 },
+    { source: 'gov2', target: 'corp2', weight: 0.7 },
+    { source: 'gov2', target: 'ngo2', weight: 0.8 },
+    { source: 'corp1', target: 'ngo1', weight: 0.4 },
+    { source: 'corp1', target: 'corp2', weight: 0.6 },
+    { source: 'ngo1', target: 'ngo2', weight: 0.7 },
+    { source: 'ngo1', target: 'acad1', weight: 0.5 },
+    { source: 'acad1', target: 'corp2', weight: 0.4 },
+    { source: 'acad1', target: 'gov2', weight: 0.6 }
+  ],
+  metrics: {
+    density: 0.42,
+    avgClustering: 0.31,
+    avgPathLength: 2.4,
+    centralization: 0.68
+  }
+};
 
 const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaData }) => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [selectedActor, setSelectedActor] = useState<Actor | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('cld'); // 'cld' or 'sna'
   const cyRef = useRef<any>(null);
+  const snaRef = useRef<any>(null);
+  const [isInfoOpen, setIsInfoOpen] = useState({
+    density: false,
+    clustering: false,
+    pathLength: false,
+    centralization: false,
+  });
 
   const handleSave = () => {
     console.log('Saving system frame...');
@@ -23,8 +124,10 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
   const handleReset = () => {
     console.log('Resetting system frame...');
     // In a real app, this would call the API endpoint /think/cld/reset
-    if (cyRef.current) {
+    if (activeTab === 'cld' && cyRef.current) {
       cyRef.current.layout({ name: 'concentric' }).run();
+    } else if (activeTab === 'sna' && snaRef.current) {
+      snaRef.current.layout({ name: 'concentric' }).run();
     }
   };
 
@@ -46,11 +149,29 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
     }
   };
 
+  // Handler for SNA node click
+  const handleSnaNodeClick = (nodeId: string) => {
+    const actor = mockSNAData.nodes.find(n => n.id === nodeId);
+    if (actor) {
+      setSelectedActor(actor);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       {/* Toolbar */}
       <div className="flex justify-between mb-4">
-        <div></div>
+        <div className="flex space-x-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="cld">Causal Loop Diagram</TabsTrigger>
+              <TabsTrigger value="sna" className="flex items-center gap-2">
+                <Network size={16} />
+                <span>Social Network Analysis</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
         <button 
           onClick={handleAddNode}
           className="px-3 py-1.5 text-sm bg-teal-500/30 text-teal-300 rounded-lg hover:bg-teal-500/40 transition-colors flex items-center"
@@ -60,33 +181,63 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
         </button>
       </div>
 
-      {/* Main visualization area - 2D view */}
+      {/* Main visualization area */}
       <div className="aspect-video bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10 mb-4">
-        <CytoscapeView 
-          nodes={mockNodes} 
-          edges={mockEdges} 
-          onNodeClick={handleCyNodeClick} 
-          cyRef={cyRef} 
-        />
+        {activeTab === 'cld' ? (
+          <CytoscapeView 
+            nodes={mockNodes} 
+            edges={mockEdges} 
+            onNodeClick={handleCyNodeClick}
+            cyRef={cyRef}
+          />
+        ) : (
+          <NetworkView
+            nodes={mockSNAData.nodes}
+            edges={mockSNAData.edges}
+            onNodeClick={handleSnaNodeClick}
+            cyRef={snaRef}
+          />
+        )}
       </div>
 
-      {/* Bottom actions bar */}
-      <div className="flex justify-end space-x-2">
-        <button
-          onClick={handleReset}
-          className="px-3 py-1.5 text-sm bg-white/5 text-gray-300 rounded-lg hover:bg-white/10 transition-colors flex items-center"
-        >
-          <RotateCcw size={16} className="mr-1.5" />
-          Reset
-        </button>
-        <button
-          onClick={handleSave}
-          className="px-3 py-1.5 text-sm bg-teal-500/70 text-white rounded-lg hover:bg-teal-500/90 transition-colors flex items-center"
-        >
-          <Save size={16} className="mr-1.5" />
-          Save
-        </button>
-      </div>
+      {/* Bottom section - conditional based on active tab */}
+      {activeTab === 'cld' ? (
+        /* Bottom actions bar for CLD */
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={handleReset}
+            className="px-3 py-1.5 text-sm bg-white/5 text-gray-300 rounded-lg hover:bg-white/10 transition-colors flex items-center"
+          >
+            <RotateCcw size={16} className="mr-1.5" />
+            Reset
+          </button>
+          <button
+            onClick={handleSave}
+            className="px-3 py-1.5 text-sm bg-teal-500/70 text-white rounded-lg hover:bg-teal-500/90 transition-colors flex items-center"
+          >
+            <Save size={16} className="mr-1.5" />
+            Save
+          </button>
+        </div>
+      ) : (
+        /* Network metrics section for SNA */
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          {Object.entries(mockSNAData.metrics).map(([key, value]) => (
+            <div key={key} className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-semibold">{value.toFixed(2)}</h3>
+                  <p className="text-sm text-gray-300 capitalize">
+                    {key === 'avgClustering' ? 'Avg. Clustering' : 
+                     key === 'avgPathLength' ? 'Avg. Path Length' : 
+                     key === 'centralization' ? 'Centralization' : 'Density'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Node Popup Dialog */}
       <Dialog open={isPopupOpen && !!selectedNode} onOpenChange={setIsPopupOpen}>
@@ -111,6 +262,32 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Selected actor info for SNA */}
+      {activeTab === 'sna' && selectedActor && (
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 text-left mt-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="text-lg font-semibold">{selectedActor.label}</h3>
+              <p className="text-sm text-gray-300 capitalize">{selectedActor.type}</p>
+            </div>
+            <div className="flex gap-2 text-xs text-white">
+              <div className="bg-white/10 rounded-lg p-2">
+                <p className="font-semibold">Degree:</p>
+                <p>{selectedActor.degree}</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-2">
+                <p className="font-semibold">Betweenness:</p>
+                <p>{selectedActor.betweenness.toFixed(2)}</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-2">
+                <p className="font-semibold">Closeness:</p>
+                <p>{selectedActor.closeness.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
