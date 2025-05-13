@@ -25,7 +25,8 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  const meshRef = React.useRef<THREE.Mesh>(null);
+  // Use a generic ref to avoid the strict typing issue
+  const meshRef = React.useRef<THREE.Mesh>(null!);
 
   // Calculate size based on actor weight
   const size = 0.4 + weight * 0.4;
