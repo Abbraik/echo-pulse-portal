@@ -29,7 +29,7 @@ const ZoneTile: React.FC<ZoneTileProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4 }}
       onClick={() => navigate(path)}
-      className="relative overflow-hidden glass-panel cursor-pointer hover-scale hover-lift p-6 flex flex-col"
+      className="relative overflow-hidden glass-panel cursor-pointer hover-scale hover-lift p-6 flex flex-col h-full"
     >
       {/* Background gradient */}
       <div 
@@ -68,9 +68,9 @@ const ZoneTile: React.FC<ZoneTileProps> = ({
 const ZoneLaunchpad: React.FC = () => {
   return (
     <div className="mb-10">
-      <h2 className="text-xl font-semibold mb-6">Zones</h2>
+      <h2 className="text-xl font-semibold mb-8">Zones</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <ZoneTile
           name="THINK"
           description="Analyze systems, model relationships, and identify patterns to understand the population dynamics."

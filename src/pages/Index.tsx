@@ -17,7 +17,7 @@ const Index: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-8 pb-10">
       {/* Hero section with animated gradient header */}
       <header className="glass-panel py-8 px-6 relative overflow-hidden mb-8">
         <div className="absolute -inset-1/2 bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-full blur-3xl transform -rotate-12 pointer-events-none"></div>
@@ -54,15 +54,15 @@ const Index: React.FC = () => {
       </header>
 
       {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left column - KPI carousel and Activity timeline */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-8">
           <KpiCarousel />
           <ActivityTimeline />
         </div>
         
         {/* Right column - System pulse and alerts */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           <SystemPulseOrb />
           <AlertStream />
         </div>

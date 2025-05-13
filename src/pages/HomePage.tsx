@@ -55,17 +55,17 @@ const HomePage: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {!showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
       
-      <main className="flex-1 overflow-auto px-6 py-4 space-y-8 pt-20">
+      <main className="flex-1 overflow-auto px-8 py-6 space-y-10 pt-20">
         {/* Main content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left column - KPI carousel and Activity timeline */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
             <KpiCarousel />
             <ActivityTimeline />
           </div>
           
           {/* Right column - System pulse and alerts */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             <SystemPulseOrb />
             <AlertStream />
           </div>

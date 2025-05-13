@@ -79,8 +79,8 @@ const AlertStream: React.FC = () => {
   };
   
   return (
-    <div className="glass-panel p-4 h-full">
-      <div className="flex justify-between items-center mb-3">
+    <div className="glass-panel p-5 h-full">
+      <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
           <Bell size={18} className="text-blue-400" />
           <h3 className="text-lg font-medium">Alerts & Notifications</h3>
@@ -90,7 +90,7 @@ const AlertStream: React.FC = () => {
         </span>
       </div>
       
-      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1 scrollbar-thin">
+      <div className="space-y-3.5 max-h-[400px] overflow-y-auto pr-1 scrollbar-thin">
         <AnimatePresence>
           {alerts.map(alert => (
             <motion.div

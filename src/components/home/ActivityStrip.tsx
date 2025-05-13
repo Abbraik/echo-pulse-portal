@@ -76,7 +76,7 @@ const ActivityStrip: React.FC = () => {
     return (
       <div className="glass-panel p-6 animate-pulse">
         <div className="h-6 w-1/3 bg-gray-700/30 rounded mb-6"></div>
-        <div className="flex space-x-4 overflow-x-auto pb-2">
+        <div className="flex space-x-6 overflow-x-auto pb-2">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex-shrink-0 w-64 h-24 rounded-lg bg-gray-700/30"></div>
           ))}
@@ -87,12 +87,12 @@ const ActivityStrip: React.FC = () => {
 
   return (
     <div className="glass-panel p-6">
-      <h2 className="text-lg font-semibold mb-4 flex items-center text-left">
+      <h2 className="text-lg font-semibold mb-5 flex items-center text-left">
         <Clock size={18} className="mr-2" />
         Recent Activity
       </h2>
 
-      <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-none">
+      <div className="flex space-x-6 overflow-x-auto pb-4 scrollbar-none">
         {activities.map((activity, index) => (
           <motion.div
             key={activity.id}
