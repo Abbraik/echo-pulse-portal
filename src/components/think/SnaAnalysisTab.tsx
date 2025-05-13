@@ -217,18 +217,15 @@ const SnaAnalysisTab: React.FC = () => {
       // Register event handlers
       cy.on('tap', 'node', handleNodeClick);
       
+      // Use proper CSS-compatible styling for node hover effect
       cy.on('mouseover', 'node', function(e: any) {
-        e.target.style({
-          'border-width': '2px',
-          'border-color': '#fff',
-        });
+        e.target.style('border-width', '2px');
+        e.target.style('border-color', '#fff');
       });
       
       cy.on('mouseout', 'node', function(e: any) {
         if (!e.target.selected()) {
-          e.target.style({
-            'border-width': '0px',
-          });
+          e.target.style('border-width', '0px');
         }
       });
 

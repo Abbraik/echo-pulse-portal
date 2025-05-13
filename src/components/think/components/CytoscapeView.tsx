@@ -82,11 +82,10 @@ const CytoscapeView: React.FC<CytoscapeViewProps> = ({ nodes, edges, onNodeClick
       }
     },
     {
-      selector: 'node:hover',
+      selector: 'node:selected',
       style: {
         'border-width': '3px',
         'border-color': '#14B8A6',
-        'box-shadow': '0 0 15px #14B8A6'
       }
     }
   ];
