@@ -19,6 +19,7 @@ const Scene3D: React.FC<Scene3DProps> = ({ nodes, edges, selectedNode, onSelectN
       orthographic
       camera={{ position: [15, 15, 15], zoom: 40, near: 0.1, far: 1000 }}
       className="w-full aspect-video bg-navy-800/50 rounded-lg"
+      gl={{ antialias: true }}
     >
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1} />
@@ -33,6 +34,7 @@ const Scene3D: React.FC<Scene3DProps> = ({ nodes, edges, selectedNode, onSelectN
         enablePan
       />
       
+      {/* Render nodes */}
       {nodes.map(node => (
         <Node3D 
           key={node.id} 
@@ -42,6 +44,7 @@ const Scene3D: React.FC<Scene3DProps> = ({ nodes, edges, selectedNode, onSelectN
         />
       ))}
       
+      {/* Render edges */}
       {edges.map(edge => (
         <Edge3D key={edge.id} edge={edge} nodes={nodes} />
       ))}

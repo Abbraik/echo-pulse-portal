@@ -1,7 +1,8 @@
 
-// Import the entire THREE namespace directly
 import * as THREE from 'three';
 
-// Make sure we're exporting the THREE namespace properly
+// Re-export THREE namespace to ensure compatibility with drei
 export { THREE };
+
+// Also export for default imports
 export default THREE;

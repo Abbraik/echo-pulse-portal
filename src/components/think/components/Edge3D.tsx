@@ -15,14 +15,14 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
   
   if (!sourceNode || !targetNode || !sourceNode.position || !targetNode.position) return null;
   
-  // Use primitive array values instead of Vector3 objects to avoid type issues
-  const sourcePos = [sourceNode.position.x || 0, 0, sourceNode.position.y || 0];
-  const targetPos = [targetNode.position.x || 0, 0, targetNode.position.y || 0];
+  // Create points using THREE.Vector3 objects
+  const sourcePos = new THREE.Vector3(sourceNode.position.x || 0, 0, sourceNode.position.y || 0);
+  const targetPos = new THREE.Vector3(targetNode.position.x || 0, 0, targetNode.position.y || 0);
   
   // Calculate midpoint for label positioning
-  const midX = (sourcePos[0] + targetPos[0]) / 2;
+  const midX = (sourcePos.x + targetPos.x) / 2;
   const midY = 1.5; // Fixed height for midpoint
-  const midZ = (sourcePos[2] + targetPos[2]) / 2;
+  const midZ = (sourcePos.z + targetPos.z) / 2;
   
   // Determine edge color
   let color;
@@ -37,17 +37,17 @@ const Edge3D: React.FC<Edge3DProps> = ({ edge, nodes }) => {
       color = '#94A3B8'; // gray for auxiliary
   }
   
-  // Create a simple line using primitive THREE.js objects
+  // Create points array for line
+  const points = [sourcePos, targetPos];
+  
+  // Create geometry and material manually
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({ color: color });
+  
   return (
     <group>
-      {/* Basic line segment using buffer geometry */}
-      <primitive object={new THREE.LineSegments(
-        new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(sourcePos[0], sourcePos[1], sourcePos[2]),
-          new THREE.Vector3(targetPos[0], targetPos[1], targetPos[2])
-        ]),
-        new THREE.LineBasicMaterial({ color: color, linewidth: 2 })
-      )} />
+      {/* Use primitive instead of Line component */}
+      <primitive object={new THREE.Line(geometry, material)} />
       
       {/* Label for the edge */}
       {edge.label && (
