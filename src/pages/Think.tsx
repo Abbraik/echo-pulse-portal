@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Layout, Layers } from 'lucide-react';
@@ -12,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
 
 // Mock data - in a real app, this would come from API calls
-const mockCLD = { nodes: [], edges: [] }; // Changed 'links' to 'edges' to match the CLDData interface
+const mockCLD = { nodes: [], edges: [] }; 
 const mockSNA = { nodes: [], edges: [] };
 
 const mockDEIMetrics = { 
