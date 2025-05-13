@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 
@@ -24,6 +24,9 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   onBlur,
   onClick,
 }) => {
+  // Reference to the mesh
+  const meshRef = useRef<THREE.Mesh>(null);
+  
   // Use state for animation values
   const [floatY, setFloatY] = useState(position[1]);
   const [rotation, setRotation] = useState(0);
@@ -49,7 +52,7 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   useFrame((state) => {
     if (isHovered) {
       // Float up and down
-      setFloatY(position[1] + Math.sin(state.clock.elapsedTime * 3) * 0.1);
+      setFloatY(position[1] + Math.sin(state.clock.getElapsedTime() * 3) * 0.1);
       
       // Slowly rotate
       setRotation(prev => prev + 0.01);
@@ -65,6 +68,7 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   return (
     <group position={meshPosition} rotation={[0, rotation, 0]}>
       <mesh
+        ref={meshRef}
         castShadow
         onPointerOver={onHover}
         onPointerOut={onBlur}

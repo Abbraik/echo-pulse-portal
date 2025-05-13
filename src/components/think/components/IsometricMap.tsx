@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, SoftShadows, Grid } from '@react-three/drei';
+import { OrbitControls, SoftShadows } from '@react-three/drei';
 import NodeMesh from './NodeMesh';
 import LoopTube from './LoopTube';
 import ActorMesh from './ActorMesh';
@@ -49,7 +49,7 @@ const IsometricMap: React.FC<IsometricMapProps> = ({ cldData, snaData, onSelect 
   return (
     <div className="w-full h-full">
       <Canvas shadows camera={{ position: [10, 10, 10], zoom: 30 }} orthographic>
-        {/* Background gradient */}
+        {/* Background color */}
         <color attach="background" args={['#1E293B']} />
 
         {/* Lighting setup */}
@@ -58,7 +58,8 @@ const IsometricMap: React.FC<IsometricMapProps> = ({ cldData, snaData, onSelect 
           position={[5, 10, 5]}
           intensity={0.8}
           castShadow
-          shadow-mapSize={[1024, 1024]}
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
         />
         <directionalLight position={[-5, 5, -5]} intensity={0.5} color="#14B8A6" />
 
@@ -144,7 +145,7 @@ const IsometricMap: React.FC<IsometricMapProps> = ({ cldData, snaData, onSelect 
         />
 
         {/* Grid helper */}
-        <Grid infiniteGrid args={[20, 20]} position={[0, -0.01, 0]} cellColor="#475569" sectionColor="#334155" />
+        <gridHelper args={[20, 20]} position={[0, -0.01, 0]} />
       </Canvas>
     </div>
   );

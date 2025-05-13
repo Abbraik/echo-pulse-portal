@@ -1,7 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Line } from '@react-three/drei';
 
 interface ActorEdgeProps {
   sourcePos: [number, number, number];
@@ -16,10 +15,13 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
   weight,
   isHighlighted,
 }) => {
+  // Reference to the line
+  const lineRef = useRef<THREE.Line>(null);
+  
   // Calculate line thickness based on weight
   const thickness = 0.5 + weight * 2;
   
-  // Use useState instead of useRef for animation value to trigger re-renders
+  // Use useState for animation value
   const [opacity, setOpacity] = useState(0.2);
   
   // Animate pulse effect using useFrame
@@ -30,15 +32,30 @@ const ActorEdge: React.FC<ActorEdgeProps> = ({
       setOpacity(0.2);
     }
   });
+
+  // Create points for line
+  const points = [
+    sourcePos,
+    targetPos
+  ].map(p => new THREE.Vector3(p[0], p[1], p[2]));
   
   return (
-    <Line
-      points={[sourcePos, targetPos]}
-      color={isHighlighted ? '#94A3B8' : '#64748B'}
-      lineWidth={thickness}
-      transparent
-      opacity={opacity}
-    />
+    <line ref={lineRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={points.length}
+          array={new Float32Array(points.flatMap(v => [v.x, v.y, v.z]))}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <lineBasicMaterial 
+        color={isHighlighted ? '#94A3B8' : '#64748B'}
+        linewidth={thickness}
+        transparent
+        opacity={opacity}
+      />
+    </line>
   );
 };
 

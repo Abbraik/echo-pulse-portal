@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 
@@ -22,6 +22,9 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
   onBlur,
   onClick,
 }) => {
+  // Reference to the mesh
+  const meshRef = useRef<THREE.Mesh>(null);
+  
   // Use state for scale animation
   const [scale, setScale] = useState(1 + (value - 50) / 100);
   
@@ -58,6 +61,7 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
   return (
     <group position={position}>
       <mesh
+        ref={meshRef}
         castShadow
         receiveShadow
         onPointerOver={onHover}
