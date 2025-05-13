@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Layers, LayoutGrid, Save, RotateCcw, Plus, Info, X } from 'lucide-react';
 import CytoScape from 'react-cytoscapejs';
@@ -216,20 +217,23 @@ const Node3D: React.FC<{
   );
 };
 
+// Simplified Edge3D component that avoids using problematic drei components
 const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
   const sourceNode = nodes.find(node => node.id === edge.source);
   const targetNode = nodes.find(node => node.id === edge.target);
   
   if (!sourceNode || !targetNode || !sourceNode.position || !targetNode.position) return null;
   
-  const source = new THREE.Vector3(sourceNode.position.x || 0, 0, sourceNode.position.y || 0);
-  const target = new THREE.Vector3(targetNode.position.x || 0, 0, targetNode.position.y || 0);
+  // Use primitive array values instead of Vector3 objects to avoid type issues
+  const sourcePos = [sourceNode.position.x || 0, 0, sourceNode.position.y || 0];
+  const targetPos = [targetNode.position.x || 0, 0, targetNode.position.y || 0];
   
-  // Calculate midpoint for the curve
-  const midX = (source.x + target.x) / 2;
-  const midZ = (source.z + target.z) / 2;
-  const midPoint = new THREE.Vector3(midX, 1.5, midZ);
+  // Calculate midpoint for label positioning
+  const midX = (sourcePos[0] + targetPos[0]) / 2;
+  const midY = 1.5; // Fixed height for midpoint
+  const midZ = (sourcePos[2] + targetPos[2]) / 2;
   
+  // Determine edge color
   let color;
   switch (edge.type) {
     case 'reinforcing':
@@ -242,25 +246,21 @@ const Edge3D: React.FC<{ edge: Edge, nodes: Node[] }> = ({ edge, nodes }) => {
       color = '#94A3B8'; // gray for auxiliary
   }
   
+  // Create a simple line using primitive THREE.js objects
   return (
     <group>
-      <line>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={2}
-            array={new Float32Array([
-              source.x, source.y, source.z,
-              target.x, target.y, target.z
-            ])}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <lineBasicMaterial color={color} linewidth={2} />
-      </line>
+      {/* Basic line segment using buffer geometry */}
+      <primitive object={new THREE.LineSegments(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(sourcePos[0], sourcePos[1], sourcePos[2]),
+          new THREE.Vector3(targetPos[0], targetPos[1], targetPos[2])
+        ]),
+        new THREE.LineBasicMaterial({ color: color, linewidth: 2 })
+      )} />
       
+      {/* Label for the edge */}
       {edge.label && (
-        <Html position={[midPoint.x, midPoint.y + 0.5, midPoint.z]} center>
+        <Html position={[midX, midY + 0.5, midZ]} center>
           <div className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${
             edge.type === 'reinforcing' ? 'bg-teal-500/80' : 'bg-orange-500/80'
           } text-white`}>
