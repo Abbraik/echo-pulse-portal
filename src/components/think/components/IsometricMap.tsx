@@ -111,7 +111,7 @@ const IsometricMap: React.FC<IsometricMapProps> = ({ cldData, snaData, onSelect 
             isHovered={hoveredActorId === actor.id}
             onHover={() => setHoveredActorId(actor.id)}
             onBlur={() => setHoveredActorId(null)}
-            onClick={() => console.log('Actor clicked:', actor.id)}
+            onClick={() => onSelect(actor.id)}
           />
         ))}
 
@@ -145,7 +145,7 @@ const IsometricMap: React.FC<IsometricMapProps> = ({ cldData, snaData, onSelect 
         />
 
         {/* Grid helper */}
-        <Grid args={[20, 20, '#475569', '#334155']} position={[0, -0.01, 0]} />
+        <Grid infiniteGrid args={[20, 20]} position={[0, -0.01, 0]} cellColor="#475569" sectionColor="#334155" />
       </Canvas>
     </div>
   );

@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html, Octahedron } from '@react-three/drei';
 import * as THREE from 'three';
@@ -25,8 +25,9 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  // Use meshRef as a group ref for animation
-  const groupRef = useRef<THREE.Group>(null);
+  // Use state instead of ref for position animation
+  const [floatY, setFloatY] = useState(position[1]);
+  const [rotation, setRotation] = useState(0);
   
   // Calculate size based on actor weight
   const size = 0.4 + weight * 0.4;
@@ -47,26 +48,23 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
 
   // Animate hover effect
   useFrame((state) => {
-    if (!groupRef.current) return;
-    
     if (isHovered) {
       // Float up and down
-      const floatY = position[1] + Math.sin(state.clock.elapsedTime * 3) * 0.1;
-      groupRef.current.position.y = floatY;
+      setFloatY(position[1] + Math.sin(state.clock.elapsedTime * 3) * 0.1);
       
       // Slowly rotate
-      groupRef.current.rotation.y += 0.01;
+      setRotation(prev => prev + 0.01);
     } else {
       // Smoothly return to original position
-      groupRef.current.position.lerp(
-        new THREE.Vector3(position[0], position[1], position[2]),
-        0.1
-      );
+      setFloatY(prev => THREE.MathUtils.lerp(prev, position[1], 0.1));
     }
   });
 
+  const actorColor = getActorColor();
+  const meshPosition: [number, number, number] = [position[0], floatY, position[2]];
+
   return (
-    <group ref={groupRef} position={position}>
+    <group position={meshPosition} rotation={[0, rotation, 0]}>
       <mesh
         castShadow
         onPointerOver={onHover}
@@ -75,10 +73,10 @@ const ActorMesh: React.FC<ActorMeshProps> = ({
       >
         <Octahedron args={[size, 0]}>
           <meshStandardMaterial
-            color={getActorColor()}
+            color={actorColor}
             roughness={0.4}
             metalness={0.6}
-            emissive={getActorColor()}
+            emissive={actorColor}
             emissiveIntensity={isHovered ? 0.8 : 0.3}
           />
         </Octahedron>

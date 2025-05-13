@@ -1,8 +1,7 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html, Icosahedron } from '@react-three/drei';
-import * as THREE from 'three';
 
 interface NodeMeshProps {
   id: string;
@@ -23,11 +22,8 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
   onBlur,
   onClick,
 }) => {
-  // Use groupRef for animations
-  const groupRef = useRef<THREE.Group>(null);
-
-  // Calculate size based on value (50-100 range maps to 1.0-1.5 size)
-  const size = 1 + (value - 50) / 100;
+  // Use state instead of ref for scale animation
+  const [scale, setScale] = useState(1 + (value - 50) / 100);
   
   // Colors based on node types (derived from id)
   const getNodeColor = () => {
@@ -47,36 +43,38 @@ const NodeMesh: React.FC<NodeMeshProps> = ({
 
   // Pulse animation on hover
   useFrame((state) => {
-    if (!groupRef.current) return;
     if (isHovered) {
       const pulseScale = 1 + Math.sin(state.clock.elapsedTime * 5) * 0.03;
-      groupRef.current.scale.setScalar(size * pulseScale);
+      setScale(baseScale => (1 + (value - 50) / 100) * pulseScale);
     } else {
       // Smooth transition back to normal size
-      groupRef.current.scale.lerp(
-        new THREE.Vector3(size, size, size),
-        0.1
-      );
+      setScale(baseScale => {
+        const targetScale = 1 + (value - 50) / 100;
+        return targetScale * 0.1 + baseScale * 0.9; // Simple lerp
+      });
     }
   });
 
+  const nodeColor = getNodeColor();
+
   return (
-    <group ref={groupRef} position={position} scale={[size, size, size]}>
+    <group position={position}>
       <mesh
         castShadow
         receiveShadow
         onPointerOver={onHover}
         onPointerOut={onBlur}
         onClick={onClick}
+        scale={[scale, scale, scale]}
       >
         <Icosahedron args={[0.8, 1]}>
           <meshPhysicalMaterial
-            color={getNodeColor()}
+            color={nodeColor}
             transmission={0.3}
             thickness={1.5}
             roughness={0.3}
             metalness={0.2}
-            emissive={getNodeColor()}
+            emissive={nodeColor}
             emissiveIntensity={isHovered ? 0.5 : 0.2}
           />
         </Icosahedron>
