@@ -13,10 +13,19 @@ import SensitivityRing from '@/components/think/rings/SensitivityRing';
 import StrategyRing from '@/components/think/rings/StrategyRing';
 import { toast } from '@/hooks/use-toast';
 
+// Mock data fixtures
+import { mockCldData } from '@/components/think/data/cldData';
+import { mockDeiMetrics } from '@/components/think/data/deiMetrics';
+import { mockSolverBands } from '@/components/think/data/solverBands';
+import { mockSensitivityData } from '@/components/think/data/sensitivityData';
+import { mockObjectives } from '@/components/think/data/objectives';
+import { mockSnaData } from '@/components/think/data/snaData';
+
 const ThinkPage: React.FC = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [snaOverlayVisible, setSnaOverlayVisible] = useState(false);
+  const [focusedRing, setFocusedRing] = useState<string | null>(null);
 
   // Handle scroll behavior for header
   useEffect(() => {
@@ -60,6 +69,18 @@ const ThinkPage: React.FC = () => {
     });
   };
 
+  const handleRingFocus = (ringName: string | null) => {
+    setFocusedRing(ringName);
+    if (ringName) {
+      toast({
+        title: `Focusing on ${ringName}`,
+        description: `${ringName} layer is now in focus`,
+        variant: "default",
+        duration: 1500,
+      });
+    }
+  };
+
   return (
     <AnimatedPage>
       {/* Top Navigation Bar */}
@@ -87,13 +108,16 @@ const ThinkPage: React.FC = () => {
       {/* Concentric Layout */}
       <div className="glass-panel p-6">
         <ConcentricLayout
-          centralContent={<CentralCLD />}
-          innerRingContent={<DeiRing />}
-          equilibriumRingContent={<EquilibriumRing />}
-          sensitivityRingContent={<SensitivityRing />}
-          strategyRingContent={<StrategyRing />}
+          centralContent={<CentralCLD data={mockCldData} />}
+          innerRingContent={<DeiRing data={mockDeiMetrics} onFocus={() => handleRingFocus('DEI & Foresight')} />}
+          equilibriumRingContent={<EquilibriumRing data={mockSolverBands} onFocus={() => handleRingFocus('Equilibrium Solver')} />}
+          sensitivityRingContent={<SensitivityRing data={mockSensitivityData} onFocus={() => handleRingFocus('Sensitivity Analysis')} />}
+          strategyRingContent={<StrategyRing objectives={mockObjectives} onFocus={() => handleRingFocus('Initial Strategy')} />}
           snaOverlayVisible={snaOverlayVisible}
           toggleSnaOverlay={toggleSnaOverlay}
+          focusedRing={focusedRing}
+          onResetFocus={() => handleRingFocus(null)}
+          snaData={mockSnaData}
         />
       </div>
       
