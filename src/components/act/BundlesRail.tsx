@@ -29,10 +29,10 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   
   // Sample data for bundles
   const bundles: Bundle[] = [
-    { id: 'b1', name: 'Resource Resilience', coherence: 58, isApproved: false },
-    { id: 'b2', name: 'Education Reform', coherence: 87, isApproved: true },
-    { id: 'b3', name: 'Health Infrastructure', coherence: 72, isApproved: false },
-    { id: 'b4', name: 'Digital Governance', coherence: 45, isApproved: false },
+    { id: 'b1', name: "Resource Resilience", coherence: 58, isApproved: false },
+    { id: 'b2', name: "Education Reform", coherence: 87, isApproved: true },
+    { id: 'b3', name: "Health Infrastructure", coherence: 72, isApproved: false },
+    { id: 'b4', name: "Water Efficiency Boost", coherence: 45, isApproved: false },
   ];
   
   const getCoherenceColor = (coherence: number) => {

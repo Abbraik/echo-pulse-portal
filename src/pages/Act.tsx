@@ -31,6 +31,12 @@ const Act: React.FC = () => {
     }
   };
 
+  // Handle bundle selection
+  const handleBundleSelect = (bundleId: string) => {
+    setSelectedBundle(bundleId);
+    setDetailView('default'); // Reset the view to default to show the bundle view
+  };
+
   return (
     <AnimatedPage>
       <div className="flex flex-col h-full">
@@ -43,7 +49,7 @@ const Act: React.FC = () => {
           <div className="w-full lg:w-1/5">
             <BundlesRail 
               selectedBundle={selectedBundle} 
-              onSelectBundle={setSelectedBundle}
+              onSelectBundle={handleBundleSelect}
             />
           </div>
           

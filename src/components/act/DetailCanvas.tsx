@@ -7,6 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/use-translation';
 import { DetailView } from '@/pages/Act';
 import { motion, AnimatePresence } from 'framer-motion';
+import BundleView from './BundleView';
 
 interface DetailCanvasProps {
   view: DetailView;
@@ -18,11 +19,16 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   
   const steps = [
-    { id: 'review', title: t('reviewObjectives') },
-    { id: 'choose', title: t('chooseLeverage') },
-    { id: 'check', title: t('checkCoherence') },
-    { id: 'finalize', title: t('finalize') },
+    { id: 'review', title: t('reviewObjectives', { defaultValue: 'Review Objectives' }) },
+    { id: 'choose', title: t('chooseLeverage', { defaultValue: 'Choose Leverage' }) },
+    { id: 'check', title: t('checkCoherence', { defaultValue: 'Check Coherence' }) },
+    { id: 'finalize', title: t('finalize', { defaultValue: 'Finalize' }) },
   ];
+
+  // If a bundle is selected and the view is 'default', show the bundle view
+  if (selectedBundle && view === 'default') {
+    return <BundleView bundleId={selectedBundle} onClose={() => {}} />;
+  }
 
   const getContent = () => {
     switch (view) {

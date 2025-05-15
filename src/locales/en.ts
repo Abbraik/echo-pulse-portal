@@ -156,7 +156,42 @@ export const en = {
   searchPlaybooks: "Search playbooks...",
   use: "Use",
   addNewPlaybook: "Add New Playbook",
-  dragPlaybookHint: "Drag a playbook to the Bundles Rail to create a new bundle"
+  dragPlaybookHint: "Drag a playbook to the Bundles Rail to create a new bundle",
+  
+  // Bundle View
+  back: "Back",
+  close: "Close",
+  updatedAgo: "Updated",
+  projectedNdi: "Projected NDI Impact",
+  estimatedCost: "Estimated Cost",
+  primaryPillar: "Primary Pillar",
+  owner: "Owner",
+  status: "Status",
+  tags: "Tags",
+  editBundle: "Edit Bundle",
+  approve: "Approve",
+  stepOf: "Step",
+  of: "of",
+  objectives: "Objectives",
+  help: "Help",
+  addObjective: "Add Objective",
+  leveragePoints: "Leverage Points",
+  suggestPoints: "Suggest Points",
+  selectLeveragePoint: "Select Leverage Point",
+  rationale: "Rationale",
+  explainWhy: "Explain why this leverage point...",
+  coherenceCheck: "Coherence Check",
+  heatmapMatrix: "Heatmap Matrix",
+  pillar: "Pillar",
+  objective: "Obj.",
+  autoBalance: "Auto-Balance Conflicts",
+  finalizeExport: "Finalize & Export",
+  coherenceScore: "Coherence Score",
+  commentsForApprover: "Comments for Approver",
+  addComments: "Add any additional comments...",
+  exportToDelivery: "Export to Delivery",
+  saveDraft: "Save Draft",
+  proMode: "Pro Mode"
 };
 
 export default en;

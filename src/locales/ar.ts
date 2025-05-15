@@ -1,4 +1,3 @@
-
 export const ar = {
   // General
   appName: "نظام ديناميكيات السكان",
@@ -139,7 +138,42 @@ export const ar = {
   searchPlaybooks: "البحث في الكتب الإرشادية...",
   use: "استخدام",
   addNewPlaybook: "إضافة كتاب إرشادي جديد",
-  dragPlaybookHint: "اسحب كتابًا إرشاديًا إلى شريط الحزم لإنشاء حزمة جديدة"
+  dragPlaybookHint: "اسحب كتابًا إرشاديًا إلى شريط الحزم لإنشاء حزمة جديدة",
+  
+  // Bundle View
+  back: "رجوع",
+  close: "إغلاق",
+  updatedAgo: "تم التحديث",
+  projectedNdi: "تأثير NDI المتوقع",
+  estimatedCost: "التكلفة المقدرة",
+  primaryPillar: "الركيزة الأساسية",
+  owner: "المالك",
+  status: "الحالة",
+  tags: "العلامات",
+  editBundle: "تعديل الحزمة",
+  approve: "موافقة",
+  stepOf: "الخطوة",
+  of: "من",
+  objectives: "الأهداف",
+  help: "مساعدة",
+  addObjective: "إضافة هدف",
+  leveragePoints: "نقاط النفوذ",
+  suggestPoints: "اقتراح النقاط",
+  selectLeveragePoint: "اختر نقطة النفوذ",
+  rationale: "المنطق",
+  explainWhy: "اشرح سبب اختيار نقطة النفوذ هذه...",
+  coherenceCheck: "التحقق من التماسك",
+  heatmapMatrix: "مصفوفة الخريطة الحرارية",
+  pillar: "ركيزة",
+  objective: "هدف",
+  autoBalance: "موازنة تلقائية للتعارضات",
+  finalizeExport: "إنهاء وتصدير",
+  coherenceScore: "درجة التماسك",
+  commentsForApprover: "تعليقات للموافق",
+  addComments: "أضف أي تعليقات إضافية...",
+  exportToDelivery: "تصدير للتسليم",
+  saveDraft: "حفظ المسودة",
+  proMode: "الوضع الاحترافي"
 };
 
 export default ar;
