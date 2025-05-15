@@ -17,6 +17,9 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import GaugeComponent from '@/components/ui/custom/Gauge';
 import SparklineChart from '@/components/think/components/SparklineChart';
 
+// Update the type for color to match the accepted values by the GaugeComponent
+type GaugeColorType = 'teal' | 'blue' | 'amber' | 'purple' | 'emerald' | 'gold' | 'rose';
+
 interface KpiData {
   id: string;
   name: string;
@@ -24,7 +27,7 @@ interface KpiData {
   target: number;
   min: number;
   max: number;
-  color: string;
+  color: GaugeColorType;
   type: 'gauge' | 'grid' | 'sparkline';
   icon: React.ElementType;
   data?: number[];
