@@ -1,68 +1,131 @@
 
-/* HomePage specific styles */
-.pulse-animation {
-  animation: pulse 2s infinite ease-in-out;
-}
+/* ... keep existing code */
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.05); opacity: 1; }
-}
-
-.ticker-animation {
-  animation: tickerMove 20s linear infinite;
-}
-
-@keyframes tickerMove {
-  0% { transform: translateY(100%); }
-  100% { transform: translateY(-100%); }
-}
-
-.parallax-card {
+/* Additional styles for the redesigned home page */
+.card-3d-effect {
   transform-style: preserve-3d;
-  transition: transform 0.3s ease;
+  perspective: 1000px;
 }
 
-.parallax-card-content {
+.card-content-3d {
   transform: translateZ(20px);
 }
 
-.glow-effect {
-  box-shadow: 0 0 15px rgba(20, 184, 166, 0.5);
-  animation: glow 2s infinite alternate;
+.glass-panel-premium {
+  @apply backdrop-blur-xl;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 4px 20px -2px rgba(0, 0, 0, 0.2),
+    0 0 10px -5px rgba(255, 255, 255, 0.1) inset;
 }
 
-@keyframes glow {
-  0% { box-shadow: 0 0 5px rgba(20, 184, 166, 0.5); }
-  100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.8); }
+.inner-shadow {
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.15);
 }
 
-.particle {
+.glass-border-glow {
+  position: relative;
+}
+
+.glass-border-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, rgba(20, 184, 166, 0.3), rgba(37, 99, 235, 0.3));
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glass-border-glow:hover::before {
+  opacity: 1;
+}
+
+/* Timeline styles */
+.event-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.event-dot:hover {
+  transform: scale(1.5);
+}
+
+.event-dot.simulation {
+  background: theme('colors.blue.500');
+}
+
+.event-dot.intervention {
+  background: theme('colors.gold.500');
+}
+
+.event-dot.milestone {
+  background: theme('colors.teal.500');
+}
+
+/* Animations */
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-float-subtle {
+  animation: float-subtle 4s ease-in-out infinite;
+}
+
+.tilt-on-hover {
+  transition: transform 0.3s ease;
+}
+
+.tilt-on-hover:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(-2deg);
+}
+
+.card-hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Ripple effect for buttons */
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  pointer-events: none;
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
-.timeline-scrubber {
-  appearance: none;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  outline: none;
+@keyframes ripple {
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
 }
 
-.timeline-scrubber::-webkit-slider-thumb {
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(20, 184, 166, 1);
-  cursor: pointer;
-  transition: background 0.2s ease;
+/* Gauge animations */
+.gauge-indicator {
+  transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.timeline-scrubber::-webkit-slider-thumb:hover {
-  background: rgba(20, 184, 166, 0.8);
-  transform: scale(1.2);
+.gauge-warning {
+  animation: gauge-warning-pulse 2s infinite;
+}
+
+@keyframes gauge-warning-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
