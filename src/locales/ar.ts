@@ -54,10 +54,20 @@ export const ar = {
   kpiTitle: "مؤشرات الأداء الرئيسية",
   activityTitle: "النشاط الحديث",
   systemPulse: "نبض النظام",
-  alertStream: "تنبيهات النظام",
+  alertStream: "التنبيهات والتوصيات",
   zoneLaunchpad: "منصة إطلاق المناطق",
-  systemStability: "استقرار النظام"
+  systemStability: "استقرار النظام",
+  systemStabilityGauge: "مقياس استقرار النظام",
+  systemStatusSummary: "مراقبة ديناميكيات السكان في الوقت الحقيقي",
+  scenarioComparator: "مقارنة السيناريوهات",
+  compareAll: "مقارنة الكل",
+  compare: "مقارنة",
+  quickActions: "إجراءات سريعة",
+  systemEventsRecord: "سجل أحداث النظام",
+  considerSocialTrust: "النظر في الثقة الاجتماعية",
+  unstable: "غير مستقر",
+  cautious: "حذر",
+  equilibrium: "توازن"
 };
 
 export default ar;
-

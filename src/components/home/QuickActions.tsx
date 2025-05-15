@@ -1,7 +1,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { FileCheck, Database, Play } from "lucide-react";
+import { FileCheck, Database, Clock } from "lucide-react";
 import { ParallaxCard } from "@/components/ui/parallax-card";
 import { GlassCard, GlassCardHeader, GlassCardTitle, GlassCardContent } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
@@ -22,28 +22,28 @@ const ActionButton: React.FC<ActionButtonProps> = ({ icon: Icon, label, delay = 
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.3 }}
       whileHover={{ y: -4 }}
-      whileTap={{ y: 0 }}
+      whileTap={{ y: 0, scale: 0.98 }}
       className="w-full"
     >
       <Button 
         variant="outline" 
-        className="w-full justify-start glass-panel hover:glass-glow"
+        className="w-full h-16 justify-start glass-panel-premium hover:glass-glow"
       >
         <Icon className="h-5 w-5 mr-2" />
-        <span>{label}</span>
+        <span className="text-sm font-medium">{label}</span>
       </Button>
     </motion.div>
   );
 };
 
-const QuickActions = () => {
+const QuickActions: React.FC = () => {
   const { t } = useTranslation();
   
   return (
     <ParallaxCard className="h-full">
-      <GlassCard className="h-full p-6">
+      <GlassCard className="h-full p-6" variant="deep">
         <GlassCardHeader>
-          <GlassCardTitle gradient>Quick Actions</GlassCardTitle>
+          <GlassCardTitle gradient>{t('quickActions')}</GlassCardTitle>
         </GlassCardHeader>
         <GlassCardContent className="flex flex-col space-y-4">
           <ActionButton 
@@ -57,8 +57,8 @@ const QuickActions = () => {
             delay={0.2} 
           />
           <ActionButton 
-            icon={Play} 
-            label="Run Micro-Sim" 
+            icon={Clock} 
+            label="Open Delivery Tasks" 
             delay={0.3} 
           />
         </GlassCardContent>

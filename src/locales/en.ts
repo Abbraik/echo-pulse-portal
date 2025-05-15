@@ -54,10 +54,20 @@ export const en = {
   kpiTitle: "Key Performance Indicators",
   activityTitle: "Recent Activity",
   systemPulse: "System Pulse",
-  alertStream: "System Alerts",
+  alertStream: "Alerts & Recommendations",
   zoneLaunchpad: "Zone Launchpad",
-  systemStability: "System Stability"
+  systemStability: "System Stability",
+  systemStabilityGauge: "System Stability Gauge",
+  systemStatusSummary: "Monitor population dynamics in real-time",
+  scenarioComparator: "Scenario Comparator",
+  compareAll: "Compare All",
+  compare: "Compare",
+  quickActions: "Quick Actions",
+  systemEventsRecord: "System Events Record",
+  considerSocialTrust: "Consider Social Trust",
+  unstable: "Unstable",
+  cautious: "Cautious",
+  equilibrium: "Equilibrium"
 };
 
 export default en;
-

@@ -6,23 +6,20 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { getKPIs, getAlerts, getActivity, getPulse } from '../api/dashboard';
 import { KPI, Alert, ActivityEvent, PulseData } from '../api/dashboard';
 import { useTranslation } from '@/hooks/use-translation';
-import { ArrowRight, Activity, BarChart, LineChart, Brain } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ParallaxCard } from "@/components/ui/parallax-card";
-import { GlassCard, GlassCardHeader, GlassCardTitle, GlassCardContent } from "@/components/ui/glass-card";
-import KpiCarousel from '../components/home/KpiCarousel';
-import SystemPulseOrb from '../components/home/SystemPulseOrb';
-import AlertStream from '../components/home/AlertStream';
-import ActivityTimeline from '../components/home/ActivityTimeline';
+import { ParticlesBackground } from "@/components/ui/particles-background";
 import WelcomeOverlay from '../components/home/WelcomeOverlay';
 import Footer from '../components/layout/Footer';
-import ParticlesBackground from '@/components/ui/particles-background';
-import Gauge from '@/components/ui/custom/Gauge';
-import HeroCard from "@/components/home/HeroCard";
-import LoopNavigation from "@/components/home/LoopNavigation";
+
+// Import new components
+import HeroNarrative from "@/components/home/HeroNarrative";
+import SystemStabilityGauge from "@/components/home/SystemStabilityGauge";
 import ScenarioComparator from "@/components/home/ScenarioComparator";
+import ActivityPanel from "@/components/home/ActivityPanel";
+import AlertsPanel from "@/components/home/AlertsPanel";
 import QuickActions from "@/components/home/QuickActions";
 import EventsTimeline from "@/components/home/EventsTimeline";
+import LanguageToggle from "@/components/home/LanguageToggle";
+import ThemeToggle from "@/components/home/ThemeToggle";
 
 import "./HomePage.css";
 
@@ -74,100 +71,57 @@ const HomePage: React.FC = () => {
       {/* Welcome overlay */}
       {!showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
       
-      <main className="flex-1 overflow-auto px-4 md:px-8 py-6 space-y-8 pt-24 container mx-auto z-10">
-        {/* Hero section with dynamic narrative card */}
-        <section className="flex justify-center mb-8">
-          <HeroCard />
+      <main className="flex-1 overflow-auto pt-24 pb-12 px-4 md:px-8 space-y-8 container mx-auto z-10">
+        {/* Hero narrative - top section */}
+        <section className="w-full">
+          <HeroNarrative />
         </section>
         
-        {/* Loop Navigation */}
-        <LoopNavigation />
-        
-        {/* Main dashboard tiles */}
+        {/* First row - System Stability and Scenario Comparator */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* System Stability Gauge */}
-          <div className="lg:col-span-3">
-            <ParallaxCard className="h-full">
-              <GlassCard className="h-full p-6">
-                <GlassCardHeader>
-                  <GlassCardTitle gradient>{t('systemPulse')}</GlassCardTitle>
-                </GlassCardHeader>
-                <GlassCardContent className="flex flex-col items-center justify-center">
-                  <Gauge 
-                    value={pulse?.stability || 75} 
-                    min={0} 
-                    max={100}
-                    size="lg"
-                    color="teal"
-                    label={t('systemStability')}
-                  />
-                  <p className="mt-4 text-muted-foreground text-sm">
-                    {pulse?.status || t('allSystemsOperational')}
-                  </p>
-                </GlassCardContent>
-              </GlassCard>
-            </ParallaxCard>
+          {/* System Stability Gauge - left section (60%) */}
+          <div className="lg:col-span-7">
+            <SystemStabilityGauge pulse={pulse} />
           </div>
           
-          {/* Scenario Comparator */}
-          <div className="lg:col-span-6">
+          {/* Scenario Comparator - right section (40%) */}
+          <div className="lg:col-span-5">
             <ScenarioComparator />
           </div>
-          
-          {/* KPI Summary */}
-          <div className="lg:col-span-3">
-            <ParallaxCard className="h-full">
-              <GlassCard className="h-full p-6">
-                <GlassCardHeader>
-                  <GlassCardTitle gradient>{t('kpiTitle')}</GlassCardTitle>
-                </GlassCardHeader>
-                <GlassCardContent>
-                  <KpiCarousel />
-                </GlassCardContent>
-              </GlassCard>
-            </ParallaxCard>
-          </div>
         </section>
         
-        {/* Secondary panels */}
+        {/* Second row - Activity, Alerts, Quick Actions */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Quick Actions */}
-          <div className="lg:col-span-3">
+          {/* Recent Activity - left section (40%) */}
+          <div className="lg:col-span-5">
+            <ActivityPanel activities={activity} />
+          </div>
+          
+          {/* Alerts & Recommendations - middle section (40%) */}
+          <div className="lg:col-span-5">
+            <AlertsPanel alerts={alerts} />
+          </div>
+          
+          {/* Quick Actions - right section (20%) */}
+          <div className="lg:col-span-2">
             <QuickActions />
           </div>
-          
-          {/* Alerts & Recommendations */}
-          <div className="lg:col-span-5">
-            <ParallaxCard className="h-full">
-              <GlassCard className="h-full p-6">
-                <GlassCardHeader>
-                  <GlassCardTitle gradient>{t('alertStream')}</GlassCardTitle>
-                </GlassCardHeader>
-                <GlassCardContent>
-                  <AlertStream alerts={alerts} />
-                </GlassCardContent>
-              </GlassCard>
-            </ParallaxCard>
-          </div>
-          
-          {/* Recent Activity */}
-          <div className="lg:col-span-4">
-            <ParallaxCard className="h-full">
-              <GlassCard className="h-full p-6">
-                <GlassCardHeader>
-                  <GlassCardTitle gradient>{t('activityTitle')}</GlassCardTitle>
-                </GlassCardHeader>
-                <GlassCardContent>
-                  <ActivityTimeline activities={activity} />
-                </GlassCardContent>
-              </GlassCard>
-            </ParallaxCard>
-          </div>
         </section>
         
-        {/* Events Timeline */}
-        <section className="mt-10">
+        {/* Third row - Events Timeline */}
+        <section className="w-full">
           <EventsTimeline />
+        </section>
+        
+        {/* Footer with language and theme toggles */}
+        <section className="flex items-center justify-between mt-8">
+          <div className="flex items-center space-x-4">
+            <LanguageToggle />
+            <ThemeToggle />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {t('copyright')}
+          </p>
         </section>
       </main>
       

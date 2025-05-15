@@ -1,199 +1,192 @@
-
-// Mock API functions for fetching dashboard data
-// In a real application, these would call actual API endpoints
-
-// Types for our dashboard data
+// Types for dashboard data
 export interface KPI {
-  id: string;
+  id: number;
   name: string;
   value: number;
-  target: number;
-  min: number;
-  max: number;
-  color: string;
+  change: number;
+  trend: 'up' | 'down' | 'stable';
+  unit: string;
+  target?: number;
 }
 
 export interface Alert {
-  id: string;
+  id: number;
   type: 'warning' | 'error' | 'info' | 'success';
   message: string;
+  details: string;
   timestamp: string;
-  isNew?: boolean;
+  priority: 'high' | 'medium' | 'low';
+  isNew: boolean;
 }
 
 export interface ActivityEvent {
-  id: string;
+  id: number;
   event: string;
-  time: string;
+  type: string;
   timeAgo: string;
+  timestamp: string;
+  user?: string;
 }
 
 export interface PulseData {
-  score: number;
+  id: number;
+  timestamp: string;
+  level: number;
+  performance: number;
   stability: number;
   status: string;
-  breakdown: {
-    [key: string]: {
-      name: string;
-      value: number;
-      color: string;
-    }
-  }
 }
 
 // Mock API functions
-export const getKPIs = async (): Promise<KPI[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return [
-    { 
-      id: '1', 
-      name: 'Network Development Index', 
-      value: 76, 
-      target: 80, 
-      min: 0, 
-      max: 100,
-      color: 'teal' 
-    },
-    { 
-      id: '2', 
-      name: 'Network Reach', 
-      value: 45, 
-      target: 60, 
-      min: 0, 
-      max: 100,
-      color: 'blue' 
-    },
-    { 
-      id: '3', 
-      name: 'Equilibrium Status', 
-      value: 82, 
-      target: 75, 
-      min: 0, 
-      max: 100,
-      color: 'emerald'
-    },
-  ];
-};
+export function getKPIs(): Promise<KPI[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          id: 1,
+          name: 'Population Growth',
+          value: 1.2,
+          change: 0.3,
+          trend: 'up',
+          unit: '%',
+          target: 1.5
+        },
+        {
+          id: 2,
+          name: 'Fertility Rate',
+          value: 2.1,
+          change: -0.2,
+          trend: 'down',
+          unit: 'children per woman',
+          target: 2.3
+        },
+        {
+          id: 3,
+          name: 'Migration Rate',
+          value: 3.7,
+          change: 1.2,
+          trend: 'up',
+          unit: 'per 1000',
+          target: 3.0
+        },
+        {
+          id: 4,
+          name: 'Life Expectancy',
+          value: 82.4,
+          change: 0.5,
+          trend: 'up',
+          unit: 'years',
+          target: 83.0
+        }
+      ]);
+    }, 500);
+  });
+}
 
-export const getAlerts = async (): Promise<Alert[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 600));
-  
-  return [
-    {
-      id: '1',
-      type: 'warning',
-      message: 'Resource allocation at 85% capacity',
-      timestamp: new Date().toISOString(),
-      isNew: true
-    },
-    {
-      id: '2',
-      type: 'error',
-      message: 'Population model deviation detected',
-      timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString() // 15 minutes ago
-    },
-    {
-      id: '3',
-      type: 'info',
-      message: 'System update scheduled for tonight',
-      timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString() // 45 minutes ago
-    },
-    {
-      id: '4',
-      type: 'success',
-      message: 'New data sources integrated successfully',
-      timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString() // 2 hours ago
-    }
-  ];
-};
+export function getAlerts(): Promise<Alert[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          id: 1,
+          type: 'warning',
+          message: 'Social Trust Declining',
+          details: 'Youth social trust metrics show 12% decline over 6 months',
+          timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+          priority: 'high',
+          isNew: true
+        },
+        {
+          id: 2,
+          type: 'info',
+          message: 'Migration Model Updated',
+          details: 'Migration prediction model has been updated with latest census data',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
+          priority: 'medium',
+          isNew: false
+        },
+        {
+          id: 3,
+          type: 'error',
+          message: 'Education Metric Anomaly',
+          details: 'Unexpected variance in education completion rates detected',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), // 12 hours ago
+          priority: 'high',
+          isNew: false
+        },
+        {
+          id: 4,
+          type: 'success',
+          message: 'Health Index Improved',
+          details: 'Population health index shows 3.2% improvement quarter-over-quarter',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+          priority: 'low',
+          isNew: false
+        }
+      ]);
+    }, 500);
+  });
+}
 
-export const getActivity = async (): Promise<ActivityEvent[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 700));
-  
-  return [
-    {
-      id: '1',
-      event: 'Equilibrium bands computed',
-      time: '10:45 AM',
-      timeAgo: '5m ago'
-    },
-    {
-      id: '2',
-      event: 'Population model updated',
-      time: '10:30 AM',
-      timeAgo: '20m ago'
-    },
-    {
-      id: '3',
-      event: 'Pilot program launched',
-      time: '9:15 AM',
-      timeAgo: '1h ago'
-    },
-    {
-      id: '4',
-      event: 'Resource allocation optimized',
-      time: '8:45 AM',
-      timeAgo: '2h ago'
-    },
-    {
-      id: '5',
-      event: 'Forecast models recalibrated',
-      time: '8:00 AM',
-      timeAgo: '3h ago'
-    },
-    {
-      id: '6',
-      event: 'New data sources integrated',
-      time: 'Yesterday',
-      timeAgo: '1d ago'
-    },
-    {
-      id: '7',
-      event: 'System maintenance completed',
-      time: 'Yesterday',
-      timeAgo: '1d ago'
-    },
-  ];
-};
+export function getActivity(): Promise<ActivityEvent[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          id: 1,
+          event: 'Scenario "Low Migration" created',
+          type: 'Scenario',
+          timeAgo: '10 minutes ago',
+          timestamp: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+          user: 'Sarah Chen'
+        },
+        {
+          id: 2,
+          event: 'System calibration completed',
+          type: 'System',
+          timeAgo: '2 hours ago',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString()
+        },
+        {
+          id: 3,
+          event: 'Migration model parameters updated',
+          type: 'Model',
+          timeAgo: '4 hours ago',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),
+          user: 'Mohammed Al-Farsi'
+        },
+        {
+          id: 4,
+          event: 'Quarterly report generated',
+          type: 'Report',
+          timeAgo: '1 day ago',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+          user: 'System'
+        },
+        {
+          id: 5,
+          event: 'New data source integrated',
+          type: 'Data',
+          timeAgo: '2 days ago',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+          user: 'Elena Petrova'
+        }
+      ]);
+    }, 500);
+  });
+}
 
-export const getPulse = async (): Promise<PulseData> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 900));
-  
-  return {
-    score: 78,
-    stability: 75,
-    status: "All systems operational",
-    breakdown: {
-      health: {
-        name: 'Health',
-        value: 82,
-        color: 'teal-400'
-      },
-      education: {
-        name: 'Education',
-        value: 68,
-        color: 'blue-400'
-      },
-      economy: {
-        name: 'Economy',
-        value: 74,
-        color: 'emerald-400'
-      },
-      environment: {
-        name: 'Environment',
-        value: 61,
-        color: 'amber-400'
-      },
-      governance: {
-        name: 'Governance',
-        value: 79,
-        color: 'purple-400'
-      }
-    }
-  };
-};
+export function getPulse(): Promise<PulseData> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: 1,
+        timestamp: new Date().toISOString(),
+        level: 78,
+        performance: 92,
+        stability: 78,
+        status: "System operating within expected parameters"
+      });
+    }, 500);
+  });
+}
