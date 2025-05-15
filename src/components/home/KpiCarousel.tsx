@@ -14,7 +14,7 @@ import {
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { useTranslation } from '@/hooks/use-translation';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import Gauge as GaugeComponent from '@/components/ui/custom/Gauge';
+import GaugeComponent from '@/components/ui/custom/Gauge';
 import SparklineChart from '@/components/think/components/SparklineChart';
 
 interface KpiData {
