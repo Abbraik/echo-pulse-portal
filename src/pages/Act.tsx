@@ -1,71 +1,74 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Activity } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
+import CommandBar from '@/components/act/CommandBar';
+import BundlesRail from '@/components/act/BundlesRail';
+import DetailCanvas from '@/components/act/DetailCanvas';
+import DeliveryChains from '@/components/act/DeliveryChains';
+import PlaybooksLibrary from '@/components/act/PlaybooksLibrary';
+
+// View states for the main detail canvas
+export type DetailView = 'assign-leverage' | 're-optimize' | 'launch-delivery' | 'default';
 
 const Act: React.FC = () => {
+  const { t } = useTranslation();
+  // Track the active detail view based on command bar actions
+  const [detailView, setDetailView] = useState<DetailView>('default');
+  // Track the currently selected bundle
+  const [selectedBundle, setSelectedBundle] = useState<string | null>(null);
+  // Track if the playbooks library is expanded
+  const [playbooksExpanded, setPlaybooksExpanded] = useState<boolean>(false);
+
+  // Handle command bar actions
+  const handleCommandAction = (action: DetailView) => {
+    setDetailView(action);
+    if (action === 'launch-delivery') {
+      // Auto-scroll to delivery chains manager when launch is clicked
+      setTimeout(() => {
+        document.getElementById('delivery-chains')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
+
   return (
     <AnimatedPage>
-      <header className="mb-8">
-        <div className="glass-panel p-6 flex items-center space-x-4">
-          <div className="p-3 rounded-xl bg-teal-500/20 text-teal-400">
-            <Activity size={24} />
+      <div className="flex flex-col h-full">
+        {/* Command Bar */}
+        <CommandBar onAction={handleCommandAction} />
+        
+        {/* Main Content Area */}
+        <div className="flex flex-col lg:flex-row gap-4 mt-4">
+          {/* Bundles Rail (Sidebar) */}
+          <div className="w-full lg:w-1/5">
+            <BundlesRail 
+              selectedBundle={selectedBundle} 
+              onSelectBundle={setSelectedBundle}
+            />
           </div>
-          <div className="text-left">
-            <h1 className="text-3xl font-extrabold">ACT Zone</h1>
-            <p className="text-gray-400">
-              Implement strategies, coordinate resources, and execute interventions
-            </p>
-          </div>
-        </div>
-      </header>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 glass-panel p-6">
-          <h2 className="text-xl font-semibold mb-4 text-left">Strategy Wizard</h2>
-          <div className="space-y-6">
-            <div className="flex justify-between mb-8">
-              <div className="flex space-x-1">
-                <div className="w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center">1</div>
-                <div className="h-1 w-10 bg-teal-500 self-center"></div>
-                <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center">2</div>
-                <div className="h-1 w-10 bg-white/10 self-center"></div>
-                <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center">3</div>
-                <div className="h-1 w-10 bg-white/10 self-center"></div>
-                <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center">4</div>
-              </div>
-            </div>
-            
-            <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-              <h3 className="text-lg font-medium mb-4">Define Objectives</h3>
-              <div className="space-y-4">
-                {/* Just placeholders */}
-                <div className="h-14 border border-white/10 rounded-lg bg-white/5 p-4"></div>
-                <div className="h-14 border border-white/10 rounded-lg bg-white/5 p-4"></div>
-                <div className="h-14 border border-white/10 rounded-lg bg-white/5 p-4"></div>
-              </div>
-            </div>
-            
-            <div className="flex justify-end">
-              <button className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-400 transition-colors">
-                Continue
-              </button>
-            </div>
+          
+          {/* Detail Canvas (Main content) */}
+          <div className="w-full lg:w-4/5">
+            <DetailCanvas 
+              view={detailView} 
+              selectedBundle={selectedBundle}
+            />
           </div>
         </div>
         
-        <div className="glass-panel p-6">
-          <h2 className="text-xl font-semibold mb-4 text-left">Delivery & Coordination</h2>
-          <div className="h-64 bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10">
-            <p className="text-gray-400">Gantt-Kanban Hybrid</p>
-          </div>
-          
-          <div className="mt-6">
-            <h3 className="text-lg font-medium mb-3 text-left">Rapid-Test Hub</h3>
-            <div className="h-32 bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10">
-              <p className="text-gray-400">Test Console</p>
-            </div>
-          </div>
+        {/* Delivery Chains Manager */}
+        <div id="delivery-chains" className="mt-6">
+          <DeliveryChains 
+            highlightBundle={detailView === 'launch-delivery' ? selectedBundle : null}
+          />
+        </div>
+        
+        {/* Playbooks Library */}
+        <div className="mt-6">
+          <PlaybooksLibrary 
+            expanded={playbooksExpanded}
+            onToggleExpanded={() => setPlaybooksExpanded(!playbooksExpanded)}
+          />
         </div>
       </div>
     </AnimatedPage>
