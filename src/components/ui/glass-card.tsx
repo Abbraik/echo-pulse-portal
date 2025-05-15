@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { motion, MotionProps } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement>, MotionProps {
+interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'deep' | 'dark';
   glowOnHover?: boolean;
   glowColor?: string;
   children: React.ReactNode;
+  layoutId?: string;
 }
 
 export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
@@ -17,6 +18,7 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
     variant = 'default', 
     glowOnHover = false,
     glowColor = 'teal',
+    layoutId,
     ...props 
   }, ref) => {
     const variantClasses = {
@@ -28,6 +30,7 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
     return (
       <motion.div
         ref={ref}
+        layoutId={layoutId}
         className={cn(
           variantClasses[variant],
           glowOnHover && 'hover:shadow-lg transition-shadow duration-300',

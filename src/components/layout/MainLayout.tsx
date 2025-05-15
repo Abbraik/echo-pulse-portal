@@ -6,12 +6,14 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import WelcomeOverlay from '../home/WelcomeOverlay';
 import { useTheme } from '@/hooks/use-theme';
+import { useTranslation } from '@/hooks/use-translation';
 
 const MainLayout = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [hideNav, setHideNav] = useState(false);
   const { resolvedTheme } = useTheme();
+  const { isRTL } = useTranslation();
   const [isPageChanging, setIsPageChanging] = useState(false);
   
   // Handle welcome overlay
@@ -81,7 +83,7 @@ const MainLayout = () => {
   };
 
   return (
-    <div className={`flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300`}>
+    <div className={`flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300 ${isRTL ? 'rtl' : ''}`}>
       {/* Page transition overlay */}
       <AnimatePresence mode="wait">
         {isPageChanging && (
@@ -103,7 +105,7 @@ const MainLayout = () => {
       {showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
       <Navbar hidden={hideNav} />
       
-      <main className="flex-grow container mx-auto px-4 py-6 pt-20">
+      <main className={`flex-grow container mx-auto px-4 py-6 pt-20 ${isRTL ? 'font-noto-arabic' : ''}`}>
         <Outlet />
       </main>
       

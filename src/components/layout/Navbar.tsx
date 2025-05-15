@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/hooks/use-theme';
-import { useLanguage } from '@/hooks/use-language';
+import { useTranslation } from '@/hooks/use-translation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavbarProps {
@@ -23,7 +23,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { theme, resolvedTheme, setTheme } = useTheme();
-  const { language, setLanguage, isRTL } = useLanguage();
+  const { t, language, setLanguage, isRTL } = useTranslation();
   const [notifications] = useState(3); // Mock notification count
   const [isHovering, setIsHovering] = useState<string | null>(null);
 
@@ -43,11 +43,11 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
   }, [scrolled]);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'THINK', path: '/think' },
-    { name: 'ACT', path: '/act' },
-    { name: 'MONITOR', path: '/monitor' },
-    { name: 'INNOVATE', path: '/innovate' },
+    { name: t('home'), path: '/' },
+    { name: t('think'), path: '/think' },
+    { name: t('act'), path: '/act' },
+    { name: t('monitor'), path: '/monitor' },
+    { name: t('innovate'), path: '/innovate' },
   ];
 
   const toggleLanguage = () => {
@@ -77,7 +77,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                   <div className="absolute inset-0 bg-gradient-to-br from-teal-300 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <span className="hidden md:block text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
-                  {language === 'en' ? 'Population Dynamics System' : 'نظام ديناميكيات السكان'}
+                  {t('appName')}
                 </span>
               </NavLink>
             </div>
@@ -200,18 +200,18 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                     ? 'glass-panel-dark' 
                     : 'bg-white border-gray-200 shadow-md'
                 }`}>
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
                   <DropdownMenuSeparator className={
                     resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-200'
                   } />
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">Profile</DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">Settings</DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">Support</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">{t('profile')}</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">{t('settings')}</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">{t('support')}</DropdownMenuItem>
                   <DropdownMenuSeparator className={
                     resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-200'
                   } />
                   <DropdownMenuItem className="text-red-400 cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">
-                    Log out
+                    {t('logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
