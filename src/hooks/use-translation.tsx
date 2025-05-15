@@ -5,12 +5,16 @@ import ar from '@/locales/ar';
 
 type TranslationKeys = keyof typeof en;
 
+interface TranslationOptions {
+  defaultValue?: string;
+}
+
 export const useTranslation = () => {
   const { language, setLanguage, isRTL } = useLanguage();
   
-  const t = (key: TranslationKeys) => {
+  const t = (key: TranslationKeys, options?: TranslationOptions) => {
     const translations = language === 'en' ? en : ar;
-    return translations[key] || key;
+    return translations[key] || options?.defaultValue || key;
   };
   
   return {

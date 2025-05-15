@@ -179,7 +179,7 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({ highlightBundle }) => {
                             
                             <div className="flex items-center justify-between">
                               <div className="flex items-center">
-                                <span className="text-sm mr-2">{t('needsApproval', { defaultValue: 'Needs Approval' })}:</span>
+                                <span className="text-sm mr-2">{t('needsApproval', { defaultValue: 'Needs Approval' })}</span>
                                 <Switch checked={task.needsApproval} />
                               </div>
                               
