@@ -55,7 +55,9 @@ export const ar = {
   activityTitle: "النشاط الحديث",
   systemPulse: "نبض النظام",
   alertStream: "تنبيهات النظام",
-  zoneLaunchpad: "منصة إطلاق المناطق"
+  zoneLaunchpad: "منصة إطلاق المناطق",
+  systemStability: "استقرار النظام"
 };
 
 export default ar;
+

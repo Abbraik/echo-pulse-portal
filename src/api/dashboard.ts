@@ -30,6 +30,8 @@ export interface ActivityEvent {
 
 export interface PulseData {
   score: number;
+  stability: number;
+  status: string;
   breakdown: {
     [key: string]: {
       name: string;
@@ -164,6 +166,8 @@ export const getPulse = async (): Promise<PulseData> => {
   
   return {
     score: 78,
+    stability: 75,
+    status: "All systems operational",
     breakdown: {
       health: {
         name: 'Health',

@@ -58,7 +58,7 @@ const LoopNavigation = () => {
               <span className="relative flex items-center space-x-2">
                 <Icon className="w-5 h-5" />
                 <span className="font-medium text-sm hidden md:inline-block">
-                  {t(id)}
+                  {t(id as "think" | "act" | "monitor" | "innovate")}
                 </span>
               </span>
             </Link>

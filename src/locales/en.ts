@@ -55,7 +55,9 @@ export const en = {
   activityTitle: "Recent Activity",
   systemPulse: "System Pulse",
   alertStream: "System Alerts",
-  zoneLaunchpad: "Zone Launchpad"
+  zoneLaunchpad: "Zone Launchpad",
+  systemStability: "System Stability"
 };
 
 export default en;
+
