@@ -18,10 +18,10 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   
   const steps = [
-    { id: 'review', title: t('reviewObjectives', { defaultValue: 'Review Objectives' }) },
-    { id: 'choose', title: t('chooseLeverage', { defaultValue: 'Choose Leverage' }) },
-    { id: 'check', title: t('checkCoherence', { defaultValue: 'Check Coherence' }) },
-    { id: 'finalize', title: t('finalize', { defaultValue: 'Finalize' }) },
+    { id: 'review', title: t('reviewObjectives') },
+    { id: 'choose', title: t('chooseLeverage') },
+    { id: 'check', title: t('checkCoherence') },
+    { id: 'finalize', title: t('finalize') },
   ];
 
   const getContent = () => {
@@ -82,20 +82,20 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                 >
                   {currentStepIndex === 0 && (
                     <div className="h-full flex flex-col">
-                      <h3 className="text-xl font-medium mb-4">{t('reviewObjectivesTitle', { defaultValue: 'Review Bundle Objectives' })}</h3>
+                      <h3 className="text-xl font-medium mb-4">{t('reviewObjectivesTitle')}</h3>
                       <div className="flex-1 space-y-4">
                         {/* Placeholder for objectives */}
                         <div className="p-4 border border-white/10 rounded-lg bg-white/5">
-                          <h4 className="font-medium">{t('objective1', { defaultValue: 'Improve resource allocation efficiency' })}</h4>
-                          <p className="text-sm text-gray-400 mt-1">{t('objective1Desc', { defaultValue: 'Optimize distribution of critical resources across all sectors' })}</p>
+                          <h4 className="font-medium">{t('objective1')}</h4>
+                          <p className="text-sm text-gray-400 mt-1">{t('objective1Desc')}</p>
                         </div>
                         <div className="p-4 border border-white/10 rounded-lg bg-white/5">
-                          <h4 className="font-medium">{t('objective2', { defaultValue: 'Increase sustainability metrics' })}</h4>
-                          <p className="text-sm text-gray-400 mt-1">{t('objective2Desc', { defaultValue: 'Ensure long-term viability of resource management practices' })}</p>
+                          <h4 className="font-medium">{t('objective2')}</h4>
+                          <p className="text-sm text-gray-400 mt-1">{t('objective2Desc')}</p>
                         </div>
                         <div className="p-4 border border-white/10 rounded-lg bg-white/5">
-                          <h4 className="font-medium">{t('objective3', { defaultValue: 'Reduce dependency on external sources' })}</h4>
-                          <p className="text-sm text-gray-400 mt-1">{t('objective3Desc', { defaultValue: 'Develop internal capacity for resource generation and management' })}</p>
+                          <h4 className="font-medium">{t('objective3')}</h4>
+                          <p className="text-sm text-gray-400 mt-1">{t('objective3Desc')}</p>
                         </div>
                       </div>
                     </div>
@@ -103,7 +103,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                   
                   {currentStepIndex === 1 && (
                     <div className="h-full">
-                      <h3 className="text-xl font-medium mb-4">{t('chooseLeverageTitle', { defaultValue: 'Choose Leverage Points' })}</h3>
+                      <h3 className="text-xl font-medium mb-4">{t('chooseLeverageTitle')}</h3>
                       {/* Leverage points selection UI */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[1, 2, 3, 4].map(i => (
@@ -111,8 +111,18 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                             key={`leverage-${i}`}
                             className="p-4 border border-white/10 rounded-lg bg-white/5 cursor-pointer hover:bg-white/10 transition-colors"
                           >
-                            <h4 className="font-medium">{t(`leverage${i}`, { defaultValue: `Leverage Point ${i}` })}</h4>
-                            <p className="text-sm text-gray-400 mt-1">{t(`leverage${i}Desc`, { defaultValue: 'Description of this leverage point and its potential impact' })}</p>
+                            <h4 className="font-medium">
+                              {i === 1 ? t('leverage1') : 
+                               i === 2 ? t('leverage2') : 
+                               i === 3 ? t('leverage3') : 
+                               t('leverage4')}
+                            </h4>
+                            <p className="text-sm text-gray-400 mt-1">
+                              {i === 1 ? t('leverage1Desc') : 
+                               i === 2 ? t('leverage2Desc') : 
+                               i === 3 ? t('leverage3Desc') : 
+                               t('leverage4Desc')}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -121,24 +131,24 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                   
                   {currentStepIndex === 2 && (
                     <div className="h-full">
-                      <h3 className="text-xl font-medium mb-4">{t('checkCoherenceTitle', { defaultValue: 'Check Bundle Coherence' })}</h3>
+                      <h3 className="text-xl font-medium mb-4">{t('checkCoherenceTitle')}</h3>
                       {/* Coherence visualization */}
                       <div className="flex flex-col items-center justify-center p-6">
                         <div className="w-40 h-40 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white text-4xl font-bold">
                           74%
                         </div>
-                        <p className="mt-4 text-center">{t('coherenceImproved', { defaultValue: 'Bundle coherence improved by 16%' })}</p>
+                        <p className="mt-4 text-center">{t('coherenceImproved')}</p>
                       </div>
                     </div>
                   )}
                   
                   {currentStepIndex === 3 && (
                     <div className="h-full">
-                      <h3 className="text-xl font-medium mb-4">{t('finalizeTitle', { defaultValue: 'Finalize Bundle Configuration' })}</h3>
+                      <h3 className="text-xl font-medium mb-4">{t('finalizeTitle')}</h3>
                       {/* Finalization options */}
                       <div className="space-y-4">
                         <div className="p-4 border border-white/10 rounded-lg bg-white/5">
-                          <h4 className="font-medium">{t('bundleName', { defaultValue: 'Bundle Name' })}</h4>
+                          <h4 className="font-medium">{t('bundleName')}</h4>
                           <input 
                             type="text" 
                             className="w-full mt-2 bg-white/5 border border-white/20 rounded p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -147,7 +157,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                         </div>
                         
                         <div className="p-4 border border-white/10 rounded-lg bg-white/5">
-                          <h4 className="font-medium">{t('bundleDescription', { defaultValue: 'Bundle Description' })}</h4>
+                          <h4 className="font-medium">{t('bundleDescription')}</h4>
                           <textarea 
                             className="w-full mt-2 bg-white/5 border border-white/20 rounded p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
                             rows={3}
@@ -156,7 +166,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                         </div>
                         
                         <div className="p-4 border border-white/10 rounded-lg bg-white/5">
-                          <h4 className="font-medium">{t('assignApprovers', { defaultValue: 'Assign Approvers' })}</h4>
+                          <h4 className="font-medium">{t('assignApprovers')}</h4>
                           <div className="flex flex-wrap gap-2 mt-2">
                             <div className="bg-white/10 px-3 py-1 rounded-full text-sm">Sarah Chen</div>
                             <div className="bg-white/10 px-3 py-1 rounded-full text-sm">Mohammed Al-Farsi</div>
@@ -178,7 +188,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                 onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
                 disabled={currentStepIndex === 0}
               >
-                {t('previous', { defaultValue: 'Previous' })}
+                {t('previous')}
               </Button>
               <Button
                 onClick={() => {
@@ -190,8 +200,8 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                 }}
               >
                 {currentStepIndex < steps.length - 1 ? 
-                  t('next', { defaultValue: 'Next' }) : 
-                  t('complete', { defaultValue: 'Complete' })
+                  t('next') : 
+                  t('complete')
                 }
               </Button>
             </div>
@@ -201,14 +211,14 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
       case 're-optimize':
         return (
           <div className="h-full">
-            <h2 className="text-xl font-medium mb-6">{t('optimizeBands', { defaultValue: 'Optimize Equilibrium Bands' })}</h2>
+            <h2 className="text-xl font-medium mb-6">{t('optimizeBands')}</h2>
             
             {/* Sliders for optimization parameters */}
             <div className="space-y-8">
               {['economic', 'social', 'environmental', 'governance'].map((band) => (
                 <div key={band} className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="capitalize">{t(band, { defaultValue: band })}</span>
+                    <span className="capitalize">{t(band as 'economic' | 'social' | 'environmental' | 'governance')}</span>
                     <span className="text-sm text-gray-400">65%</span>
                   </div>
                   <Slider
@@ -222,8 +232,8 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
               
               <div className="pt-4 border-t border-white/10">
                 <div className="flex justify-between mb-2">
-                  <span>{t('weightDistribution', { defaultValue: 'Weight Distribution' })}</span>
-                  <span className="text-sm text-gray-400">{t('balanced', { defaultValue: 'Balanced' })}</span>
+                  <span>{t('weightDistribution')}</span>
+                  <span className="text-sm text-gray-400">{t('balanced')}</span>
                 </div>
                 <div className="grid grid-cols-4 gap-1 h-6">
                   <div className="bg-teal-500/80 rounded-l-full" />
@@ -235,7 +245,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
               
               <div className="flex justify-center">
                 <Button size="lg" className="px-8">
-                  {t('compute', { defaultValue: 'Compute' })}
+                  {t('compute')}
                 </Button>
               </div>
             </div>
@@ -251,10 +261,10 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
               transition={{ duration: 0.5 }}
             >
               <h2 className="text-2xl font-bold mb-4">
-                {t('launchingDeliveryPlan', { defaultValue: 'Launching Delivery Plan' })}
+                {t('launchingDeliveryPlan')}
               </h2>
               <p className="text-gray-400 mb-8">
-                {t('scrollingToDelivery', { defaultValue: 'Scrolling to Delivery Chains Manager...' })}
+                {t('scrollingToDelivery')}
               </p>
               <div className="animate-pulse text-teal-400 text-6xl">↓</div>
             </motion.div>
@@ -266,12 +276,12 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
           <div className="h-full flex flex-col items-center justify-center text-center py-12">
             <h2 className="text-xl font-medium mb-4">
               {selectedBundle ? 
-                t('selectAction', { defaultValue: 'Select an action from the command bar' }) : 
-                t('selectBundle', { defaultValue: 'Select a bundle from the sidebar' })
+                t('selectAction') : 
+                t('selectBundle')
               }
             </h2>
             <p className="text-gray-400">
-              {t('detailInstructions', { defaultValue: 'Use the command bar above to assign leverage, optimize bands, or launch a delivery plan' })}
+              {t('detailInstructions')}
             </p>
           </div>
         );

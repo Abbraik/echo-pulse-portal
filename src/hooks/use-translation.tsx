@@ -8,17 +8,9 @@ type TranslationKeys = keyof typeof en;
 export const useTranslation = () => {
   const { language, setLanguage, isRTL } = useLanguage();
   
-  const t = (key: TranslationKeys, placeholders?: Record<string, string>) => {
+  const t = (key: TranslationKeys) => {
     const translations = language === 'en' ? en : ar;
-    let text = translations[key] || key;
-    
-    if (placeholders) {
-      Object.entries(placeholders).forEach(([key, value]) => {
-        text = text.replace(new RegExp(`{${key}}`, 'g'), value);
-      });
-    }
-    
-    return text;
+    return translations[key] || key;
   };
   
   return {
