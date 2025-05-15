@@ -8,8 +8,9 @@ interface GaugeProps {
   min?: number;
   max?: number;
   label?: string;
-  size?: 'sm' | 'md' | 'lg';
-  color?: 'teal' | 'blue' | 'amber' | 'purple' | 'emerald';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  color?: 'teal' | 'blue' | 'amber' | 'purple' | 'emerald' | 'gold' | 'rose';
+  showValue?: boolean;
 }
 
 const Gauge: React.FC<GaugeProps> = ({ 
@@ -18,7 +19,8 @@ const Gauge: React.FC<GaugeProps> = ({
   max = 100, 
   label, 
   size = 'md',
-  color = 'teal' 
+  color = 'teal',
+  showValue = false
 }) => {
   // Normalize value between 0 and 1
   const normalizedValue = Math.max(0, Math.min(1, (value - min) / (max - min)));
@@ -49,6 +51,13 @@ const Gauge: React.FC<GaugeProps> = ({
       centerCircle: 'w-20 h-20',
       valueText: 'text-3xl',
     },
+    xl: {
+      container: 'w-48 h-48',
+      needle: 'w-2 h-20',
+      icon: 32,
+      centerCircle: 'w-24 h-24',
+      valueText: 'text-4xl',
+    },
   };
   
   const colorClasses = {
@@ -66,6 +75,16 @@ const Gauge: React.FC<GaugeProps> = ({
       fill: 'from-amber-500 to-amber-300',
       text: 'text-amber-400',
       icon: 'text-amber-400',
+    },
+    gold: {
+      fill: 'from-amber-500 to-amber-300',
+      text: 'text-amber-400',
+      icon: 'text-amber-400',
+    },
+    rose: {
+      fill: 'from-rose-500 to-rose-300',
+      text: 'text-rose-400',
+      icon: 'text-rose-400',
     },
     purple: {
       fill: 'from-purple-500 to-purple-300',
@@ -115,17 +134,19 @@ const Gauge: React.FC<GaugeProps> = ({
         </motion.div>
         
         {/* Gauge value indicator */}
-        <div className="absolute -bottom-2 inset-x-0 text-center">
-          <motion.span 
-            className={`${sizeClasses[size].valueText} font-bold text-white`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            {value}
-          </motion.span>
-          <span className="text-xs text-gray-400">/{max}</span>
-        </div>
+        {showValue && (
+          <div className="absolute -bottom-2 inset-x-0 text-center">
+            <motion.span 
+              className={`${sizeClasses[size].valueText} font-bold text-white`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              {value}
+            </motion.span>
+            <span className="text-xs text-gray-400">/{max}</span>
+          </div>
+        )}
       </div>
       
       {label && (

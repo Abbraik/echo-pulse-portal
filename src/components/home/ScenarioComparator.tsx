@@ -1,7 +1,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowLeftRight, CircleA, CircleB } from "lucide-react";
+import { ArrowLeftRight, Circle, CircleDashed } from "lucide-react";
 import { ParallaxCard } from "@/components/ui/parallax-card";
 import { GlassCard, GlassCardHeader, GlassCardTitle, GlassCardContent, GlassCardFooter } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ interface ScenarioCardProps {
 
 const ScenarioCard: React.FC<ScenarioCardProps> = ({ title, letter, value, isPositive }) => {
   const { t, isRTL } = useTranslation();
-  const Icon = letter === "A" ? CircleA : CircleB;
+  const Icon = letter === "A" ? Circle : CircleDashed;
   
   return (
     <motion.div
@@ -34,8 +34,11 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({ title, letter, value, isPos
       <GlassCard className="h-full rounded-3xl overflow-hidden" variant="deep">
         <div className="aspect-square p-6 flex flex-col items-center justify-center">
           {/* Letter badge */}
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <Icon size={48} className="text-teal-400" />
+            <span className="absolute inset-0 flex items-center justify-center font-bold text-lg">
+              {letter}
+            </span>
           </div>
           
           {/* Title */}

@@ -6,7 +6,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { getKPIs, getAlerts, getActivity, getPulse } from '../api/dashboard';
 import { KPI, Alert, ActivityEvent, PulseData } from '../api/dashboard';
 import { useTranslation } from '@/hooks/use-translation';
-import { ParticlesBackground } from "@/components/ui/particles-background";
+import ParticlesBackground from "@/components/ui/particles-background";
 import WelcomeOverlay from '../components/home/WelcomeOverlay';
 import Footer from '../components/layout/Footer';
 
