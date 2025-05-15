@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Menu, User, Bell, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/hooks/use-theme';
+import { useLanguage } from '@/hooks/use-language';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavbarProps {
@@ -22,10 +23,12 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { theme, resolvedTheme, setTheme } = useTheme();
+  const { language, setLanguage, isRTL } = useLanguage();
   const [notifications] = useState(3); // Mock notification count
+  const [isHovering, setIsHovering] = useState<string | null>(null);
 
   // Listen for scroll events
-  React.useEffect(() => {
+  useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
       if (isScrolled !== scrolled) {
@@ -47,6 +50,10 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
     { name: 'INNOVATE', path: '/innovate' },
   ];
 
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'ar' : 'en');
+  };
+
   return (
     <AnimatePresence>
       <motion.nav
@@ -62,20 +69,21 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
         transition={{ duration: 0.3 }}
       >
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <NavLink to="/" className="flex items-center space-x-2">
-                <div className="h-8 w-8 bg-gradient-to-br from-teal-400 to-blue-500 rounded-lg flex items-center justify-center text-white font-bold">
-                  PD
+          <div className={`flex items-center justify-between h-16 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <NavLink to="/" className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
+                <div className="h-8 w-8 bg-gradient-to-br from-teal-400 to-blue-500 rounded-lg flex items-center justify-center text-white font-bold relative overflow-hidden group">
+                  <span className="relative z-10">PD</span>
+                  <div className="absolute inset-0 bg-gradient-to-br from-teal-300 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <span className="hidden md:block text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
-                  Population Dynamics System
+                  {language === 'en' ? 'Population Dynamics System' : 'نظام ديناميكيات السكان'}
                 </span>
               </NavLink>
             </div>
 
-            <div className="hidden md:flex items-center justify-center flex-1">
-              <div className="flex space-x-1">
+            <div className={`hidden md:flex items-center justify-center flex-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex ${isRTL ? 'flex-row-reverse space-x-reverse' : ''} space-x-1`}>
                 {navLinks.map((link) => (
                   <NavLink
                     key={link.path}
@@ -89,15 +97,40 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                             : 'text-gray-600 hover:bg-black/5 hover:text-gray-900'
                       }`
                     }
+                    onMouseEnter={() => setIsHovering(link.path)}
+                    onMouseLeave={() => setIsHovering(null)}
                   >
                     {link.name}
-                    <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-teal-400 transition-all duration-300 group-hover:w-full"></span>
+                    {isHovering === link.path && (
+                      <motion.span
+                        layoutId="nav-hover"
+                        className="absolute bottom-0 left-0 h-[2px] w-full bg-gradient-to-r from-teal-400 to-blue-500"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    )}
                   </NavLink>
                 ))}
               </div>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
+              {/* Language Toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleLanguage}
+                className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5 relative"
+              >
+                <Globe size={18} className="text-gray-300 dark:text-gray-300 light:text-gray-600" />
+                <span className="absolute -top-1 -right-1 text-[10px] font-bold bg-gradient-to-r from-teal-400 to-blue-500 text-white rounded-full w-4 h-4 flex items-center justify-center">
+                  {language === 'en' ? 'AR' : 'EN'}
+                </span>
+              </Button>
+              
+              {/* Notification Bell */}
               <div className="relative">
                 <Button
                   variant="ghost"
@@ -107,12 +140,17 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                   <Bell size={18} className="text-gray-300 dark:text-gray-300 light:text-gray-600" />
                 </Button>
                 {notifications > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white">
+                  <motion.span 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 h-4 w-4 bg-gradient-to-r from-teal-400 to-blue-500 rounded-full flex items-center justify-center text-xs text-white"
+                  >
                     {notifications > 9 ? '9+' : notifications}
-                  </span>
+                  </motion.span>
                 )}
               </div>
 
+              {/* Theme Toggle */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -144,6 +182,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                 </AnimatePresence>
               </Button>
 
+              {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button

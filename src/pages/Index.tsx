@@ -1,79 +1,274 @@
 
-import React, { useEffect } from 'react';
-import { Staggered } from '@/components/ui/motion';
-import KpiCarousel from '@/components/home/KpiCarousel';
-import SystemPulseOrb from '@/components/home/SystemPulseOrb';
-import AlertStream from '@/components/home/AlertStream';
-import ZoneLaunchpad from '@/components/home/ZoneLaunchpad';
-import ActivityStrip from '@/components/home/ActivityStrip';
-import ActivityTimeline from '@/components/home/ActivityTimeline';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { ChevronRight, Heart, Globe, Layers, Cpu, BarChart, Zap, Users } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+
+const ParticleBackground = () => {
+  return (
+    <div className="absolute inset-0 -z-10 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b dark:from-navy-900/80 dark:to-navy-900 from-blue-50/80 to-white"></div>
+      {Array(20)
+        .fill(0)
+        .map((_, i) => (
+          <div 
+            key={i}
+            className="absolute rounded-full bg-teal-500/10 animate-float-subtle"
+            style={{
+              width: `${Math.random() * 200 + 50}px`,
+              height: `${Math.random() * 200 + 50}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${8 + Math.random() * 10}s`,
+            }}
+          />
+        ))}
+    </div>
+  );
+};
+
+const ZoneCard = ({ icon: Icon, title, description, color, delay = 0 }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.5 }}
+      className="group relative"
+    >
+      <Card className="glass-panel-deep hover:shadow-xl transition-all duration-300 overflow-hidden h-full border border-white/20">
+        <div className={`absolute inset-0 ${color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
+        <CardContent className="p-6 flex flex-col items-center text-center h-full">
+          <div className="relative mb-4">
+            <div className={`absolute inset-0 blur-xl ${color} opacity-20 group-hover:opacity-30 transition-all duration-300`}></div>
+            <div className={`relative z-10 h-12 w-12 rounded-xl flex items-center justify-center ${color} bg-opacity-10 group-hover:bg-opacity-20 transition-all duration-300`}>
+              <Icon size={24} className={`${color} text-opacity-80`} />
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold mb-2">{title}</h3>
+          <p className="text-sm text-muted-foreground mb-4">{description}</p>
+          <div className="mt-auto">
+            <Button variant="ghost" size="sm" className="group-hover:translate-x-1 transition-transform duration-300">
+              Explore <ChevronRight size={16} className="ml-1" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
+
+const GlowingButton = ({ children, ...props }) => {
+  return (
+    <button
+      className="relative px-6 py-3 bg-gradient-to-r from-teal-500 to-blue-600 rounded-lg text-white font-medium group overflow-hidden"
+      {...props}
+    >
+      <span className="relative z-10">{children}</span>
+      <span className="absolute inset-0 bg-gradient-to-r from-teal-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+      <span className="absolute inset-0 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 bg-white/20"></span>
+    </button>
+  );
+};
 
 const Index: React.FC = () => {
-  // Current system phase indicator
-  const currentPhase = {
-    name: "Optimization",
-    color: "from-teal-500 to-teal-400"
-  };
+  const { resolvedTheme } = useTheme();
+  const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(false);
+  
+  useEffect(() => {
+    // Simulating content loading for animation purposes
+    setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+  }, []);
+  
+  const zones = [
+    { 
+      icon: Heart, 
+      title: "Home", 
+      description: "Dashboard with real-time population metrics and system health indicators", 
+      color: "text-teal-500",
+      path: "/home"
+    },
+    { 
+      icon: Globe, 
+      title: "THINK", 
+      description: "Advanced system modeling and collaborative scenario planning tools", 
+      color: "text-blue-500",
+      path: "/think"
+    },
+    { 
+      icon: Layers, 
+      title: "ACT", 
+      description: "Implement strategic interventions and policy adjustments", 
+      color: "text-indigo-500",
+      path: "/act"
+    },
+    { 
+      icon: BarChart, 
+      title: "MONITOR", 
+      description: "Track outcomes and visualize system performance metrics", 
+      color: "text-violet-500",
+      path: "/monitor"
+    },
+    { 
+      icon: Zap, 
+      title: "INNOVATE", 
+      description: "Explore emerging practices and experimental approaches", 
+      color: "text-fuchsia-500",
+      path: "/innovate"
+    },
+    { 
+      icon: Cpu, 
+      title: "Sandbox Lab", 
+      description: "Test new models and strategies in a controlled environment", 
+      color: "text-rose-500",
+      path: "/sandbox"
+    },
+  ];
 
   return (
-    <div className="space-y-8 pb-10">
-      {/* Hero section with animated gradient header */}
-      <header className="glass-panel py-8 px-6 relative overflow-hidden mb-8">
-        <div className="absolute -inset-1/2 bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-full blur-3xl transform -rotate-12 pointer-events-none"></div>
-        
-        <Staggered>
-          <motion.h1 
-            className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500 mb-4"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            Population Dynamics System
-          </motion.h1>
-          
-          <motion.p 
-            className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-6"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Analyze, strategize, and optimize population dynamics with real-time insights and collaborative tools
-          </motion.p>
-          
-          <motion.div 
-            className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500/20 to-teal-500/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <span className={`inline-block h-3 w-3 rounded-full bg-gradient-to-r ${currentPhase.color} animate-pulse`}></span>
-            <span>Current Phase: <span className="font-medium text-white">{currentPhase.name}</span></span>
-          </motion.div>
-        </Staggered>
-      </header>
-
-      {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left column - KPI carousel and Activity timeline */}
-        <div className="lg:col-span-2 space-y-8">
-          <KpiCarousel />
-          <ActivityTimeline />
-        </div>
-        
-        {/* Right column - System pulse and alerts */}
-        <div className="space-y-8">
-          <SystemPulseOrb />
-          <AlertStream />
-        </div>
-      </div>
+    <div className="min-h-screen w-full relative pb-20">
+      <ParticleBackground />
       
-      {/* Zone launchpad section */}
-      <ZoneLaunchpad />
+      <AnimatePresence>
+        {isVisible && (
+          <div className="container mx-auto px-4 pt-12 pb-20 relative z-10">
+            {/* Hero Section with animated text */}
+            <motion.section 
+              className="text-center mb-20"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+            >
+              <motion.h1 
+                className="text-4xl md:text-6xl font-black mb-6"
+                initial={{ y: -20 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <span className="hero-heading">Population Dynamics System</span>
+              </motion.h1>
+              
+              <motion.p 
+                className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                Analyze, strategize, and optimize population dynamics with real-time insights and collaborative tools
+              </motion.p>
+              
+              <motion.div
+                className="flex flex-wrap gap-4 justify-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+              >
+                <GlowingButton onClick={() => navigate('/home')}>
+                  Launch Dashboard
+                </GlowingButton>
+                
+                <Button variant="outline" className="border-white/20 backdrop-blur-sm hover:bg-white/10">
+                  Learn More
+                </Button>
+              </motion.div>
+            </motion.section>
+            
+            {/* Featured Phase Indicator */}
+            <motion.div 
+              className="relative max-w-md mx-auto mb-20"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <div className="glass-panel-deep py-4 px-6">
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-2xl"></div>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="inline-block h-3 w-3 rounded-full bg-gradient-to-r from-teal-400 to-teal-500 animate-pulse"></span>
+                  <span>Current Phase: <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">Optimization</span></span>
+                </div>
+              </div>
+            </motion.div>
+            
+            {/* Zones Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+              {zones.map((zone, idx) => (
+                <div key={zone.title} onClick={() => navigate(zone.path)} className="cursor-pointer">
+                  <ZoneCard 
+                    icon={zone.icon} 
+                    title={zone.title}
+                    description={zone.description}
+                    color={zone.color}
+                    delay={0.2 + idx * 0.1}
+                  />
+                </div>
+              ))}
+            </div>
+            
+            {/* System Status Card */}
+            <motion.div
+              className="max-w-4xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+            >
+              <div className="glass-panel-deep p-6 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-teal-500/5 rounded-2xl"></div>
+                
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold mb-2">System Status</h3>
+                    <p className="text-muted-foreground text-sm mb-4">All systems operational with 99.9% uptime</p>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block h-2 w-2 rounded-full bg-teal-500"></span>
+                        <span className="text-xs text-muted-foreground">Data Processing</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block h-2 w-2 rounded-full bg-teal-500"></span>
+                        <span className="text-xs text-muted-foreground">Analysis Engine</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block h-2 w-2 rounded-full bg-teal-500"></span>
+                        <span className="text-xs text-muted-foreground">Visualization API</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="relative h-16 w-16">
+                    <div className="absolute inset-0 bg-teal-500/20 rounded-full animate-pulse blur-xl"></div>
+                    <div className="relative z-10 h-full w-full rounded-full border-4 border-t-teal-500 border-r-transparent border-b-transparent border-l-transparent animate-spin" style={{ animationDuration: '3s' }}></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Users size={20} className="text-teal-500" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       
-      {/* Activity stream at the bottom */}
-      <div className="mt-8">
-        <ActivityStrip />
+      {/* Navigation Ribbon */}
+      <div className="nav-ribbon">
+        {zones.map((zone) => (
+          <button 
+            key={zone.title}
+            onClick={() => navigate(zone.path)}
+            className={`nav-ribbon-item ${
+              window.location.pathname === zone.path ? 'nav-ribbon-item-active' : ''
+            }`}
+          >
+            <zone.icon size={16} className="mr-2 inline" />
+            <span>{zone.title === "Home" ? "Home" : zone.title.charAt(0)}</span>
+          </button>
+        ))}
       </div>
     </div>
   );

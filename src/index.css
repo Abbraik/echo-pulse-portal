@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans:wght@100;200;300;400;500;600;700;800;900&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -94,7 +95,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-inter;
   }
   
   ::-webkit-scrollbar {
@@ -115,6 +116,15 @@
     @apply backdrop-blur-lg rounded-2xl shadow-lg;
     @apply dark:bg-white/10 dark:border dark:border-white/20;
     @apply bg-secondary/80 border border-black/10;
+    @apply transition-all duration-300;
+  }
+  
+  .glass-panel-deep {
+    @apply backdrop-blur-xl rounded-2xl shadow-xl;
+    @apply dark:bg-white/5 dark:border dark:border-white/10;
+    @apply bg-white/40 border border-white/30;
+    @apply transition-all duration-300;
+    @apply relative overflow-hidden;
   }
   
   .glass-panel-dark {
@@ -144,6 +154,80 @@
   .animated-gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-blue-500 to-teal-300 bg-size-200 animate-gradient;
   }
+
+  /* New 3D-infused components */
+  .panel-3d {
+    @apply relative overflow-hidden;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+  
+  .panel-3d-content {
+    @apply relative z-10;
+    transform: translateZ(20px);
+  }
+  
+  .panel-3d-bg {
+    @apply absolute inset-0 -z-10;
+    transform: translateZ(0);
+  }
+  
+  /* New glassmorphism inner glow */
+  .glass-glow {
+    @apply relative;
+  }
+  
+  .glass-glow::before {
+    content: '';
+    @apply absolute inset-0 rounded-2xl;
+    @apply bg-gradient-to-br from-white/20 to-transparent;
+    @apply dark:from-white/10 dark:to-transparent;
+    @apply blur-sm;
+  }
+  
+  /* Dynamic typography */
+  .hero-heading {
+    @apply font-inter font-black text-transparent bg-clip-text;
+    @apply bg-gradient-to-r from-teal-400 via-blue-500 to-teal-500;
+    @apply animate-text-reveal;
+  }
+  
+  /* Interactive button styles */
+  .btn-primary-glow {
+    @apply relative overflow-hidden bg-gradient-to-r from-teal-500 to-blue-600;
+    @apply text-white font-medium rounded-lg px-4 py-2;
+    @apply hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2;
+  }
+  
+  .btn-secondary-glow {
+    @apply relative overflow-hidden bg-white/10 backdrop-blur-md;
+    @apply border border-white/20 text-foreground font-medium rounded-lg px-4 py-2;
+    @apply hover:bg-white/20 hover:shadow-lg transition-all duration-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2;
+  }
+  
+  /* RTL Support */
+  .rtl {
+    direction: rtl;
+  }
+  
+  /* Zone navigation ribbon */
+  .nav-ribbon {
+    @apply fixed bottom-4 left-1/2 -translate-x-1/2 z-50;
+    @apply flex items-center gap-2 py-2 px-4 rounded-full;
+    @apply bg-white/10 backdrop-blur-lg border border-white/20;
+    @apply shadow-xl shadow-black/5;
+  }
+  
+  .nav-ribbon-item {
+    @apply relative px-4 py-2 rounded-full text-sm font-medium transition-all;
+    @apply hover:bg-white/10;
+  }
+  
+  .nav-ribbon-item-active {
+    @apply bg-gradient-to-r from-teal-500 to-blue-600 text-white;
+  }
 }
 
 @layer utilities {
@@ -153,6 +237,30 @@
   
   .animate-gradient {
     animation: moveGradient 5s infinite linear;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-pulse-subtle {
+    animation: pulsate 3s ease-in-out infinite;
+  }
+  
+  .animate-text-reveal {
+    animation: textReveal 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+  
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .font-noto {
+    font-family: 'Noto Sans', sans-serif;
+  }
+  
+  .font-noto-arabic {
+    font-family: 'Noto Naskh Arabic', serif;
   }
   
   @keyframes moveGradient {
@@ -165,8 +273,25 @@
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
   }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  @keyframes pulsate {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.03); }
+  }
+  
+  @keyframes textReveal {
+    from { letter-spacing: -8px; opacity: 0; }
+    to { letter-spacing: normal; opacity: 1; }
+  }
 }
 
+/* Root element styling */
 #root {
   width: 100%;
   margin: 0;

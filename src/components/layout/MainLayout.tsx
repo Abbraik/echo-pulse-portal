@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import WelcomeOverlay from '../home/WelcomeOverlay';
@@ -11,6 +12,7 @@ const MainLayout = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [hideNav, setHideNav] = useState(false);
   const { resolvedTheme } = useTheme();
+  const [isPageChanging, setIsPageChanging] = useState(false);
   
   // Handle welcome overlay
   useEffect(() => {
@@ -51,17 +53,60 @@ const MainLayout = () => {
     };
   }, [lastScrollY, hideNav]);
   
+  // Simulate page transitions
+  const handlePageChange = () => {
+    setIsPageChanging(true);
+    setTimeout(() => {
+      setIsPageChanging(false);
+    }, 1000);
+  };
+  
+  useEffect(() => {
+    window.addEventListener('popstate', handlePageChange);
+    
+    const originalPushState = history.pushState;
+    history.pushState = function() {
+      originalPushState.apply(this, arguments);
+      handlePageChange();
+    };
+    
+    return () => {
+      window.removeEventListener('popstate', handlePageChange);
+      history.pushState = originalPushState;
+    };
+  }, []);
+  
   const handleDismissWelcome = () => {
     setShowWelcome(false);
   };
 
   return (
     <div className={`flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300`}>
+      {/* Page transition overlay */}
+      <AnimatePresence mode="wait">
+        {isPageChanging && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-gradient-to-r from-teal-500/20 to-blue-500/20 backdrop-blur-lg flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="relative h-16 w-16">
+              <div className="absolute inset-0 bg-teal-500/20 rounded-full animate-pulse blur-xl"></div>
+              <div className="relative z-10 h-full w-full rounded-full border-4 border-t-teal-500 border-r-transparent border-b-transparent border-l-transparent animate-spin" style={{ animationDuration: '1s' }}></div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
       {showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
       <Navbar hidden={hideNav} />
+      
       <main className="flex-grow container mx-auto px-4 py-6 pt-20">
         <Outlet />
       </main>
+      
       <Footer />
     </div>
   );
