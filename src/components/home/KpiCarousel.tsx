@@ -1,8 +1,21 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Gauge } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Gauge, TrendingUp, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
+import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
+import { useTranslation } from '@/hooks/use-translation';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import Gauge as GaugeComponent from '@/components/ui/custom/Gauge';
+import SparklineChart from '@/components/think/components/SparklineChart';
 
 interface KpiData {
   id: string;
@@ -12,12 +25,16 @@ interface KpiData {
   min: number;
   max: number;
   color: string;
+  type: 'gauge' | 'grid' | 'sparkline';
+  icon: React.ElementType;
+  data?: number[];
 }
 
 const KpiCarousel: React.FC = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { t, isRTL } = useTranslation();
   const [kpis, setKpis] = useState<KpiData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [autoplay, setAutoplay] = useState(true);
 
   useEffect(() => {
     // Simulating API call
@@ -30,166 +47,200 @@ const KpiCarousel: React.FC = () => {
           target: 80, 
           min: 0, 
           max: 100,
-          color: 'teal' 
+          color: 'teal',
+          type: 'gauge',
+          icon: Gauge
         },
         { 
           id: '2', 
-          name: 'Network Reach', 
+          name: 'Trust Recovery Index', 
           value: 45, 
           target: 60, 
           min: 0, 
           max: 100,
-          color: 'blue' 
+          color: 'amber',
+          type: 'gauge',
+          icon: Gauge
         },
         { 
           id: '3', 
-          name: 'Equilibrium Status', 
+          name: 'Average Bundle Coherence', 
           value: 82, 
           target: 75, 
           min: 0, 
           max: 100,
-          color: 'emerald'
+          color: 'blue',
+          type: 'grid',
+          icon: Gauge
+        },
+        { 
+          id: '4', 
+          name: 'Pilot Success Rate', 
+          value: 73, 
+          target: 70, 
+          min: 0, 
+          max: 100,
+          color: 'emerald',
+          type: 'sparkline',
+          icon: TrendingUp,
+          data: [65, 68, 62, 70, 75, 73, 77, 73]
         },
       ]);
       setLoading(false);
     }, 800);
   }, []);
 
-  const nextKpi = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % kpis.length);
-  };
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    
+    if (autoplay) {
+      interval = setInterval(() => {
+        // Auto-rotate logic would go here if we weren't using the Carousel component
+        // which handles this internally
+      }, 5000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [autoplay]);
 
-  const prevKpi = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? kpis.length - 1 : prevIndex - 1
-    );
-  };
-
-  const calculateRotation = (value: number, min: number, max: number) => {
-    // Convert value to degrees (0-180 degree rotation)
-    const percentage = ((value - min) / (max - min)) * 100;
-    return (percentage / 100) * 180 - 90; // -90 to +90 degrees
-  };
+  const handleMouseEnter = () => setAutoplay(false);
+  const handleMouseLeave = () => setAutoplay(true);
 
   if (loading) {
     return (
-      <div className="glass-panel animate-pulse flex items-center justify-center p-12 h-56">
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-teal-500/20 rounded-full mb-3"></div>
-          <div className="w-36 h-3 bg-gray-500/20 rounded-full"></div>
-        </div>
+      <div className="w-full">
+        <GlassCard className="animate-pulse p-6 h-64">
+          <div className="flex flex-col items-center justify-center h-full space-y-4">
+            <Skeleton className="w-24 h-24 rounded-full" />
+            <Skeleton className="w-48 h-4" />
+            <Skeleton className="w-32 h-4" />
+          </div>
+        </GlassCard>
       </div>
     );
   }
 
-  const currentKpi = kpis[currentIndex];
-  const rotation = calculateRotation(
-    currentKpi.value,
-    currentKpi.min,
-    currentKpi.max
-  );
-
-  const getColorClass = (color: string) => {
-    const colorMap: Record<string, string> = {
-      teal: 'from-teal-500 to-teal-300',
-      blue: 'from-blue-500 to-blue-300',
-      emerald: 'from-emerald-500 to-emerald-300',
-      amber: 'from-amber-500 to-amber-300',
-      red: 'from-red-500 to-red-300',
-    };
-    
-    return colorMap[color] || 'from-teal-500 to-teal-300';
-  };
-
   return (
-    <div className="glass-panel p-6 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
-      
-      <h2 className="text-lg font-semibold mb-4 text-left">Key Performance Indicators</h2>
-      
-      <div className="flex justify-between items-center">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full hover:bg-white/10 z-10"
-          onClick={prevKpi}
-        >
-          <ChevronLeft size={20} />
-        </Button>
+    <div 
+      className="w-full" 
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <GlassCard className="p-6 relative overflow-hidden" variant="deep">
+        <h2 className="text-xl font-semibold mb-6">Key Performance Indicators</h2>
         
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentKpi.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col items-center flex-1 px-4"
-          >
-            <div className="relative w-32 h-32">
-              {/* Gauge background */}
-              <div className="absolute inset-0 rounded-full border-8 border-gray-700/30"></div>
-              
-              {/* Gauge fill */}
-              <div className="absolute inset-0 rounded-full overflow-hidden">
-                <div 
-                  className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t ${getColorClass(currentKpi.color)}`} 
-                  style={{ height: `${(currentKpi.value / currentKpi.max) * 100}%`, transition: 'height 1s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-                ></div>
-              </div>
-              
-              {/* Center circle */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-navy-800/80 flex items-center justify-center backdrop-blur">
-                  <Gauge className="text-teal-400" size={24} />
+        <Carousel 
+          className="w-full"
+          opts={{
+            loop: true,
+            align: "start",
+          }}
+        >
+          <CarouselContent>
+            {kpis.map((kpi) => (
+              <CarouselItem key={kpi.id} className="md:basis-1/2 lg:basis-1/2">
+                <div className="p-1">
+                  <KpiCard kpi={kpi} />
                 </div>
-              </div>
-              
-              {/* Gauge needle */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div 
-                  className="w-1 h-12 bg-gradient-to-b from-white to-teal-400 rounded origin-bottom transform"
-                  style={{ transform: `translateY(-6px) rotate(${rotation}deg)`, transition: 'transform 1s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-                ></div>
-              </div>
-              
-              {/* Gauge value indicator */}
-              <div className="absolute -bottom-2 inset-x-0 text-center">
-                <span className="text-2xl font-bold text-white">{currentKpi.value}</span>
-                <span className="text-xs text-gray-400">/{currentKpi.max}</span>
-              </div>
-            </div>
-            
-            <h3 className="mt-4 font-medium text-center">{currentKpi.name}</h3>
-            <p className="text-sm text-gray-400">
-              Target: {currentKpi.target}
-            </p>
-          </motion.div>
-        </AnimatePresence>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          
+          <div className="hidden md:flex justify-end mt-4">
+            <CarouselPrevious className="relative static transform-none mx-2" />
+            <CarouselNext className="relative static transform-none mx-2" />
+          </div>
+        </Carousel>
         
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full hover:bg-white/10 z-10"
-          onClick={nextKpi}
-        >
-          <ChevronRight size={20} />
-        </Button>
-      </div>
-      
-      {/* Indicator dots */}
-      <div className="flex justify-center mt-4 space-x-2">
-        {kpis.map((kpi, index) => (
-          <button
-            key={kpi.id}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === currentIndex ? 'bg-teal-400 w-4' : 'bg-gray-600'
-            }`}
-          ></button>
-        ))}
-      </div>
+        {/* Indicator dots for mobile */}
+        <div className="flex justify-center mt-4 md:hidden space-x-2">
+          {kpis.map((kpi, index) => (
+            <div
+              key={kpi.id}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                index === 0 ? 'bg-teal-400 w-4' : 'bg-gray-600'
+              }`}
+            />
+          ))}
+        </div>
+      </GlassCard>
     </div>
+  );
+};
+
+interface KpiCardProps {
+  kpi: KpiData;
+}
+
+const KpiCard: React.FC<KpiCardProps> = ({ kpi }) => {
+  const { t } = useTranslation();
+  const Icon = kpi.icon;
+  
+  return (
+    <GlassCard className="h-full rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-white/10">
+      <AspectRatio ratio={4/3}>
+        <GlassCardContent className="p-4 flex flex-col h-full">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-medium text-base">{kpi.name}</h3>
+            <Icon className={`h-5 w-5 text-${kpi.color}-400`} />
+          </div>
+          
+          <div className="flex-grow flex items-center justify-center py-2">
+            {kpi.type === 'gauge' && (
+              <div className="flex flex-col items-center">
+                <GaugeComponent 
+                  value={kpi.value} 
+                  min={kpi.min} 
+                  max={kpi.max}
+                  size="md"
+                  color={kpi.color}
+                  showValue={true}
+                />
+              </div>
+            )}
+            
+            {kpi.type === 'grid' && (
+              <div className="grid grid-cols-4 gap-1 w-full max-w-[120px]">
+                {Array.from({ length: 16 }).map((_, i) => {
+                  // Calculate a value between 0 and 1 for each cell
+                  const cellValue = 0.3 + (Math.sin(i * 0.5) + 1) / 2 * 0.7;
+                  return (
+                    <div 
+                      key={i}
+                      className="aspect-square rounded-sm"
+                      style={{ 
+                        backgroundColor: `rgba(59, 130, 246, ${cellValue})`,
+                        transform: `scale(${0.8 + cellValue * 0.2})` 
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            )}
+            
+            {kpi.type === 'sparkline' && (
+              <div className="flex flex-col items-center">
+                <div className="text-2xl font-bold mb-2">{kpi.value}%</div>
+                {kpi.data && <SparklineChart data={kpi.data} />}
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-auto">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs hover:bg-white/10 w-full justify-between"
+            >
+              <span>View Details</span>
+              <ArrowRight className="h-3 w-3 ml-1" />
+            </Button>
+          </div>
+        </GlassCardContent>
+      </AspectRatio>
+    </GlassCard>
   );
 };
 

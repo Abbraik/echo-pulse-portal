@@ -10,9 +10,9 @@ import ParticlesBackground from "@/components/ui/particles-background";
 import WelcomeOverlay from '../components/home/WelcomeOverlay';
 import Footer from '../components/layout/Footer';
 
-// Import new components
-import HeroNarrative from "@/components/home/HeroNarrative";
-import SystemStabilityGauge from "@/components/home/SystemStabilityGauge";
+// Import components
+import NarrativeBar from "@/components/home/NarrativeBar";
+import KpiCarousel from "@/components/home/KpiCarousel";
 import ScenarioComparator from "@/components/home/ScenarioComparator";
 import ActivityPanel from "@/components/home/ActivityPanel";
 import AlertsPanel from "@/components/home/AlertsPanel";
@@ -72,16 +72,16 @@ const HomePage: React.FC = () => {
       {!showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
       
       <main className="flex-1 overflow-auto pt-24 pb-12 px-4 md:px-8 space-y-8 container mx-auto z-10">
-        {/* Hero narrative - top section */}
+        {/* Narrative Bar - top section */}
         <section className="w-full">
-          <HeroNarrative />
+          <NarrativeBar />
         </section>
         
-        {/* First row - System Stability and Scenario Comparator */}
+        {/* First row - Key Indicators Carousel and Scenario Comparator */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* System Stability Gauge - left section (60%) */}
+          {/* Key Indicators Carousel - left section (60%) */}
           <div className="lg:col-span-7">
-            <SystemStabilityGauge pulse={pulse} />
+            <KpiCarousel />
           </div>
           
           {/* Scenario Comparator - right section (40%) */}

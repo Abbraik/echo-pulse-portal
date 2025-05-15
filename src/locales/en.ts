@@ -67,7 +67,24 @@ export const en = {
   considerSocialTrust: "Consider Social Trust",
   unstable: "Unstable",
   cautious: "Cautious",
-  equilibrium: "Equilibrium"
+  equilibrium: "Equilibrium",
+  
+  // New keys added for carousel and narrative
+  viewDetails: "View Details",
+  networkDevelopmentIndex: "Network Development Index",
+  trustRecoveryIndex: "Trust Recovery Index",
+  averageBundleCoherence: "Average Bundle Coherence",
+  pilotSuccessRate: "Pilot Success Rate",
+  narrativeWelcome: "Welcome to the Population Dynamics System—a living governance engine uniting foresight, strategy, monitoring, and innovation.",
+  narrativeDiscover: "Discover how our policies keep the UAE balanced—simulating futures, launching interventions, and capturing lessons.",
+  narrativeLoop: "Your loop to dynamic equilibrium starts here—think, act, monitor, innovate.",
+  fourZones: "The Four Zones",
+  zonesDescription: "The PDS operates as a continuous loop:",
+  zoneThink: "Simulate scenarios",
+  zoneAct: "Launch interventions",
+  zoneMonitor: "Track outcomes",
+  zoneInnovate: "Generate new ideas",
+  stability: "Stability"
 };
 
 export default en;
