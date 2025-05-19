@@ -1,12 +1,12 @@
 
 // English locale
-export const en = {
-  // General
+const general = {
   appName: "Population Dynamics System",
   loading: "Loading...",
   welcome: "Welcome to Population Dynamics System",
-  
-  // Navigation
+};
+
+const navigation = {
   home: "Home",
   think: "THINK",
   act: "ACT",
@@ -15,8 +15,9 @@ export const en = {
   sandbox: "Sandbox Lab",
   launchDashboard: "Launch Dashboard",
   learnMore: "Learn More",
-  
-  // Index Page
+};
+
+const indexPage = {
   heroTitle: "Population Dynamics System",
   heroSubtitle: "Analyze, strategize, and optimize population dynamics with real-time insights and collaborative tools",
   currentPhase: "Current Phase:",
@@ -26,16 +27,18 @@ export const en = {
   dataProcessing: "Data Processing",
   analysisEngine: "Analysis Engine",
   visualizationAPI: "Visualization API",
-  
-  // Zone Descriptions
+};
+
+const zoneDescriptions = {
   homeDesc: "Dashboard with real-time population metrics and system health indicators",
   thinkDesc: "Advanced system modeling and collaborative scenario planning tools",
   actDesc: "Implement strategic interventions and policy adjustments",
   monitorDesc: "Track outcomes and visualize system performance metrics",
   innovateDesc: "Explore emerging practices and experimental approaches",
   sandboxDesc: "Test new models and strategies in a controlled environment",
-  
-  // Footer
+};
+
+const footer = {
   copyright: "© 2025 Population Dynamics System",
   help: "Help",
   documentation: "Documentation",
@@ -43,15 +46,17 @@ export const en = {
   allSystemsGo: "All systems go",
   performanceIssues: "Performance issues",
   systemOutage: "System outage",
-  
-  // User Menu
+};
+
+const userMenu = {
   myAccount: "My Account",
   profile: "Profile",
   settings: "Settings",
   support: "Support",
   logout: "Log out",
-  
-  // Home Page
+};
+
+const homePage = {
   kpiTitle: "Key Performance Indicators",
   activityTitle: "Recent Activity",
   systemPulse: "System Pulse",
@@ -69,8 +74,9 @@ export const en = {
   unstable: "Unstable",
   cautious: "Cautious",
   equilibrium: "Equilibrium",
-  
-  // New keys added for carousel and narrative
+};
+
+const carouselAndNarrative = {
   viewDetails: "View Details",
   networkDevelopmentIndex: "Network Development Index",
   trustRecoveryIndex: "Trust Recovery Index",
@@ -86,8 +92,9 @@ export const en = {
   zoneMonitor: "Track outcomes",
   zoneInnovate: "Generate new ideas",
   stability: "Stability",
-  
-  // ACT Zone Page
+};
+
+const actZonePage = {
   bundleCoherencePrompt: "Bundle 'Resource Resilience' coherence is 58—next step?",
   assignLeverage: "Assign Leverage ▶",
   reOptimizeBands: "Re-optimize Bands ▶",
@@ -159,13 +166,14 @@ export const en = {
   addNewPlaybook: "Add New Playbook",
   dragPlaybookHint: "Drag a playbook to the Bundles Rail to create a new bundle",
   
-  // New translation keys for Act.tsx error messages
+  // Act.tsx error messages
   noSelectedBundle: "No Bundle Selected",
   pleaseSelectBundle: "Please select a bundle before performing this action.",
   deliveryLaunched: "Delivery Plan Launched",
   bundleLaunchedToDelivery: "Bundle has been launched to delivery chains.",
-  
-  // Bundle View
+};
+
+const bundleView = {
   back: "Back",
   close: "Close",
   updatedAgo: "Updated",
@@ -199,8 +207,9 @@ export const en = {
   exportToDelivery: "Export to Delivery",
   saveDraft: "Save Draft",
   proMode: "Pro Mode",
-  
-  // New Bundle View additions
+};
+
+const bundleViewAdditions = {
   policyBundles: "Policy Bundles",
   narrativeSnapshot: "Boosts resource efficiency by optimizing water tariffs and incentives—model predicts +3.2 NDI points over 12 months.",
   ndiPoints: "pts",
@@ -231,16 +240,18 @@ export const en = {
   parameterAdjustment: "Parameter Adjustment",
   simulationPreview: "Simulation Preview",
   impact: "Impact",
-  
-  // New Monitor Zone translations
+};
+
+const monitorZone = {
   monitor: "Monitor",
   monitorDesc: "Real-time system health monitoring dashboard",
   monitorNarrativeOne: "System at a glance: NDI steady, resource pressures emerging",
   monitorNarrativeTwo: "Alerts: Cohesion loop nearing boundary—prepare recalibration",
   monitorNarrativeThree: "Next: Diagnose root causes or escalate to strategy",
   monitorInfoTooltip: "The Monitor zone provides real-time insights into system health and alerts you to emerging patterns that require attention.",
-  
-  // Alert Detail & Recommendation Popups
+};
+
+const alertDetail = {
   alertStream: "Alert Stream",
   anomalyDetector: "Anomaly Detector",
   coordinationTracker: "Coordination Tracker",
@@ -278,8 +289,10 @@ export const en = {
   high: "High",
   medium: "Medium",
   low: "Low",
-  
-  // Recommendation Popup
+  equilibriumBand: "Equilibrium Band",
+};
+
+const recommendationPopup = {
   recommendation: "Recommendation",
   recommendationOne: "Consider strengthening Social Trust via youth engagement programs",
   recommendationTwo: "Water efficiency could be improved with updated tariff structure",
@@ -288,8 +301,9 @@ export const en = {
   playbookAppliedDescription: "The selected playbook has been applied to address this issue",
   bundleCreated: "Bundle Created",
   bundleCreatedDescription: "A new bundle has been created to address this issue",
-  
-  // Anomaly Panel
+};
+
+const anomalyPanel = {
   askAboutAnomalies: "Ask about anomalies...",
   askAi: "Ask AI",
   socialTrust: "Social Trust",
@@ -301,8 +315,9 @@ export const en = {
   socialTrustRootCause: "Decreased community participation in local institutions",
   waterResourcesRootCause: "Seasonal rainfall patterns shifting due to climate factors",
   economicActivityRootCause: "New trade agreements and tourism investments",
-  
-  // Anomaly Detail Panel
+};
+
+const anomalyDetailPanel = {
   overview: "Overview",
   severity: "Severity",
   rootCauseHint: "Root Cause Hint",
@@ -312,8 +327,9 @@ export const en = {
   triggerPlaybook: "Trigger Playbook",
   viewInMonitor: "View in Monitor",
   trust: "Trust",
-  
-  // Coordination Tracker
+};
+
+const coordinationTracker = {
   coordinationGap: "Coordination Gap",
   meetingScheduled: "Meeting Scheduled",
   meetingScheduledDescription: "A coordination meeting has been scheduled",
@@ -321,13 +337,15 @@ export const en = {
   strongCoordination: "Strong Coordination",
   coordinationStrong: "Coordination is strong",
   noCoordination: "No Coordination",
-  
-  // System Events Timeline
+};
+
+const systemEventsTimeline = {
   simulation: "Simulation",
   bundle: "Bundle",
   lesson: "Lesson",
-  
-  // Metrics
+};
+
+const metrics = {
   metric: "Metric",
   deviation: "Deviation",
   time: "Time",
@@ -389,9 +407,8 @@ const bundleModalEN = {
   bundleStatusDescription: "New bundles start as drafts. Submit for approval to make them pending, and once approved they become active policies."
 };
 
-// New translation keys for Delivery Chains Manager
+// Delivery Chains Manager translations
 const deliveryChainsEN = {
-  // Delivery Chains Manager translations
   simple: "Simple",
   pro: "Pro",
   searchTasks: "Search tasks...",
@@ -417,10 +434,28 @@ const deliveryChainsEN = {
 };
 
 // Combine all translation objects
-const allTranslations = {
-  ...en,
+export const en = {
+  ...general,
+  ...navigation,
+  ...indexPage,
+  ...zoneDescriptions,
+  ...footer,
+  ...userMenu,
+  ...homePage,
+  ...carouselAndNarrative,
+  ...actZonePage,
+  ...bundleView,
+  ...bundleViewAdditions,
+  ...monitorZone,
+  ...alertDetail,
+  ...recommendationPopup,
+  ...anomalyPanel,
+  ...anomalyDetailPanel,
+  ...coordinationTracker,
+  ...systemEventsTimeline,
+  ...metrics,
   ...bundleModalEN,
   ...deliveryChainsEN,
 };
 
-export default allTranslations;
+export default en;

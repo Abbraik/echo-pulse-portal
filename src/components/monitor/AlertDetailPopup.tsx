@@ -96,7 +96,7 @@ export const AlertDetailPopup: React.FC<AlertDetailPopupProps> = ({ isOpen, onCl
           {/* Left Column - Detailed Metrics */}
           <div className="md:col-span-3 space-y-4">
             <div className="h-48 glass-panel p-4">
-              <h3 className="text-sm font-medium mb-2">{t('historicalTrend')}</h3>
+              <h3 className="text-sm font-medium mb-2">{t('historicalTrend' as any)}</h3>
               <ResponsiveContainer width="100%" height="80%">
                 <AreaChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
                   <defs>
@@ -132,14 +132,14 @@ export const AlertDetailPopup: React.FC<AlertDetailPopupProps> = ({ isOpen, onCl
             </div>
             
             <div className="glass-panel p-4">
-              <h3 className="text-sm font-medium mb-2">{t('exactDeviation')}</h3>
+              <h3 className="text-sm font-medium mb-2">{t('exactDeviation' as any)}</h3>
               <p className={`text-lg font-medium ${alert.deviation.startsWith('-') ? 'text-red-400' : 'text-green-400'}`}>
-                {alert.deviation} vs. {t('equilibriumBand')}
+                {alert.deviation} vs. {t('equilibriumBand' as any)}
               </p>
             </div>
             
             <div className="glass-panel p-4">
-              <h3 className="text-sm font-medium mb-3">{t('affectedSubIndicators')}</h3>
+              <h3 className="text-sm font-medium mb-3">{t('affectedSubIndicators' as any)}</h3>
               <div className="space-y-3">
                 {subIndicators.map((indicator, i) => (
                   <div key={i} className="flex items-center justify-between">
@@ -173,7 +173,7 @@ export const AlertDetailPopup: React.FC<AlertDetailPopupProps> = ({ isOpen, onCl
           {/* Right Column - Recommended Actions */}
           <div className="md:col-span-2 space-y-4">
             <div className="glass-panel p-4 space-y-4">
-              <h3 className="text-sm font-medium">{t('recommendedActions')}</h3>
+              <h3 className="text-sm font-medium">{t('recommendedActions' as any)}</h3>
               
               <div className="space-y-3">
                 <Button 
@@ -182,7 +182,7 @@ export const AlertDetailPopup: React.FC<AlertDetailPopupProps> = ({ isOpen, onCl
                   onClick={handleRunMicroSim}
                 >
                   <Settings className="mr-2 h-4 w-4" /> 
-                  {t('runMicroSim')}
+                  {t('runMicroSim' as any)}
                 </Button>
                 
                 <Button 
@@ -191,7 +191,7 @@ export const AlertDetailPopup: React.FC<AlertDetailPopupProps> = ({ isOpen, onCl
                   onClick={handleApplyPlaybook}
                 >
                   <Play className="mr-2 h-4 w-4" /> 
-                  {t('applyPlaybook')}
+                  {t('applyPlaybook' as any)}
                 </Button>
                 
                 <Button 
@@ -200,15 +200,15 @@ export const AlertDetailPopup: React.FC<AlertDetailPopupProps> = ({ isOpen, onCl
                   onClick={handleCreateBundle}
                 >
                   <Plus className="mr-2 h-4 w-4" /> 
-                  {t('createBundle')}
+                  {t('createBundle' as any)}
                 </Button>
               </div>
             </div>
             
             <div className="glass-panel p-4">
-              <h3 className="text-sm font-medium mb-2">{t('impactAssessment')}</h3>
+              <h3 className="text-sm font-medium mb-2">{t('impactAssessment' as any)}</h3>
               <p className="text-sm text-gray-400 mb-2">
-                {t('alertImpactDescription')}
+                {t('alertImpactDescription' as any)}
               </p>
               <div className="flex items-center space-x-2">
                 <div className="h-2 flex-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -229,13 +229,13 @@ export const AlertDetailPopup: React.FC<AlertDetailPopupProps> = ({ isOpen, onCl
             onClick={() => console.log('Investigate in THINK')}
             className="flex-1"
           >
-            {t('investigateInThink')}
+            {t('investigateInThink' as any)}
           </Button>
           <Button 
             className="flex-1 bg-gradient-to-r from-teal-500 to-blue-500"
             onClick={() => console.log('Escalate to ACT')}
           >
-            {t('escalateToAct')}
+            {t('escalateToAct' as any)}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </DialogFooter>

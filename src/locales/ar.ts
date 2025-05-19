@@ -1,11 +1,12 @@
 
-export const ar = {
-  // General
+// Arabic locale
+const general = {
   appName: "نظام ديناميكيات السكان",
   loading: "جاري التحميل...",
   welcome: "مرحبًا بك في نظام ديناميكيات السكان",
-  
-  // Navigation
+};
+
+const navigation = {
   home: "الرئيسية",
   think: "تفكير",
   act: "تنفيذ",
@@ -14,8 +15,9 @@ export const ar = {
   sandbox: "مختبر تجريبي",
   launchDashboard: "إطلاق لوحة المعلومات",
   learnMore: "معرفة المزيد",
-  
-  // Index Page
+};
+
+const indexPage = {
   heroTitle: "نظام ديناميكيات السكان",
   heroSubtitle: "تحليل واستراتيجية وتحسين ديناميكيات السكان مع رؤى في الوقت الحقيقي وأدوات تعاونية",
   currentPhase: "المرحلة الحالية:",
@@ -25,16 +27,18 @@ export const ar = {
   dataProcessing: "معالجة البيانات",
   analysisEngine: "محرك التحليل",
   visualizationAPI: "واجهة برمجة تطبيقات التصور",
-  
-  // Zone Descriptions
+};
+
+const zoneDescriptions = {
   homeDesc: "لوحة معلومات مع مقاييس السكان في الوقت الحقيقي ومؤشرات صحة النظام",
   thinkDesc: "نمذجة النظام المتقدمة وأدوات تخطيط السيناريوهات التعاونية",
   actDesc: "تنفيذ التدخلات الاستراتيجية وتعديلات السياسات",
   monitorDesc: "تتبع النتائج وتصور مقاييس أداء النظام",
   innovateDesc: "استكشاف الممارسات الناشئة والنهج التجريبية",
   sandboxDesc: "اختبار النماذج والاستراتيجيات الجديدة في بيئة محكومة",
-  
-  // Footer
+};
+
+const footer = {
   copyright: "© 2025 نظام ديناميكيات السكان",
   help: "المساعدة",
   documentation: "الوثائق",
@@ -42,15 +46,17 @@ export const ar = {
   allSystemsGo: "جميع الأنظمة تعمل",
   performanceIssues: "مشاكل في الأداء",
   systemOutage: "انقطاع النظام",
-  
-  // User Menu
+};
+
+const userMenu = {
   myAccount: "حسابي",
   profile: "الملف الشخصي",
   settings: "الإعدادات",
   support: "الدعم",
   logout: "تسجيل الخروج",
-  
-  // Home Page
+};
+
+const homePage = {
   kpiTitle: "مؤشرات الأداء الرئيسية",
   activityTitle: "النشاط الحديث",
   systemPulse: "نبض النظام",
@@ -68,8 +74,9 @@ export const ar = {
   unstable: "غير مستقر",
   cautious: "حذر",
   equilibrium: "توازن",
+};
 
-  // ACT Zone Page
+const actZone = {
   bundleCoherencePrompt: "تماسك حزمة 'مرونة الموارد' هو 58 — ما هي الخطوة التالية؟",
   assignLeverage: "تعيين النفوذ ◀",
   reOptimizeBands: "إعادة تحسين النطاقات ◀",
@@ -140,8 +147,9 @@ export const ar = {
   use: "استخدام",
   addNewPlaybook: "إضافة كتاب إرشادي جديد",
   dragPlaybookHint: "اسحب كتابًا إرشاديًا إلى شريط الحزم لإنشاء حزمة جديدة",
-  
-  // Bundle View
+};
+
+const bundleView = {
   back: "رجوع",
   close: "إغلاق",
   updatedAgo: "تم التحديث",
@@ -175,8 +183,9 @@ export const ar = {
   exportToDelivery: "تصدير للتسليم",
   saveDraft: "حفظ المسودة",
   proMode: "الوضع الاحترافي",
-  
-  // New Bundle View additions
+};
+
+const bundleViewAdditions = {
   policyBundles: "حزم السياسات",
   narrativeSnapshot: "تعزيز كفاءة الموارد من خلال تحسين تعرفة المياه والحوافز — يتوقع النموذج زيادة 3.2 نقطة في مؤشر التنمية الشبكية على مدار 12 شهرًا.",
   ndiPoints: "نقاط",
@@ -207,16 +216,18 @@ export const ar = {
   parameterAdjustment: "ضبط المعلمات",
   simulationPreview: "معاينة المحاكاة",
   impact: "التأثير",
-  
-  // Monitor Zone translations
+};
+
+const monitorZone = {
   monitor: "مراقبة",
   monitorDesc: "لوحة معلومات لمراقبة صحة النظام في الوقت الفعلي",
   monitorNarrativeOne: "نظرة عامة على النظام: مؤشر التنمية الوطني مستقر، وضغوط الموارد تظهر",
   monitorNarrativeTwo: "تنبيهات: حلقة التماسك تقترب من الحدود - استعد لإعادة المعايرة",
   monitorNarrativeThree: "التالي: تشخيص الأسباب الجذرية أو التصعيد إلى الاستراتيجية",
   monitorInfoTooltip: "توفر منطقة المراقبة رؤى في الوقت الفعلي حول صحة النظام وتنبهك إلى الأنماط الناشئة التي تتطلب الاهتمام.",
+};
 
-  // Alert Detail & Recommendation Popups
+const alertDetail = {
   alertStream: "تدفق التنبيهات",
   anomalyDetector: "كاشف الشذوذ",
   systemPulse: "نبض النظام",
@@ -225,10 +236,6 @@ export const ar = {
   trustRecoveryIndex: "مؤشر استعادة الثقة",
   averageBundleCoherence: "متوسط تماسك الحزمة",
   resourceEfficiency: "كفاءة الموارد",
-  social: "اجتماعي",
-  governance: "الحوكمة",
-  economic: "اقتصادي",
-  environmental: "بيئي",
   stability: "استقرار",
   equilibriumBand: "نطاق التوازن",
   
@@ -264,8 +271,9 @@ export const ar = {
   high: "عالي",
   medium: "متوسط",
   low: "منخفض",
-  
-  // Recommendation Popup
+};
+
+const recommendationPopup = {
   recommendation: "توصية",
   recommendationOne: "فكر في تعزيز الثقة الاجتماعية عبر برامج إشراك الشباب",
   recommendationTwo: "يمكن تحسين كفاءة المياه بهيكل تعريفة محدث",
@@ -274,8 +282,9 @@ export const ar = {
   playbookAppliedDescription: "تم تطبيق دليل التشغيل المحدد لمعالجة هذه المشكلة",
   bundleCreated: "تم إنشاء حزمة",
   bundleCreatedDescription: "تم إنشاء حزمة جديدة لمعالجة هذه المشكلة",
-  
-  // Anomaly Panel
+};
+
+const anomalyPanel = {
   askAboutAnomalies: "اسأل عن الشذوذ...",
   askAi: "اسأل الذكاء الاصطناعي",
   socialTrust: "الثقة الاجتماعية",
@@ -287,8 +296,9 @@ export const ar = {
   socialTrustRootCause: "انخفاض المشاركة المجتمعية في المؤسسات المحلية",
   waterResourcesRootCause: "تحول أنماط هطول الأمطار الموسمية بسبب العوامل المناخية",
   economicActivityRootCause: "اتفاقيات تجارية جديدة واستثمارات سياحية",
-  
-  // Anomaly Detail Panel
+};
+
+const anomalyDetailPanel = {
   overview: "نظرة عامة",
   severity: "شدة",
   rootCauseHint: "تلميح السبب الجذري",
@@ -298,8 +308,9 @@ export const ar = {
   triggerPlaybook: "تشغيل دليل التشغيل",
   viewInMonitor: "عرض في المراقبة",
   trust: "ثقة",
-  
-  // Coordination Tracker
+};
+
+const coordinationTracker = {
   coordinationTracker: "متتبع التنسيق",
   coordinationGap: "فجوة التنسيق",
   meetingScheduled: "تم جدولة اجتماع",
@@ -308,13 +319,15 @@ export const ar = {
   strongCoordination: "تنسيق قوي",
   coordinationStrong: "التنسيق قوي",
   noCoordination: "لا تنسيق",
-  
-  // System Events Timeline
+};
+
+const systemEventsTimeline = {
   simulation: "محاكاة",
   bundle: "حزمة",
   lesson: "درس",
-  
-  // Metrics
+};
+
+const metrics = {
   metric: "مقياس",
   deviation: "انحراف",
   time: "وقت",
@@ -376,10 +389,27 @@ const bundleModalAR = {
   bundleStatusDescription: "تبدأ الحزم الجديدة كمسودات. قدمها للموافقة لتصبح معلقة، وبمجرد الموافقة عليها تصبح سياسات نشطة."
 };
 
-// Combine all translations
-const allTranslations = {
-  ...ar,
+// Combine all translation objects
+export const ar = {
+  ...general,
+  ...navigation,
+  ...indexPage,
+  ...zoneDescriptions,
+  ...footer,
+  ...userMenu,
+  ...homePage,
+  ...actZone,
+  ...bundleView,
+  ...bundleViewAdditions,
+  ...monitorZone,
+  ...alertDetail,
+  ...recommendationPopup,
+  ...anomalyPanel,
+  ...anomalyDetailPanel,
+  ...coordinationTracker,
+  ...systemEventsTimeline,
+  ...metrics,
   ...bundleModalAR,
 };
 
-export default allTranslations;
+export default ar;
