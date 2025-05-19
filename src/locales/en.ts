@@ -1,4 +1,3 @@
-
 export const en = {
   // General
   appName: "Population Dynamics System",
@@ -226,4 +225,64 @@ export const en = {
   impact: "Impact",
 };
 
-export default en;
+// Bundle Modal Translations
+const bundleModalEN = {
+  createNewBundle: "Create New Bundle",
+  editBundle: "Edit Bundle",
+  step: "Step",
+  of: "of",
+  back: "Back",
+  next: "Next",
+  saveBundle: "Save Bundle",
+  updateBundle: "Update Bundle",
+  bundleCreated: "Bundle Created",
+  bundleUpdated: "Bundle Updated",
+  bundleDeleted: "Bundle Deleted",
+  createdAsDraft: "has been created as a draft",
+  updatedSuccessfully: "has been updated successfully",
+  hasBeenDeleted: "has been deleted",
+  basicInformation: "Basic Information",
+  objectivesAndScope: "Objectives & Scope",
+  reviewAndSave: "Review & Save",
+  bundleName: "Bundle Name",
+  bundleSummary: "Bundle Description",
+  bundleNameTooltip: "Give your bundle a concise, descriptive name (3-60 characters)",
+  bundleSummaryTooltip: "Write a one or two sentence summary of what this bundle aims to achieve (10-200 characters)",
+  bundleTagsTooltip: "Add tags to help categorize and find this bundle later",
+  enterBundleName: "Enter bundle name...",
+  enterBundleSummary: "Enter a brief description of this policy bundle...",
+  bundleNameRequired: "Bundle name is required",
+  bundleNameLengthError: "Bundle name must be between 3 and 60 characters",
+  bundleSummaryRequired: "Bundle description is required",
+  bundleSummaryLengthError: "Bundle description must be between 10 and 200 characters",
+  objectives: "Objectives",
+  objectivesTooltip: "Define specific objectives this policy bundle aims to achieve",
+  atLeastOneObjectiveRequired: "At least one objective is required",
+  addObjective: "Add Objective",
+  objective: "Objective",
+  pillars: "Pillars",
+  pillarsTooltip: "Select which policy pillars this bundle affects",
+  atLeastOnePillarRequired: "At least one pillar must be selected",
+  population: "Population",
+  resource: "Resource",
+  services: "Services",
+  social: "Social",
+  geography: "Geography",
+  allEmirates: "All Emirates",
+  geographyTooltip: "Select which emirates this policy bundle applies to",
+  tags: "Tags",
+  addOrSelectTags: "Add or select tags...",
+  searchTags: "Search tags...",
+  createTag: "Create tag",
+  noTagsFound: "No tags found",
+  suggestedTags: "Suggested Tags",
+  bundleStatusInfo: "Bundle Status Information",
+  bundleStatusDescription: "New bundles start as drafts. Submit for approval to make them pending, and once approved they become active policies."
+};
+
+export default {
+  ...en,
+  
+  // Add bundle modal translations
+  ...bundleModalEN,
+};

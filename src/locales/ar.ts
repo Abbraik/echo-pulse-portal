@@ -1,4 +1,3 @@
-
 export const ar = {
   // General
   appName: "نظام ديناميكيات السكان",
@@ -209,4 +208,62 @@ export const ar = {
   impact: "التأثير",
 };
 
-export default ar;
+// Bundle Modal Translations
+const bundleModalAR = {
+  createNewBundle: "إنشاء حزمة جديدة",
+  editBundle: "تعديل الحزمة",
+  step: "الخطوة",
+  of: "من",
+  back: "السابق",
+  next: "التالي",
+  saveBundle: "حفظ الحزمة",
+  updateBundle: "تحديث الحزمة",
+  bundleCreated: "تم إنشاء الحزمة",
+  bundleUpdated: "تم تحديث الحزمة",
+  bundleDeleted: "تم حذف الحزمة",
+  createdAsDraft: "تم إنشاؤها كمسودة",
+  updatedSuccessfully: "تم تحديثها بنجاح",
+  hasBeenDeleted: "تم حذفها",
+  basicInformation: "المعلومات الأساسية",
+  objectivesAndScope: "الأهداف والنطاق",
+  reviewAndSave: "المراجعة والحفظ",
+  bundleName: "اسم الحزمة",
+  bundleSummary: "وصف الحزمة",
+  bundleNameTooltip: "اختر اسمًا موجزًا وواضحًا للحزمة (3-60 حرف)",
+  bundleSummaryTooltip: "اكتب ملخصًا من جملة أو جملتين لما تهدف إليه هذه الحزمة (10-200 حرف)",
+  bundleTagsTooltip: "أضف علامات لتصنيف وإيجاد هذه الحزمة لاحقًا",
+  enterBundleName: "أدخل اسم الحزمة...",
+  enterBundleSummary: "أدخل وصفًا موجزًا لحزمة السياسة هذه...",
+  bundleNameRequired: "اسم الحزمة مطلوب",
+  bundleNameLengthError: "يجب أن يكون اسم الحزمة بين 3 و60 حرفًا",
+  bundleSummaryRequired: "وصف الحزمة مطلوب",
+  bundleSummaryLengthError: "يجب أن يكون وصف الحزمة بين 10 و200 حرف",
+  objectives: "الأهداف",
+  objectivesTooltip: "حدد الأهداف المحددة التي تسعى حزمة السياسة هذه لتحقيقها",
+  atLeastOneObjectiveRequired: "مطلوب هدف واحد على الأقل",
+  addObjective: "إضافة هدف",
+  objective: "هدف",
+  pillars: "الركائز",
+  pillarsTooltip: "حدد ركائز السياسة التي تؤثر عليها هذه الحزمة",
+  atLeastOnePillarRequired: "يجب تحديد ركيزة واحدة على الأقل",
+  population: "السكان",
+  resource: "الموارد",
+  services: "الخدمات",
+  social: "الاجتماعية",
+  geography: "النطاق الجغرافي",
+  allEmirates: "جميع الإمارات",
+  geographyTooltip: "حدد الإمارات التي تنطبق عليها هذه الحزمة",
+  tags: "العلامات",
+  addOrSelectTags: "أضف أو اختر علامات...",
+  searchTags: "ابحث عن علامات...",
+  createTag: "إنشاء علامة",
+  noTagsFound: "لم يتم العثور على علامات",
+  suggestedTags: "العلامات المقترحة",
+  bundleStatusInfo: "معلومات حالة الحزمة",
+  bundleStatusDescription: "تبدأ الحزم الجديدة كمسودات. قدمها للموافقة لتصبح معلقة، وبمجرد الموافقة عليها تصبح سياسات نشطة."
+};
+
+export default {
+  ...ar,
+  ...bundleModalAR,
+};

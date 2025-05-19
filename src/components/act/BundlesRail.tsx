@@ -8,6 +8,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { BundleTag } from './types/act-types';
+import BundleModal, { BundleFormData } from './BundleModal';
 
 interface Bundle {
   id: string;
@@ -36,9 +37,12 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   const [rapidTestMode, setRapidTestMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [bundleToEdit, setBundleToEdit] = useState<Bundle | null>(null);
   
   // Sample data for bundles
-  const bundles: Bundle[] = [
+  const [bundles, setBundles] = useState<Bundle[]>([
     { 
       id: 'b1', 
       name: "Water Efficiency Boost", 
@@ -87,7 +91,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
       lastModified: "3d ago",
       tags: ["Digital", "Governance", "Innovation"] as BundleTag[]
     },
-  ];
+  ]);
   
   // Filter bundles based on search query and status filter
   const filteredBundles = bundles.filter((bundle) => {
@@ -159,6 +163,57 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
     
     return baseClass;
   };
+
+  const handleEditButtonClick = (e: React.MouseEvent, bundle: Bundle) => {
+    e.stopPropagation();
+    setBundleToEdit(bundle);
+    setEditModalOpen(true);
+  };
+  
+  const handleCreateBundle = (bundleData: BundleFormData) => {
+    const newBundle: Bundle = {
+      id: `b${bundles.length + 1}`,
+      name: bundleData.name,
+      summary: bundleData.summary,
+      coherence: 50, // Default coherence
+      ndiImpact: 1.0, // Default NDI impact
+      isApproved: false,
+      status: 'draft',
+      owner: "Current User", // In a real app, this would be the current user
+      lastModified: "Just now",
+      tags: bundleData.tags,
+    };
+    
+    setBundles([newBundle, ...bundles]);
+  };
+  
+  const handleUpdateBundle = (bundleData: BundleFormData) => {
+    if (!bundleData.id) return;
+    
+    const updatedBundles = bundles.map(bundle => 
+      bundle.id === bundleData.id 
+        ? { 
+            ...bundle, 
+            name: bundleData.name, 
+            summary: bundleData.summary, 
+            tags: bundleData.tags,
+            lastModified: "Just now", 
+          }
+        : bundle
+    );
+    
+    setBundles(updatedBundles);
+  };
+  
+  const handleDeleteBundle = (bundleId: string) => {
+    const updatedBundles = bundles.filter(bundle => bundle.id !== bundleId);
+    setBundles(updatedBundles);
+    
+    if (selectedBundle === bundleId) {
+      // If the deleted bundle was selected, clear the selection
+      onSelectBundle('');
+    }
+  };
   
   return (
     <GlassCard className="h-full flex flex-col overflow-hidden">
@@ -170,6 +225,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           variant="outline"
           size="sm"
           className="h-8 px-3 bg-white/5 border-white/20 hover:bg-white/10"
+          onClick={() => setCreateModalOpen(true)}
         >
           <Plus className="h-4 w-4 mr-1" />
           <span className="text-xs">{t('newBundle')}</span>
@@ -309,10 +365,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                   variant="ghost" 
                   size="sm" 
                   className="h-6 w-6 p-0 hover:bg-white/10 flex items-center justify-center"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Handle edit action
-                  }}
+                  onClick={(e) => handleEditButtonClick(e, bundle)}
                 >
                   <Pencil className="h-3 w-3 text-gray-400" />
                 </Button>
@@ -338,6 +391,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           className="p-4 rounded-lg border border-dashed border-white/20 flex items-center justify-center hover:bg-white/5 cursor-pointer"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
+          onClick={() => setCreateModalOpen(true)}
         >
           <Plus className="h-5 w-5 mr-2 text-teal-400" />
           <span>{t('newBundle', { defaultValue: 'New Bundle' })}</span>
@@ -365,6 +419,22 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           <Switch checked={rapidTestMode} onCheckedChange={setRapidTestMode} />
         </div>
       </div>
+      
+      {/* Create Bundle Modal */}
+      <BundleModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+        onSave={handleCreateBundle}
+      />
+      
+      {/* Edit Bundle Modal */}
+      <BundleModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        initialBundle={bundleToEdit}
+        onSave={handleUpdateBundle}
+        onDelete={handleDeleteBundle}
+      />
     </GlassCard>
   );
 };

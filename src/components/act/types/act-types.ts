@@ -1,114 +1,54 @@
 
-import { ReactNode } from 'react';
-import { DetailView } from '@/pages/Act';
-
+// Bundle tag types
 export type BundleTag = 
-  | 'Resource' 
-  | 'Economic' 
-  | 'Social' 
-  | 'Governance' 
-  | 'Environmental' 
-  | 'Cohesion'
-  | 'Water'
-  | 'Incentive'
-  | 'Short-Term'
-  | 'Long-Term'
-  | 'Education'
-  | 'Health'
-  | 'Digital'
-  | 'Infrastructure'
-  | 'Innovation';
+  | "Water" 
+  | "Energy" 
+  | "Education" 
+  | "Health" 
+  | "Economy" 
+  | "Digital" 
+  | "Innovation" 
+  | "Governance"
+  | "Sustainability"
+  | "Social"
+  | "Infrastructure"
+  | "Climate"
+  | "Incentive"
+  | "Short-Term"
+  | "Medium-Term"
+  | "Long-Term"
+  | "High-Priority"
+  | string; // Allow custom tags beyond the predefined ones
 
-export type GlassType = 'default' | 'deep' | 'dark';
-
-export type TaskStatus = 'completed' | 'in-progress' | 'planned';
-
+// Bundle status
 export type BundleStatus = 'draft' | 'pending' | 'active';
 
-export type BundleCoherence = {
-  value: number;
-  delta?: number;
-  trend: 'up' | 'down' | 'stable';
-};
-
-export type PillarType = 'economic' | 'social' | 'environmental' | 'governance';
-
+// Bundle object structure
 export interface Bundle {
   id: string;
   name: string;
   summary?: string;
-  coherence: BundleCoherence | number;
+  coherence: number;
   ndiImpact: number;
   isApproved: boolean;
   status: BundleStatus;
   owner: string;
   lastModified: string;
   tags: BundleTag[];
-  cost?: number;
-  primaryPillar?: string;
-  objectives?: Objective[];
+  objectives?: string[];
+  pillars?: ('population' | 'resource' | 'services' | 'social')[];
+  geography?: string[];
 }
 
-export interface Objective {
-  id: string;
-  text: string;
-  leveragePoint?: LeveragePoint;
-  rationale?: string;
-  order: number;
-}
-
-export interface LeveragePoint {
-  id: string;
-  number: number;
+// Custom types for Bundle creation form
+export type BundleFormFields = {
   name: string;
-  description: string;
-}
-
-export interface CoherenceMatrixCell {
-  pillar: PillarType;
-  objective: string;
-  value: number;
-  conflicts?: string[];
-  synergies?: string[];
-}
-
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  assignee: string;
-  dueDate: string;
-  needsApproval: boolean;
-  comments?: Comment[];
-  dependencies?: string[];
-}
-
-export interface ObjectiveLane {
-  id: string;
-  title: string;
-  tasks: Task[];
-}
-
-export interface Comment {
-  id: string;
-  author: string;
-  text: string;
-  timestamp: string;
-  isTeam: boolean;
-}
-
-export interface Playbook {
-  id: string;
-  name: string;
-  description: string;
+  summary: string;
   tags: BundleTag[];
-  templateData?: any; // This would contain the actual template data structure
-}
+  objectives: string[];
+  pillars: ('population' | 'resource' | 'services' | 'social')[];
+  geography: string[];
+};
 
-export interface CommandAction {
-  type: DetailView;
-  label: string;
-  icon: ReactNode;
-  description?: string;
-}
+// Act Zone Command Actions
+export type ActCommandAction = 'assign-leverage' | 're-optimize' | 'launch-delivery';
