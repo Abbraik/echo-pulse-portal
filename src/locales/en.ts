@@ -1,3 +1,4 @@
+
 export const en = {
   // General
   appName: "Population Dynamics System",
@@ -156,6 +157,12 @@ export const en = {
   use: "Use",
   addNewPlaybook: "Add New Playbook",
   dragPlaybookHint: "Drag a playbook to the Bundles Rail to create a new bundle",
+  
+  // New translation keys for Act.tsx error messages
+  noSelectedBundle: "No Bundle Selected",
+  pleaseSelectBundle: "Please select a bundle before performing this action.",
+  deliveryLaunched: "Delivery Plan Launched",
+  bundleLaunchedToDelivery: "Bundle has been launched to delivery chains.",
   
   // Bundle View
   back: "Back",

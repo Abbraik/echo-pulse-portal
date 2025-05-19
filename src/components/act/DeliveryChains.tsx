@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   MessageSquare, Calendar, AtSign, Bell, Check, 
   ChevronDown, Plus, Search, Users, Filter, 
-  Clock, ArrowRight, Download, Share2 
+  Clock, ArrowRight, Download, Share2, X, Send 
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
