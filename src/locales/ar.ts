@@ -1,3 +1,4 @@
+
 export const ar = {
   // General
   appName: "نظام ديناميكيات السكان",
@@ -35,7 +36,6 @@ export const ar = {
   
   // Footer
   copyright: "© 2025 نظام ديناميكيات السكان",
-  help: "المساعدة",
   documentation: "الوثائق",
   feedback: "التعليقات",
   allSystemsGo: "جميع الأنظمة تعمل",
@@ -155,7 +155,7 @@ export const ar = {
   stepOf: "الخطوة",
   of: "من",
   objectives: "الأهداف",
-  help: "مساعدة",
+  // Removed duplicate "help" key
   addObjective: "إضافة هدف",
   leveragePoints: "نقاط النفوذ",
   suggestPoints: "اقتراح النقاط",

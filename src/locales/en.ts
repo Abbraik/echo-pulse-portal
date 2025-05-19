@@ -36,7 +36,6 @@ export const en = {
   
   // Footer
   copyright: "© 2025 Population Dynamics System",
-  help: "Help",
   documentation: "Documentation",
   feedback: "Feedback",
   allSystemsGo: "All systems go",
@@ -173,7 +172,7 @@ export const en = {
   stepOf: "Step",
   of: "of",
   objectives: "Objectives",
-  help: "Help",
+  // Removed duplicate "help" key
   addObjective: "Add Objective",
   leveragePoints: "Leverage Points",
   suggestPoints: "Suggest Points",
