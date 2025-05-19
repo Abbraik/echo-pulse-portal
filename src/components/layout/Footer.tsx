@@ -41,7 +41,7 @@ const Footer = () => {
           >
             <HelpCircle size={16} />
             <span className={`relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-teal-400 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left ${isRTL ? 'font-noto-arabic' : ''}`}>
-              {t('help')}
+              {t('help', { defaultValue: 'Help' })}
             </span>
           </Link>
           <Link
@@ -50,7 +50,7 @@ const Footer = () => {
           >
             <BookOpen size={16} />
             <span className={`relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-teal-400 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left ${isRTL ? 'font-noto-arabic' : ''}`}>
-              {t('documentation')}
+              {t('documentation', { defaultValue: 'Documentation' })}
             </span>
           </Link>
           <Link
@@ -59,7 +59,7 @@ const Footer = () => {
           >
             <MessageSquare size={16} />
             <span className={`relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-teal-400 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left ${isRTL ? 'font-noto-arabic' : ''}`}>
-              {t('feedback')}
+              {t('feedback', { defaultValue: 'Feedback' })}
             </span>
           </Link>
         </div>

@@ -202,7 +202,7 @@ const BundleView: React.FC<BundleViewProps> = ({ bundleId, onClose }) => {
                   <h3 className="text-lg font-medium">{t('objectives', { defaultValue: 'Objectives' })}</h3>
                   <Button variant="ghost" size="sm">
                     <Info className="h-4 w-4 mr-1" />
-                    {t('help', { defaultValue: 'Help' })}
+                    {t('helpButton', { defaultValue: 'Help' })}
                   </Button>
                 </div>
                 
