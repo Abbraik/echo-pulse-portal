@@ -7,7 +7,11 @@ import { TrendingDown, MessageCircle, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
-export const AnomalyDetector: React.FC = () => {
+interface AnomalyDetectorProps {
+  onViewAnomaly?: (id: number) => void;
+}
+
+export const AnomalyDetector: React.FC<AnomalyDetectorProps> = ({ onViewAnomaly }) => {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   
@@ -47,6 +51,12 @@ export const AnomalyDetector: React.FC = () => {
     setQuery('');
   };
   
+  const handleInvestigate = (anomalyId: number) => {
+    if (onViewAnomaly) {
+      onViewAnomaly(anomalyId);
+    }
+  };
+  
   return (
     <GlassCard className="p-6 h-full">
       <div className="flex items-center justify-between mb-4">
@@ -72,6 +82,7 @@ export const AnomalyDetector: React.FC = () => {
                     variant="ghost" 
                     size="sm" 
                     className="text-xs text-teal-400 hover:text-teal-300 flex items-center gap-1"
+                    onClick={() => handleInvestigate(anomaly.id)}
                   >
                     {t('investigate')}
                     <ArrowRight size={12} />

@@ -269,4 +269,102 @@ const bundleModalAR = {
 export default {
   ...ar,
   ...bundleModalAR,
-};
+  
+  // Monitor Page Translations
+  monitor: "مراقبة",
+  monitorDesc: "لوحة معلومات لمراقبة صحة النظام في الوقت الفعلي",
+  monitorNarrativeOne: "نظرة عامة على النظام: مؤشر التنمية الوطني مستقر، وضغوط الموارد تظهر",
+  monitorNarrativeTwo: "تنبيهات: حلقة التماسك تقترب من الحدود - استعد لإعادة المعايرة",
+  monitorNarrativeThree: "التالي: تشخيص الأسباب الجذرية أو التصعيد إلى الاستراتيجية",
+  monitorInfoTooltip: "توفر منطقة المراقبة رؤى في الوقت الفعلي حول صحة النظام وتنبهك إلى الأنماط الناشئة التي تتطلب الاهتمام.",
+  
+  // Alert Detail & Recommendation Popups
+  alertStream: "تدفق التنبيهات",
+  anomalyDetector: "كاشف الشذوذ",
+  systemPulse: "نبض النظام",
+  systemEventsRecord: "سجل أحداث النظام",
+  networkDevelopmentIndex: "مؤشر تطوير الشبكة",
+  trustRecoveryIndex: "مؤشر استعادة الثقة",
+  averageBundleCoherence: "متوسط تماسك الحزمة",
+  resourceEfficiency: "كفاءة الموارد",
+  social: "اجتماعي",
+  governance: "الحوكمة",
+  economic: "اقتصادي",
+  environmental: "بيئي",
+  stability: "استقرار",
+  equilibriumBand: "نطاق التوازن",
+  
+  // Alert Actions
+  viewInThink: "عرض في التفكير",
+  recalibrate: "إعادة معايرة",
+  escalateToAct: "التصعيد للعمل",
+  viewDetails: "عرض التفاصيل",
+  investigate: "التحقيق",
+  recalibrationStarted: "بدأت إعادة المعايرة",
+  recalibrationDescription: "ضبط المعلمات لتحسين أداء النظام",
+  escalated: "تم تصعيد التنبيه",
+  escalatedDescription: "تم ت��عيد التنبيه إلى منطقة العمل",
+  applyChanges: "تطبيق التغييرات",
+  close: "إغلاق",
+  parameter: "معامل",
+  impact: "تأثير",
+  innovate: "ابتكار",
+  
+  // Alert Detail Popup
+  historicalTrend: "الاتجاه التاريخي",
+  exactDeviation: "الانحراف الدقيق",
+  affectedSubIndicators: "المؤشرات الفرعية المتأثرة",
+  recommendedActions: "الإجراءات الموصى بها",
+  runMicroSim: "تشغيل المحاكاة المصغرة",
+  applyPlaybook: "تطبيق دليل التشغيل",
+  createBundle: "إنشاء حزمة",
+  investigateInThink: "التحقيق في التفكير",
+  escalateToAct: "التصعيد إلى العمل",
+  impactAssessment: "تقييم الأثر",
+  alertImpactDescription: "الانحراف الحالي يؤثر على مرونة النظام ويمكن أن يؤثر على تخصيص الموارد.",
+  high: "عالي",
+  medium: "متوسط",
+  low: "منخفض",
+  
+  // Recommendation Popup
+  recommendation: "توصية",
+  recommendationOne: "فكر في تعزيز الثقة الاجتماعية عبر برامج إشراك الشباب",
+  recommendationTwo: "يمكن تحسين كفاءة المياه بهيكل تعريفة محدث",
+  recommendationThree: "المرونة الاقتصادية تتطلب التنويع في المناطق الساحلية",
+  applyPlaybook: "تطبيق دليل التشغيل",
+  newBundle: "حزمة جديدة",
+  playbookApplied: "تم تطبيق دليل التشغيل",
+  playbookAppliedDescription: "تم تطبيق دليل التشغيل المحدد لمعالجة هذه المشكلة",
+  bundleCreated: "تم إنشاء حزمة",
+  bundleCreatedDescription: "تم إنشاء حزمة جديدة لمعالجة هذه المشكلة",
+  
+  // Anomaly Panel
+  askAboutAnomalies: "اسأل عن الشذوذ...",
+  askAi: "اسأل الذكاء الاصطناعي",
+  socialTrust: "الثقة الاجتماعية",
+  waterResources: "موارد المياه",
+  economicActivity: "النشاط الاقتصادي",
+  socialTrustDescription: "انخفاض غير متوقع في مؤشر الثقة الاجتماعية عبر الإمارات الشمالية",
+  waterResourcesDescription: "اتجاه تناقص توافر المياه في المناطق الزراعية",
+  economicActivityDescription: "ارتفاع غير عادي في النشاط الاقتصادي في المناطق الساحلية",
+  socialTrustRootCause: "انخفاض المشاركة المجتمعية في المؤسسات المحلية",
+  waterResourcesRootCause: "تحول أنماط هطول الأمطار الموسمية بسبب العوامل المناخية",
+  economicActivityRootCause: "اتفاقيات تجارية جديدة واستثمارات سياحية",
+  
+  // Anomaly Detail Panel
+  overview: "نظرة عامة",
+  severity: "شدة",
+  rootCauseHint: "تلميح السبب الجذري",
+  linkedFeedbackLoop: "حلقة التغذية الراجعة المرتبطة: اجتماعي → ثقة",
+  quickActions: "إجراءات سريعة",
+  runDeepAnalysisThink: "تشغيل تحليل عميق في التفكير",
+  triggerPlaybook: "تشغيل دليل التشغيل",
+  viewInMonitor: "عرض في المراقبة",
+  
+  // Recalibration
+  recalibration: "إعادة المعايرة",
+  metric: "مقياس",
+  deviation: "انحراف",
+  time: "وقت",
+  actions: "إجراءات"
+} as const;

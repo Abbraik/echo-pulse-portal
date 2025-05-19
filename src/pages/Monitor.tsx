@@ -25,11 +25,19 @@ import { SystemPulseOrb } from '@/components/monitor/SystemPulseOrb';
 import { AnomalyDetector } from '@/components/monitor/AnomalyDetector';
 import { CoordinationTracker } from '@/components/monitor/CoordinationTracker';
 import { SystemEventsTimeline } from '@/components/monitor/SystemEventsTimeline';
+import { AlertDetailPopup } from '@/components/monitor/AlertDetailPopup';
+import { RecommendationPopup } from '@/components/monitor/RecommendationPopup';
+import { AnomalyDetailPanel } from '@/components/monitor/AnomalyDetailPanel';
 
 const MonitorPage: React.FC = () => {
   const { t, isRTL } = useTranslation();
   const [selectedAlert, setSelectedAlert] = useState<string | null>(null);
   const [showRecalibration, setShowRecalibration] = useState(false);
+  const [alertDetailOpen, setAlertDetailOpen] = useState(false);
+  const [selectedAlertData, setSelectedAlertData] = useState<any>(null);
+  const [activeRecommendation, setActiveRecommendation] = useState<any>(null);
+  const [anomalyDetailOpen, setAnomalyDetailOpen] = useState(false);
+  const [selectedAnomaly, setSelectedAnomaly] = useState<any>(null);
 
   // Mock data for demonstration
   const indicators = [
@@ -44,8 +52,55 @@ const MonitorPage: React.FC = () => {
     { id: 3, metric: t('governance'), deviation: "+1.7%", time: "05/14 11:42", severity: "low" }
   ];
   
+  const anomalies = [
+    {
+      id: 1,
+      title: t('socialTrust'),
+      change: '-3.5%',
+      date: '2025-05-18',
+      description: t('socialTrustDescription'),
+      rootCause: t('socialTrustRootCause')
+    },
+    {
+      id: 2,
+      title: t('waterResources'),
+      change: '-2.8%',
+      date: '2025-05-17',
+      description: t('waterResourcesDescription'),
+      rootCause: t('waterResourcesRootCause')
+    },
+    {
+      id: 3,
+      title: t('economicActivity'),
+      change: '+4.2%',
+      date: '2025-05-16',
+      description: t('economicActivityDescription'),
+      rootCause: t('economicActivityRootCause')
+    }
+  ];
+  
+  // Recommendations cycle for demonstration
+  useEffect(() => {
+    const recommendations = [
+      { id: '1', message: t('recommendationOne') },
+      { id: '2', message: t('recommendationTwo') },
+      { id: '3', message: t('recommendationThree') }
+    ];
+    
+    let index = 0;
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) { // 30% chance of showing a recommendation
+        setActiveRecommendation(recommendations[index]);
+        index = (index + 1) % recommendations.length;
+      }
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, [t]);
+  
   const handleAlertAction = (alertId: number, action: 'view' | 'recalibrate' | 'escalate') => {
     setSelectedAlert(String(alertId));
+    const alertData = alerts.find(a => a.id === alertId);
     
     if (action === 'recalibrate') {
       setShowRecalibration(true);
@@ -58,16 +113,42 @@ const MonitorPage: React.FC = () => {
         title: t('escalated'),
         description: t('escalatedDescription'),
       });
-    } else {
-      toast({
-        title: t('viewingAlert'),
-        description: t('viewingAlertDescription'),
-      });
+    } else if (action === 'view') {
+      setSelectedAlertData(alertData);
+      setAlertDetailOpen(true);
     }
   };
 
   const handleCloseRecalibration = () => {
     setShowRecalibration(false);
+  };
+  
+  const handleViewAnomaly = (anomalyId: number) => {
+    const anomaly = anomalies.find(a => a.id === anomalyId);
+    if (anomaly) {
+      setSelectedAnomaly(anomaly);
+      setAnomalyDetailOpen(true);
+    }
+  };
+  
+  const handleDismissRecommendation = () => {
+    setActiveRecommendation(null);
+  };
+  
+  const handleApplyPlaybook = () => {
+    toast({
+      title: t('playbookApplied'),
+      description: t('playbookAppliedDescription'),
+    });
+    setActiveRecommendation(null);
+  };
+  
+  const handleCreateBundle = () => {
+    toast({
+      title: t('bundleCreated'),
+      description: t('bundleCreatedDescription'),
+    });
+    setActiveRecommendation(null);
   };
 
   return (
@@ -187,7 +268,7 @@ const MonitorPage: React.FC = () => {
           
           {/* Anomaly Detector Feed */}
           <div className="lg:col-span-6">
-            <AnomalyDetector />
+            <AnomalyDetector onViewAnomaly={handleViewAnomaly} />
           </div>
           
           {/* Coordination Gap Tracker */}
@@ -252,6 +333,26 @@ const MonitorPage: React.FC = () => {
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
+        
+        {/* Modal Components */}
+        <AlertDetailPopup 
+          isOpen={alertDetailOpen}
+          onClose={() => setAlertDetailOpen(false)}
+          alert={selectedAlertData}
+        />
+        
+        <AnomalyDetailPanel
+          isOpen={anomalyDetailOpen}
+          onClose={() => setAnomalyDetailOpen(false)}
+          anomaly={selectedAnomaly}
+        />
+        
+        <RecommendationPopup
+          recommendation={activeRecommendation}
+          onDismiss={handleDismissRecommendation}
+          onApplyPlaybook={handleApplyPlaybook}
+          onCreateBundle={handleCreateBundle}
+        />
       </div>
     </AnimatedPage>
   );
