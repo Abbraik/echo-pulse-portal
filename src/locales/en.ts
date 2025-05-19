@@ -283,13 +283,12 @@ const alertDetailObj = {
   applyPlaybook: "Apply Playbook",
   createBundle: "Create Bundle",
   investigateInThink: "Investigate in Think",
-  escalateToAct: "Escalate to Act",
+  equilibriumBand: "Equilibrium Band",
   impactAssessment: "Impact Assessment",
   alertImpactDescription: "Current deviation is affecting system resilience and could impact resource allocation.",
   high: "High",
   medium: "Medium",
   low: "Low",
-  equilibriumBand: "Equilibrium Band",
 };
 
 const recommendationPopup = {
