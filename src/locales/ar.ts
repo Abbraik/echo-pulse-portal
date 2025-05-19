@@ -206,6 +206,9 @@ export const ar = {
   parameterAdjustment: "ضبط المعلمات",
   simulationPreview: "معاينة المحاكاة",
   impact: "التأثير",
+  
+  // Monitor Zone translations
+  recalibration: "إعادة المعايرة",
 };
 
 // Bundle Modal Translations

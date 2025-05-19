@@ -1,4 +1,3 @@
-
 export const en = {
   // General
   appName: "Population Dynamics System",
@@ -266,6 +265,7 @@ export const en = {
   monitorNarrativeTwo: "Alerts: Cohesion loop nearing boundary—prepare recalibration.",
   monitorNarrativeThree: "Next: Diagnose root causes or escalate to strategy.",
   monitorInfoTooltip: "The MONITOR zone provides real-time insights into system health and performance, allowing you to track outcomes and identify issues that may require intervention.",
+  recalibration: "Recalibration",
 };
 
 // Bundle Modal Translations

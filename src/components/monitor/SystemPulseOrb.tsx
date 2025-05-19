@@ -67,7 +67,7 @@ export const SystemPulseOrb: React.FC = () => {
             72
           </div>
           <div className="text-xs text-teal-300/80">
-            {t('stability')}
+            {t('stability' as any)}
           </div>
         </div>
       </motion.div>
@@ -103,7 +103,7 @@ export const SystemPulseOrb: React.FC = () => {
                 }}
               >
                 <div className="text-sm font-medium" style={{ color: pillar.color }}>
-                  {t(pillar.id)}
+                  {t(pillar.id as any)}
                 </div>
                 <div 
                   className="h-1 mt-1 rounded-full" 

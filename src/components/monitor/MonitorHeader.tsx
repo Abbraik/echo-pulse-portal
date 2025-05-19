@@ -41,7 +41,7 @@ const MonitorHeader: React.FC = () => {
       <div className="mt-6 glass-panel-deep p-4 border-l-4 border-teal-500">
         <div className="flex items-center justify-between">
           <p className="text-left animate-fade-in font-medium text-lg">
-            {t(narrativeMessages[activeNarrative])}
+            {t(narrativeMessages[activeNarrative] as any)}
           </p>
           <Tooltip>
             <TooltipTrigger asChild>
