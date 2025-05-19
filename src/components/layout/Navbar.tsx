@@ -47,6 +47,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
     { name: t('think'), path: '/think' },
     { name: t('act'), path: '/act' },
     { name: t('monitor'), path: '/monitor' },
+    { name: t('learn'), path: '/learn' },
     { name: t('innovate'), path: '/innovate' },
   ];
 
