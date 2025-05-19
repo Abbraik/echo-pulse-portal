@@ -1,3 +1,5 @@
+
+// English locale
 export const en = {
   // General
   appName: "Population Dynamics System",
@@ -241,18 +243,8 @@ export const en = {
   // Alert Detail & Recommendation Popups
   alertStream: "Alert Stream",
   anomalyDetector: "Anomaly Detector",
-  systemPulse: "System Pulse",
+  coordinationTracker: "Coordination Tracker",
   systemEventsRecord: "System Events Record",
-  networkDevelopmentIndex: "Network Development Index",
-  trustRecoveryIndex: "Trust Recovery Index",
-  averageBundleCoherence: "Average Bundle Coherence",
-  resourceEfficiency: "Resource Efficiency",
-  social: "Social",
-  governance: "Governance",
-  economic: "Economic",
-  environmental: "Environmental",
-  stability: "Stability",
-  equilibriumBand: "equilibrium band",
   
   // Alert Actions
   viewInThink: "View in Think",
@@ -269,6 +261,7 @@ export const en = {
   parameter: "Parameter",
   impact: "Impact",
   innovate: "Innovate",
+  recalibration: "Recalibration",
   
   // Alert Detail Popup
   historicalTrend: "Historical Trend",
@@ -291,8 +284,6 @@ export const en = {
   recommendationOne: "Consider strengthening Social Trust via youth engagement programs",
   recommendationTwo: "Water efficiency could be improved with updated tariff structure",
   recommendationThree: "Economic resilience requires diversification in coastal regions",
-  applyPlaybook: "Apply Playbook",
-  newBundle: "New Bundle",
   playbookApplied: "Playbook Applied",
   playbookAppliedDescription: "The selected playbook has been applied to address this issue",
   bundleCreated: "Bundle Created",
@@ -320,14 +311,28 @@ export const en = {
   runDeepAnalysisThink: "Run Deep Analysis in Think",
   triggerPlaybook: "Trigger Playbook",
   viewInMonitor: "View in Monitor",
+  trust: "Trust",
   
-  // Recalibration
-  recalibration: "Recalibration",
+  // Coordination Tracker
+  coordinationGap: "Coordination Gap",
+  meetingScheduled: "Meeting Scheduled",
+  meetingScheduledDescription: "A coordination meeting has been scheduled",
+  schedule: "Schedule",
+  strongCoordination: "Strong Coordination",
+  coordinationStrong: "Coordination is strong",
+  noCoordination: "No Coordination",
+  
+  // System Events Timeline
+  simulation: "Simulation",
+  bundle: "Bundle",
+  lesson: "Lesson",
+  
+  // Metrics
   metric: "Metric",
   deviation: "Deviation",
   time: "Time",
-  actions: "Actions"
-} as const;
+  actions: "Actions",
+};
 
 // Bundle Modal Translations
 const bundleModalEN = {
@@ -411,12 +416,11 @@ const deliveryChainsEN = {
   usersOnline: "users online",
 };
 
-export default {
+// Combine all translation objects
+const allTranslations = {
   ...en,
-  
-  // Add bundle modal translations
   ...bundleModalEN,
-  
-  // Add delivery chains translations
   ...deliveryChainsEN,
 };
+
+export default allTranslations;

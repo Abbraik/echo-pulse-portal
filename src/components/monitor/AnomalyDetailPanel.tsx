@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { X, ArrowLeft, Play, Plus, Search, TrendingDown } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, Play, Plus, Search, TrendingDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import {
   Sheet,
@@ -98,9 +98,9 @@ export const AnomalyDetailPanel: React.FC<AnomalyDetailPanelProps> = ({
               
               <div className="flex items-center mt-2 text-xs text-teal-400">
                 <div className="h-1 w-1 rounded-full bg-teal-400 mr-1"></div>
-                <span>{t('social')}</span>
+                <span>{t('social' as any)}</span>
                 <ArrowRight className="h-3 w-3 mx-1" />
-                <span>{t('trust')}</span>
+                <span>{t('trust' as any)}</span>
               </div>
             </div>
           </div>

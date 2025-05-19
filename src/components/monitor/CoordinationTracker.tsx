@@ -34,24 +34,24 @@ export const CoordinationTracker: React.FC = () => {
   const handleCellClick = (intervention: string, actor: string, value: number) => {
     if (value < 2) {
       toast({
-        title: t('coordinationGap'),
-        description: `${intervention} + ${actor}: ${t('scheduleMeeting')}?`,
+        title: t('coordinationGap' as any),
+        description: `${intervention} + ${actor}: ${t('scheduleMeeting' as any)}?`,
         action: (
           <Button size="sm" variant="outline" onClick={() => {
             toast({
-              title: t('meetingScheduled'),
-              description: t('meetingScheduledDescription'),
+              title: t('meetingScheduled' as any),
+              description: t('meetingScheduledDescription' as any),
             });
           }}>
             <Calendar className="mr-1" size={14} />
-            {t('schedule')}
+            {t('schedule' as any)}
           </Button>
         ),
       });
     } else {
       toast({
-        title: t('strongCoordination'),
-        description: `${intervention} + ${actor}: ${t('coordinationStrong')}`,
+        title: t('strongCoordination' as any),
+        description: `${intervention} + ${actor}: ${t('coordinationStrong' as any)}`,
       });
     }
   };
@@ -60,7 +60,7 @@ export const CoordinationTracker: React.FC = () => {
     <GlassCard className="p-6 h-full">
       <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
         <Map className="mr-2 text-teal-400" size={18} />
-        {t('coordinationTracker')}
+        {t('coordinationTracker' as any)}
       </h2>
       
       <div className="relative overflow-x-auto">
@@ -103,11 +103,11 @@ export const CoordinationTracker: React.FC = () => {
       <div className="flex justify-between mt-4 text-xs text-gray-400">
         <div className="flex items-center">
           <div className="w-3 h-3 rounded-full bg-red-500/30 mr-1"></div>
-          <span>{t('noCoordination')}</span>
+          <span>{t('noCoordination' as any)}</span>
         </div>
         <div className="flex items-center">
           <div className="w-3 h-3 rounded-full bg-green-500/30 mr-1"></div>
-          <span>{t('strongCoordination')}</span>
+          <span>{t('strongCoordination' as any)}</span>
         </div>
       </div>
     </GlassCard>

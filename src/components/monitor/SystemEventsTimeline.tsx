@@ -109,15 +109,15 @@ export const SystemEventsTimeline: React.FC = () => {
       <div className="flex justify-center gap-4 mt-6 text-xs text-gray-400">
         <div className="flex items-center">
           <div className="w-3 h-3 rounded-full bg-blue-400 mr-1"></div>
-          <span>{t('simulation')}</span>
+          <span>{t('simulation' as any)}</span>
         </div>
         <div className="flex items-center">
           <div className="w-3 h-3 rounded-full bg-teal-400 mr-1"></div>
-          <span>{t('bundle')}</span>
+          <span>{t('bundle' as any)}</span>
         </div>
         <div className="flex items-center">
           <div className="w-3 h-3 rounded-full bg-purple-400 mr-1"></div>
-          <span>{t('lesson')}</span>
+          <span>{t('lesson' as any)}</span>
         </div>
       </div>
     </div>
