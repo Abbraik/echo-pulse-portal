@@ -1,4 +1,3 @@
-
 // Arabic locale
 const general = {
   appName: "نظام ديناميكيات السكان",
@@ -11,6 +10,7 @@ const navigation = {
   think: "تفكير",
   act: "تنفيذ",
   monitor: "مراقبة",
+  learn: "تعلم",
   innovate: "ابتكار",
   sandbox: "مختبر تجريبي",
   launchDashboard: "إطلاق لوحة المعلومات",
@@ -34,6 +34,7 @@ const zoneDescriptions = {
   thinkDesc: "نمذجة النظام المتقدمة وأدوات تخطيط السيناريوهات التعاونية",
   actDesc: "تنفيذ التدخلات الاستراتيجية وتعديلات السياسات",
   monitorDesc: "تتبع النتائج وتصور مقاييس أداء النظام",
+  learnDesc: "استكشاف الممارسات الناشئة والنهج التجريبية",
   innovateDesc: "استكشاف الممارسات الناشئة والنهج التجريبية",
   sandboxDesc: "اختبار النماذج والاستراتيجيات الجديدة في بيئة محكومة",
 };
@@ -76,7 +77,26 @@ const homePage = {
   equilibrium: "توازن",
 };
 
-const actZone = {
+const carouselAndNarrative = {
+  viewDetails: "عرض التفاصيل",
+  networkDevelopmentIndex: "مؤشر تطوير الشبكة",
+  trustRecoveryIndex: "مؤشر استعادة الثقة",
+  averageBundleCoherence: "متوسط تماسك الحزمة",
+  pilotSuccessRate: "معدل نجاح البرنامج التجريبي",
+  narrativeWelcome: "مرحبًا بكم في نظام ديناميكيات السكان — محرك إدارة حي يوحد البصيرة والاستراتيجية والمراقبة والابتكار.",
+  narrativeDiscover: "اكتشف كيف تحافظ سياساتنا على توازن دولة الإمارات العربية المتحدة — محاكاة المستقبل وإطلاق التدخلات والتقاط الدروس.",
+  narrativeLoop: "تبدأ حلقتك لتحقيق التوازن الديناميكي هنا — فكر، اعمل، راقب، تعلم، ابتكر.",
+  fourZones: "المناطق الخمس",
+  zonesDescription: "يعمل نظام PDS كحلقة مستمرة:",
+  zoneThink: "محاكاة السيناريوهات",
+  zoneAct: "إطلاق التدخلات",
+  zoneMonitor: "تتبع النتائج",
+  zoneLearn: "التقاط الدروس",
+  zoneInnovate: "توليد أفكار جديدة",
+  stability: "استقرار",
+};
+
+const actZonePage = {
   bundleCoherencePrompt: "تماسك حزمة 'مرونة الموارد' هو 58 — ما هي الخطوة التالية؟",
   assignLeverage: "تعيين النفوذ ◀",
   reOptimizeBands: "إعادة تحسين النطاقات ◀",
@@ -147,6 +167,12 @@ const actZone = {
   use: "استخدام",
   addNewPlaybook: "إضافة كتاب إرشادي جديد",
   dragPlaybookHint: "اسحب كتابًا إرشاديًا إلى شريط الحزم لإنشاء حزمة جديدة",
+  
+  // Act.tsx error messages
+  noSelectedBundle: "لم يتم اختيار حزمة",
+  pleaseSelectBundle: "الرجاء تحديد حزمة قبل تنفيذ هذا الإجراء.",
+  deliveryLaunched: "تم إطلاق خطة التسليم",
+  bundleLaunchedToDelivery: "تم إطلاق الحزمة إلى سلاسل التسليم.",
 };
 
 const bundleView = {
@@ -230,15 +256,8 @@ const monitorZone = {
 const alertDetailObj = {
   alertStream: "تدفق التنبيهات",
   anomalyDetector: "كاشف الشذوذ",
-  systemPulse: "نبض النظام",
-  systemEventsRecord: "سجل أحداث النظام",
-  networkDevelopmentIndex: "مؤشر تطوير الشبكة",
-  trustRecoveryIndex: "مؤشر استعادة الثقة",
-  averageBundleCoherence: "متوسط تماسك الحزمة",
-  resourceEfficiency: "كفاءة الموارد",
-  stability: "استقرار",
-  equilibriumBand: "نطاق التوازن",
   coordinationTracker: "متتبع التنسيق",
+  systemEventsRecord: "سجل أحداث النظام",
   
   // Alert Actions
   viewInThink: "عرض في التفكير",
@@ -266,6 +285,7 @@ const alertDetailObj = {
   applyPlaybook: "تطبيق دليل التشغيل",
   createBundle: "إنشاء حزمة",
   investigateInThink: "التحقيق في التفكير",
+  equilibriumBand: "نطاق التوازن",
   impactAssessment: "تقييم الأثر",
   alertImpactDescription: "الانحراف الحالي يؤثر على مرونة النظام ويمكن أن يؤثر على تخصيص الموارد.",
   high: "عالي",
@@ -414,6 +434,101 @@ const deliveryChainsAR = {
   usersOnline: "المستخدمون متصلون",
 };
 
+// Learn Zone Translations
+const learnZone = {
+  learnZoneTitle: "منطقة التعلم",
+  learnZoneDesc: "التقاط وتنظيم ومشاركة الدروس والرؤى من التدخلات",
+  lessonsHub: "مركز الدروس",
+  fiveWhys: "تحليل الأسباب الخمسة",
+  fishboneAnalysis: "تحليل عظم السمكة",
+  retrospective: "معرض استعادي",
+  reportBuilder: "منشئ التقارير",
+  knowledgeMap: "خريطة المعرفة",
+  captureLesson: "التقاط درس",
+  lessonTitle: "العنوان",
+  lessonDesc: "الوصف",
+  lessonSource: "المصدر",
+  lessonDate: "التاريخ",
+  lessonImpact: "التأثير",
+  lessonRecommendation: "التوصية",
+  saveLesson: "حفظ الدرس",
+  lessonsLibrary: "مكتبة الدروس",
+  lessonCount: "الدروس",
+  verified: "تم التحقق",
+  generateReport: "إنشاء تقرير المراقبة والتقييم",
+  selectDateRange: "تحديد نطاق التاريخ",
+  reportFormat: "تنسيق التقرير",
+  pdfFormat: "PDF",
+  pptxFormat: "PowerPoint",
+  emailDistribution: "توزيع البريد الإلكتروني",
+  generateAndDownload: "إنشاء وتنزيل",
+  rootCauseAnalysis: "تحليل السبب الجذري",
+  event: "الحدث",
+  why1: "لماذا؟ (المستوى الأول)",
+  why2: "لماذا؟ (المستوى الثاني)",
+  why3: "لماذا؟ (المستوى الثالث)",
+  why4: "لماذا؟ (المستوى الرابع)",
+  why5: "لماذا؟ (المستوى الخامس)",
+  fishboneDiagram: "مخطط عظم السمكة",
+  category1: "الأشخاص",
+  category2: "العملية",
+  category3: "المعدات",
+  category4: "البيئة",
+  category5: "الإدارة",
+  category6: "المواد",
+  relatedLessons: "الدروس ذات الصلة",
+  peerReview: "مراجعة الأقران",
+  submitForReview: "تقديم للمراجعة",
+  filtering: "التصفية",
+  all: "الكل",
+  filterByDate: "تصفية حسب التاريخ",
+  filterByBundle: "تصفية حسب الحزمة",
+  filterByPilot: "تصفية حسب البرنامج التجريبي",
+  filterByTag: "تصفية حسب العلامة",
+  timelineExplorer: "مستكشف الجدول الزمني",
+};
+
+// Innovate Zone Translations
+const innovateZone = {
+  innovateZoneTitle: "منطقة الابتكار",
+  innovateZoneDesc: "النماذج الأولية والمحاكاة وصياغة مخططات السياسات الجديدة",
+  blueprintConsole: "وحدة التحكم في المخطط",
+  sandboxLab: "مختبر الابتكار التجريبي",
+  playbookLibrary: "مكتبة الكتب الإرشادية",
+  scheduledSprints: "سباقات السرعة المجدولة",
+  aiCoach: "مدرب الذكاء الاصطناعي",
+  parameterEditor: "محرر المعلمات",
+  miniSimPreviews: "معاينات المحاكاة المصغرة",
+  saveAsPlaybook: "حفظ ككتاب إرشادي",
+  publishToLibrary: "نشر في المكتبة",
+  templateLibrary: "مكتبة القوالب",
+  dragAndTune: "قماش CLD للسحب والضبط",
+  nonExpertMode: "وضع غير الخبراء",
+  expertMode: "وضع الخبراء",
+  batchSweeps: "عمليات المسح الدفعية",
+  monteCarlo: "تشغيل مونت كارلو",
+  impactDashboard: "لوحة معلومات التأثير",
+  compareWithBaseline: "قارن بالخط الأساسي",
+  versionControl: "التحكم في الإصدار",
+  forks: "الشعب",
+  comments: "تعليقات",
+  teamsIntegration: "تكامل الفرق",
+  approvedPlaybooks: "الكتب الإرشادية المعتمدة",
+  dragToInstantiate: "اسحب لإنشاء مثيل",
+  learningSprints: "سباقات السرعة التعليمية",
+  aiSummarization: "مساعد تلخيص الذكاء الاصطناعي",
+  draftReview: "مراجعة المسودة",
+  modelOptimization: "تحسين النموذج",
+  runSimulation: "تشغيل المحاكاة",
+  saveBlueprint: "حفظ المخطط",
+  intensity: "كثافة",
+  duration: "مدة",
+  integration: "تكامل",
+  simulateBandChange: "محاكاة تغيير النطاق",
+  activeBlueprints: "المخططات النشطة",
+  progress: "التقدم",
+};
+
 // Combine all translation objects
 export const ar = {
   ...general,
@@ -423,7 +538,8 @@ export const ar = {
   ...footer,
   ...userMenu,
   ...homePage,
-  ...actZone,
+  ...carouselAndNarrative,
+  ...actZonePage,
   ...bundleView,
   ...bundleViewAdditions,
   ...monitorZone,
@@ -436,6 +552,8 @@ export const ar = {
   ...metrics,
   ...bundleModalAR,
   ...deliveryChainsAR,
+  ...learnZone,
+  ...innovateZone,
 };
 
 export default ar;

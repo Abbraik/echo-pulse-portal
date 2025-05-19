@@ -212,16 +212,20 @@ const Learn: React.FC = () => {
                   />
                 </div>
                 
-                {[1, 2, 3, 4, 5].map(i => (
-                  <div key={i}>
-                    <label className="text-sm text-gray-300 block mb-1 text-left">{t(`why${i}`)}</label>
-                    <input 
-                      type="text" 
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm"
-                      placeholder={`Why did this happen? (Level ${i})...`}
-                    />
-                  </div>
-                ))}
+                {[1, 2, 3, 4, 5].map(i => {
+                  // Use string concatenation rather than template literals for translation keys
+                  const whyKey = "why" + i;
+                  return (
+                    <div key={i}>
+                      <label className="text-sm text-gray-300 block mb-1 text-left">{t(whyKey as any)}</label>
+                      <input 
+                        type="text" 
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm"
+                        placeholder={`Why did this happen? (Level ${i})...`}
+                      />
+                    </div>
+                  );
+                })}
                 
                 <div>
                   <label className="text-sm text-gray-300 block mb-1 text-left">{t('lessonRecommendation')}</label>
@@ -249,11 +253,15 @@ const Learn: React.FC = () => {
               </div>
               
               <div className="grid grid-cols-3 gap-2 mb-4">
-                {[1, 2, 3, 4, 5, 6].map(i => (
-                  <button key={i} className="py-1 px-2 text-xs bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">
-                    {t(`category${i}`)}
-                  </button>
-                ))}
+                {[1, 2, 3, 4, 5, 6].map(i => {
+                  // Use string concatenation rather than template literals for translation keys
+                  const categoryKey = "category" + i;
+                  return (
+                    <button key={i} className="py-1 px-2 text-xs bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">
+                      {t(categoryKey as any)}
+                    </button>
+                  );
+                })}
               </div>
               
               <Button className="w-full bg-blue-600 hover:bg-blue-500">
@@ -592,3 +600,4 @@ const Learn: React.FC = () => {
 };
 
 export default Learn;
+
