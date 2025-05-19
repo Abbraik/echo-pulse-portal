@@ -1,127 +1,255 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Monitor, BarChart2, AlertTriangle, Map } from 'lucide-react';
+import { 
+  Monitor, BarChart2, AlertTriangle, Map, Info, 
+  TrendingUp, TrendingDown, Search, Settings, Zap, 
+  ArrowRight, Bell, Gauge as GaugeIcon 
+} from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
+import { GlassCard } from '@/components/ui/glass-card';
 import Gauge from '@/components/ui/custom/Gauge';
+import { Button } from '@/components/ui/button';
+import { 
+  Table, 
+  TableHeader, 
+  TableBody, 
+  TableRow, 
+  TableHead, 
+  TableCell 
+} from '@/components/ui/table';
+import { toast } from '@/hooks/use-toast';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import MonitorHeader from '@/components/monitor/MonitorHeader';
+import { SystemPulseOrb } from '@/components/monitor/SystemPulseOrb';
+import { AnomalyDetector } from '@/components/monitor/AnomalyDetector';
+import { CoordinationTracker } from '@/components/monitor/CoordinationTracker';
+import { SystemEventsTimeline } from '@/components/monitor/SystemEventsTimeline';
 
 const MonitorPage: React.FC = () => {
+  const { t, isRTL } = useTranslation();
+  const [selectedAlert, setSelectedAlert] = useState<string | null>(null);
+  const [showRecalibration, setShowRecalibration] = useState(false);
+
+  // Mock data for demonstration
+  const indicators = [
+    { id: 'ndi', value: 78, label: t('networkDevelopmentIndex'), color: "teal" },
+    { id: 'tri', value: 64, label: t('trustRecoveryIndex'), color: "amber" },
+    { id: 'abc', value: 89, label: t('averageBundleCoherence'), color: "blue" }
+  ];
+  
+  const alerts = [
+    { id: 1, metric: t('resourceEfficiency'), deviation: "-4.2%", time: "05/14 09:23", severity: "high" },
+    { id: 2, metric: t('social'), deviation: "-2.8%", time: "05/14 10:15", severity: "medium" },
+    { id: 3, metric: t('governance'), deviation: "+1.7%", time: "05/14 11:42", severity: "low" }
+  ];
+  
+  const handleAlertAction = (alertId: number, action: 'view' | 'recalibrate' | 'escalate') => {
+    setSelectedAlert(String(alertId));
+    
+    if (action === 'recalibrate') {
+      setShowRecalibration(true);
+      toast({
+        title: t('recalibrationStarted'),
+        description: t('recalibrationDescription'),
+      });
+    } else if (action === 'escalate') {
+      toast({
+        title: t('escalated'),
+        description: t('escalatedDescription'),
+      });
+    } else {
+      toast({
+        title: t('viewingAlert'),
+        description: t('viewingAlertDescription'),
+      });
+    }
+  };
+
+  const handleCloseRecalibration = () => {
+    setShowRecalibration(false);
+  };
+
   return (
-    <AnimatedPage>
-      <header className="mb-8">
-        <div className="glass-panel p-6 flex items-center space-x-4">
-          <div className="p-3 rounded-xl bg-amber-500/20 text-amber-400">
-            <Monitor size={24} />
-          </div>
-          <div className="text-left">
-            <h1 className="text-3xl font-extrabold">MONITOR Zone</h1>
-            <p className="text-gray-400">
-              Track metrics, spot trends, and receive alerts about dynamics
-            </p>
-          </div>
-        </div>
-      </header>
+    <AnimatedPage className={`${isRTL ? 'rtl' : ''}`}>
+      {/* Monitor Zone Header */}
+      <MonitorHeader />
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="glass-panel p-6">
-          <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
-            {/* Replace Gauge icon with actual Lucide icon */}
-            <Monitor size={18} className="mr-2 text-amber-500" />
-            Overview Gauges
-          </h2>
-          <div className="space-y-4">
-            {[
-              { value: 78, label: "Metric 1", color: "amber" },
-              { value: 64, label: "Metric 2", color: "amber" },
-              { value: 89, label: "Metric 3", color: "amber" }
-            ].map((metric, i) => (
-              <div key={i} className="p-4 border border-white/10 rounded-lg bg-white/5">
-                <div className="flex items-center">
-                  <div className="w-24 flex justify-center">
-                    <Gauge 
-                      value={metric.value} 
-                      size="sm" 
-                      label={metric.label}
-                      color="amber" 
-                    />
+      {/* Main Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Key Indicators Carousel */}
+        <div className="lg:col-span-12">
+          <Carousel className="w-full">
+            <CarouselContent>
+              {indicators.map((indicator) => (
+                <CarouselItem key={indicator.id} className="md:basis-1/3 lg:basis-1/4">
+                  <div className="glass-panel p-6 h-full">
+                    <h3 className="text-lg font-semibold mb-4 text-left">{indicator.label}</h3>
+                    <div className="flex justify-center mb-4">
+                      <Gauge 
+                        value={indicator.value} 
+                        size="lg" 
+                        color={indicator.color as any} 
+                        showValue={true}
+                      />
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                      <Button variant="ghost" className="text-xs text-teal-400 hover:text-teal-300 flex items-center gap-1">
+                        {t('viewDetails')}
+                        <ArrowRight size={12} />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex-1 ml-4">
-                    <div className="flex justify-between">
-                      <h3 className="text-sm font-medium">{metric.label}</h3>
-                      <span className="text-amber-400 text-sm font-bold">{metric.value}%</span>
-                    </div>
-                    <div className="h-1 w-full bg-white/10 rounded-full mt-1">
-                      <div 
-                        className="h-1 bg-amber-500 rounded-full" 
-                        style={{width: `${metric.value}%`}}
-                      ></div>
-                    </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center mt-4">
+              <CarouselPrevious className={`${isRTL ? 'order-2' : 'order-1'} relative inset-auto mx-1`} />
+              <CarouselNext className={`${isRTL ? 'order-1' : 'order-2'} relative inset-auto mx-1`} />
+            </div>
+          </Carousel>
+        </div>
+        
+        {/* System Pulse Orb */}
+        <div className="lg:col-span-4">
+          <GlassCard className="p-6">
+            <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
+              <GaugeIcon className="mr-2 text-teal-400" size={18} />
+              {t('systemPulse')}
+            </h2>
+            <div className="h-64 flex items-center justify-center">
+              <SystemPulseOrb />
+            </div>
+          </GlassCard>
+        </div>
+        
+        {/* Alerts & Response Table */}
+        <div className="lg:col-span-8">
+          <GlassCard className="p-6">
+            <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
+              <AlertTriangle className="mr-2 text-amber-400" size={18} />
+              {t('alertStream')}
+            </h2>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('metric')}</TableHead>
+                    <TableHead>{t('deviation')}</TableHead>
+                    <TableHead>{t('time')}</TableHead>
+                    <TableHead className="text-right">{t('actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {alerts.map((alert) => (
+                    <TableRow key={alert.id} className={`hover:bg-white/5 ${alert.id === Number(selectedAlert) ? 'bg-amber-500/10' : ''}`}>
+                      <TableCell className="font-medium">{alert.metric}</TableCell>
+                      <TableCell className={alert.deviation.startsWith('-') ? 'text-red-400' : 'text-green-400'}>
+                        {alert.deviation}
+                      </TableCell>
+                      <TableCell>{alert.time}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleAlertAction(alert.id, 'view')}
+                            title={t('viewInThink')}
+                          >
+                            <Search size={16} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleAlertAction(alert.id, 'recalibrate')}
+                            title={t('recalibrate')}
+                          >
+                            <Settings size={16} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleAlertAction(alert.id, 'escalate')}
+                            title={t('escalateToAct')}
+                          >
+                            <Zap size={16} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </GlassCard>
+        </div>
+        
+        {/* Anomaly Detector Feed */}
+        <div className="lg:col-span-6">
+          <AnomalyDetector />
+        </div>
+        
+        {/* Coordination Gap Tracker */}
+        <div className="lg:col-span-6">
+          <CoordinationTracker />
+        </div>
+        
+        {/* System Events Record Timeline */}
+        <div className="lg:col-span-12">
+          <GlassCard className="p-6">
+            <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
+              <BarChart2 className="mr-2 text-teal-400" size={18} />
+              {t('systemEventsRecord')}
+            </h2>
+            <SystemEventsTimeline />
+          </GlassCard>
+        </div>
+      </div>
+      
+      {/* Micro-Sim Recalibration Panel */}
+      <div className={`fixed inset-y-0 ${isRTL ? 'left-0' : 'right-0'} w-96 glass-panel-deep z-50 shadow-2xl transform transition-transform duration-300 ${showRecalibration ? 'translate-x-0' : isRTL ? '-translate-x-full' : 'translate-x-full'}`}>
+        <div className="p-6 h-full flex flex-col">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-teal-400">{t('recalibration')}</h3>
+            <Button variant="ghost" size="sm" onClick={handleCloseRecalibration}>
+              {t('close')}
+            </Button>
+          </div>
+          <div className="flex-grow overflow-y-auto">
+            {selectedAlert && (
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-medium mb-2">{t('parameter')}: {alerts.find(a => a.id === Number(selectedAlert))?.metric}</h4>
+                  <input type="range" className="w-full" />
+                  <div className="flex justify-between text-xs mt-1">
+                    <span>-10%</span>
+                    <span>0%</span>
+                    <span>+10%</span>
+                  </div>
+                </div>
+                <div className="border-t border-white/10 pt-4">
+                  <h4 className="text-sm font-medium mb-2">{t('impact')}</h4>
+                  <div className="flex justify-center py-4">
+                    <Gauge value={72} size="md" color="teal" />
                   </div>
                 </div>
               </div>
-            ))}
+            )}
           </div>
-        </div>
-        
-        <div className="glass-panel p-6">
-          <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
-            <BarChart2 size={18} className="mr-2 text-amber-500" />
-            Trend Panels
-          </h2>
-          <div className="h-64 bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10">
-            <p className="text-gray-400">Interactive Charts</p>
-          </div>
-          <div className="mt-4 flex justify-end">
-            <button className="text-xs text-amber-400 hover:text-amber-300 transition-colors flex items-center">
-              View Details
-              <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        
-        <div>
-          <div className="glass-panel p-6 mb-8">
-            <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
-              <AlertTriangle size={18} className="mr-2 text-amber-500" />
-              Alerts Hub
-            </h2>
-            <div className="space-y-2">
-              {[1, 2].map((i) => (
-                <div key={i} className="p-3 border border-white/10 rounded-lg hover:bg-white/5 cursor-pointer">
-                  <div className="flex items-start">
-                    <div className="p-1 rounded-full bg-amber-500/20 text-amber-400 mr-2">
-                      <AlertTriangle size={14} />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium">Alert Title {i}</h3>
-                      <p className="text-xs text-gray-400">12 minutes ago</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="glass-panel p-6">
-            <h2 className="text-lg font-semibold mb-4 text-left flex items-center">
-              <Map size={18} className="mr-2 text-amber-500" />
-              Coordination Heatmap
-            </h2>
-            <div className="h-44 bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10">
-              <p className="text-gray-400">Matrix View</p>
-            </div>
+          <div className="mt-4">
+            <Button className="w-full">{t('applyChanges')}</Button>
           </div>
         </div>
       </div>
       
+      {/* Next Zone CTA */}
       <div className="mt-8 flex justify-center">
-        <button className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors flex items-center">
-          Go to INNOVATE Zone
-          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </button>
+        <Button 
+          className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors flex items-center"
+        >
+          {t('innovate')}
+          <ArrowRight className="w-4 h-4 ml-2" />
+        </Button>
       </div>
     </AnimatedPage>
   );
