@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans:wght@100;200;300;400;500;600;700;800;900&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -17,35 +16,35 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 173 80% 35%;
+    --primary: 173 80% 30%;  /* Darker primary for better contrast */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 92%;
+    --secondary: 210 40% 88%; /* Slightly darker secondary */
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 40% 90%;
-    --muted-foreground: 215 16% 35%;
+    --muted: 210 40% 85%; /* Darker muted for better contrast */
+    --muted-foreground: 215 16% 30%; /* Darker muted text */
 
-    --accent: 210 40% 88%;
+    --accent: 210 40% 84%; /* Darker accent */
     --accent-foreground: 222 47% 11%;
 
-    --destructive: 0 84% 50%;
+    --destructive: 0 84% 45%; /* Darker destructive */
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214 32% 80%;
-    --input: 214 32% 80%;
-    --ring: 222 84% 5%;
+    --border: 214 32% 70%; /* Darker border for better contrast */
+    --input: 214 32% 70%;  /* Darker input border */
+    --ring: 222 84% 20%;   /* Darker ring */
 
     --radius: 1rem;
 
     --sidebar-background: 240 5% 88%;
     --sidebar-foreground: 240 10% 4%;
-    --sidebar-primary: 224 76% 40%;
+    --sidebar-primary: 224 76% 35%; /* Darker sidebar primary */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 4% 82%;
+    --sidebar-accent: 240 4% 76%; /* Darker sidebar accent */
     --sidebar-accent-foreground: 240 10% 4%;
-    --sidebar-border: 240 4% 76%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-border: 240 4% 70%; /* Darker sidebar border */
+    --sidebar-ring: 217 91% 50%; /* Darker sidebar ring */
   }
 
   .dark {
@@ -115,14 +114,14 @@
   .glass-panel {
     @apply backdrop-blur-lg rounded-2xl shadow-lg;
     @apply dark:bg-white/10 dark:border dark:border-white/20;
-    @apply bg-secondary/80 border border-black/10;
+    @apply bg-secondary/90 border border-black/20; /* Improved border contrast */
     @apply transition-all duration-300;
   }
   
   .glass-panel-deep {
     @apply backdrop-blur-xl rounded-2xl shadow-xl;
     @apply dark:bg-white/5 dark:border dark:border-white/10;
-    @apply bg-white/40 border border-white/30;
+    @apply bg-white/50 border border-black/20; /* Improved border contrast */
     @apply transition-all duration-300;
     @apply relative overflow-hidden;
   }
@@ -144,7 +143,7 @@
   }
   
   .neon-border {
-    @apply transition-all duration-300 hover:ring-2 hover:ring-teal-300/70 hover:ring-offset-0;
+    @apply transition-all duration-300 hover:ring-2 hover:ring-teal-500/70 hover:ring-offset-0; /* Darker ring color */
   }
   
   .zone-tile {
@@ -152,7 +151,7 @@
   }
   
   .animated-gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-blue-500 to-teal-300 bg-size-200 animate-gradient;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-500 via-blue-600 to-teal-500 bg-size-200 animate-gradient; /* Darker gradient colors */
   }
 
   /* New 3D-infused components */
@@ -180,31 +179,31 @@
   .glass-glow::before {
     content: '';
     @apply absolute inset-0 rounded-2xl;
-    @apply bg-gradient-to-br from-white/20 to-transparent;
+    @apply bg-gradient-to-br from-white/40 to-transparent; /* Increased opacity for better visibility */
     @apply dark:from-white/10 dark:to-transparent;
     @apply blur-sm;
   }
   
-  /* Dynamic typography */
+  /* Dynamic typography with better contrast */
   .hero-heading {
     @apply font-inter font-black text-transparent bg-clip-text;
-    @apply bg-gradient-to-r from-teal-400 via-blue-500 to-teal-500;
+    @apply bg-gradient-to-r from-teal-600 via-blue-600 to-teal-600; /* Darker gradient for better contrast */
     @apply animate-text-reveal;
   }
   
-  /* Interactive button styles */
+  /* Interactive button styles with better contrast */
   .btn-primary-glow {
-    @apply relative overflow-hidden bg-gradient-to-r from-teal-500 to-blue-600;
+    @apply relative overflow-hidden bg-gradient-to-r from-teal-600 to-blue-700; /* Darker gradient */
     @apply text-white font-medium rounded-lg px-4 py-2;
     @apply hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300;
     @apply focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2;
   }
   
   .btn-secondary-glow {
-    @apply relative overflow-hidden bg-white/10 backdrop-blur-md;
-    @apply border border-white/20 text-foreground font-medium rounded-lg px-4 py-2;
-    @apply hover:bg-white/20 hover:shadow-lg transition-all duration-300;
-    @apply focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2;
+    @apply relative overflow-hidden bg-white/30 backdrop-blur-md; /* Increased opacity */
+    @apply border border-black/20 text-foreground font-medium rounded-lg px-4 py-2; /* Darker border */
+    @apply hover:bg-white/40 hover:shadow-lg transition-all duration-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-black/30 focus:ring-offset-2; /* Darker ring */
   }
   
   /* RTL Support */
@@ -216,17 +215,17 @@
   .nav-ribbon {
     @apply fixed bottom-4 left-1/2 -translate-x-1/2 z-50;
     @apply flex items-center gap-2 py-2 px-4 rounded-full;
-    @apply bg-white/10 backdrop-blur-lg border border-white/20;
+    @apply bg-white/30 backdrop-blur-lg border border-black/20; /* Increased opacity and darker border */
     @apply shadow-xl shadow-black/5;
   }
   
   .nav-ribbon-item {
     @apply relative px-4 py-2 rounded-full text-sm font-medium transition-all;
-    @apply hover:bg-white/10;
+    @apply hover:bg-white/20; /* Increased opacity */
   }
   
   .nav-ribbon-item-active {
-    @apply bg-gradient-to-r from-teal-500 to-blue-600 text-white;
+    @apply bg-gradient-to-r from-teal-600 to-blue-700 text-white; /* Darker gradient */
   }
 }
 

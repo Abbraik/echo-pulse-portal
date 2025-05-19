@@ -17,13 +17,17 @@ const ThemeToggle: React.FC = () => {
       <Button 
         variant="outline" 
         size="sm" 
-        className="bg-white/5 backdrop-blur-sm border-white/10"
+        className={
+          resolvedTheme === 'dark' 
+            ? "bg-white/5 backdrop-blur-sm border-white/10" 
+            : "bg-white/30 backdrop-blur-sm border-black/20 text-gray-800" /* Improved contrast for light mode */
+        }
         onClick={toggleTheme}
       >
         {resolvedTheme === 'dark' ? (
           <Sun className="h-4 w-4 mr-2" />
         ) : (
-          <Moon className="h-4 w-4 mr-2" />
+          <Moon className="h-4 w-4 mr-2 text-gray-800" /* Darker color for better contrast */ />
         )}
         <span>{resolvedTheme === 'dark' ? 'Light' : 'Dark'}</span>
       </Button>
