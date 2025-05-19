@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { Brain, Activity, BarChart, LineChart } from "lucide-react";
+import { Brain, Activity, BarChart, Lightbulb, BookOpen } from "lucide-react";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 
@@ -10,7 +10,8 @@ const navItems = [
   { id: "think", path: "/think", icon: Brain },
   { id: "act", path: "/act", icon: Activity },
   { id: "monitor", path: "/monitor", icon: BarChart },
-  { id: "innovate", path: "/innovate", icon: LineChart }
+  { id: "learn", path: "/learn", icon: BookOpen },
+  { id: "innovate", path: "/innovate", icon: Lightbulb }
 ];
 
 const LoopNavigation = () => {
@@ -58,7 +59,7 @@ const LoopNavigation = () => {
               <span className="relative flex items-center space-x-2">
                 <Icon className="w-5 h-5" />
                 <span className="font-medium text-sm hidden md:inline-block">
-                  {t(id as "think" | "act" | "monitor" | "innovate")}
+                  {t(id as "think" | "act" | "monitor" | "learn" | "innovate")}
                 </span>
               </span>
             </Link>

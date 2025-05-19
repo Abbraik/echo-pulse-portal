@@ -12,6 +12,7 @@ import HomePage from "./pages/HomePage";
 import Think from "./pages/Think";
 import Act from "./pages/Act";
 import Monitor from "./pages/Monitor";
+import Learn from "./pages/Learn";
 import Innovate from "./pages/Innovate";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,7 @@ const App = () => (
                   <Route path="/think" element={<Think />} />
                   <Route path="/act" element={<Act />} />
                   <Route path="/monitor" element={<Monitor />} />
+                  <Route path="/learn" element={<Learn />} />
                   <Route path="/innovate" element={<Innovate />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>
