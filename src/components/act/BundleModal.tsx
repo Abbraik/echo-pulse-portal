@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info, ChevronLeft, ChevronRight, Trash2, Save } from 'lucide-react';
@@ -185,6 +184,16 @@ const BundleModal: React.FC<BundleModalProps> = ({
     }
   };
 
+  // Helper function to translate bundle status
+  const translateStatus = (status: 'draft' | 'pending' | 'active'): string => {
+    switch(status) {
+      case 'draft': return t('draft');
+      case 'pending': return t('pendingApproval');
+      case 'active': return t('active');
+      default: return status;
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl w-full md:w-[60%] sm:w-[90%] glass-morphism overflow-hidden p-0 border border-white/20">
@@ -195,7 +204,7 @@ const BundleModal: React.FC<BundleModalProps> = ({
               
               {isEditMode && initialBundle?.status && (
                 <Badge variant="outline" className="ml-2 capitalize text-xs">
-                  {t(initialBundle.status)}
+                  {translateStatus(initialBundle.status)}
                 </Badge>
               )}
             </DialogTitle>
