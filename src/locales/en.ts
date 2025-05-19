@@ -251,7 +251,7 @@ const monitorZone = {
   monitorInfoTooltip: "The Monitor zone provides real-time insights into system health and alerts you to emerging patterns that require attention.",
 };
 
-const alertDetail = {
+const alertDetailObj = {
   alertStream: "Alert Stream",
   anomalyDetector: "Anomaly Detector",
   coordinationTracker: "Coordination Tracker",
@@ -329,7 +329,7 @@ const anomalyDetailPanel = {
   trust: "Trust",
 };
 
-const coordinationTracker = {
+const coordinationTrackerObj = {
   coordinationGap: "Coordination Gap",
   meetingScheduled: "Meeting Scheduled",
   meetingScheduledDescription: "A coordination meeting has been scheduled",
@@ -339,7 +339,7 @@ const coordinationTracker = {
   noCoordination: "No Coordination",
 };
 
-const systemEventsTimeline = {
+const systemEventsTimelineObj = {
   simulation: "Simulation",
   bundle: "Bundle",
   lesson: "Lesson",
@@ -447,12 +447,12 @@ export const en = {
   ...bundleView,
   ...bundleViewAdditions,
   ...monitorZone,
-  ...alertDetail,
+  ...alertDetailObj,
   ...recommendationPopup,
   ...anomalyPanel,
   ...anomalyDetailPanel,
-  ...coordinationTracker,
-  ...systemEventsTimeline,
+  ...coordinationTrackerObj,
+  ...systemEventsTimelineObj,
   ...metrics,
   ...bundleModalEN,
   ...deliveryChainsEN,

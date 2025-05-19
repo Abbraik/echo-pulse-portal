@@ -227,7 +227,7 @@ const monitorZone = {
   monitorInfoTooltip: "توفر منطقة المراقبة رؤى في الوقت الفعلي حول صحة النظام وتنبهك إلى الأنماط الناشئة التي تتطلب الاهتمام.",
 };
 
-const alertDetail = {
+const alertDetailObj = {
   alertStream: "تدفق التنبيهات",
   anomalyDetector: "كاشف الشذوذ",
   systemPulse: "نبض النظام",
@@ -238,6 +238,7 @@ const alertDetail = {
   resourceEfficiency: "كفاءة الموارد",
   stability: "استقرار",
   equilibriumBand: "نطاق التوازن",
+  coordinationTracker: "متتبع التنسيق",
   
   // Alert Actions
   viewInThink: "عرض في التفكير",
@@ -265,7 +266,6 @@ const alertDetail = {
   applyPlaybook: "تطبيق دليل التشغيل",
   createBundle: "إنشاء حزمة",
   investigateInThink: "التحقيق في التفكير",
-  escalateToAct: "التصعيد إلى العمل",
   impactAssessment: "تقييم الأثر",
   alertImpactDescription: "الانحراف الحالي يؤثر على مرونة النظام ويمكن أن يؤثر على تخصيص الموارد.",
   high: "عالي",
@@ -310,8 +310,7 @@ const anomalyDetailPanel = {
   trust: "ثقة",
 };
 
-const coordinationTracker = {
-  coordinationTracker: "متتبع التنسيق",
+const coordinationTrackerObj = {
   coordinationGap: "فجوة التنسيق",
   meetingScheduled: "تم جدولة اجتماع",
   meetingScheduledDescription: "تم جدولة اجتماع تنسيق",
@@ -321,7 +320,7 @@ const coordinationTracker = {
   noCoordination: "لا تنسيق",
 };
 
-const systemEventsTimeline = {
+const systemEventsTimelineObj = {
   simulation: "محاكاة",
   bundle: "حزمة",
   lesson: "درس",
@@ -389,6 +388,32 @@ const bundleModalAR = {
   bundleStatusDescription: "تبدأ الحزم الجديدة كمسودات. قدمها للموافقة لتصبح معلقة، وبمجرد الموافقة عليها تصبح سياسات نشطة."
 };
 
+// Delivery Chains Manager translations
+const deliveryChainsAR = {
+  simple: "بسيط",
+  pro: "احترافي",
+  searchTasks: "البحث عن المهام...",
+  inProgress: "قيد التنفيذ",
+  toDo: "للتنفيذ",
+  completed: "مكتمل",
+  status: "الحالة",
+  channel: "القناة",
+  noMessages: "لا توجد رسائل بعد",
+  noMessagesStart: "لا توجد رسائل بعد. ابدأ المحادثة!",
+  typeMessage: "اكتب رسالة...",
+  inviteParticipants: "دعوة",
+  timeScale: "المقياس الزمني",
+  days: "أيام",
+  weeks: "أسابيع",
+  months: "أشهر",
+  task: "مهمة",
+  syncToPlanner: "مزامنة مع المخطط",
+  export: "تصدير",
+  shareDeliveryPlan: "مشاركة خطة التنفيذ",
+  publishToMonitor: "نشر للمراقبة",
+  usersOnline: "المستخدمون متصلون",
+};
+
 // Combine all translation objects
 export const ar = {
   ...general,
@@ -402,14 +427,15 @@ export const ar = {
   ...bundleView,
   ...bundleViewAdditions,
   ...monitorZone,
-  ...alertDetail,
+  ...alertDetailObj,
   ...recommendationPopup,
   ...anomalyPanel,
   ...anomalyDetailPanel,
-  ...coordinationTracker,
-  ...systemEventsTimeline,
+  ...coordinationTrackerObj,
+  ...systemEventsTimelineObj,
   ...metrics,
   ...bundleModalAR,
+  ...deliveryChainsAR,
 };
 
 export default ar;
