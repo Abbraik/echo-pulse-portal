@@ -280,9 +280,39 @@ const bundleModalEN = {
   bundleStatusDescription: "New bundles start as drafts. Submit for approval to make them pending, and once approved they become active policies."
 };
 
+// New translation keys for Delivery Chains Manager
+const deliveryChainsEN = {
+  // Delivery Chains Manager translations
+  simple: "Simple",
+  pro: "Pro",
+  searchTasks: "Search tasks...",
+  inProgress: "In Progress",
+  toDo: "To Do",
+  completed: "Completed",
+  status: "Status",
+  channel: "Channel",
+  noMessages: "No messages yet",
+  noMessagesStart: "No messages yet. Start the conversation!",
+  typeMessage: "Type a message...",
+  inviteParticipants: "Invite",
+  timeScale: "Time Scale",
+  days: "Days",
+  weeks: "Weeks",
+  months: "Months",
+  task: "Task",
+  syncToPlanner: "Sync to Planner",
+  export: "Export",
+  shareDeliveryPlan: "Share Delivery Plan",
+  publishToMonitor: "Publish to Monitor",
+  usersOnline: "users online",
+};
+
 export default {
   ...en,
   
   // Add bundle modal translations
   ...bundleModalEN,
+  
+  // Add delivery chains translations
+  ...deliveryChainsEN,
 };

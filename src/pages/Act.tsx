@@ -9,12 +9,15 @@ import DeliveryChains from '@/components/act/DeliveryChains';
 import PlaybooksLibrary from '@/components/act/PlaybooksLibrary';
 import { Button } from '@/components/ui/button';
 import { ArrowUpCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 // View states for the main detail canvas
 export type DetailView = 'assign-leverage' | 're-optimize' | 'launch-delivery' | 'default';
 
 const Act: React.FC = () => {
   const { t, isRTL } = useTranslation();
+  const { toast } = useToast();
+  
   // Track the active detail view based on command bar actions
   const [detailView, setDetailView] = useState<DetailView>('default');
   // Track the currently selected bundle
@@ -30,7 +33,11 @@ const Act: React.FC = () => {
   const handleCommandAction = (action: DetailView) => {
     // If no bundle is selected, don't proceed
     if (!selectedBundle && action !== 'default') {
-      // Could show a toast or alert here
+      toast({
+        title: t('noSelectedBundle', { defaultValue: 'No Bundle Selected' }),
+        description: t('pleaseSelectBundle', { defaultValue: 'Please select a bundle before performing this action.' }),
+        variant: "destructive"
+      });
       return;
     }
 
@@ -39,6 +46,12 @@ const Act: React.FC = () => {
     if (action === 'launch-delivery') {
       // Auto-scroll to delivery chains manager when launch is clicked
       setScrollToDelivery(true);
+      
+      // Show a toast indicating successful launch
+      toast({
+        title: t('deliveryLaunched', { defaultValue: 'Delivery Plan Launched' }),
+        description: t('bundleLaunchedToDelivery', { defaultValue: 'Bundle has been launched to delivery chains.' }),
+      });
     }
   };
 
