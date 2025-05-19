@@ -307,7 +307,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
               <div className="flex space-x-1">
                 <Button 
                   variant="ghost" 
-                  size="xs" 
+                  size="sm" 
                   className="h-6 w-6 p-0 hover:bg-white/10 flex items-center justify-center"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -319,7 +319,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                 
                 <Button 
                   variant="ghost" 
-                  size="xs"
+                  size="sm"
                   className={`h-6 w-6 p-0 hover:bg-white/10 flex items-center justify-center ${bundle.isApproved ? 'text-green-500' : 'text-gray-400'}`}
                   onClick={(e) => {
                     e.stopPropagation();
