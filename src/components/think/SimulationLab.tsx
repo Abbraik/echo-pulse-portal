@@ -155,7 +155,7 @@ const SimulationLab: React.FC<SimulationLabProps> = ({ metrics }) => {
         {Object.entries(metrics.pillars).map(([pillarKey, pillar]) => (
           <div key={pillarKey} className="bg-navy-900/40 rounded-xl p-4 border border-white/10">
             <div className="flex justify-between items-center mb-4">
-              <h3 className={`text-lg font-medium capitalize`}>{t(pillarKey)}</h3>
+              <h3 className={`text-lg font-medium capitalize`}>{t(pillarKey as any)}</h3>
               <div className={`px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${getPillarColor(pillarKey)} bg-opacity-30`}>
                 {pillar.value}%
               </div>
@@ -182,7 +182,13 @@ const SimulationLab: React.FC<SimulationLabProps> = ({ metrics }) => {
                             </span>
                           )}
                         </div>
-                        {indicator.trend && <SparklineChart data={indicator.trend} height={20} width={60} />}
+                        {indicator.trend && (
+                          <SparklineChart 
+                            data={indicator.trend} 
+                            height={20} 
+                            width={60}
+                          />
+                        )}
                       </div>
                     </div>
                     <Slider

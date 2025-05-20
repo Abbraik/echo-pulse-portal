@@ -587,6 +587,32 @@ const thinkZone = {
   resources: "Resources",
   goods: "Goods & Services",
   social: "Social Outcomes",
+  
+  // Add missing translation keys for OverallDeiIndicator
+  inEquilibrium: "In Equilibrium",
+  pointsBelow: "points below equilibrium",
+  pointsAbove: "points above equilibrium",
+  expandDeiIndicator: "Expand DEI Indicator",
+  deiRadarView: "DEI Radar View",
+  radarChartPlaceholder: "Radar chart visualization will be shown here",
+  close: "Close",
+  
+  // Add missing translation keys for PillarBreakouts
+  populationPillar: "Population",
+  resourcesPillar: "Resources",
+  goodsPillar: "Goods & Services",
+  socialPillar: "Social Outcomes",
+  indicator: "Indicator",
+  trend: "Trend",
+  inBalance: "In Balance",
+  below: "below",
+  above: "above",
+  equilibrium: "equilibrium",
+  more: "more",
+  
+  // Add missing translation keys for StrategyBuilder
+  selectApproach: "Select approach",
+  executeStrategy: "Execute Strategy",
 };
 
 // Combine all translation objects

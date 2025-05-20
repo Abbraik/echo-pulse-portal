@@ -97,7 +97,7 @@ const carouselAndNarrative = {
   trustRecoveryIndex: "مؤشر استعادة الثقة",
   averageBundleCoherence: "متوسط تماسك الحزمة",
   pilotSuccessRate: "معدل نجاح البرنامج التجريبي",
-  narrativeWelcome: "مرح��ًا بكم في نظام ديناميكيات السكان — محرك إدارة حي يوحد البصيرة والاستراتيجية والمراقبة والابتكار.",
+  narrativeWelcome: "مرحباً بكم في نظام ديناميكيات السكان — محرك إدارة حي يوحد البصيرة والاستراتيجية والمراقبة والابتكار.",
   narrativeDiscover: "اكتشف كيف تحافظ سياساتنا على توازن دولة الإمارات العربية المتحدة — محاكاة المستقبل وإطلاق التدخلات والتقاط الدروس.",
   narrativeLoop: "تبدأ حلقتك لتحقيق التوازن الديناميكي هنا — فكر، اعمل، راقب، تعلم، ابتكر.",
   fourZones: "المناطق الخمس",
@@ -160,7 +160,7 @@ const actZonePage = {
   scrollingToDelivery: "التمرير إلى مدير سلاسل التسليم...",
   selectAction: "اختر إجراءً من شريط الأوامر",
   selectBundle: "اختر حزمة من الشريط الجانبي",
-  detailInstructions: "استخدم شريط الأوامر أعلاه لتعيين النفوذ، ��و تحسين النطاقات، أو إطلاق خطة التنفيذ",
+  detailInstructions: "استخدم شريط الأوامر أعلاه لتعيين النفوذ، أو تحسين النطاقات، أو إطلاق خطة التنفيذ",
   deliveryChainsManager: "مدير سلاسل التسليم",
   kanban: "كانبان",
   gantt: "جانت",
@@ -246,7 +246,7 @@ const bundleViewAdditions = {
   leveragePointPlaceholder: "اختر نقطة نفوذ...",
   parameters: "المعلمات",
   conflicts: "التعارضات",
-  synergies: "ال��آزر",
+  synergies: "الآزر",
   conflictsDetected: "تم اكتشاف تعارضات بين الركائز الاقتصادية والبيئية",
   applyAutoBalance: "تطبيق حل التوازن التلقائي",
   exportSummary: "ملخص التصدير",
@@ -399,7 +399,7 @@ const bundleModalAR = {
   bundleSummaryLengthError: "يجب أن يكون وصف الحزمة بين 10 و200 حرف",
   objectives: "الأهداف",
   objectivesTooltip: "حدد الأهداف المحددة التي تسعى حزمة السياسة هذه لتحقيقها",
-  atLeastOneObjectiveRequired: "م��لوب هدف واحد على الأقل",
+  atLeastOneObjectiveRequired: "مطلوب هدف واحد على الأقل",
   addObjective: "إضافة هدف",
   objective: "هدف",
   pillars: "الركائز",
@@ -587,6 +587,32 @@ const thinkZone = {
   resources: "الموارد",
   goods: "السلع والخدمات",
   social: "النتائج الاجتماعية",
+  
+  // Add missing translation keys for OverallDeiIndicator
+  inEquilibrium: "في حالة توازن",
+  pointsBelow: "نقاط أقل من التوازن",
+  pointsAbove: "نقاط أعلى من التوازن",
+  expandDeiIndicator: "توسيع مؤشر DEI",
+  deiRadarView: "عرض رادار DEI",
+  radarChartPlaceholder: "سيتم عرض مخطط الرادار هنا",
+  close: "إغلاق",
+  
+  // Add missing translation keys for PillarBreakouts
+  populationPillar: "السكان",
+  resourcesPillar: "الموارد",
+  goodsPillar: "السلع والخدمات",
+  socialPillar: "النتائج الاجتماعية",
+  indicator: "المؤشر",
+  trend: "الاتجاه",
+  inBalance: "متوازن",
+  below: "أقل من",
+  above: "أعلى من",
+  equilibrium: "التوازن",
+  more: "المزيد",
+  
+  // Add missing translation keys for StrategyBuilder
+  selectApproach: "اختر النهج",
+  executeStrategy: "تنفيذ الاستراتيجية",
 };
 
 // Combine all translation objects
