@@ -46,6 +46,21 @@ const OverallDeiIndicator: React.FC<OverallDeiIndicatorProps> = ({
     : value < minBand 
       ? `${deviation} ${t("pointsBelow")}`
       : `${deviation} ${t("pointsAbove")}`;
+
+  // Create default empty structures for pillars and equilibriumBands if they're not provided
+  const defaultPillars = {
+    population: { value: 0, subIndicators: [] },
+    resources: { value: 0, subIndicators: [] },
+    goods: { value: 0, subIndicators: [] },
+    social: { value: 0, subIndicators: [] }
+  };
+
+  const defaultEquilibriumBands = {
+    population: { min: 0, max: 0 },
+    resources: { min: 0, max: 0 },
+    goods: { min: 0, max: 0 },
+    social: { min: 0, max: 0 }
+  };
   
   return (
     <div className="flex flex-col items-center">
@@ -126,8 +141,8 @@ const OverallDeiIndicator: React.FC<OverallDeiIndicatorProps> = ({
         deiValue={value}
         minBand={minBand}
         maxBand={maxBand}
-        pillars={pillars || {}}
-        equilibriumBands={equilibriumBands || {}}
+        pillars={pillars || defaultPillars}
+        equilibriumBands={equilibriumBands || defaultEquilibriumBands}
       />
     </div>
   );

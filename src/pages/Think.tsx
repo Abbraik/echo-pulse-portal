@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Layout, Layers, Network, BarChart3, ArrowRight } from 'lucide-react';
@@ -257,6 +256,8 @@ const ThinkPage: React.FC = () => {
                     value={currentMetrics.overall} 
                     minBand={currentMetrics.equilibriumBands.overall.min} 
                     maxBand={currentMetrics.equilibriumBands.overall.max}
+                    pillars={currentMetrics.pillars}
+                    equilibriumBands={currentMetrics.equilibriumBands}
                   />
                 </div>
                 
