@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Save, RotateCcw, Plus, Network } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -123,12 +122,8 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
 
   const handleReset = () => {
     console.log('Resetting system frame...');
-    // In a real app, this would call the API endpoint /think/cld/reset
-    if (activeTab === 'cld' && cyRef.current) {
-      cyRef.current.layout({ name: 'concentric' }).run();
-    } else if (activeTab === 'sna' && snaRef.current) {
-      snaRef.current.layout({ name: 'concentric' }).run();
-    }
+    // No longer reset layout when Reset button is clicked
+    // Instead, we could implement a function to reset node values but keep positions
   };
 
   const handleAddNode = () => {
@@ -209,7 +204,7 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
             className="px-3 py-1.5 text-sm bg-white/5 text-gray-300 rounded-lg hover:bg-white/10 transition-colors flex items-center"
           >
             <RotateCcw size={16} className="mr-1.5" />
-            Reset
+            Reset Values
           </button>
           <button
             onClick={handleSave}

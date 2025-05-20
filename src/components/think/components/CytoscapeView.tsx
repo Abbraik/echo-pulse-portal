@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import CytoScape from 'react-cytoscapejs';
 import { Node, Edge } from '../types/system-framing-types';
@@ -162,11 +161,9 @@ const CytoscapeView: React.FC<CytoscapeViewProps> = ({ nodes, edges, onNodeClick
 
   const cytoOptions = {
     layout: {
-      name: 'concentric',
-      concentric: function(node: any) {
-        return node.data('type') === 'stock' ? 2 : 1;
-      },
-      levelWidth: function() { return 1; }
+      name: 'preset', // Change from 'concentric' to 'preset' to prevent automatic layout
+      fit: true,
+      padding: 30
     },
     style: cytoStyle
   };
@@ -256,7 +253,8 @@ const CytoscapeView: React.FC<CytoscapeViewProps> = ({ nodes, edges, onNodeClick
         cy={(cy) => {
           cyRef.current = cy;
           cy.on('tap', 'node', handleCyNodeClick);
-          cy.layout(cytoOptions.layout).run();
+          // Don't automatically run layout
+          // Instead position nodes where they are
         }}
       />
     </div>

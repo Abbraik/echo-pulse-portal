@@ -26,6 +26,11 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         degree: node.degree,
         betweenness: node.betweenness,
         closeness: node.closeness
+      },
+      // Add position information to prevent automatic layout
+      position: {
+        x: Math.random() * 500, // Random initial position if no position exists
+        y: Math.random() * 400
       }
     })),
     ...edges.map((edge, index) => ({
@@ -153,13 +158,10 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
 
   const cytoOptions = {
     layout: {
-      name: 'concentric',
+      name: 'preset', // Change from 'concentric' to 'preset'
       fit: true,
       padding: 30,
-      concentric: function(node: any) {
-        return node.data('degree');
-      },
-      levelWidth: function() { return 2; }
+      // Remove other layout properties that would cause automatic movement
     }
   };
 
@@ -252,7 +254,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         cy={(cy) => {
           cyRef.current = cy;
           cy.on('tap', 'node', handleCyNodeClick);
-          cy.layout(cytoOptions.layout).run();
+          // We no longer automatically run the layout
         }}
       />
     </div>
