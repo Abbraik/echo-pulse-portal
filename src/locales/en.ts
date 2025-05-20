@@ -612,6 +612,16 @@ const thinkZone = {
   
   // Add missing translation keys for StrategyBuilder
   selectApproach: "Select approach",
+  conservativeApproach: "Conservative Approach",
+  conservativeDesc: "Low-risk strategy with gradual changes and higher stability",
+  balancedApproach: "Balanced Approach",
+  balancedDesc: "Moderate adjustments with controlled risk and solid outcomes",
+  aggressiveApproach: "Aggressive Approach",
+  aggressiveDesc: "High-impact changes with faster results but increased volatility",
+  sensitivityParameters: "Sensitivity Parameters",
+  impactForecast: "Impact Forecast",
+  deiPoints: "DEI Points",
+  executionImpact: "Execution Impact",
   executeStrategy: "Execute Strategy",
 };
 
