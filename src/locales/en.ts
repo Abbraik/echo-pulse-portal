@@ -1,3 +1,4 @@
+
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -136,7 +137,6 @@ const en = {
   "autoSuggest": "Auto-Suggest",
   "deiImpact": "DEI Impact",
   "timeToEquilibrium": "Time to Equilibrium",
-  "months": "months",
   "implementationTimeline": "Implementation Timeline",
   "phase": "Phase",
   "now": "NOW",
@@ -145,7 +145,6 @@ const en = {
   "aiSuggestions": "AI Suggestions",
   "suggestedParameters": "Suggested Parameters",
   "projectedOutcome": "Projected Outcome",
-  "cancel": "Cancel",
   "applyAll": "Apply All",
   "leveragePoints": "Leverage Points",
   "current": "Current",
@@ -197,9 +196,11 @@ const en = {
   "informationFlowsRationale": "Change who has access to what information",
   "selfOrganizationRationale": "Enable system to evolve new structures and behaviors",
   "bufferStocksRationale": "Increase or decrease reserves that stabilize the system",
+  "constantsRationale": "Adjust numerical values that affect system behavior",
   "systemRulesRationale": "Modify policies and incentives that govern behavior",
   
-  // ... keep any existing code
+  // Additional needed translations
+  "infoFlowsRationale": "Change who has access to what information"
 };
 
 export default en;
