@@ -43,12 +43,12 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
   }, [scrolled]);
 
   const navLinks = [
-    { name: t('home'), path: '/' },
-    { name: t('think'), path: '/think' },
-    { name: t('act'), path: '/act' },
-    { name: t('monitor'), path: '/monitor' },
-    { name: t('learn'), path: '/learn' },
-    { name: t('innovate'), path: '/innovate' },
+    { name: t('navigation.home'), path: '/' },
+    { name: t('navigation.think'), path: '/think' },
+    { name: t('navigation.act'), path: '/act' },
+    { name: t('navigation.monitor'), path: '/monitor' },
+    { name: t('navigation.learn'), path: '/learn' },
+    { name: t('navigation.innovate'), path: '/innovate' },
   ];
 
   const toggleLanguage = () => {
