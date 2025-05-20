@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Layout, Layers, Network, BarChart3, ArrowRight } from 'lucide-react';
@@ -5,12 +6,16 @@ import SystemFramingStudio from '@/components/think/SystemFramingStudio';
 import OverallDeiIndicator from '@/components/think/OverallDeiIndicator';
 import PillarBreakouts from '@/components/think/PillarBreakouts';
 import StrategyBuilder from '@/components/think/StrategyBuilder';
+import SimulationLab from '@/components/think/SimulationLab';
 import AiAdvisorSidebar from '@/components/think/AiAdvisorSidebar';
 import FooterCTA from '@/components/think/FooterCTA';
 import { GlassCard } from '@/components/ui/glass-card';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { motion } from 'framer-motion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import DeiForesightTab from '@/components/think/DeiForesightTab';
+import EquilibriumSolverTab from '@/components/think/EquilibriumSolverTab';
 
 // Mock data for DEI metrics and scenarios
 const mockDEIMetrics = { 
@@ -91,10 +96,19 @@ const mockExecutionImpact = {
   timelineShift: 4,
 };
 
+// Initial equilibrium bands for the solver
+const initialBands = [
+  { name: "Population", min: 70, max: 85 },
+  { name: "Resources", min: 60, max: 80 },
+  { name: "Goods & Services", min: 70, max: 90 },
+  { name: "Social Outcomes", min: 65, max: 85 },
+];
+
 const ThinkPage: React.FC = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { t, isRTL } = useTranslation();
+  const [activeTab, setActiveTab] = useState("simulation");
 
   // Handle scroll behavior for header
   useEffect(() => {
@@ -157,9 +171,9 @@ const ThinkPage: React.FC = () => {
         </div>
       </motion.header>
       
-      {/* Main Content Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* System Framing Studio (Left-Top) */}
+      {/* Main Content Layout */}
+      <div className="flex flex-col gap-6">
+        {/* System Framing Studio (Full Width) */}
         <GlassCard className="p-6">
           <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
             <Layout className="mr-2" size={20} />
@@ -168,67 +182,79 @@ const ThinkPage: React.FC = () => {
           <SystemFramingStudio cldData={mockCldData} snaData={mockSnaData} />
         </GlassCard>
         
-        {/* Simulation Lab (Right-Top) */}
+        {/* Tabbed Interface for Other Components */}
         <GlassCard className="p-6">
-          <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
-            <BarChart3 className="mr-2" size={20} />
-            {t("simulationLab")}
-          </h2>
-          <div className="flex justify-center items-center h-64 bg-black/20 rounded-lg">
-            <p className="text-muted-foreground">{t("simulationLabPlaceholder")}</p>
-          </div>
-        </GlassCard>
-        
-        {/* DEI & Foresight Hub (Center-Split) */}
-        <GlassCard className="md:col-span-2">
-          <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
-              <Network className="mr-2" size={20} />
-              {t("deiHubTitle")}
-            </h2>
-            <div className="flex flex-col md:flex-row">
-              {/* Overall DEI Indicator (Central Orb) */}
-              <div className="w-full md:w-1/3 flex justify-center items-center py-6">
-                <OverallDeiIndicator 
-                  value={mockDEIMetrics.overall} 
-                  minBand={mockDEIMetrics.equilibriumBands.overall.min} 
-                  maxBand={mockDEIMetrics.equilibriumBands.overall.max}
-                />
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="mb-4 w-full justify-start">
+              <TabsTrigger value="simulation" className="flex items-center gap-2">
+                <BarChart3 size={16} />
+                <span>{t("simulationLab")}</span>
+              </TabsTrigger>
+              <TabsTrigger value="dei" className="flex items-center gap-2">
+                <Network size={16} />
+                <span>{t("deiHubTitle")}</span>
+              </TabsTrigger>
+              <TabsTrigger value="strategy" className="flex items-center gap-2">
+                <ArrowRight size={16} />
+                <span>{t("strategyBuilder")}</span>
+              </TabsTrigger>
+              <TabsTrigger value="equilibrium" className="flex items-center gap-2">
+                <Layout size={16} />
+                <span>{t("equilibriumSolver")}</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            {/* Simulation Lab Tab */}
+            <TabsContent value="simulation">
+              <SimulationLab metrics={mockDEIMetrics} />
+            </TabsContent>
+            
+            {/* DEI & Foresight Hub Tab */}
+            <TabsContent value="dei">
+              <div className="flex flex-col md:flex-row">
+                {/* Overall DEI Indicator (Central Orb) */}
+                <div className="w-full md:w-1/3 flex justify-center items-center py-6">
+                  <OverallDeiIndicator 
+                    value={mockDEIMetrics.overall} 
+                    minBand={mockDEIMetrics.equilibriumBands.overall.min} 
+                    maxBand={mockDEIMetrics.equilibriumBands.overall.max}
+                  />
+                </div>
+                
+                {/* Four Pillar Breakouts */}
+                <div className="w-full md:w-2/3">
+                  <PillarBreakouts 
+                    pillars={mockDEIMetrics.pillars} 
+                    equilibriumBands={mockDEIMetrics.equilibriumBands}
+                  />
+                </div>
               </div>
-              
-              {/* Four Pillar Breakouts */}
-              <div className="w-full md:w-2/3">
-                <PillarBreakouts 
-                  pillars={mockDEIMetrics.pillars} 
-                  equilibriumBands={mockDEIMetrics.equilibriumBands}
-                />
-              </div>
-            </div>
-          </div>
-        </GlassCard>
-        
-        {/* Strategy Builder (Bottom-Full) */}
-        <GlassCard className="md:col-span-2">
-          <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
-              <ArrowRight className="mr-2" size={20} />
-              {t("strategyBuilder")}
-            </h2>
-            <StrategyBuilder 
-              sensitivityParameters={mockSensitivity} 
-              executionImpact={mockExecutionImpact}
-              onCompute={(approach) => {
-                showToast(`${approach} - ${t("strategyComputeToast", { 
-                  approach, 
-                  impact: mockExecutionImpact.budgetChange / 1000000
-                })}`);
-              }}
-            />
-          </div>
+              <DeiForesightTab metrics={mockDEIMetrics} scenarios={mockScenarios} />
+            </TabsContent>
+            
+            {/* Strategy Builder Tab */}
+            <TabsContent value="strategy">
+              <StrategyBuilder 
+                sensitivityParameters={mockSensitivity} 
+                executionImpact={mockExecutionImpact}
+                onCompute={(approach) => {
+                  showToast(`${approach} - ${t("strategyComputeToast", { 
+                    approach, 
+                    impact: mockExecutionImpact.budgetChange / 1000000
+                  })}`);
+                }}
+              />
+            </TabsContent>
+            
+            {/* Equilibrium Solver Tab */}
+            <TabsContent value="equilibrium">
+              <EquilibriumSolverTab initialBands={initialBands} />
+            </TabsContent>
+          </Tabs>
         </GlassCard>
         
         {/* AI Advisor (Full-Width) */}
-        <AiAdvisorSidebar className="glass-panel p-4 md:col-span-2" />
+        <AiAdvisorSidebar className="glass-panel p-4" />
       </div>
 
       {/* Footer CTA */}
