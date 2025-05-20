@@ -550,7 +550,6 @@ const thinkZone = {
   systemFramingStudio: "System Framing Studio",
   simulationLab: "Simulation Lab",
   deiHubTitle: "DEI & Foresight Hub",
-  equilibriumSolver: "Equilibrium Solver",
   strategyBuilder: "Strategy Builder",
   simulationLabPlaceholder: "Simulation visualization will appear here. Select parameters to begin.",
   conservative: "Conservative",
@@ -588,7 +587,7 @@ const thinkZone = {
   goods: "Goods & Services",
   social: "Social Outcomes",
   
-  // Add missing translation keys for OverallDeiIndicator
+  // Translation keys for OverallDeiIndicator
   inEquilibrium: "In Equilibrium",
   pointsBelow: "points below equilibrium",
   pointsAbove: "points above equilibrium",
@@ -597,7 +596,7 @@ const thinkZone = {
   radarChartPlaceholder: "Radar chart visualization will be shown here",
   close: "Close",
   
-  // Add missing translation keys for PillarBreakouts
+  // Translation keys for PillarBreakouts
   populationPillar: "Population",
   resourcesPillar: "Resources",
   goodsPillar: "Goods & Services",
@@ -610,7 +609,7 @@ const thinkZone = {
   equilibrium: "equilibrium",
   more: "more",
   
-  // Add missing translation keys for StrategyBuilder
+  // Translation keys for StrategyBuilder
   selectApproach: "Select approach",
   conservativeApproach: "Conservative Approach",
   conservativeDesc: "Low-risk strategy with gradual changes and higher stability",
@@ -623,6 +622,27 @@ const thinkZone = {
   deiPoints: "DEI Points",
   executionImpact: "Execution Impact",
   executeStrategy: "Execute Strategy",
+  
+  // New keys for SimulationLab and scenarios
+  scenarios: "Scenarios",
+  newScenario: "New Scenario",
+  saveScenario: "Save Scenario",
+  equilibriumBand: "Equilibrium Band",
+  scenarioName: "Scenario Name",
+  enterScenarioName: "Enter scenario name...",
+  probability: "Probability",
+  preview: "Preview",
+  cancel: "Cancel",
+  save: "Save",
+  scenarioSaved: "Scenario Saved",
+  hasBeenSaved: "has been saved successfully",
+  scenarioLoaded: "Scenario Loaded",
+  scenarioApplied: "scenario has been applied to metrics",
+  activeScenarios: "Active Scenarios",
+  mostProbable: "Most Probable",
+  mostRecent: "Most Recent",
+  scenarioDistribution: "Scenario Distribution",
+  deviationFromEquilibrium: "Deviation from Equilibrium",
 };
 
 // Combine all translation objects

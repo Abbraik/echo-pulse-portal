@@ -1,7 +1,5 @@
-
-import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
-import CreateScenarioModal from './CreateScenarioModal';
+import React from 'react';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface SubIndicator {
   name: string;
@@ -20,6 +18,13 @@ interface Metrics {
     goods: Pillar;
     social: Pillar;
   };
+  equilibriumBands: {
+    overall: { min: number; max: number };
+    population: { min: number; max: number };
+    resources: { min: number; max: number };
+    goods: { min: number; max: number };
+    social: { min: number; max: number };
+  };
 }
 
 interface Scenario {
@@ -36,192 +41,158 @@ interface DeiForesightTabProps {
 }
 
 const DeiForesightTab: React.FC<DeiForesightTabProps> = ({ metrics, scenarios }) => {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  
-  const renderSparkline = (data: number[], color: string = 'bg-teal-500') => {
-    const max = Math.max(...data);
-    const min = Math.min(...data);
-    const range = max - min || 1;
-    
-    return (
-      <div className="flex items-end h-6 space-x-0.5">
-        {data.map((value, i) => (
-          <div 
-            key={i}
-            className={`w-1 ${color}`}
-            style={{
-              height: `${((value - min) / range) * 100}%`,
-              minHeight: '15%',
-            }}
-          />
-        ))}
-      </div>
-    );
-  };
+  const { t } = useTranslation();
   
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-left">NDI Pillars & Sub-Indicators</h2>
-        <button 
-          onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-1 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-400 hover:to-teal-500 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-all button-glow"
-        >
-          <Plus size={16} />
-          New Scenario
-        </button>
-      </div>
-      
-      {/* Pillar metrics grid */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        {/* Population Dynamics */}
-        <div className="bg-navy-800/50 p-4 rounded-lg border border-white/10">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-medium">Population</h3>
-            <div className="text-2xl font-bold">{metrics.pillars.population.value}%</div>
-          </div>
-          <div className="space-y-2">
-            {metrics.pillars.population.subIndicators.map((indicator, index) => (
-              <div key={index} className="flex justify-between items-center text-xs">
-                <span className="text-gray-400">{indicator.name}</span>
-                <span>{typeof indicator.value === 'number' && indicator.value % 1 === 0 
-                  ? indicator.value 
-                  : indicator.value.toFixed(1)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Resource-Market Efficiency */}
-        <div className="bg-navy-800/50 p-4 rounded-lg border border-white/10">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-medium">Resources</h3>
-            <div className="text-2xl font-bold">{metrics.pillars.resources.value}%</div>
-          </div>
-          <div className="space-y-2">
-            {metrics.pillars.resources.subIndicators.map((indicator, index) => (
-              <div key={index} className="flex justify-between items-center text-xs">
-                <span className="text-gray-400">{indicator.name}</span>
-                <span>{typeof indicator.value === 'number' && indicator.value % 1 === 0 
-                  ? indicator.value 
-                  : indicator.value.toFixed(1)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Goods & Services Stability */}
-        <div className="bg-navy-800/50 p-4 rounded-lg border border-white/10">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-medium">Goods & Services</h3>
-            <div className="text-2xl font-bold">{metrics.pillars.goods.value}%</div>
-          </div>
-          <div className="space-y-2">
-            {metrics.pillars.goods.subIndicators.map((indicator, index) => (
-              <div key={index} className="flex justify-between items-center text-xs">
-                <span className="text-gray-400">{indicator.name}</span>
-                <span>{typeof indicator.value === 'number' && indicator.value % 1 === 0 
-                  ? indicator.value 
-                  : indicator.value.toFixed(1)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Social Outcomes */}
-        <div className="bg-navy-800/50 p-4 rounded-lg border border-white/10">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-medium">Social Outcomes</h3>
-            <div className="text-2xl font-bold">{metrics.pillars.social.value}%</div>
-          </div>
-          <div className="space-y-2">
-            {metrics.pillars.social.subIndicators.map((indicator, index) => (
-              <div key={index} className="flex justify-between items-center text-xs">
-                <span className="text-gray-400">{indicator.name}</span>
-                <span>{typeof indicator.value === 'number' && indicator.value % 1 === 0 
-                  ? indicator.value 
-                  : indicator.value.toFixed(1)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      
-      {/* Deviation Heatmap */}
+      {/* Deviation Heatmap - Keeping this as requested */}
       <div className="mb-6">
-        <h3 className="text-md font-medium mb-3 text-left">Deviation from Equilibrium</h3>
+        <h3 className="text-md font-medium mb-3 text-left">{t("deviationFromEquilibrium")}</h3>
         <div className="flex justify-between">
-          <div className="flex flex-col items-center">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-teal-500/80 to-teal-700/80 flex items-center justify-center text-sm font-medium border border-white/10">
-              -3%
-            </div>
-            <span className="mt-1 text-xs">Population</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-yellow-500/80 to-yellow-700/80 flex items-center justify-center text-sm font-medium border border-white/10">
-              +8%
-            </div>
-            <span className="mt-1 text-xs">Resources</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-green-500/80 to-green-700/80 flex items-center justify-center text-sm font-medium border border-white/10">
-              +1%
-            </div>
-            <span className="mt-1 text-xs">Goods</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-red-500/80 to-red-700/80 flex items-center justify-center text-sm font-medium border border-white/10">
-              -12%
-            </div>
-            <span className="mt-1 text-xs">Social</span>
-          </div>
+          {/* Population pillar deviation */}
+          <PillarDeviationIndicator 
+            pillarName="population"
+            value={metrics.pillars.population.value}
+            minBand={metrics.equilibriumBands.population.min}
+            maxBand={metrics.equilibriumBands.population.max}
+          />
+          
+          {/* Resources pillar deviation */}
+          <PillarDeviationIndicator 
+            pillarName="resources"
+            value={metrics.pillars.resources.value}
+            minBand={metrics.equilibriumBands.resources.min}
+            maxBand={metrics.equilibriumBands.resources.max}
+          />
+          
+          {/* Goods pillar deviation */}
+          <PillarDeviationIndicator 
+            pillarName="goods"
+            value={metrics.pillars.goods.value}
+            minBand={metrics.equilibriumBands.goods.min}
+            maxBand={metrics.equilibriumBands.goods.max}
+          />
+          
+          {/* Social pillar deviation */}
+          <PillarDeviationIndicator 
+            pillarName="social"
+            value={metrics.pillars.social.value}
+            minBand={metrics.equilibriumBands.social.min}
+            maxBand={metrics.equilibriumBands.social.max}
+          />
         </div>
       </div>
       
-      {/* Scenario Carousel */}
-      <h3 className="text-md font-medium mb-3 text-left">Scenarios</h3>
-      <div className="flex overflow-x-auto pb-4 space-x-4 -mx-2 px-2">
-        {scenarios.map((scenario) => (
-          <div 
-            key={scenario.id} 
-            className="min-w-[200px] bg-navy-800/50 p-4 rounded-lg border border-white/10 transform hover:scale-[1.02] transition-transform"
-          >
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h4 className="font-medium">{scenario.name}</h4>
-                <p className="text-xs text-gray-400">{scenario.date}</p>
+      {/* Active scenario details */}
+      {scenarios.length > 0 && (
+        <div className="bg-navy-900/40 rounded-xl p-4 border border-white/10">
+          <h3 className="text-lg font-medium mb-4">{t("activeScenarios")}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <div className="bg-white/10 p-3 rounded-lg">
+                <div className="text-xs text-gray-400 mb-1">{t("mostProbable")}</div>
+                <div className="text-xl font-bold">
+                  {scenarios
+                    .sort((a, b) => b.probability - a.probability)[0]?.name || "—"}
+                </div>
               </div>
-              <span className="text-xs bg-white/10 px-2 py-1 rounded">
-                {Math.round(scenario.probability * 100)}%
-              </span>
+              
+              <div className="bg-white/10 p-3 rounded-lg">
+                <div className="text-xs text-gray-400 mb-1">{t("mostRecent")}</div>
+                <div className="text-xl font-bold">
+                  {scenarios
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]?.name || "—"}
+                </div>
+              </div>
             </div>
-            <div className="mb-2">
-              {renderSparkline(scenario.sparkline)}
+            
+            <div className="bg-white/10 p-3 rounded-lg h-full flex flex-col">
+              <div className="text-xs text-gray-400 mb-2">{t("scenarioDistribution")}</div>
+              <div className="flex-1 flex items-center">
+                <div className="w-full h-6 bg-white/5 rounded-full overflow-hidden flex">
+                  {scenarios.slice(0, 5).map((scenario, index) => (
+                    <div 
+                      key={scenario.id}
+                      className="h-full" 
+                      style={{ 
+                        width: `${scenario.probability * 100}%`,
+                        backgroundColor: getScenarioColor(index)
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-1 text-xs">
+                {scenarios.slice(0, 3).map((scenario, index) => (
+                  <div key={scenario.id} className="flex items-center">
+                    <div 
+                      className="w-2 h-2 rounded-full mr-1"
+                      style={{ backgroundColor: getScenarioColor(index) }}
+                    />
+                    <span className="truncate">{scenario.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        ))}
-        
-        {/* New Scenario Card */}
-        <div 
-          onClick={() => setIsCreateModalOpen(true)}
-          className="min-w-[200px] bg-gradient-to-br from-teal-800/30 to-blue-800/30 p-4 rounded-lg border border-teal-500/30 flex flex-col items-center justify-center transform hover:scale-[1.02] transition-transform cursor-pointer"
-        >
-          <Plus size={24} className="mb-2 text-teal-400" />
-          <span className="text-teal-400 font-medium">New Scenario</span>
         </div>
-      </div>
-
-      {/* Create Scenario Modal */}
-      <CreateScenarioModal 
-        open={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
+      )}
     </div>
   );
+};
+
+interface PillarDeviationIndicatorProps {
+  pillarName: string;
+  value: number;
+  minBand: number;
+  maxBand: number;
+}
+
+const PillarDeviationIndicator: React.FC<PillarDeviationIndicatorProps> = ({ 
+  pillarName, 
+  value, 
+  minBand, 
+  maxBand 
+}) => {
+  const { t } = useTranslation();
+  
+  // Calculate deviation from equilibrium band
+  let deviation = 0;
+  let colorClass = "from-green-500/80 to-green-700/80";
+  
+  if (value < minBand) {
+    deviation = minBand - value;
+    colorClass = "from-red-500/80 to-red-700/80";
+  } else if (value > maxBand) {
+    deviation = value - maxBand;
+    colorClass = "from-yellow-500/80 to-yellow-700/80";
+  }
+  
+  const deviationText = deviation === 0 ? 
+    "0" : 
+    (value < minBand ? "-" : "+") + deviation + "%";
+  
+  return (
+    <div className="flex flex-col items-center">
+      <div className={`h-12 w-12 rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center text-sm font-medium border border-white/10`}>
+        {deviationText}
+      </div>
+      <span className="mt-1 text-xs capitalize">{t(pillarName as any)}</span>
+    </div>
+  );
+};
+
+// Helper function to get colors for scenario visualization
+const getScenarioColor = (index: number): string => {
+  const colors = [
+    "#14b8a6", // teal-500
+    "#0ea5e9", // sky-500
+    "#8b5cf6", // violet-500
+    "#f59e0b", // amber-500
+    "#ef4444", // red-500
+  ];
+  
+  return colors[index % colors.length];
 };
 
 export default DeiForesightTab;

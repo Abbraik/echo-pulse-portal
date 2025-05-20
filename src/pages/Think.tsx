@@ -15,7 +15,6 @@ import { useTranslation } from '@/hooks/use-translation';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DeiForesightTab from '@/components/think/DeiForesightTab';
-import EquilibriumSolverTab from '@/components/think/EquilibriumSolverTab';
 
 // Mock data for DEI metrics and scenarios
 const mockDEIMetrics = { 
@@ -76,6 +75,7 @@ const mockSnaData = {
   edges: []
 };
 
+// Initial mockScenarios - moved from DeiForesightTab to be shared
 const mockScenarios = [
   { id: 1, name: "Baseline", date: "2025-01-01", probability: 0.4, sparkline: [65, 68, 72, 78, 76] },
   { id: 2, name: "Optimistic", date: "2025-02-15", probability: 0.2, sparkline: [65, 70, 75, 82, 88] },
@@ -96,19 +96,13 @@ const mockExecutionImpact = {
   timelineShift: 4,
 };
 
-// Initial equilibrium bands for the solver
-const initialBands = [
-  { name: "Population", min: 70, max: 85 },
-  { name: "Resources", min: 60, max: 80 },
-  { name: "Goods & Services", min: 70, max: 90 },
-  { name: "Social Outcomes", min: 65, max: 85 },
-];
-
 const ThinkPage: React.FC = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { t, isRTL } = useTranslation();
   const [activeTab, setActiveTab] = useState("simulation");
+  const [scenarios, setScenarios] = useState(mockScenarios);
+  const [currentMetrics, setCurrentMetrics] = useState(mockDEIMetrics);
 
   // Handle scroll behavior for header
   useEffect(() => {
@@ -139,11 +133,55 @@ const ThinkPage: React.FC = () => {
     };
   }, [lastScrollY, hideHeader]);
 
-  const showToast = (message: string) => {
+  // Handle saving a new scenario
+  const handleSaveScenario = (newScenario: any) => {
+    const id = scenarios.length > 0 ? Math.max(...scenarios.map(s => s.id)) + 1 : 1;
+    const scenarioToAdd = {
+      ...newScenario,
+      id,
+      date: new Date().toISOString().split('T')[0]
+    };
+    
+    const updatedScenarios = [...scenarios, scenarioToAdd];
+    setScenarios(updatedScenarios);
+    
     toast({
-      title: t("simulationComplete"),
-      description: message,
-      duration: 5000,
+      title: t("scenarioSaved"),
+      description: `${newScenario.name} ${t("hasBeenSaved")}`,
+      duration: 3000,
+    });
+  };
+
+  // Handle updating metrics when a scenario is selected
+  const handleScenarioSelect = (selectedScenarioId: number) => {
+    // Find the selected scenario
+    const selectedScenario = scenarios.find(s => s.id === selectedScenarioId);
+    if (!selectedScenario) return;
+    
+    // In a real app, this would load detailed metrics for the scenario
+    // For now, we'll just simulate a change
+    const adjustedMetrics = {...currentMetrics};
+    
+    // Simulate adjustments based on the scenario trend
+    const trendDirection = selectedScenario.sparkline[selectedScenario.sparkline.length - 1] - 
+                           selectedScenario.sparkline[0];
+    
+    // Apply a percentage change to each pillar based on the scenario
+    Object.keys(adjustedMetrics.pillars).forEach(pillar => {
+      const pillarKey = pillar as keyof typeof adjustedMetrics.pillars;
+      const adjustmentFactor = (1 + (trendDirection / 100));
+      adjustedMetrics.pillars[pillarKey].value = Math.min(
+        100,
+        Math.max(1, Math.round(adjustedMetrics.pillars[pillarKey].value * adjustmentFactor))
+      );
+    });
+    
+    setCurrentMetrics(adjustedMetrics);
+    
+    toast({
+      title: t("scenarioLoaded"),
+      description: `${selectedScenario.name} ${t("scenarioApplied")}`,
+      duration: 3000,
     });
   };
 
@@ -198,15 +236,16 @@ const ThinkPage: React.FC = () => {
                 <ArrowRight size={16} />
                 <span>{t("strategyBuilder")}</span>
               </TabsTrigger>
-              <TabsTrigger value="equilibrium" className="flex items-center gap-2">
-                <Layout size={16} />
-                <span>{t("equilibriumSolver")}</span>
-              </TabsTrigger>
             </TabsList>
             
             {/* Simulation Lab Tab */}
             <TabsContent value="simulation">
-              <SimulationLab metrics={mockDEIMetrics} />
+              <SimulationLab 
+                metrics={currentMetrics} 
+                scenarios={scenarios}
+                onSaveScenario={handleSaveScenario}
+                onSelectScenario={handleScenarioSelect}
+              />
             </TabsContent>
             
             {/* DEI & Foresight Hub Tab */}
@@ -215,21 +254,21 @@ const ThinkPage: React.FC = () => {
                 {/* Overall DEI Indicator (Central Orb) */}
                 <div className="w-full md:w-1/3 flex justify-center items-center py-6">
                   <OverallDeiIndicator 
-                    value={mockDEIMetrics.overall} 
-                    minBand={mockDEIMetrics.equilibriumBands.overall.min} 
-                    maxBand={mockDEIMetrics.equilibriumBands.overall.max}
+                    value={currentMetrics.overall} 
+                    minBand={currentMetrics.equilibriumBands.overall.min} 
+                    maxBand={currentMetrics.equilibriumBands.overall.max}
                   />
                 </div>
                 
                 {/* Four Pillar Breakouts */}
                 <div className="w-full md:w-2/3">
                   <PillarBreakouts 
-                    pillars={mockDEIMetrics.pillars} 
-                    equilibriumBands={mockDEIMetrics.equilibriumBands}
+                    pillars={currentMetrics.pillars} 
+                    equilibriumBands={currentMetrics.equilibriumBands}
                   />
                 </div>
               </div>
-              <DeiForesightTab metrics={mockDEIMetrics} scenarios={mockScenarios} />
+              <DeiForesightTab metrics={currentMetrics} scenarios={scenarios} />
             </TabsContent>
             
             {/* Strategy Builder Tab */}
@@ -238,17 +277,15 @@ const ThinkPage: React.FC = () => {
                 sensitivityParameters={mockSensitivity} 
                 executionImpact={mockExecutionImpact}
                 onCompute={(approach) => {
-                  showToast(`${approach} - ${t("strategyComputeToast", { 
-                    approach, 
-                    impact: mockExecutionImpact.budgetChange / 1000000
-                  })}`);
+                  toast({
+                    title: t("strategyComputeToast", { 
+                      approach, 
+                      impact: mockExecutionImpact.budgetChange / 1000000
+                    }),
+                    duration: 5000,
+                  });
                 }}
               />
-            </TabsContent>
-            
-            {/* Equilibrium Solver Tab */}
-            <TabsContent value="equilibrium">
-              <EquilibriumSolverTab initialBands={initialBands} />
             </TabsContent>
           </Tabs>
         </GlassCard>
