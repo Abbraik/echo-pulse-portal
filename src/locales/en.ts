@@ -1,4 +1,3 @@
-
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -128,9 +127,79 @@ const en = {
   "bundleStatusInfo": "Bundle Status Information",
   "bundleStatusDescription": "Bundles start as drafts, then move to pending approval, and finally become active.",
   "strategyComputeToast": "Computed new equilibrium bands with {{approach}} approach, projecting a {{impact}}M AED budget change.",
-
+  
   // Strategy Builder
-  createNewStrategyBundle: "Create a new Strategy Bundle",
+  "conservative": "Conservative",
+  "balanced": "Balanced",
+  "aggressive": "Aggressive",
+  "modelParameters": "Model Parameters",
+  "autoSuggest": "Auto-Suggest",
+  "deiImpact": "DEI Impact",
+  "timeToEquilibrium": "Time to Equilibrium",
+  "months": "months",
+  "implementationTimeline": "Implementation Timeline",
+  "phase": "Phase",
+  "now": "NOW",
+  "computeScenario": "Compute Scenario",
+  "exportStrategy": "Export Strategy",
+  "aiSuggestions": "AI Suggestions",
+  "suggestedParameters": "Suggested Parameters",
+  "projectedOutcome": "Projected Outcome",
+  "cancel": "Cancel",
+  "applyAll": "Apply All",
+  "leveragePoints": "Leverage Points",
+  "current": "Current",
+  "resetParameters": "Reset Parameters",
+  "viewAllSuggestions": "View All Suggestions",
+  "suggestionsApplied": "Suggestions Applied",
+  "parameterAdjustmentsUpdated": "Parameter adjustments have been updated",
+  "adjustmentsReset": "Adjustments Reset",
+  "parameterValuesReset": "Parameter values have been reset to default",
+  "scenarioComputed": "Scenario Computed",
+  "projectedImpact": "Projected impact: {impact} DEI points",
+  "strategyExported": "Strategy Exported",
+  "strategyExportedDesc": "Strategy exported and ready for ACT zone implementation",
+  
+  // Parameters
+  "migrationRate": "Migration Rate",
+  "migrationRateDesc": "Annual net migration as a percentage of total population",
+  "waterTariff": "Water Tariff",
+  "waterTariffDesc": "Price per cubic meter of water for residential use",
+  "educationInvestment": "Education Investment",
+  "educationInvestmentDesc": "Annual government budget for education sector",
+  "energySubsidies": "Energy Subsidies",
+  "energySubsidiesDesc": "Government subsidies for energy consumption",
+  "healthcareAccess": "Healthcare Access",
+  "healthcareAccessDesc": "Percentage of population with access to quality healthcare",
+  "employmentRate": "Employment Rate",
+  "employmentRateDesc": "Percentage of working-age population employed",
+  "tourismPolicies": "Tourism Policies",
+  "tourismPoliciesDesc": "Effectiveness of tourism development policies",
+  
+  // Meadows' Leverage Points
+  "paradigms": "Paradigms",
+  "systemGoals": "System Goals",
+  "systemStructure": "System Structure",
+  "delays": "Delays & Buffers",
+  "feedbackLoops": "Feedback Loops",
+  "informationFlows": "Information Flows",
+  "selfOrganization": "Self-Organization",
+  "bufferStocks": "Buffer Stocks",
+  "constants": "Constants & Parameters",
+  "systemRules": "System Rules",
+  
+  // Rationales
+  "paradigmsRationale": "Shift mental models and assumptions about how the system works",
+  "systemGoalsRationale": "Reorient what the system is trying to achieve",
+  "systemStructureRationale": "Reorganize system elements and their connections",
+  "delaysRationale": "Adjust time lags between actions and consequences",
+  "feedbackLoopsRationale": "Strengthen or weaken reinforcing or balancing loops",
+  "informationFlowsRationale": "Change who has access to what information",
+  "selfOrganizationRationale": "Enable system to evolve new structures and behaviors",
+  "bufferStocksRationale": "Increase or decrease reserves that stabilize the system",
+  "systemRulesRationale": "Modify policies and incentives that govern behavior",
+  
+  // ... keep any existing code
 };
 
 export default en;
