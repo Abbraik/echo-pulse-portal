@@ -182,7 +182,7 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
       </div>
 
       {/* Main visualization area */}
-      <div className="aspect-video bg-navy-800/50 rounded-lg flex items-center justify-center border border-white/10 mb-4">
+      <div className="aspect-video bg-navy-800/50 backdrop-blur-md rounded-lg flex items-center justify-center border border-white/10 mb-4 shadow-lg">
         {activeTab === 'cld' ? (
           <CytoscapeView 
             nodes={mockNodes} 
@@ -213,7 +213,7 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
           </button>
           <button
             onClick={handleSave}
-            className="px-3 py-1.5 text-sm bg-teal-500/70 text-white rounded-lg hover:bg-teal-500/90 transition-colors flex items-center"
+            className="px-3 py-1.5 text-sm bg-gradient-to-br from-teal-500/80 to-blue-500/80 text-white rounded-lg hover:from-teal-500/90 hover:to-blue-500/90 transition-colors flex items-center shadow-md backdrop-blur-sm"
           >
             <Save size={16} className="mr-1.5" />
             Save
@@ -223,7 +223,7 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
         /* Network metrics section for SNA */
         <div className="grid grid-cols-2 gap-4 mt-4">
           {Object.entries(mockSNAData.metrics).map(([key, value]) => (
-            <div key={key} className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+            <div key={key} className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20 transition-all hover:bg-white/15">
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-lg font-semibold">{value.toFixed(2)}</h3>
@@ -241,18 +241,18 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
 
       {/* Node Popup Dialog */}
       <Dialog open={isPopupOpen && !!selectedNode} onOpenChange={setIsPopupOpen}>
-        <DialogContent className="bg-black/40 backdrop-blur-lg border-white/20">
+        <DialogContent className="bg-black/60 backdrop-blur-xl border-white/20 animate-scale-in shadow-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl" style={{ color: selectedNode?.color }}>
+            <DialogTitle className="text-xl font-medium bg-gradient-to-r from-teal-300 to-blue-300 bg-clip-text text-transparent">
               {selectedNode?.label}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 mt-2">
             {selectedNode?.subIndicators?.map((indicator) => (
-              <div key={indicator.name} className="flex items-center justify-between">
+              <div key={indicator.name} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
                 <span className="text-gray-300">{indicator.name}: </span>
                 <div className="flex items-center">
-                  <span className="text-white font-medium">
+                  <span className="text-white font-medium mr-2">
                     {indicator.value} {indicator.unit || ''}
                   </span>
                   {indicator.history && <SparklineChart data={indicator.history} />}
@@ -265,24 +265,24 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
 
       {/* Selected actor info for SNA */}
       {activeTab === 'sna' && selectedActor && (
-        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 text-left mt-4">
+        <div className="bg-black/40 backdrop-blur-xl border border-white/20 rounded-xl p-4 text-left mt-4 shadow-lg animate-fade-in">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="text-lg font-semibold">{selectedActor.label}</h3>
+              <h3 className="text-lg font-semibold bg-gradient-to-r from-teal-300 to-blue-300 bg-clip-text text-transparent">{selectedActor.label}</h3>
               <p className="text-sm text-gray-300 capitalize">{selectedActor.type}</p>
             </div>
             <div className="flex gap-2 text-xs text-white">
-              <div className="bg-white/10 rounded-lg p-2">
-                <p className="font-semibold">Degree:</p>
-                <p>{selectedActor.degree}</p>
+              <div className="bg-white/10 rounded-lg p-2 border border-white/10">
+                <p className="font-semibold text-gray-400">Degree</p>
+                <p className="font-medium">{selectedActor.degree}</p>
               </div>
-              <div className="bg-white/10 rounded-lg p-2">
-                <p className="font-semibold">Betweenness:</p>
-                <p>{selectedActor.betweenness.toFixed(2)}</p>
+              <div className="bg-white/10 rounded-lg p-2 border border-white/10">
+                <p className="font-semibold text-gray-400">Betweenness</p>
+                <p className="font-medium">{selectedActor.betweenness.toFixed(2)}</p>
               </div>
-              <div className="bg-white/10 rounded-lg p-2">
-                <p className="font-semibold">Closeness:</p>
-                <p>{selectedActor.closeness.toFixed(2)}</p>
+              <div className="bg-white/10 rounded-lg p-2 border border-white/10">
+                <p className="font-semibold text-gray-400">Closeness</p>
+                <p className="font-medium">{selectedActor.closeness.toFixed(2)}</p>
               </div>
             </div>
           </div>

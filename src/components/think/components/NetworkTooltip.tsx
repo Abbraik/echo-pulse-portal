@@ -11,20 +11,33 @@ const NetworkTooltip: React.FC<NetworkTooltipProps> = ({ data, type }) => {
   if (type === 'node') {
     const actor = data as Actor;
     return (
-      <div className="bg-black/80 backdrop-blur-lg text-white rounded-md p-2 shadow-lg border border-white/10 text-xs">
-        <div className="font-semibold">{actor.label}</div>
-        <div className="text-gray-300">{actor.type}</div>
-        <div className="grid grid-cols-2 gap-x-4 mt-1">
-          <div>Degree: {actor.degree}</div>
-          <div>Betweenness: {actor.betweenness.toFixed(2)}</div>
+      <div className="bg-black/70 backdrop-blur-lg text-white rounded-md p-3 shadow-lg border border-white/20 text-xs">
+        <div className="font-semibold mb-1">{actor.label}</div>
+        <div className="text-gray-300 capitalize mb-2">{actor.type}</div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          <div className="flex items-center gap-1">
+            <span className="text-gray-400">Degree:</span> 
+            <span className="font-medium">{actor.degree}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-gray-400">Betweenness:</span> 
+            <span className="font-medium">{actor.betweenness.toFixed(2)}</span>
+          </div>
+          <div className="flex items-center gap-1 col-span-2">
+            <span className="text-gray-400">Closeness:</span> 
+            <span className="font-medium">{actor.closeness.toFixed(2)}</span>
+          </div>
         </div>
       </div>
     );
   } else {
     const connection = data as { source: string; target: string; weight: number };
     return (
-      <div className="bg-black/80 backdrop-blur-lg text-white rounded-md p-2 shadow-lg border border-white/10 text-xs">
-        <div>Connection Strength: {connection.weight.toFixed(2)}</div>
+      <div className="bg-black/70 backdrop-blur-lg text-white rounded-md p-3 shadow-lg border border-white/20 text-xs">
+        <div className="flex items-center gap-1">
+          <span className="text-gray-400">Connection Strength:</span>
+          <span className="font-medium">{connection.weight.toFixed(2)}</span>
+        </div>
       </div>
     );
   }
