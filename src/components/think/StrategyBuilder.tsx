@@ -10,8 +10,10 @@ import {
   BarChart2, 
   Zap,
   Target,
-  Plus
+  Plus,
+  PackagePlus
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import ObjectivesList, { Objective } from './components/ObjectivesList';
 import AddObjectiveModal from './components/AddObjectiveModal';
 import { Button } from '@/components/ui/button';
@@ -42,6 +44,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
   onCompute
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [selectedApproach, setSelectedApproach] = useState<Approach>('balanced');
   const [isAddObjectiveOpen, setIsAddObjectiveOpen] = useState(false);
   const [objectives, setObjectives] = useState<Objective[]>([
@@ -137,6 +140,10 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
     
     setObjectives([...objectives, objectiveToAdd]);
     setSelectedObjectives([...selectedObjectives, newId]);
+  };
+  
+  const handleCreateBundle = () => {
+    navigate('/act');
   };
   
   return (
@@ -326,14 +333,11 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       <div className="pt-2">
         <button
           className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-blue-600 rounded-lg text-white font-medium hover:from-teal-400 hover:to-blue-500 transition-colors shadow-lg shadow-blue-600/20 group"
-          onClick={() => onCompute(t(
-            selectedApproach === 'conservative' ? 'conservativeApproach' : 
-            selectedApproach === 'balanced' ? 'balancedApproach' : 
-            'aggressiveApproach'
-          ))}
+          onClick={handleCreateBundle}
         >
-          <span className="group-hover:scale-105 inline-block transition-transform">
-            {t("computeNewBands")}
+          <span className="group-hover:scale-105 inline-block transition-transform flex items-center justify-center gap-2">
+            <PackagePlus className="h-5 w-5" />
+            {t("createNewStrategyBundle", { defaultValue: "Create a new Strategy Bundle" })}
           </span>
         </button>
       </div>
