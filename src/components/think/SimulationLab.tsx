@@ -72,13 +72,17 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
   const [currentSparkline, setCurrentSparkline] = useState<number[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [selectedScenarios, setSelectedScenarios] = useState<number[]>([]);
+  const [pillarValues, setPillarValues] = useState<Record<string, number>>({});
 
   // Initialize simulationValues with current values from metrics
   useEffect(() => {
     const initialValues: Record<string, number> = {};
     const originalVals: Record<string, number> = {};
+    const initialPillarValues: Record<string, number> = {};
     
     Object.entries(metrics.pillars).forEach(([pillarKey, pillar]) => {
+      initialPillarValues[pillarKey] = pillar.value;
+      
       pillar.subIndicators.forEach(subInd => {
         const key = `${pillarKey}-${subInd.name}`;
         initialValues[key] = subInd.value;
@@ -88,6 +92,7 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
     
     setSimulationValues(initialValues);
     setOriginalValues(originalVals);
+    setPillarValues(initialPillarValues);
     
     // Generate a baseline sparkline
     const overallValue = metrics.overall;
@@ -101,9 +106,52 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
   }, [metrics]);
 
   const handleSimulationValueChange = (key: string, newValue: number) => {
+    // Parse the pillar name from the key (format: "pillarName-indicatorName")
+    const pillarName = key.split('-')[0];
+    
     // Calculate the change percentage
     const originalValue = originalValues[key];
     const changePercent = ((newValue - originalValue) / originalValue) * 100;
+    
+    // Update the simulation values
+    setSimulationValues(prev => ({
+      ...prev,
+      [key]: newValue
+    }));
+    
+    // Update the pillar values
+    setPillarValues(prev => {
+      // Calculate average adjustment for all indicators in this pillar
+      const pillarIndicators = Object.keys(simulationValues).filter(k => k.startsWith(`${pillarName}-`));
+      let totalAdjustmentPercent = 0;
+      
+      pillarIndicators.forEach(indicatorKey => {
+        if (indicatorKey === key) {
+          // Use the new value for the current indicator
+          const origVal = originalValues[indicatorKey];
+          const newPercent = ((newValue - origVal) / origVal) * 100;
+          totalAdjustmentPercent += newPercent;
+        } else {
+          // Use existing values for other indicators
+          const currentVal = simulationValues[indicatorKey];
+          const origVal = originalValues[indicatorKey];
+          const percent = ((currentVal - origVal) / origVal) * 100;
+          totalAdjustmentPercent += percent;
+        }
+      });
+      
+      // Calculate average percent change across all indicators
+      const avgPercentChange = totalAdjustmentPercent / pillarIndicators.length;
+      
+      // Apply the average percent change to the pillar's original value
+      const originalPillarValue = metrics.pillars[pillarName as keyof typeof metrics.pillars].value;
+      const newPillarValue = Math.max(1, Math.min(100, originalPillarValue * (1 + avgPercentChange / 100)));
+      
+      return {
+        ...prev,
+        [pillarName]: Math.round(newPillarValue)
+      };
+    });
     
     // Update the impact estimates based on the changes
     setImpactEstimates(prev => {
@@ -123,11 +171,6 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
       baseValue,
       baseValue + Math.round(changePercent / 5)
     ]);
-    
-    setSimulationValues(prev => ({
-      ...prev,
-      [key]: newValue
-    }));
   };
   
   const runSimulation = () => {
@@ -146,6 +189,13 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
       timeToEquilibrium: 0,
       confidence: 85,
     });
+    
+    // Reset pillar values to original
+    const originalPillarValues: Record<string, number> = {};
+    Object.entries(metrics.pillars).forEach(([pillarKey, pillar]) => {
+      originalPillarValues[pillarKey] = pillar.value;
+    });
+    setPillarValues(originalPillarValues);
     
     // Reset sparkline
     const baseValue = metrics.overall;
@@ -341,13 +391,14 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {Object.entries(metrics.pillars).map(([pillarKey, pillar]) => {
           const equilibriumBand = metrics.equilibriumBands[pillarKey as keyof typeof metrics.equilibriumBands];
+          const currentPillarValue = pillarValues[pillarKey] || pillar.value;
           
           return (
             <div key={pillarKey} className="bg-navy-900/40 rounded-xl p-4 border border-white/10">
               <div className="flex justify-between items-center mb-4">
                 <h3 className={`text-lg font-medium capitalize`}>{t(pillarKey as any)}</h3>
                 <div className={`px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${getPillarColor(pillarKey)} bg-opacity-30`}>
-                  {pillar.value}%
+                  {currentPillarValue}%
                 </div>
               </div>
               
@@ -367,7 +418,7 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
                   ></div>
                   <div 
                     className="absolute h-3 w-3 bg-white rounded-full top-1/2 transform -translate-y-1/2"
-                    style={{ left: `${pillar.value}%` }}
+                    style={{ left: `${currentPillarValue}%` }}
                   ></div>
                 </div>
               </div>
