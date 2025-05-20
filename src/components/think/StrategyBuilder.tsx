@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -9,8 +8,13 @@ import {
   SquareArrowRight, 
   Shield, 
   BarChart2, 
-  Zap
+  Zap,
+  Target,
+  Plus
 } from 'lucide-react';
+import ObjectivesList, { Objective } from './components/ObjectivesList';
+import AddObjectiveModal from './components/AddObjectiveModal';
+import { Button } from '@/components/ui/button';
 
 interface SensitivityParameter {
   parameter: string;
@@ -37,8 +41,39 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
   executionImpact,
   onCompute
 }) => {
-  const { t, isRTL } = useTranslation();
+  const { t } = useTranslation();
   const [selectedApproach, setSelectedApproach] = useState<Approach>('balanced');
+  const [isAddObjectiveOpen, setIsAddObjectiveOpen] = useState(false);
+  const [objectives, setObjectives] = useState<Objective[]>([
+    {
+      id: 1,
+      title: "Improve water resource management",
+      description: "Implement advanced water recycling systems in urban areas to reduce consumption per capita by 15%",
+      priority: "high",
+      pillar: "resources",
+      impact: 8,
+      recommended: true
+    },
+    {
+      id: 2,
+      title: "Increase renewable energy adoption",
+      description: "Expand solar infrastructure in desert regions to increase renewable energy contribution by 20%",
+      priority: "medium",
+      pillar: "resources",
+      impact: 7,
+      recommended: true
+    },
+    {
+      id: 3,
+      title: "Enhance birth rate stability",
+      description: "Introduce family support programs to maintain population growth within equilibrium bands",
+      priority: "medium",
+      pillar: "population",
+      impact: 6,
+      recommended: true
+    }
+  ]);
+  const [selectedObjectives, setSelectedObjectives] = useState<number[]>([1]);
   
   const approachModifiers = {
     conservative: { 
@@ -82,9 +117,57 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       maximumFractionDigits: 1
     }).format(value);
   };
+
+  const handleObjectiveToggle = (objectiveId: number) => {
+    setSelectedObjectives(prev => {
+      if (prev.includes(objectiveId)) {
+        return prev.filter(id => id !== objectiveId);
+      } else {
+        return [...prev, objectiveId];
+      }
+    });
+  };
+  
+  const handleAddObjective = (newObjective: Omit<Objective, 'id'>) => {
+    const newId = objectives.length > 0 ? Math.max(...objectives.map(o => o.id)) + 1 : 1;
+    const objectiveToAdd = {
+      ...newObjective,
+      id: newId
+    };
+    
+    setObjectives([...objectives, objectiveToAdd]);
+    setSelectedObjectives([...selectedObjectives, newId]);
+  };
   
   return (
     <div className="space-y-6">
+      {/* Strategic Objectives Section */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-md font-medium flex items-center">
+            <Target className="mr-2" size={16} />
+            {t("strategicObjectives")}
+          </h3>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center"
+            onClick={() => setIsAddObjectiveOpen(true)}
+          >
+            <Plus className="mr-1" size={14} />
+            {t("addObjective")}
+          </Button>
+        </div>
+        
+        <div className="bg-navy-900/40 rounded-xl p-4 border border-white/10">
+          <ObjectivesList 
+            objectives={objectives}
+            selectedObjectives={selectedObjectives}
+            onToggleSelect={handleObjectiveToggle}
+          />
+        </div>
+      </div>
+      
       {/* Approach Selector */}
       <div>
         <h3 className="text-sm font-medium mb-3 text-left">{t("selectApproach")}</h3>
@@ -254,6 +337,13 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
           </span>
         </button>
       </div>
+      
+      {/* Add Objective Modal */}
+      <AddObjectiveModal
+        open={isAddObjectiveOpen}
+        onOpenChange={setIsAddObjectiveOpen}
+        onSave={handleAddObjective}
+      />
     </div>
   );
 };

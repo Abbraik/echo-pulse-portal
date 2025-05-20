@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
-import { Plus, Play, RotateCcw, Save, Check } from 'lucide-react';
+import { Plus, Play, RotateCcw, Save, Check, BarChart3 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/use-translation';
 import SparklineChart from './components/SparklineChart';
+import ScenarioComparison from './components/ScenarioComparison';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -70,6 +70,8 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
   const [newScenarioName, setNewScenarioName] = useState('');
   const [newScenarioProbability, setNewScenarioProbability] = useState(50);
   const [currentSparkline, setCurrentSparkline] = useState<number[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
+  const [selectedScenarios, setSelectedScenarios] = useState<number[]>([]);
 
   // Initialize simulationValues with current values from metrics
   useEffect(() => {
@@ -201,6 +203,16 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
     );
   };
   
+  const toggleScenarioSelection = (id: number) => {
+    setSelectedScenarios(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(scenId => scenId !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+  
   return (
     <div className="flex flex-col">
       <div className="flex justify-between items-center mb-6">
@@ -244,16 +256,51 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
         </div>
       </div>
       
-      {/* Scenarios carousel */}
+      {/* Scenarios carousel with selection checkboxes */}
       <div className="mb-6">
-        <h3 className="text-md font-medium mb-3 text-left">{t("scenarios")}</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-md font-medium text-left">{t("scenarios")}</h3>
+          {scenarios.length > 1 && (
+            <button 
+              onClick={() => setShowComparison(!showComparison)}
+              className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm ${
+                showComparison 
+                  ? 'bg-teal-500/20 text-teal-400' 
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              <BarChart3 size={16} />
+              <span>{showComparison ? t("hideComparison") : t("compareScenarios")}</span>
+            </button>
+          )}
+        </div>
         <div className="flex overflow-x-auto pb-4 space-x-4 -mx-2 px-2">
           {scenarios.map((scenario) => (
             <div 
               key={scenario.id} 
-              className="min-w-[200px] bg-navy-800/50 p-4 rounded-lg border border-white/10 transform hover:scale-[1.02] transition-transform cursor-pointer"
-              onClick={() => onSelectScenario(scenario.id)}
+              className={`min-w-[200px] bg-navy-800/50 p-4 rounded-lg border ${
+                selectedScenarios.includes(scenario.id) 
+                  ? 'border-teal-500' 
+                  : 'border-white/10'
+              } transform hover:scale-[1.02] transition-transform cursor-pointer relative`}
+              onClick={() => {
+                if (showComparison) {
+                  toggleScenarioSelection(scenario.id);
+                } else {
+                  onSelectScenario(scenario.id);
+                }
+              }}
             >
+              {showComparison && (
+                <div className={`absolute top-2 right-2 w-5 h-5 rounded-full border ${
+                  selectedScenarios.includes(scenario.id) 
+                    ? 'bg-teal-500 border-teal-500' 
+                    : 'bg-transparent border-white/30'
+                  } flex items-center justify-center`}
+                >
+                  {selectedScenarios.includes(scenario.id) && <Check size={12} />}
+                </div>
+              )}
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <h4 className="font-medium">{scenario.name}</h4>
@@ -279,6 +326,16 @@ const SimulationLab: React.FC<SimulationLabProps> = ({
           </div>
         </div>
       </div>
+      
+      {/* Scenario Comparison Chart (conditionally shown) */}
+      {showComparison && (
+        <div className="mb-6 bg-navy-900/40 rounded-xl p-4 border border-white/10">
+          <h3 className="text-md font-medium mb-4">{t("scenarioComparison")}</h3>
+          <ScenarioComparison 
+            scenarios={scenarios.filter(s => selectedScenarios.includes(s.id))}
+          />
+        </div>
+      )}
       
       {/* Main simulation area with pillars and sliders */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
