@@ -6,17 +6,15 @@ import {
   SlidersHorizontal, 
   TrendingUp, 
   TrendingDown, 
-  SquareArrowRight, 
   Shield, 
   BarChart2, 
   Zap,
   Target,
   Plus,
-  PackagePlus,
   Calendar,
   InfoIcon,
-  ArrowRight,
-  Lightbulb
+  Lightbulb,
+  PackagePlus
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ObjectivesList, { Objective } from './components/ObjectivesList';
@@ -113,8 +111,8 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
   ]);
   const [selectedObjectives, setSelectedObjectives] = useState<number[]>([1]);
   
-  // Simulation parameters data (in real implementation this would come from API)
-  const [parameters, setParameters] = useState<SimParameter[]>([
+  // Base parameters data
+  const baseParameters = [
     {
       id: 'migration-rate',
       name: t('migrationRate'),
@@ -209,7 +207,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       impact: 18,
       suggestedLeveragePoints: [
         { id: 2, title: t('systemGoals'), rationale: t('systemGoalsRationale'), relevance: 85 },
-        { id: 6, title: t('informationFlows'), rationale: t('informationFlowsRationale'), relevance: 70 }
+        { id: 6, title: t('informationFlows'), rationale: t('infoFlowsRationale'), relevance: 70 }
       ]
     },
     {
@@ -228,7 +226,10 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
         { id: 9, title: t('systemRules'), rationale: t('systemRulesRationale'), relevance: 68 }
       ]
     }
-  ]);
+  ];
+  
+  // Parameters state
+  const [parameters, setParameters] = useState<SimParameter[]>(baseParameters);
   
   // Parameter adjustments (% change from baseline)
   const [adjustments, setAdjustments] = useState<Record<string, number>>({});
@@ -243,7 +244,14 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       timeToEquilibrium: 12,
       risk: 'low',
       icon: Shield,
-      maxAdjustmentPercent: 10
+      maxAdjustmentPercent: 10,
+      defaultAdjustments: {
+        'migration-rate': 2,
+        'water-tariff': 5,
+        'education-investment': 3,
+        'energy-subsidies': -2,
+        'healthcare-access': 4,
+      }
     },
     balanced: { 
       deltaMultiplier: 1, 
@@ -251,7 +259,14 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       timeToEquilibrium: 8,
       risk: 'medium',
       icon: BarChart2,
-      maxAdjustmentPercent: 15
+      maxAdjustmentPercent: 15,
+      defaultAdjustments: {
+        'migration-rate': 5,
+        'water-tariff': 8,
+        'education-investment': 7,
+        'energy-subsidies': -5,
+        'healthcare-access': 6,
+      }
     },
     aggressive: { 
       deltaMultiplier: 2, 
@@ -259,7 +274,14 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       timeToEquilibrium: 4,
       risk: 'high',
       icon: Zap,
-      maxAdjustmentPercent: 20
+      maxAdjustmentPercent: 20,
+      defaultAdjustments: {
+        'migration-rate': 10,
+        'water-tariff': 15,
+        'education-investment': 12,
+        'energy-subsidies': -10,
+        'healthcare-access': 9,
+      }
     }
   };
   
@@ -320,6 +342,13 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
   };
   
   const handleCreateBundle = () => {
+    // In a real app, this would create a new bundle based on the current strategy
+    toast({
+      title: t("bundleCreated"),
+      description: t("createdAsDraft"),
+      duration: 3000,
+    });
+    
     navigate('/act');
   };
   
@@ -352,25 +381,25 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
   
   // Apply AI suggestions
   const handleApplySuggestions = () => {
-    // Mock AI suggestions - in a real app, these would come from an API
-    const newAdjustments: Record<string, number> = {
-      'migration-rate': 5,
-      'water-tariff': 7,
-      'education-investment': 10,
-      'energy-subsidies': -5,
-      'healthcare-access': 3
+    // Optimized suggestions - a mix of approaches with the best outcomes
+    const optimizedAdjustments: Record<string, number> = {
+      'migration-rate': 8,
+      'water-tariff': 10,
+      'education-investment': 12,
+      'energy-subsidies': -8,
+      'healthcare-access': 6
     };
     
-    const newLeveragePoints: Record<string, number[]> = {
+    const optimizedLeveragePoints: Record<string, number[]> = {
       'migration-rate': [6, 3],
-      'water-tariff': [5],
+      'water-tariff': [5, 2],
       'education-investment': [1, 4],
-      'energy-subsidies': [7],
-      'healthcare-access': [3]
+      'energy-subsidies': [7, 5],
+      'healthcare-access': [3, 8]
     };
     
-    setAdjustments(newAdjustments);
-    setSelectedLeveragePoints(newLeveragePoints);
+    setAdjustments(optimizedAdjustments);
+    setSelectedLeveragePoints(optimizedLeveragePoints);
     setIsSuggestModalOpen(false);
     
     toast({
@@ -378,6 +407,9 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       description: t("parameterAdjustmentsUpdated"),
       duration: 3000,
     });
+    
+    // Also notify about changes
+    onCompute('optimized');
   };
   
   // Reset adjustments
@@ -392,34 +424,37 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
     });
   };
   
-  // Compute scenario with current settings
-  const handleComputeScenario = () => {
-    onCompute(selectedApproach);
-    
-    toast({
-      title: t("scenarioComputed"),
-      description: t("projectedImpact", { impact: calculateTotalImpact() }),
-      duration: 3000,
-    });
-  };
-  
-  // Export strategy to ACT
-  const handleExportStrategy = () => {
-    // In a real app, this would generate a file or send to backend
-    toast({
-      title: t("strategyExported"),
-      description: t("strategyExportedDesc"),
-      duration: 3000,
-    });
-    
-    setTimeout(() => {
-      navigate('/act');
-    }, 1000);
-  };
-  
-  // Effect to reset adjustments when approach changes
+  // Effect to apply default adjustments when approach changes
   useEffect(() => {
-    handleResetAdjustments();
+    if (selectedApproach) {
+      const defaultAdjustments = approachModifiers[selectedApproach].defaultAdjustments;
+      setAdjustments(defaultAdjustments);
+      
+      // Also set some default leverage points for the approach
+      const newLeveragePoints: Record<string, number[]> = {};
+      
+      if (selectedApproach === 'conservative') {
+        newLeveragePoints['migration-rate'] = [9];
+        newLeveragePoints['water-tariff'] = [8];
+        newLeveragePoints['education-investment'] = [4];
+      } else if (selectedApproach === 'balanced') {
+        newLeveragePoints['migration-rate'] = [6, 9];
+        newLeveragePoints['water-tariff'] = [5];
+        newLeveragePoints['education-investment'] = [4, 2];
+        newLeveragePoints['energy-subsidies'] = [7];
+      } else {
+        newLeveragePoints['migration-rate'] = [3, 6];
+        newLeveragePoints['water-tariff'] = [2, 5]; 
+        newLeveragePoints['education-investment'] = [1];
+        newLeveragePoints['energy-subsidies'] = [5, 7];
+        newLeveragePoints['healthcare-access'] = [3];
+      }
+      
+      setSelectedLeveragePoints(newLeveragePoints);
+      
+      // Notify the parent component about the approach change
+      onCompute(selectedApproach);
+    }
   }, [selectedApproach]);
   
   return (
@@ -745,19 +780,12 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
             </div>
           </div>
           
-          <div className="mt-4 space-y-2">
+          <div className="mt-4">
             <Button
-              className="w-full bg-teal-600 hover:bg-teal-500"
-              onClick={handleComputeScenario}
+              className="w-full bg-teal-600 hover:bg-teal-500 flex items-center justify-center"
+              onClick={handleCreateBundle}
             >
-              {t("computeScenario")} <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleExportStrategy}
-            >
-              {t("exportStrategy")} <SquareArrowRight className="ml-1 h-4 w-4" />
+              <PackagePlus className="mr-2 h-4 w-4" /> {t("newBundle")}
             </Button>
           </div>
         </div>
@@ -786,7 +814,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
               <div className="bg-white/5 rounded p-3 border border-white/10">
                 <div className="flex justify-between">
                   <span className="text-sm">{t("migrationRate")}</span>
-                  <span className="text-sm text-teal-400">+5%</span>
+                  <span className="text-sm text-teal-400">+8%</span>
                 </div>
                 <div className="mt-1 flex gap-1">
                   <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#6 {t("informationFlows")}</span>
@@ -797,20 +825,22 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
               <div className="bg-white/5 rounded p-3 border border-white/10">
                 <div className="flex justify-between">
                   <span className="text-sm">{t("waterTariff")}</span>
-                  <span className="text-sm text-teal-400">+7%</span>
+                  <span className="text-sm text-teal-400">+10%</span>
                 </div>
                 <div className="mt-1 flex gap-1">
                   <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#5 {t("feedbackLoops")}</span>
+                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#2 {t("systemGoals")}</span>
                 </div>
               </div>
               
               <div className="bg-white/5 rounded p-3 border border-white/10">
                 <div className="flex justify-between">
                   <span className="text-sm">{t("energySubsidies")}</span>
-                  <span className="text-sm text-red-400">-5%</span>
+                  <span className="text-sm text-red-400">-8%</span>
                 </div>
                 <div className="mt-1 flex gap-1">
                   <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#7 {t("selfOrganization")}</span>
+                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#5 {t("feedbackLoops")}</span>
                 </div>
               </div>
             </div>
@@ -820,11 +850,11 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
               <div className="bg-white/5 rounded p-3 border border-white/10">
                 <div className="flex justify-between items-center">
                   <span className="text-sm">{t("deiImpact")}</span>
-                  <span className="text-lg font-bold text-teal-400">+3.2</span>
+                  <span className="text-lg font-bold text-teal-400">+4.5</span>
                 </div>
                 <div className="mt-2 flex justify-between items-center">
                   <span className="text-sm text-gray-400">{t("timeToEquilibrium")}</span>
-                  <span className="text-sm">7 {t("months")}</span>
+                  <span className="text-sm">6 {t("months")}</span>
                 </div>
               </div>
             </div>
@@ -845,3 +875,4 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
 };
 
 export default StrategyBuilder;
+
