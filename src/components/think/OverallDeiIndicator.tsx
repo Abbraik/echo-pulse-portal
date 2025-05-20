@@ -3,19 +3,24 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
+import DeiCompositeModal from './DeiCompositeModal';
 
 interface OverallDeiIndicatorProps {
   value: number;
   minBand: number;
   maxBand: number;
+  pillars?: any;
+  equilibriumBands?: any;
 }
 
 const OverallDeiIndicator: React.FC<OverallDeiIndicatorProps> = ({
   value,
   minBand,
-  maxBand
+  maxBand,
+  pillars,
+  equilibriumBands
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const { t } = useTranslation();
   
   const isInEquilibrium = value >= minBand && value <= maxBand;
@@ -46,7 +51,7 @@ const OverallDeiIndicator: React.FC<OverallDeiIndicatorProps> = ({
     <div className="flex flex-col items-center">
       <motion.button
         className="relative outline-none focus:ring-2 focus:ring-teal-500/50 focus-visible:ring-2 focus-visible:ring-teal-500/50 rounded-full"
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => setModalOpen(true)}
         aria-label={t("expandDeiIndicator")}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -114,37 +119,16 @@ const OverallDeiIndicator: React.FC<OverallDeiIndicatorProps> = ({
         )}
       </div>
       
-      {/* Expanded view (Spider/Radar chart would go here) */}
-      <AnimatePresence>
-        {expanded && (
-          <motion.div 
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setExpanded(false)}
-          >
-            <motion.div 
-              className="glass-panel-deep p-6 w-full max-w-4xl"
-              onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-            >
-              <h3 className="text-2xl font-bold mb-6">{t("deiRadarView")}</h3>
-              <div className="aspect-square w-full max-w-xl mx-auto bg-black/20 rounded-lg flex items-center justify-center">
-                <p className="text-gray-400">{t("radarChartPlaceholder")}</p>
-              </div>
-              <button 
-                className="mt-6 px-4 py-2 bg-gray-500/30 hover:bg-gray-500/50 rounded-lg transition-colors"
-                onClick={() => setExpanded(false)}
-              >
-                {t("close")}
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Premium DEI Modal */}
+      <DeiCompositeModal 
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        deiValue={value}
+        minBand={minBand}
+        maxBand={maxBand}
+        pillars={pillars || {}}
+        equilibriumBands={equilibriumBands || {}}
+      />
     </div>
   );
 };
