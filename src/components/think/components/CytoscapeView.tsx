@@ -27,7 +27,8 @@ const CytoscapeView: React.FC<CytoscapeViewProps> = ({ nodes, edges, onNodeClick
       position: {
         x: node.position?.x || 0,
         y: node.position?.y || 0
-      }
+      },
+      classes: []
     })),
     ...edges.map(edge => ({
       data: {
@@ -159,11 +160,17 @@ const CytoscapeView: React.FC<CytoscapeViewProps> = ({ nodes, edges, onNodeClick
     onNodeClick(nodeId);
   };
 
+  // Completely disable any auto layout
   const cytoOptions = {
     layout: {
-      name: 'preset', // Change from 'concentric' to 'preset' to prevent automatic layout
-      fit: true,
-      padding: 30
+      name: 'preset',
+      fit: false, // Don't adjust zoom to fit all elements
+      padding: 30,
+      animate: false, // Don't animate when adding new nodes
+      positions: function(node: any) {
+        // Use the exact positions from node data
+        return { x: node.position().x, y: node.position().y };
+      }
     },
     style: cytoStyle
   };
@@ -237,9 +244,23 @@ const CytoscapeView: React.FC<CytoscapeViewProps> = ({ nodes, edges, onNodeClick
       // Start pulse animations
       setupPulseAnimation();
       
+      // This is crucial: save positions after node movement
+      cy.on('dragfree', 'node', function(e: any) {
+        const node = e.target;
+        // Update the node's position data to maintain its position
+        node.data('position', { x: node.position().x, y: node.position().y });
+      });
+      
+      // Disable any automatic layout forces
+      cy.userZoomingEnabled(true);
+      cy.userPanningEnabled(true);
+      cy.autoungrabify(false); // Allow users to grab nodes
+      cy.autopanOnDrag(true); // Auto-pan when dragging nodes to edge of viewport
+      
       return () => {
         cy.off('mouseover');
         cy.off('mouseout');
+        cy.off('dragfree');
       };
     }
   }, []);
@@ -253,9 +274,19 @@ const CytoscapeView: React.FC<CytoscapeViewProps> = ({ nodes, edges, onNodeClick
         cy={(cy) => {
           cyRef.current = cy;
           cy.on('tap', 'node', handleCyNodeClick);
-          // Don't automatically run layout
-          // Instead position nodes where they are
+          
+          // Completely disable auto layout
+          cy.layout({
+            name: 'preset',
+            fit: false,
+            animate: false
+          }).run();
+          
+          // Set nodes to be draggable
+          cy.nodes().grabify();
         }}
+        userZoomingEnabled={true}
+        userPanningEnabled={true}
       />
     </div>
   );

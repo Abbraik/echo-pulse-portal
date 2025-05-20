@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import CytoScape from 'react-cytoscapejs';
 import { Actor } from '../types/sna-types';
@@ -27,11 +26,12 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         betweenness: node.betweenness,
         closeness: node.closeness
       },
-      // Add position information to prevent automatic layout
       position: {
         x: Math.random() * 500, // Random initial position if no position exists
         y: Math.random() * 400
-      }
+      },
+      // Add classes for selection and grabbing
+      classes: []
     })),
     ...edges.map((edge, index) => ({
       data: {
@@ -156,12 +156,17 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
     onNodeClick(nodeId);
   };
 
+  // Disable all automatic layout forces
   const cytoOptions = {
     layout: {
-      name: 'preset', // Change from 'concentric' to 'preset'
-      fit: true,
+      name: 'preset',
+      fit: false,
       padding: 30,
-      // Remove other layout properties that would cause automatic movement
+      animate: false,
+      positions: function(node: any) {
+        // Use the exact positions from node data
+        return { x: node.position().x, y: node.position().y };
+      }
     }
   };
 
@@ -237,10 +242,24 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       // Start pulse animations
       setupEdgePulses();
 
+      // This is crucial: save positions after node movement
+      cy.on('dragfree', 'node', function(e: any) {
+        const node = e.target;
+        // Update the node's position data to maintain its position
+        node.data('position', { x: node.position().x, y: node.position().y });
+      });
+      
+      // Disable any automatic layout forces
+      cy.userZoomingEnabled(true);
+      cy.userPanningEnabled(true);
+      cy.autoungrabify(false);
+      cy.autopanOnDrag(true);
+
       return () => {
         cy.removeListener('tap');
         cy.removeListener('mouseover');
         cy.removeListener('mouseout');
+        cy.removeListener('dragfree');
       };
     }
   }, []);
@@ -254,8 +273,19 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         cy={(cy) => {
           cyRef.current = cy;
           cy.on('tap', 'node', handleCyNodeClick);
-          // We no longer automatically run the layout
+          
+          // Completely disable auto layout
+          cy.layout({
+            name: 'preset',
+            fit: false,
+            animate: false
+          }).run();
+          
+          // Set nodes to be draggable
+          cy.nodes().grabify();
         }}
+        userZoomingEnabled={true}
+        userPanningEnabled={true}
       />
     </div>
   );
