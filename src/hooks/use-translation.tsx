@@ -18,14 +18,22 @@ export const useTranslation = () => {
     const translations = language === 'en' ? en : ar;
     
     // Get the translation or fallback
-    let translation = translations[key as keyof typeof en] || options?.defaultValue || key;
+    let translation = '';
+    
+    // Check if the key exists in translations
+    if (key in translations) {
+      translation = translations[key as keyof typeof en];
+    } else {
+      // Use default value or key itself as fallback
+      translation = options?.defaultValue || key as string;
+    }
     
     // Handle interpolation if options are provided
     if (options) {
       Object.keys(options).forEach(optionKey => {
         if (optionKey !== 'defaultValue') {
           const regex = new RegExp(`{{${optionKey}}}`, 'g');
-          translation = translation.replace(regex, options[optionKey]);
+          translation = translation.replace(regex, String(options[optionKey]));
         }
       });
     }

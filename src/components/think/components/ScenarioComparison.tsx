@@ -173,7 +173,12 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                     dataKey={scenario} 
                     position="right" 
                     fill="#fff"
-                    formatter={(value: number) => value > 0 ? `+${value}%` : `${value}%`}
+                    formatter={(value: any) => {
+                      // Fix: Check if value is a number first
+                      const numValue = Number(value);
+                      return !isNaN(numValue) ? 
+                        (numValue > 0 ? `+${numValue}%` : `${numValue}%`) : '';
+                    }}
                   />
                 </Bar>
               ))}
@@ -211,8 +216,10 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                 }}
                 formatter={(value, name, props) => {
                   const key = props.dataKey as string;
-                  if (key === "budgetImpact") {
-                    return [`${value.toFixed(2)}M AED`, ''];
+                  if (key === t('budgetImpact')) {
+                    // Fix: Convert value to number before using toFixed
+                    const numValue = Number(value);
+                    return !isNaN(numValue) ? [`${numValue.toFixed(2)}M AED`, ''] : [`${value}`, ''];
                   }
                   return [`${value} weeks`, ''];
                 }}
