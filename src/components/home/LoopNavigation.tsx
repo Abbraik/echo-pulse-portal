@@ -48,7 +48,9 @@ const LoopNavigation = () => {
                   className={cn(
                     "absolute inset-0 rounded-full", 
                     isActive 
-                      ? "bg-gradient-to-r from-teal-500 to-blue-600" 
+                      ? id === "think" 
+                        ? "bg-gradient-to-r from-teal-600 to-blue-700" 
+                        : "bg-gradient-to-r from-teal-500 to-blue-600" 
                       : "bg-white/10"
                   )}
                   initial={false}
@@ -57,8 +59,14 @@ const LoopNavigation = () => {
               )}
               
               <span className="relative flex items-center space-x-2">
-                <Icon className="w-5 h-5" />
-                <span className="font-medium text-sm hidden md:inline-block">
+                <Icon className={cn(
+                  "w-5 h-5",
+                  isActive && id === "think" && "text-white"
+                )} />
+                <span className={cn(
+                  "font-medium text-sm hidden md:inline-block",
+                  isActive && id === "think" && "font-bold"
+                )}>
                   {t(id as "think" | "act" | "monitor" | "learn" | "innovate")}
                 </span>
               </span>

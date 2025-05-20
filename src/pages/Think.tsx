@@ -1,55 +1,63 @@
+
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Layout, Layers, Network } from 'lucide-react';
+import { Layout, Layers, Network, BarChart3, ArrowRight } from 'lucide-react';
 import SystemFramingStudio from '@/components/think/SystemFramingStudio';
-import DeiForesightTab from '@/components/think/DeiForesightTab';
-import EquilibriumSolverTab from '@/components/think/EquilibriumSolverTab';
-import SensitivityTab from '@/components/think/SensitivityTab';
-import StrategyGeneratorTab from '@/components/think/StrategyGeneratorTab';
+import OverallDeiIndicator from '@/components/think/OverallDeiIndicator';
+import PillarBreakouts from '@/components/think/PillarBreakouts';
+import StrategyBuilder from '@/components/think/StrategyBuilder';
 import AiAdvisorSidebar from '@/components/think/AiAdvisorSidebar';
 import FooterCTA from '@/components/think/FooterCTA';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GlassCard } from '@/components/ui/glass-card';
+import { toast } from '@/components/ui/use-toast';
+import { useTranslation } from '@/hooks/use-translation';
 import { motion } from 'framer-motion';
 
-// Mock data - in a real app, this would come from API calls
-const mockCLD = { nodes: [], edges: [] }; 
-const mockSNA = { nodes: [], edges: [] };
-
+// Mock data for DEI metrics and scenarios
 const mockDEIMetrics = { 
+  overall: 74,
   pillars: {
     population: {
       value: 78,
       subIndicators: [
-        { name: 'Fertility Rate', value: 2.1 },
-        { name: 'Age-Dependency Ratio', value: 52 },
-        { name: 'Migration Volatility', value: 18 },
-        { name: 'Population Growth Stability', value: 76 }
+        { name: 'Fertility Rate', value: 2.1, trend: [2.0, 2.1, 2.1, 2.2, 2.1] },
+        { name: 'Age-Dependency Ratio', value: 52, trend: [55, 54, 53, 52, 52] },
+        { name: 'Migration Volatility', value: 18, trend: [22, 20, 19, 18, 18] },
+        { name: 'Population Growth Stability', value: 76, trend: [72, 73, 75, 76, 76] }
       ]
     },
     resources: {
       value: 65,
       subIndicators: [
-        { name: 'Water Consumption per Capita', value: 130 },
-        { name: 'Energy Use per GDP', value: 68 },
-        { name: 'Agricultural Yield Index', value: 72 }
+        { name: 'Water Consumption per Capita', value: 130, trend: [145, 140, 135, 132, 130] },
+        { name: 'Energy Use per GDP', value: 68, trend: [72, 70, 69, 68, 68] },
+        { name: 'Agricultural Yield Index', value: 72, trend: [68, 69, 70, 71, 72] }
       ]
     },
     goods: {
       value: 82,
       subIndicators: [
-        { name: 'Manufacturing Output Growth', value: 3.2 },
-        { name: 'Service Sector Resilience Index', value: 79 },
-        { name: 'Supply-Chain Robustness', value: 81 }
+        { name: 'Manufacturing Output Growth', value: 3.2, trend: [2.9, 3.0, 3.1, 3.2, 3.2] },
+        { name: 'Service Sector Resilience Index', value: 79, trend: [75, 76, 78, 79, 79] },
+        { name: 'Supply-Chain Robustness', value: 81, trend: [77, 78, 79, 80, 81] }
       ]
     },
     social: {
       value: 71,
       subIndicators: [
-        { name: 'Education Attainment Rate', value: 74 },
-        { name: 'Health Service Coverage', value: 82 },
-        { name: 'Social Cohesion Index', value: 68 }
+        { name: 'Education Attainment Rate', value: 74, trend: [70, 71, 73, 74, 74] },
+        { name: 'Health Service Coverage', value: 82, trend: [78, 79, 80, 81, 82] },
+        { name: 'Social Cohesion Index', value: 68, trend: [64, 65, 66, 67, 68] },
+        { name: 'Trust Index', value: 72, trend: [68, 69, 70, 71, 72] }
       ]
     }
+  },
+  equilibriumBands: {
+    overall: { min: 70, max: 85 },
+    population: { min: 75, max: 85 },
+    resources: { min: 60, max: 80 },
+    goods: { min: 70, max: 90 },
+    social: { min: 65, max: 85 },
   }
 };
 
@@ -59,34 +67,24 @@ const mockScenarios = [
   { id: 3, name: "Pessimistic", date: "2025-03-10", probability: 0.4, sparkline: [65, 62, 58, 55, 52] },
 ];
 
-const mockBands = [
-  { name: "Population", min: 75, max: 85 },
-  { name: "Resources", min: 60, max: 80 },
-  { name: "Goods & Services", min: 70, max: 90 },
-  { name: "Social Outcomes", min: 65, max: 85 },
-];
-
 const mockSensitivity = [
   { parameter: "Water Tariff", delta: 8, impact: 34 },
   { parameter: "Migration Policy", delta: 5, impact: 28 },
   { parameter: "Educational Investment", delta: 12, impact: 25 },
   { parameter: "Energy Subsidies", delta: -7, impact: 22 },
   { parameter: "Healthcare Access", delta: 9, impact: 20 },
-  { parameter: "Supply Chain Resilience", delta: 6, impact: 18 },
-  { parameter: "Agricultural Support", delta: 10, impact: 15 },
-  { parameter: "Manufacturing Incentives", delta: 4, impact: 12 },
 ];
 
-// Fixed the priority types to be specific string literals
-const mockObjectives = [
-  { id: 1, name: "Increase Water Efficiency", description: "Reduce water consumption per capita by 15% through smart irrigation and usage monitoring", priority: "High" as const, delta: 15, timeline: "2030", leveragePoint: "Parameters" },
-  { id: 2, name: "Balance Age Demographics", description: "Implement policies to address aging population and support working-age groups", priority: "Medium" as const, delta: 8, timeline: "2035", leveragePoint: "Feedback Loops" },
-  { id: 3, name: "Strengthen Social Cohesion", description: "Enhance community engagement and inclusive growth initiatives", priority: "High" as const, delta: 12, timeline: "2028", leveragePoint: "Information Flows" },
-];
+const mockExecutionImpact = {
+  bundlesAffected: 7,
+  budgetChange: 45000000,
+  timelineShift: 4,
+};
 
 const ThinkPage: React.FC = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { t, isRTL } = useTranslation();
 
   // Handle scroll behavior for header
   useEffect(() => {
@@ -117,6 +115,14 @@ const ThinkPage: React.FC = () => {
     };
   }, [lastScrollY, hideHeader]);
 
+  const showToast = (message: string) => {
+    toast({
+      title: t("simulationComplete"),
+      description: message,
+      duration: 5000,
+    });
+  };
+
   return (
     <AnimatedPage>
       {/* Top Navigation Bar */}
@@ -132,59 +138,87 @@ const ThinkPage: React.FC = () => {
               <Layers size={24} />
             </div>
             <div className="text-left">
-              <h1 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">THINK 🔍: Diagnose & Plan</h1>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">THINK 🔍: {t("strategyZone")}</h1>
               <p className="text-sm md:text-base text-gray-400">
-                Analyze systems, model relationships, and develop strategies
+                {t("thinkCoreDesc")}
               </p>
             </div>
           </div>
         </div>
       </motion.header>
       
-      {/* Main Content Layout - Now a vertical stack */}
-      <div className="flex flex-col space-y-6">
-        {/* System Framing Studio (Full Width) */}
-        <div className="glass-panel p-6">
+      {/* Main Content Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* System Framing Studio (Left-Top) */}
+        <GlassCard className="p-6">
           <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
             <Layout className="mr-2" size={20} />
-            System Framing Studio
+            {t("systemFramingStudio")}
           </h2>
-          <SystemFramingStudio
-            cldData={mockCLD}
-            snaData={mockSNA}
-          />
-        </div>
+          <SystemFramingStudio />
+        </GlassCard>
         
-        {/* Full-Width Tabbed Analysis Tools Panel */}
-        <div className="glass-panel p-6 flex-1">
-          <Tabs defaultValue="dei" className="w-full">
-            <TabsList className="grid grid-cols-4 mb-6">
-              <TabsTrigger value="dei">DEI & Foresight</TabsTrigger>
-              <TabsTrigger value="solver">Equilibrium</TabsTrigger>
-              <TabsTrigger value="sensitivity">Sensitivity</TabsTrigger>
-              <TabsTrigger value="strategy">Strategy</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="dei" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-              <DeiForesightTab metrics={mockDEIMetrics} scenarios={mockScenarios} />
-            </TabsContent>
-            
-            <TabsContent value="solver" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-              <EquilibriumSolverTab initialBands={mockBands} />
-            </TabsContent>
-            
-            <TabsContent value="sensitivity" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-              <SensitivityTab parameters={mockSensitivity} />
-            </TabsContent>
-            
-            <TabsContent value="strategy" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
-              <StrategyGeneratorTab objectives={mockObjectives} />
-            </TabsContent>
-          </Tabs>
-        </div>
+        {/* Simulation Lab (Right-Top) */}
+        <GlassCard className="p-6">
+          <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
+            <BarChart3 className="mr-2" size={20} />
+            {t("simulationLab")}
+          </h2>
+          <div className="flex justify-center items-center h-64 bg-black/20 rounded-lg">
+            <p className="text-muted-foreground">{t("simulationLabPlaceholder")}</p>
+          </div>
+        </GlassCard>
         
-        {/* AI Advisor - Now a full-width component */}
-        <AiAdvisorSidebar className="glass-panel p-4" />
+        {/* DEI & Foresight Hub (Center-Split) */}
+        <GlassCard className="md:col-span-2">
+          <div className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
+              <Network className="mr-2" size={20} />
+              {t("deiHubTitle")}
+            </h2>
+            <div className="flex flex-col md:flex-row">
+              {/* Overall DEI Indicator (Central Orb) */}
+              <div className="w-full md:w-1/3 flex justify-center items-center py-6">
+                <OverallDeiIndicator 
+                  value={mockDEIMetrics.overall} 
+                  minBand={mockDEIMetrics.equilibriumBands.overall.min} 
+                  maxBand={mockDEIMetrics.equilibriumBands.overall.max}
+                />
+              </div>
+              
+              {/* Four Pillar Breakouts */}
+              <div className="w-full md:w-2/3">
+                <PillarBreakouts 
+                  pillars={mockDEIMetrics.pillars} 
+                  equilibriumBands={mockDEIMetrics.equilibriumBands}
+                />
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+        
+        {/* Strategy Builder (Bottom-Full) */}
+        <GlassCard className="md:col-span-2">
+          <div className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
+              <ArrowRight className="mr-2" size={20} />
+              {t("strategyBuilder")}
+            </h2>
+            <StrategyBuilder 
+              sensitivityParameters={mockSensitivity} 
+              executionImpact={mockExecutionImpact}
+              onCompute={(approach) => {
+                showToast(t("strategyComputeToast", { 
+                  approach, 
+                  impact: mockExecutionImpact.budgetChange / 1000000
+                }));
+              }}
+            />
+          </div>
+        </GlassCard>
+        
+        {/* AI Advisor (Full-Width) */}
+        <AiAdvisorSidebar className="glass-panel p-4 md:col-span-2" />
       </div>
 
       {/* Footer CTA */}

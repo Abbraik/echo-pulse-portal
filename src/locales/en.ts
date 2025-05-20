@@ -1,4 +1,3 @@
-
 // English locale
 const general = {
   appName: "Population Dynamics System",
@@ -530,6 +529,64 @@ const innovateZone = {
   progress: "Progress",
 };
 
+// Think Zone
+const thinkZone = {
+  strategyZone: "Diagnose & Plan",
+  thinkCoreDesc: "Analyze systems, model relationships, and develop strategies",
+  systemFramingStudio: "System Framing Studio",
+  simulationLab: "Simulation Lab", 
+  simulationLabPlaceholder: "Advanced simulation environment will be displayed here",
+  deiHubTitle: "DEI & Foresight Hub",
+  deiRadarView: "Dynamic Equilibrium Index - Radar View",
+  radarChartPlaceholder: "Interactive radar chart visualization will appear here",
+  inEquilibrium: "In Equilibrium",
+  pointsBelow: "points below equilibrium",
+  pointsAbove: "points above equilibrium",
+  expandDeiIndicator: "Expand DEI indicator",
+  close: "Close",
+  
+  // Pillar Names
+  populationPillar: "Population",
+  resourcesPillar: "Resources",
+  goodsPillar: "Goods & Services",
+  socialPillar: "Social Outcomes",
+  
+  // Pillar Details
+  indicator: "Indicator",
+  value: "Value",
+  trend: "Trend",
+  inBalance: "In balance",
+  equilibrium: "equilibrium",
+  below: "Below",
+  above: "Above",
+  more: "more",
+  
+  // Strategy Builder
+  strategyBuilder: "Strategy Builder",
+  selectApproach: "Select Strategic Approach",
+  conservativeApproach: "Conservative",
+  conservativeDesc: "Small parameter shifts with low risk and gradual impact",
+  balancedApproach: "Balanced",
+  balancedDesc: "Moderate adjustments with balanced risk and reward",
+  aggressiveApproach: "Aggressive",
+  aggressiveDesc: "High-leverage modifications for rapid system transformation",
+  sensitivityParameters: "Key Parameters & Sensitivity",
+  impact: "impact",
+  impactForecast: "Impact Forecast",
+  deiPoints: "DEI points",
+  months: "months",
+  confidence: "confidence",
+  executionImpact: "Execution Impact",
+  bundlesAffected: "Bundles Affected",
+  budgetChange: "Budget Change", 
+  timelineShift: "Timeline Shift",
+  weeks: "weeks",
+  viewInAct: "View in ACT",
+  computeNewBands: "Compute New Bands ▶",
+  strategyComputeToast: "{{approach}} scenario computed—DEI equilibrium band updated, 3 bundles impacted, +AED {{impact}} M budget",
+  simulationComplete: "Simulation Complete"
+};
+
 // Combine all translation objects
 export const en = {
   ...general,
@@ -555,6 +612,7 @@ export const en = {
   ...deliveryChainsEN,
   ...learnZone,
   ...innovateZone,
+  ...thinkZone,
 };
 
 export default en;

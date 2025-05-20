@@ -232,7 +232,7 @@ const bundleViewAdditions = {
   leveragePointPlaceholder: "اختر نقطة نفوذ...",
   parameters: "المعلمات",
   conflicts: "التعارضات",
-  synergies: "التآزر",
+  synergies: "ال��آزر",
   conflictsDetected: "تم اكتشاف تعارضات بين الركائز الاقتصادية والبيئية",
   applyAutoBalance: "تطبيق حل التوازن التلقائي",
   exportSummary: "ملخص التصدير",
@@ -529,6 +529,64 @@ const innovateZone = {
   progress: "التقدم",
 };
 
+// Think Zone
+const strategyZone = {
+  "strategyZone": "التشخيص والتخطيط",
+  "thinkCoreDesc": "تحليل الأنظمة، نمذجة العلاقات، وتطوير الاستراتيجيات",
+  "systemFramingStudio": "استوديو تأطير النظام",
+  "simulationLab": "مختبر المحاكاة",
+  "simulationLabPlaceholder": "ستظهر هنا بيئة المحاكاة المتقدمة",
+  "deiHubTitle": "مركز مؤشر التوازن الديناميكي والاستشراف",
+  "deiRadarView": "مؤشر التوازن الديناميكي - عرض الرادار",
+  "radarChartPlaceholder": "سيظهر هنا عرض الرادار التفاعلي",
+  "inEquilibrium": "في حالة توازن",
+  "pointsBelow": "نقاط أقل من التوازن",
+  "pointsAbove": "نقاط أعلى من التوازن",
+  "expandDeiIndicator": "توسيع مؤشر التوازن الديناميكي",
+  "close": "إغلاق",
+  
+  // Pillar Names
+  "populationPillar": "السكان",
+  "resourcesPillar": "الموارد",
+  "goodsPillar": "السلع والخدمات",
+  "socialPillar": "النتائج الاجتماعية",
+  
+  // Pillar Details
+  "indicator": "المؤشر",
+  "value": "القيمة",
+  "trend": "الاتجاه",
+  "inBalance": "متوازن",
+  "equilibrium": "التوازن",
+  "below": "أقل من",
+  "above": "أعلى من",
+  "more": "المزيد",
+  
+  // Strategy Builder
+  "strategyBuilder": "بناء الاستراتيجية",
+  "selectApproach": "اختر المنهج الاستراتيجي",
+  "conservativeApproach": "محافظ",
+  "conservativeDesc": "تعديلات صغيرة في المعايير مع مخاطر منخفضة وتأثير تدريجي",
+  "balancedApproach": "متوازن",
+  "balancedDesc": "تعديلات معتدلة مع توازن بين المخاطر والمكاسب",
+  "aggressiveApproach": "جريء",
+  "aggressiveDesc": "تعديلات ذات تأثير كبير لتحويل النظام بسرعة",
+  "sensitivityParameters": "المعايير الرئيسية والحساسية",
+  "impact": "تأثير",
+  "impactForecast": "تنبؤ التأثير",
+  "deiPoints": "نقاط مؤشر التوازن",
+  "months": "أشهر",
+  "confidence": "الثقة",
+  "executionImpact": "تأثير التنفيذ",
+  "bundlesAffected": "الحزم المتأثرة",
+  "budgetChange": "تغيير الميزانية",
+  "timelineShift": "تغيير الجدول الزمني",
+  "weeks": "أسابيع",
+  "viewInAct": "عرض في منطقة التنفيذ",
+  "computeNewBands": "حساب النطاقات الجديدة ◀",
+  "strategyComputeToast": "تم حساب سيناريو {{approach}}— تم تحديث نطاق التوازن، وتأثر 3 حزم، وتغيير الميزانية بقيمة {{impact}} مليون درهم",
+  "simulationComplete": "اكتملت المحاكاة"
+};
+
 // Combine all translation objects
 export const ar = {
   ...general,
@@ -554,6 +612,7 @@ export const ar = {
   ...deliveryChainsAR,
   ...learnZone,
   ...innovateZone,
+  ...strategyZone
 };
 
 export default ar;

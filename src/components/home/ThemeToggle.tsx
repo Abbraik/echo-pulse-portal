@@ -20,16 +20,18 @@ const ThemeToggle: React.FC = () => {
         className={
           resolvedTheme === 'dark' 
             ? "bg-white/5 backdrop-blur-sm border-white/10" 
-            : "bg-white/30 backdrop-blur-sm border-black/20 text-gray-800" /* Improved contrast for light mode */
+            : "bg-white/50 backdrop-blur-sm border-gray-400/30 text-gray-800 hover:bg-white/60" /* Improved contrast for light mode */
         }
         onClick={toggleTheme}
       >
         {resolvedTheme === 'dark' ? (
           <Sun className="h-4 w-4 mr-2" />
         ) : (
-          <Moon className="h-4 w-4 mr-2 text-gray-800" /* Darker color for better contrast */ />
+          <Moon className="h-4 w-4 mr-2 text-gray-700" /* Darker color for better contrast */ />
         )}
-        <span>{resolvedTheme === 'dark' ? 'Light' : 'Dark'}</span>
+        <span className={resolvedTheme === 'dark' ? '' : 'text-gray-800'}>
+          {resolvedTheme === 'dark' ? 'Light' : 'Dark'}
+        </span>
       </Button>
     </motion.div>
   );
