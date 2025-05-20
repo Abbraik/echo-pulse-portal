@@ -3,18 +3,34 @@ import { useLanguage } from '@/hooks/use-language';
 import en from '@/locales/en';
 import ar from '@/locales/ar';
 
-type TranslationKeys = keyof typeof en;
+// Define the type for all translation keys
+export type TranslationKey = keyof typeof en;
 
 interface TranslationOptions {
   defaultValue?: string;
+  [key: string]: any; // Allow for interpolation values
 }
 
 export const useTranslation = () => {
   const { language, setLanguage, isRTL } = useLanguage();
   
-  const t = (key: TranslationKeys, options?: TranslationOptions) => {
+  const t = (key: TranslationKey, options?: TranslationOptions) => {
     const translations = language === 'en' ? en : ar;
-    return translations[key] || options?.defaultValue || key;
+    
+    // Get the translation or fallback
+    let translation = translations[key] || options?.defaultValue || key;
+    
+    // Handle interpolation if options are provided
+    if (options) {
+      Object.keys(options).forEach(optionKey => {
+        if (optionKey !== 'defaultValue') {
+          const regex = new RegExp(`{{${optionKey}}}`, 'g');
+          translation = translation.replace(regex, options[optionKey]);
+        }
+      });
+    }
+    
+    return translation;
   };
   
   return {

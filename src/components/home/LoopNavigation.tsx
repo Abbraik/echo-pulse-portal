@@ -14,6 +14,9 @@ const navItems = [
   { id: "innovate", path: "/innovate", icon: Lightbulb }
 ];
 
+// Define a type for valid navigation items to enable type safety
+type NavItemId = "think" | "act" | "monitor" | "learn" | "innovate";
+
 const LoopNavigation = () => {
   const { t, isRTL } = useTranslation();
   const location = useLocation();
@@ -67,7 +70,7 @@ const LoopNavigation = () => {
                   "font-medium text-sm hidden md:inline-block",
                   isActive && id === "think" && "font-bold"
                 )}>
-                  {t(id)}
+                  {t(id as NavItemId)}
                 </span>
               </span>
             </Link>

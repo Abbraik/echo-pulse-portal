@@ -1,3 +1,4 @@
+
 // Arabic locale
 const general = {
   appName: "نظام ديناميكيات السكان",
@@ -584,6 +585,7 @@ const strategyZone = {
   "viewInAct": "عرض في منطقة التنفيذ",
   "computeNewBands": "حساب النطاقات الجديدة ◀",
   "strategyComputeToast": "تم حساب سيناريو {{approach}}— تم تحديث نطاق التوازن، وتأثر 3 حزم، وتغيير الميزانية بقيمة {{impact}} مليون درهم",
+  "strategyComputeToastDesc": "تم تحديث نطاق التوازن، وتأثر 3 حزم، وتغيير الميزانية بقيمة {{impact}} مليون درهم",
   "simulationComplete": "اكتملت المحاكاة"
 };
 

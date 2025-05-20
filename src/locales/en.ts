@@ -1,3 +1,4 @@
+
 // English locale
 const general = {
   appName: "Population Dynamics System",
@@ -584,6 +585,7 @@ const thinkZone = {
   viewInAct: "View in ACT",
   computeNewBands: "Compute New Bands ▶",
   strategyComputeToast: "{{approach}} scenario computed—DEI equilibrium band updated, 3 bundles impacted, +AED {{impact}} M budget",
+  strategyComputeToastDesc: "scenario computed—DEI equilibrium band updated, 3 bundles impacted, +AED {{impact}} M budget",
   simulationComplete: "Simulation Complete"
 };
 

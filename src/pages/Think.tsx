@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Layout, Layers, Network, BarChart3, ArrowRight } from 'lucide-react';
@@ -219,7 +218,8 @@ const ThinkPage: React.FC = () => {
               sensitivityParameters={mockSensitivity} 
               executionImpact={mockExecutionImpact}
               onCompute={(approach) => {
-                showToast(`${approach} - ${t("strategyComputeToastDesc", { 
+                showToast(`${approach} - ${t("strategyComputeToast", { 
+                  approach, 
                   impact: mockExecutionImpact.budgetChange / 1000000
                 })}`);
               }}
