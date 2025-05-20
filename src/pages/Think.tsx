@@ -61,6 +61,17 @@ const mockDEIMetrics = {
   }
 };
 
+// Mock data for the SystemFramingStudio component
+const mockCldData = {
+  nodes: [],
+  edges: []
+};
+
+const mockSnaData = {
+  nodes: [],
+  edges: []
+};
+
 const mockScenarios = [
   { id: 1, name: "Baseline", date: "2025-01-01", probability: 0.4, sparkline: [65, 68, 72, 78, 76] },
   { id: 2, name: "Optimistic", date: "2025-02-15", probability: 0.2, sparkline: [65, 70, 75, 82, 88] },
@@ -155,7 +166,7 @@ const ThinkPage: React.FC = () => {
             <Layout className="mr-2" size={20} />
             {t("systemFramingStudio")}
           </h2>
-          <SystemFramingStudio />
+          <SystemFramingStudio cldData={mockCldData} snaData={mockSnaData} />
         </GlassCard>
         
         {/* Simulation Lab (Right-Top) */}
@@ -208,10 +219,9 @@ const ThinkPage: React.FC = () => {
               sensitivityParameters={mockSensitivity} 
               executionImpact={mockExecutionImpact}
               onCompute={(approach) => {
-                showToast(t("strategyComputeToast", { 
-                  approach, 
+                showToast(`${approach} - ${t("strategyComputeToastDesc", { 
                   impact: mockExecutionImpact.budgetChange / 1000000
-                }));
+                })}`);
               }}
             />
           </div>

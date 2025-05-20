@@ -170,7 +170,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
           {/* Impact Forecast */}
           <div>
             <h3 className="text-sm font-medium mb-3 text-left flex items-center">
-              {calculateTotalImpact() >= 0 
+              {parseFloat(calculateTotalImpact()) >= 0 
                 ? <TrendingUp className="mr-1" size={14} /> 
                 : <TrendingDown className="mr-1" size={14} />
               }
@@ -179,7 +179,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
             <div className="grid grid-cols-3 gap-2">
               <div className="glass-panel-dark p-3 text-center">
                 <div className="text-2xl font-bold text-teal-400">
-                  {calculateTotalImpact() >= 0 ? '+' : ''}{calculateTotalImpact()}
+                  {parseFloat(calculateTotalImpact()) >= 0 ? '+' : ''}{calculateTotalImpact()}
                 </div>
                 <div className="text-xs text-gray-400">{t("deiPoints")}</div>
               </div>
@@ -298,11 +298,7 @@ const ApproachButton: React.FC<ApproachButtonProps> = ({
       )}
       
       <div className="flex justify-between items-start">
-        <Icon size={16} className={`
-          ${riskLevel === 'low' ? 'text-green-400' : 
-            riskLevel === 'medium' ? 'text-blue-400' : 
-            'text-amber-400'}
-        `} />
+        <Icon size={16} />
         <div className={`text-xs px-1.5 py-0.5 rounded ${
           riskLevel === 'low' ? 'bg-green-500/20 text-green-400' :
           riskLevel === 'medium' ? 'bg-blue-500/20 text-blue-400' :

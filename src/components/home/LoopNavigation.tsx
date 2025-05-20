@@ -67,7 +67,7 @@ const LoopNavigation = () => {
                   "font-medium text-sm hidden md:inline-block",
                   isActive && id === "think" && "font-bold"
                 )}>
-                  {t(id as "think" | "act" | "monitor" | "learn" | "innovate")}
+                  {t(id)}
                 </span>
               </span>
             </Link>

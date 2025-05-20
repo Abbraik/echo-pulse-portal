@@ -90,6 +90,7 @@ const PillarBreakouts: React.FC<PillarBreakoutsProps> = ({
         inEquilibrium={isInEquilibrium(pillars.population.value, 'population')}
         band={equilibriumBands.population}
         onClick={() => setActivePillar('population')}
+        getTrendDirection={getTrendDirection}
       />
       
       {/* Resources Pillar */}
@@ -100,6 +101,7 @@ const PillarBreakouts: React.FC<PillarBreakoutsProps> = ({
         inEquilibrium={isInEquilibrium(pillars.resources.value, 'resources')}
         band={equilibriumBands.resources}
         onClick={() => setActivePillar('resources')}
+        getTrendDirection={getTrendDirection}
       />
       
       {/* Goods & Services Pillar */}
@@ -110,6 +112,7 @@ const PillarBreakouts: React.FC<PillarBreakoutsProps> = ({
         inEquilibrium={isInEquilibrium(pillars.goods.value, 'goods')}
         band={equilibriumBands.goods}
         onClick={() => setActivePillar('goods')}
+        getTrendDirection={getTrendDirection}
       />
       
       {/* Social Outcomes Pillar */}
@@ -120,6 +123,7 @@ const PillarBreakouts: React.FC<PillarBreakoutsProps> = ({
         inEquilibrium={isInEquilibrium(pillars.social.value, 'social')}
         band={equilibriumBands.social}
         onClick={() => setActivePillar('social')}
+        getTrendDirection={getTrendDirection}
       />
       
       {/* Detailed Pillar Panel */}
@@ -201,6 +205,7 @@ interface PillarCardProps {
   inEquilibrium: boolean;
   band: { min: number; max: number };
   onClick: () => void;
+  getTrendDirection: (trend: number[]) => 'up' | 'down' | 'stable';
 }
 
 const PillarCard: React.FC<PillarCardProps> = ({
@@ -209,7 +214,8 @@ const PillarCard: React.FC<PillarCardProps> = ({
   subIndicators,
   inEquilibrium,
   band,
-  onClick
+  onClick,
+  getTrendDirection
 }) => {
   const { t } = useTranslation();
   
