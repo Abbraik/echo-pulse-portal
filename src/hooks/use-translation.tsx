@@ -14,11 +14,11 @@ interface TranslationOptions {
 export const useTranslation = () => {
   const { language, setLanguage, isRTL } = useLanguage();
   
-  const t = (key: TranslationKey, options?: TranslationOptions) => {
+  const t = (key: TranslationKey | string, options?: TranslationOptions) => {
     const translations = language === 'en' ? en : ar;
     
     // Get the translation or fallback
-    let translation = translations[key] || options?.defaultValue || key;
+    let translation = translations[key as keyof typeof en] || options?.defaultValue || key;
     
     // Handle interpolation if options are provided
     if (options) {
