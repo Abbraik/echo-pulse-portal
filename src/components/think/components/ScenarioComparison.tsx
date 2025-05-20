@@ -174,8 +174,8 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                     position="right" 
                     fill="#fff"
                     formatter={(value: any) => {
-                      // Fix: Check if value is a number first
-                      const numValue = Number(value);
+                      // Fix: Check if value is a number and convert it if needed
+                      const numValue = typeof value === 'number' ? value : Number(value);
                       return !isNaN(numValue) ? 
                         (numValue > 0 ? `+${numValue}%` : `${numValue}%`) : '';
                     }}
@@ -217,8 +217,8 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                 formatter={(value, name, props) => {
                   const key = props.dataKey as string;
                   if (key === t('budgetImpact')) {
-                    // Fix: Convert value to number before using toFixed
-                    const numValue = Number(value);
+                    // Fix: Check if value is a number and convert it if needed
+                    const numValue = typeof value === 'number' ? value : Number(value);
                     return !isNaN(numValue) ? [`${numValue.toFixed(2)}M AED`, ''] : [`${value}`, ''];
                   }
                   return [`${value} weeks`, ''];
