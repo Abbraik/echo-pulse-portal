@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import CytoScape from 'react-cytoscapejs';
 import { Node, Edge } from '../types/system-framing-types';
@@ -255,7 +256,7 @@ const CytoscapeView: React.FC<CytoscapeViewProps> = ({ nodes, edges, onNodeClick
       cy.userZoomingEnabled(true);
       cy.userPanningEnabled(true);
       cy.autoungrabify(false); // Allow users to grab nodes
-      cy.autopanOnDrag(true); // Auto-pan when dragging nodes to edge of viewport
+      // Removed: cy.autopanOnDrag(true) - This function doesn't exist in the current Cytoscape version
       
       return () => {
         cy.off('mouseover');

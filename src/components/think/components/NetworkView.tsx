@@ -253,7 +253,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       cy.userZoomingEnabled(true);
       cy.userPanningEnabled(true);
       cy.autoungrabify(false);
-      cy.autopanOnDrag(true);
+      // Removed: cy.autopanOnDrag(true) - This function doesn't exist in the current Cytoscape version
 
       return () => {
         cy.removeListener('tap');
