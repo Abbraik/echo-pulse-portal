@@ -144,7 +144,7 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
               <XAxis 
                 type="number"
                 tick={{ fill: '#ccc', fontSize: 12 }}
-                tickFormatter={(value) => `${value > 0 ? '+' : ''}${value}%`}
+                tickFormatter={(value) => `${typeof value === 'number' && value > 0 ? '+' : ''}${value}%`}
               />
               <YAxis 
                 dataKey="name"
@@ -159,7 +159,10 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                   borderRadius: '8px',
                   color: '#fff'
                 }}
-                formatter={(value) => [`${value > 0 ? '+' : ''}${value}%`, '']}
+                formatter={(value) => {
+                  const numValue = typeof value === 'number' ? value : Number(value);
+                  return [!isNaN(numValue) ? `${numValue > 0 ? '+' : ''}${numValue}%` : `${value}`, ''];
+                }}
               />
               <Legend wrapperStyle={{ paddingTop: 10 }} />
               {displayedScenarios.map((scenario, index) => (
