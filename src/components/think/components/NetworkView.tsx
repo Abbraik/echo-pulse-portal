@@ -63,7 +63,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
     }
   }
   
-  // Calculate a deterministic position for a node based on its index
+  // Calculate a deterministic position for a node based on its id
   function calculateNodePosition(id: string, totalNodes: number) {
     // Use the node id's character codes to create a deterministic position
     // This ensures nodes will always be positioned the same way
@@ -72,8 +72,8 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       idSum += id.charCodeAt(i);
     }
     
-    // Create a circular layout
-    const radius = 150;
+    // Create a circular layout with more spacing
+    const radius = 180; // Increased from 150 for better spacing
     const index = idSum % totalNodes; // Get a consistent index
     const angleStep = (2 * Math.PI) / totalNodes;
     const angle = index * angleStep;
@@ -166,12 +166,20 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
     onNodeClick(nodeId);
   };
 
-  // Use a more static layout with reduced forces for stability
+  // Use a static preset layout with no animation
   const cytoOptions = {
     layout: {
-      name: 'preset', // Use preset layout to maintain positions
+      name: 'preset',
       fit: true,
-      padding: 30
+      padding: 30,
+      animate: false,
+      animationDuration: 0,
+      stop: function() {
+        // After layout completes, ensure nodes are locked in place
+        if (cyRef.current) {
+          cyRef.current.nodes().lock();
+        }
+      }
     }
   };
 
@@ -182,73 +190,56 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       // Register event handlers
       cy.on('tap', 'node', handleCyNodeClick);
       
-      // Use proper method for styling nodes on hover
+      // Remove animations for more stability
       cy.on('mouseover', 'node', function(e: any) {
-        e.target.animate({
-          style: { 'border-width': '3px', 'border-opacity': 1, 'overlay-opacity': 0.1 },
-          duration: 150
+        e.target.style({
+          'border-width': '3px', 
+          'border-opacity': 1, 
+          'overlay-opacity': 0.1
         });
       });
       
       cy.on('mouseout', 'node', function(e: any) {
         if (!e.target.selected()) {
-          e.target.animate({
-            style: { 'border-width': '2px', 'border-opacity': 0.9, 'overlay-opacity': 0 },
-            duration: 150
+          e.target.style({
+            'border-width': '2px', 
+            'border-opacity': 0.9, 
+            'overlay-opacity': 0
           });
         }
       });
       
-      // Edge hover animation
+      // Edge hover - simplified with no animations
       cy.on('mouseover', 'edge', function(e: any) {
-        e.target.animate({
-          style: { 'opacity': 1, 'overlay-opacity': 0.2 },
-          duration: 150
+        e.target.style({
+          'opacity': 1, 
+          'overlay-opacity': 0.2
         });
       });
       
       cy.on('mouseout', 'edge', function(e: any) {
-        e.target.animate({
-          style: { 'opacity': 0.6, 'overlay-opacity': 0.1 },
-          duration: 150
+        e.target.style({
+          'opacity': 0.6, 
+          'overlay-opacity': 0.1
         });
       });
 
-      // Removed the flow pulses on edges which were causing visual chaos
+      // Disable drag movement for stability
+      cy.autoungrabify(true); // Prevent nodes from being moved
 
-      // This is crucial: save positions after node movement
-      cy.on('dragfree', 'node', function(e: any) {
-        const node = e.target;
-        // Update the node's position data to maintain its position
-        node.data('positionX', node.position().x);
-        node.data('positionY', node.position().y);
-      });
-      
-      // Configure user interaction
+      // Configure user interaction - allow pan and zoom only
       cy.userZoomingEnabled(true);
       cy.userPanningEnabled(true);
-      cy.autoungrabify(false); // Allow nodes to be grabbed
-      cy.autounselectify(false); // Allow nodes to be selected
+      cy.autounselectify(false); // Still allow selection
       
-      // Add resistance to node movements to make dragging feel more stable
-      cy.nodes().on('drag', function() {
-        const draggedNode = this;
-        // Add damping/resistance factor to make movement more controlled
-        const dampingFactor = 0.8;
-        const dx = (draggedNode.position().x - draggedNode.data('positionX')) * dampingFactor;
-        const dy = (draggedNode.position().y - draggedNode.data('positionY')) * dampingFactor;
-        
-        draggedNode.position({
-          x: draggedNode.data('positionX') + dx,
-          y: draggedNode.data('positionY') + dy
-        });
-      });
+      // Set strict zoom limits for stability
+      cy.minZoom(0.5);
+      cy.maxZoom(2.0);
 
       return () => {
         cy.removeListener('tap');
         cy.removeListener('mouseover');
         cy.removeListener('mouseout');
-        cy.removeListener('dragfree');
       };
     }
   }, [onNodeClick]);
@@ -265,7 +256,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
           // Configure the initial rendering
           cy.on('tap', 'node', handleCyNodeClick);
           
-          // Use preset layout to maintain node positions
+          // Use preset layout with no animation for stability
           cy.layout({
             name: 'preset',
             fit: true,
@@ -273,15 +264,15 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
             animate: false,
           }).run();
           
-          // Make nodes draggable
-          cy.nodes().grabify();
+          // Lock nodes in position
+          cy.nodes().lock();
           
           // Fit the view to the elements with some padding
           cy.fit(undefined, 40);
           
           // Limit the zoom level to prevent extreme zooming
           cy.minZoom(0.5);
-          cy.maxZoom(2.5);
+          cy.maxZoom(2.0);
         }}
         userZoomingEnabled={true}
         userPanningEnabled={true}
