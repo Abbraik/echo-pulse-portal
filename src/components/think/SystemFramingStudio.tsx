@@ -114,6 +114,8 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
     pathLength: false,
     centralization: false,
   });
+  // Add highlightedActors state for network visualization
+  const [highlightedActors, setHighlightedActors] = useState<string[]>([]);
 
   const handleSave = () => {
     console.log('Saving system frame...');
@@ -149,6 +151,8 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
     const actor = mockSNAData.nodes.find(n => n.id === nodeId);
     if (actor) {
       setSelectedActor(actor);
+      // When selecting an actor, highlight it in the network
+      setHighlightedActors([nodeId]);
     }
   };
 
@@ -191,6 +195,7 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
             edges={mockSNAData.edges}
             onNodeClick={handleSnaNodeClick}
             cyRef={snaRef}
+            highlightedActors={highlightedActors}
           />
         )}
       </div>
