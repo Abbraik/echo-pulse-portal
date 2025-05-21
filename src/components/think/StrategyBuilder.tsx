@@ -40,6 +40,7 @@ interface SimParameter {
   equilibriumMax: number;
   suggestedLeveragePoints: LeveragePoint[];
   impact: number;
+  relatedObjectives: number[]; // Add objectiveIds this parameter relates to
 }
 
 // Type for leverage points based on Meadows' system leverage points
@@ -111,7 +112,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
   ]);
   const [selectedObjectives, setSelectedObjectives] = useState<number[]>([1]);
   
-  // Base parameters data
+  // Base parameters data with related objectives
   const baseParameters = [
     {
       id: 'migration-rate',
@@ -124,6 +125,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       equilibriumMin: 2.5,
       equilibriumMax: 4.0,
       impact: 34,
+      relatedObjectives: [3],
       suggestedLeveragePoints: [
         { id: 6, title: t('informationFlows'), rationale: t('infoFlowsRationale'), relevance: 90 },
         { id: 3, title: t('systemStructure'), rationale: t('systemStructureRationale'), relevance: 75 },
@@ -141,6 +143,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       equilibriumMin: 3.8,
       equilibriumMax: 5.2,
       impact: 28,
+      relatedObjectives: [1],
       suggestedLeveragePoints: [
         { id: 5, title: t('feedbackLoops'), rationale: t('feedbackLoopsRationale'), relevance: 85 },
         { id: 2, title: t('systemGoals'), rationale: t('systemGoalsRationale'), relevance: 70 }
@@ -157,6 +160,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       equilibriumMin: 10,
       equilibriumMax: 15,
       impact: 25,
+      relatedObjectives: [3],
       suggestedLeveragePoints: [
         { id: 1, title: t('paradigms'), rationale: t('paradigmsRationale'), relevance: 95 },
         { id: 4, title: t('delays'), rationale: t('delaysRationale'), relevance: 65 }
@@ -173,6 +177,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       equilibriumMin: 7.0,
       equilibriumMax: 9.5,
       impact: 22,
+      relatedObjectives: [2],
       suggestedLeveragePoints: [
         { id: 7, title: t('selfOrganization'), rationale: t('selfOrganizationRationale'), relevance: 80 },
         { id: 5, title: t('feedbackLoops'), rationale: t('feedbackLoopsRationale'), relevance: 72 }
@@ -189,6 +194,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       equilibriumMin: 75,
       equilibriumMax: 95,
       impact: 20,
+      relatedObjectives: [3],
       suggestedLeveragePoints: [
         { id: 3, title: t('systemStructure'), rationale: t('systemStructureRationale'), relevance: 88 },
         { id: 8, title: t('bufferStocks'), rationale: t('bufferStocksRationale'), relevance: 63 }
@@ -205,6 +211,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       equilibriumMin: 92,
       equilibriumMax: 97,
       impact: 18,
+      relatedObjectives: [3],
       suggestedLeveragePoints: [
         { id: 2, title: t('systemGoals'), rationale: t('systemGoalsRationale'), relevance: 85 },
         { id: 6, title: t('informationFlows'), rationale: t('infoFlowsRationale'), relevance: 70 }
@@ -221,6 +228,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       equilibriumMin: 60,
       equilibriumMax: 80,
       impact: 15,
+      relatedObjectives: [],
       suggestedLeveragePoints: [
         { id: 4, title: t('delays'), rationale: t('delaysRationale'), relevance: 75 },
         { id: 9, title: t('systemRules'), rationale: t('systemRulesRationale'), relevance: 68 }
@@ -287,13 +295,24 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
   
   const selectedModifiers = approachModifiers[selectedApproach];
   
-  // Get filtered parameters based on selected approach
+  // Get filtered parameters based on selected objectives
   const getFilteredParameters = () => {
+    // Filter parameters related to selected objectives
+    let filteredParams = parameters.filter(param => {
+      // If no objectives are selected, show all parameters
+      if (selectedObjectives.length === 0) return true;
+      
+      // Show parameters related to at least one selected objective
+      // or parameters that don't have specific objective relations
+      return param.relatedObjectives.some(id => selectedObjectives.includes(id)) ||
+        param.relatedObjectives.length === 0;
+    });
+    
     // Sort by impact (highest impact first)
-    const sortedParams = [...parameters].sort((a, b) => b.impact - a.impact);
+    filteredParams = filteredParams.sort((a, b) => b.impact - a.impact);
     
     // Show top 7 parameters for current approach
-    return sortedParams.slice(0, 7);
+    return filteredParams.slice(0, 7);
   };
   
   // Calculate the total impact based on all adjustments
@@ -339,6 +358,9 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
     
     setObjectives([...objectives, objectiveToAdd]);
     setSelectedObjectives([...selectedObjectives, newId]);
+    
+    // Notify parent about new pathway detection needs
+    onCompute(selectedApproach);
   };
   
   const handleCreateBundle = () => {
@@ -381,22 +403,28 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
   
   // Apply AI suggestions
   const handleApplySuggestions = () => {
-    // Optimized suggestions - a mix of approaches with the best outcomes
-    const optimizedAdjustments: Record<string, number> = {
-      'migration-rate': 8,
-      'water-tariff': 10,
-      'education-investment': 12,
-      'energy-subsidies': -8,
-      'healthcare-access': 6
-    };
+    // Get relevant objectives for the suggestion
+    const objectiveIds = selectedObjectives.length > 0 ? selectedObjectives : [1];
     
-    const optimizedLeveragePoints: Record<string, number[]> = {
-      'migration-rate': [6, 3],
-      'water-tariff': [5, 2],
-      'education-investment': [1, 4],
-      'energy-subsidies': [7, 5],
-      'healthcare-access': [3, 8]
-    };
+    // Dynamically generate suggestions based on selected objectives
+    const optimizedAdjustments: Record<string, number> = {};
+    const optimizedLeveragePoints: Record<string, number[]> = {};
+    
+    // Filter parameters relevant to selected objectives
+    getFilteredParameters().forEach(param => {
+      // Generate an appropriate adjustment value based on impact and approach
+      const adjustmentBase = Math.round(param.impact / 3);
+      optimizedAdjustments[param.id] = Math.min(
+        param.id === 'energy-subsidies' ? -adjustmentBase : adjustmentBase,
+        selectedModifiers.maxAdjustmentPercent
+      );
+      
+      // Select the top 2 leverage points for each parameter
+      optimizedLeveragePoints[param.id] = param.suggestedLeveragePoints
+        .sort((a, b) => b.relevance - a.relevance)
+        .slice(0, 2)
+        .map(lp => lp.id);
+    });
     
     setAdjustments(optimizedAdjustments);
     setSelectedLeveragePoints(optimizedLeveragePoints);
@@ -424,38 +452,59 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
     });
   };
   
-  // Effect to apply default adjustments when approach changes
+  // Effect to apply default adjustments when approach changes or objectives change
   useEffect(() => {
     if (selectedApproach) {
       const defaultAdjustments = approachModifiers[selectedApproach].defaultAdjustments;
-      setAdjustments(defaultAdjustments);
       
-      // Also set some default leverage points for the approach
+      // Filter adjustments to only include parameters related to selected objectives
+      const filteredAdjustments: Record<string, number> = {};
+      const filteredParams = getFilteredParameters();
+      
+      Object.keys(defaultAdjustments).forEach(paramId => {
+        if (filteredParams.some(p => p.id === paramId)) {
+          filteredAdjustments[paramId] = defaultAdjustments[paramId as keyof typeof defaultAdjustments];
+        }
+      });
+      
+      setAdjustments(filteredAdjustments);
+      
+      // Also set some default leverage points for the approach and selected objectives
       const newLeveragePoints: Record<string, number[]> = {};
       
-      if (selectedApproach === 'conservative') {
-        newLeveragePoints['migration-rate'] = [9];
-        newLeveragePoints['water-tariff'] = [8];
-        newLeveragePoints['education-investment'] = [4];
-      } else if (selectedApproach === 'balanced') {
-        newLeveragePoints['migration-rate'] = [6, 9];
-        newLeveragePoints['water-tariff'] = [5];
-        newLeveragePoints['education-investment'] = [4, 2];
-        newLeveragePoints['energy-subsidies'] = [7];
-      } else {
-        newLeveragePoints['migration-rate'] = [3, 6];
-        newLeveragePoints['water-tariff'] = [2, 5]; 
-        newLeveragePoints['education-investment'] = [1];
-        newLeveragePoints['energy-subsidies'] = [5, 7];
-        newLeveragePoints['healthcare-access'] = [3];
-      }
+      filteredParams.forEach(param => {
+        if (selectedApproach === 'conservative') {
+          // Conservative: select most relevant point only
+          const topPoint = [...param.suggestedLeveragePoints].sort((a, b) => b.relevance - a.relevance)[0];
+          if (topPoint) {
+            newLeveragePoints[param.id] = [topPoint.id];
+          }
+        } else if (selectedApproach === 'balanced') {
+          // Balanced: select top 2 most relevant points
+          const topPoints = [...param.suggestedLeveragePoints]
+            .sort((a, b) => b.relevance - a.relevance)
+            .slice(0, 2)
+            .map(p => p.id);
+          if (topPoints.length > 0) {
+            newLeveragePoints[param.id] = topPoints;
+          }
+        } else {
+          // Aggressive: select all highly relevant points
+          const relevantPoints = param.suggestedLeveragePoints
+            .filter(p => p.relevance > 65)
+            .map(p => p.id);
+          if (relevantPoints.length > 0) {
+            newLeveragePoints[param.id] = relevantPoints;
+          }
+        }
+      });
       
       setSelectedLeveragePoints(newLeveragePoints);
       
-      // Notify the parent component about the approach change
+      // Notify the parent component about the approach change and currently selected objectives
       onCompute(selectedApproach);
     }
-  }, [selectedApproach]);
+  }, [selectedApproach, selectedObjectives]);
   
   return (
     <div className="space-y-6">
@@ -533,94 +582,102 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
           
           <div className="glass-panel-dark p-2 rounded-lg max-h-[400px] overflow-y-auto">
             <div className="space-y-4 p-2">
-              {getFilteredParameters().map((param) => {
-                const currentAdjustment = adjustments[param.id] || 0;
-                const selectedLeverage = selectedLeveragePoints[param.id] || [];
-                
-                // Calculate adjusted value
-                const adjustedValue = param.currentValue * (1 + currentAdjustment / 100);
-                
-                return (
-                  <div key={param.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h4 className="font-medium text-sm">{param.name}</h4>
-                        <p className="text-xs text-gray-400">{param.description}</p>
+              {getFilteredParameters().length > 0 ? (
+                getFilteredParameters().map((param) => {
+                  const currentAdjustment = adjustments[param.id] || 0;
+                  const selectedLeverage = selectedLeveragePoints[param.id] || [];
+                  
+                  // Calculate adjusted value
+                  const adjustedValue = param.currentValue * (1 + currentAdjustment / 100);
+                  
+                  return (
+                    <div key={param.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-medium text-sm">{param.name}</h4>
+                          <p className="text-xs text-gray-400">{param.description}</p>
+                        </div>
+                        
+                        <div className="text-right">
+                          <div className="text-sm font-medium">
+                            {adjustedValue.toFixed(1)} {param.unit}
+                          </div>
+                          <div className="text-xs text-gray-400 flex items-center justify-end mt-0.5">
+                            <span>{t("current")}: {param.currentValue} {param.unit}</span>
+                            <span className={`ml-2 px-1.5 py-0.5 rounded text-xs ${
+                              currentAdjustment > 0 
+                                ? 'bg-green-500/20 text-green-400' 
+                                : currentAdjustment < 0 
+                                  ? 'bg-red-500/20 text-red-400'
+                                  : 'bg-gray-500/20 text-gray-400'
+                            }`}>
+                              {currentAdjustment > 0 ? '+' : ''}{currentAdjustment}%
+                            </span>
+                          </div>
+                        </div>
                       </div>
                       
-                      <div className="text-right">
-                        <div className="text-sm font-medium">
-                          {adjustedValue.toFixed(1)} {param.unit}
+                      {/* Equilibrium band indicator */}
+                      <div className="relative h-1 w-full bg-white/10 rounded-full mb-3 mt-1">
+                        <div 
+                          className="absolute h-1 bg-teal-500/50 rounded-full" 
+                          style={{ 
+                            left: `${(param.equilibriumMin / param.maxValue) * 100}%`,
+                            right: `${100 - (param.equilibriumMax / param.maxValue) * 100}%`
+                          }}
+                        />
+                        <div 
+                          className="absolute w-2 h-2 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/4"
+                          style={{
+                            left: `${(adjustedValue / param.maxValue) * 100}%`
+                          }}
+                        />
+                      </div>
+                      
+                      {/* Adjustment slider */}
+                      <div className="mb-4">
+                        <Slider
+                          value={[currentAdjustment]}
+                          min={-selectedModifiers.maxAdjustmentPercent}
+                          max={selectedModifiers.maxAdjustmentPercent}
+                          step={1}
+                          onValueChange={(value) => handleAdjustParameter(param.id, value)}
+                          className="my-4"
+                        />
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>-{selectedModifiers.maxAdjustmentPercent}%</span>
+                          <span>0%</span>
+                          <span>+{selectedModifiers.maxAdjustmentPercent}%</span>
                         </div>
-                        <div className="text-xs text-gray-400 flex items-center justify-end mt-0.5">
-                          <span>{t("current")}: {param.currentValue} {param.unit}</span>
-                          <span className={`ml-2 px-1.5 py-0.5 rounded text-xs ${
-                            currentAdjustment > 0 
-                              ? 'bg-green-500/20 text-green-400' 
-                              : currentAdjustment < 0 
-                                ? 'bg-red-500/20 text-red-400'
-                                : 'bg-gray-500/20 text-gray-400'
-                          }`}>
-                            {currentAdjustment > 0 ? '+' : ''}{currentAdjustment}%
-                          </span>
+                      </div>
+                      
+                      {/* Leverage points */}
+                      <div>
+                        <div className="flex items-center gap-1 mb-2">
+                          <span className="text-xs text-gray-400">{t("leveragePoints")}</span>
+                          <InfoIcon size={12} className="text-gray-500" />
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {param.suggestedLeveragePoints.map(leverage => (
+                            <LeveragePointPill
+                              key={`${param.id}-${leverage.id}`}
+                              leveragePoint={leverage}
+                              isSelected={selectedLeverage.includes(leverage.id)}
+                              onClick={() => handleToggleLeveragePoint(param.id, leverage.id)}
+                            />
+                          ))}
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Equilibrium band indicator */}
-                    <div className="relative h-1 w-full bg-white/10 rounded-full mb-3 mt-1">
-                      <div 
-                        className="absolute h-1 bg-teal-500/50 rounded-full" 
-                        style={{ 
-                          left: `${(param.equilibriumMin / param.maxValue) * 100}%`,
-                          right: `${100 - (param.equilibriumMax / param.maxValue) * 100}%`
-                        }}
-                      />
-                      <div 
-                        className="absolute w-2 h-2 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/4"
-                        style={{
-                          left: `${(adjustedValue / param.maxValue) * 100}%`
-                        }}
-                      />
-                    </div>
-                    
-                    {/* Adjustment slider */}
-                    <div className="mb-4">
-                      <Slider
-                        value={[currentAdjustment]}
-                        min={-selectedModifiers.maxAdjustmentPercent}
-                        max={selectedModifiers.maxAdjustmentPercent}
-                        step={1}
-                        onValueChange={(value) => handleAdjustParameter(param.id, value)}
-                        className="my-4"
-                      />
-                      <div className="flex justify-between text-xs text-gray-500">
-                        <span>-{selectedModifiers.maxAdjustmentPercent}%</span>
-                        <span>0%</span>
-                        <span>+{selectedModifiers.maxAdjustmentPercent}%</span>
-                      </div>
-                    </div>
-                    
-                    {/* Leverage points */}
-                    <div>
-                      <div className="flex items-center gap-1 mb-2">
-                        <span className="text-xs text-gray-400">{t("leveragePoints")}</span>
-                        <InfoIcon size={12} className="text-gray-500" />
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {param.suggestedLeveragePoints.map(leverage => (
-                          <LeveragePointPill
-                            key={`${param.id}-${leverage.id}`}
-                            leveragePoint={leverage}
-                            isSelected={selectedLeverage.includes(leverage.id)}
-                            onClick={() => handleToggleLeveragePoint(param.id, leverage.id)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <div className="text-center py-12 text-gray-400">
+                  <SlidersHorizontal className="mx-auto mb-3 h-8 w-8 opacity-30" />
+                  <p>{t("noParametersSelected")}</p>
+                  <p className="text-sm mt-2">{t("selectObjectivesForParameters")}</p>
+                </div>
+              )}
             </div>
           </div>
           
@@ -811,38 +868,34 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
           <div className="py-4">
             <h4 className="text-sm font-medium mb-2">{t("suggestedParameters")}</h4>
             <div className="space-y-3 mb-4">
-              <div className="bg-white/5 rounded p-3 border border-white/10">
-                <div className="flex justify-between">
-                  <span className="text-sm">{t("migrationRate")}</span>
-                  <span className="text-sm text-teal-400">+8%</span>
+              {getFilteredParameters().slice(0, 3).map(param => (
+                <div key={param.id} className="bg-white/5 rounded p-3 border border-white/10">
+                  <div className="flex justify-between">
+                    <span className="text-sm">{param.name}</span>
+                    <span className="text-sm text-teal-400">
+                      {param.id === 'energy-subsidies' ? '-' : '+'}
+                      {Math.round(param.impact / 3)}%
+                    </span>
+                  </div>
+                  <div className="mt-1 flex gap-1">
+                    {param.suggestedLeveragePoints
+                      .sort((a, b) => b.relevance - a.relevance)
+                      .slice(0, 2)
+                      .map(lp => (
+                        <span key={lp.id} className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">
+                          #{lp.id} {lp.title}
+                        </span>
+                    ))}
+                  </div>
                 </div>
-                <div className="mt-1 flex gap-1">
-                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#6 {t("informationFlows")}</span>
-                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#3 {t("systemStructure")}</span>
-                </div>
-              </div>
+              ))}
               
-              <div className="bg-white/5 rounded p-3 border border-white/10">
-                <div className="flex justify-between">
-                  <span className="text-sm">{t("waterTariff")}</span>
-                  <span className="text-sm text-teal-400">+10%</span>
+              {getFilteredParameters().length === 0 && (
+                <div className="text-center py-6 text-gray-400">
+                  <p>{t("noParametersForSuggestions")}</p>
+                  <p className="text-sm mt-1">{t("selectObjectivesForParameters")}</p>
                 </div>
-                <div className="mt-1 flex gap-1">
-                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#5 {t("feedbackLoops")}</span>
-                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#2 {t("systemGoals")}</span>
-                </div>
-              </div>
-              
-              <div className="bg-white/5 rounded p-3 border border-white/10">
-                <div className="flex justify-between">
-                  <span className="text-sm">{t("energySubsidies")}</span>
-                  <span className="text-sm text-red-400">-8%</span>
-                </div>
-                <div className="mt-1 flex gap-1">
-                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#7 {t("selfOrganization")}</span>
-                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">#5 {t("feedbackLoops")}</span>
-                </div>
-              </div>
+              )}
             </div>
             
             <div className="mt-4">
@@ -850,11 +903,13 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
               <div className="bg-white/5 rounded p-3 border border-white/10">
                 <div className="flex justify-between items-center">
                   <span className="text-sm">{t("deiImpact")}</span>
-                  <span className="text-lg font-bold text-teal-400">+4.5</span>
+                  <span className="text-lg font-bold text-teal-400">+{(getFilteredParameters().length * 0.9).toFixed(1)}</span>
                 </div>
                 <div className="mt-2 flex justify-between items-center">
                   <span className="text-sm text-gray-400">{t("timeToEquilibrium")}</span>
-                  <span className="text-sm">6 {t("months")}</span>
+                  <span className="text-sm">
+                    {selectedObjectives.length > 0 ? 6 : 8} {t("months")}
+                  </span>
                 </div>
               </div>
             </div>
@@ -864,7 +919,7 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
             <Button variant="outline" onClick={() => setIsSuggestModalOpen(false)}>
               {t("cancel")}
             </Button>
-            <Button onClick={handleApplySuggestions}>
+            <Button onClick={handleApplySuggestions} disabled={getFilteredParameters().length === 0}>
               {t("applyAll")}
             </Button>
           </div>
@@ -875,4 +930,3 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
 };
 
 export default StrategyBuilder;
-

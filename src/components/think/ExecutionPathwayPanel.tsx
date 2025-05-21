@@ -63,13 +63,13 @@ const ExecutionPathwayPanel: React.FC<ExecutionPathwayPanelProps> = ({
             </div>
             
             {/* Actor chain visualization */}
-            <div className="flex items-center my-4">
+            <div className="flex items-center my-4 flex-wrap">
               {pathway.actors.map((actorId, index) => (
                 <React.Fragment key={actorId}>
                   {index > 0 && (
                     <ArrowRight className="mx-2 text-gray-400 h-4 w-4 flex-shrink-0" />
                   )}
-                  <div className="bg-white/10 rounded-lg px-2 py-1 text-xs">
+                  <div className="bg-white/10 rounded-lg px-2 py-1 text-xs my-1">
                     {actorId}
                   </div>
                 </React.Fragment>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Layout, Layers, Network, BarChart3, ArrowRight, GitBranch } from 'lucide-react';
@@ -102,15 +103,16 @@ const mockSnaData: SNAData = {
   }
 };
 
-// Mock execution pathways
-const mockPathways: ExecutionPathway[] = [
+// All potential execution pathways
+const allMockPathways: ExecutionPathway[] = [
   {
     id: 'path1',
     title: 'Energy Policy Reform',
     description: 'Coordinate across agencies to reform energy subsidy structure',
     actors: ['MOF', 'ADNOC', 'EAD'],
     coordinationTime: 8,
-    impact: 4.2
+    impact: 4.2,
+    relatedObjectives: [2] // Connected to renewable energy objective
   },
   {
     id: 'path2',
@@ -118,7 +120,8 @@ const mockPathways: ExecutionPathway[] = [
     description: 'Establish integrated environmental standards across sectors',
     actors: ['EAD', 'UAEU', 'MOE'],
     coordinationTime: 6,
-    impact: 3.8
+    impact: 3.8,
+    relatedObjectives: [1] // Connected to water management
   },
   {
     id: 'path3',
@@ -126,7 +129,35 @@ const mockPathways: ExecutionPathway[] = [
     description: 'Develop sustainable transportation initiative with key stakeholders',
     actors: ['DMT', 'RTA', 'EAD'],
     coordinationTime: 12,
-    impact: 5.1
+    impact: 5.1,
+    relatedObjectives: []
+  },
+  {
+    id: 'path4',
+    title: 'Water Resource Strategy',
+    description: 'Implement advanced water recycling systems in cooperation with key agencies',
+    actors: ['EAD', 'MOE', 'UAEU'],
+    coordinationTime: 7,
+    impact: 4.0,
+    relatedObjectives: [1] // Connected to water management
+  },
+  {
+    id: 'path5',
+    title: 'Renewable Energy Expansion',
+    description: 'Coordinate solar infrastructure development in underutilized desert regions',
+    actors: ['ADNOC', 'MOE', 'EDB'],
+    coordinationTime: 10,
+    impact: 4.5,
+    relatedObjectives: [2] // Connected to renewable energy
+  },
+  {
+    id: 'path6',
+    title: 'Population Growth Management',
+    description: 'Design and implement family support programs for population stability',
+    actors: ['MOF', 'MOE', 'UAEU'],
+    coordinationTime: 14,
+    impact: 3.5,
+    relatedObjectives: [3] // Connected to birth rate stability
   }
 ];
 
@@ -160,6 +191,7 @@ const ThinkPage: React.FC = () => {
   const [highlightedActors, setHighlightedActors] = useState<string[]>([]);
   const [activeApproach, setActiveApproach] = useState<'conservative' | 'balanced' | 'aggressive'>('balanced');
   const [pathways, setPathways] = useState<ExecutionPathway[]>([]);
+  const [selectedObjectives, setSelectedObjectives] = useState<number[]>([1]);
   
   // Reference for the network visualization
   const networkRef = useRef<any>(null);
@@ -250,22 +282,59 @@ const ThinkPage: React.FC = () => {
     setHighlightedActors(actorIds);
   };
   
-  // Handle approach change - update pathways based on selected approach
+  // Handle approach and objective changes - update pathways based on selected approach
   useEffect(() => {
-    // In a real app, we would call an API to get the appropriate pathways
-    // Here we'll just simulate different pathways for each approach
-    let filteredPathways: ExecutionPathway[] = [];
+    // Filter and prioritize pathways based on:
+    // 1. Selected objectives (by showing related ones first)
+    // 2. Selected approach (conservative shows fewer, aggressive shows more)
+    
+    // Step 1: Filter pathways related to selected objectives
+    let relevantPathways = allMockPathways.filter(pathway => {
+      // If no objectives selected, all pathways are potentially relevant
+      if (selectedObjectives.length === 0) return true;
+      
+      // Check if pathway is related to any selected objective
+      const isRelatedToSelectedObjective = pathway.relatedObjectives.some(
+        objId => selectedObjectives.includes(objId)
+      );
+      
+      // For pathways not specifically tied to objectives, include them for aggressive approach 
+      // or if they're particularly impactful
+      const isGenerallyRelevant = pathway.relatedObjectives.length === 0 && 
+        (activeApproach === 'aggressive' || pathway.impact > 4.5);
+        
+      return isRelatedToSelectedObjective || isGenerallyRelevant;
+    });
+    
+    // Step 2: Sort by impact and then by relation to selected objectives
+    relevantPathways.sort((a, b) => {
+      // First prioritize pathways with relations to objectives
+      const aHasRelation = a.relatedObjectives.some(id => selectedObjectives.includes(id));
+      const bHasRelation = b.relatedObjectives.some(id => selectedObjectives.includes(id));
+      
+      if (aHasRelation && !bHasRelation) return -1;
+      if (!aHasRelation && bHasRelation) return 1;
+      
+      // Then sort by impact
+      return b.impact - a.impact;
+    });
+    
+    // Step 3: Limit pathways based on approach
+    let filteredPathways: ExecutionPathway[];
     
     if (activeApproach === 'conservative') {
-      filteredPathways = [mockPathways[1]]; // Just the environmental standards pathway
+      // Conservative: show just 1-2 highest impact pathways related to objectives
+      filteredPathways = relevantPathways.slice(0, Math.max(1, Math.min(2, selectedObjectives.length)));
     } else if (activeApproach === 'balanced') {
-      filteredPathways = [mockPathways[0], mockPathways[1]]; // Energy and environmental pathways
+      // Balanced: show moderate number of pathways (2-4)
+      filteredPathways = relevantPathways.slice(0, Math.min(4, relevantPathways.length));
     } else {
-      filteredPathways = mockPathways; // All pathways
+      // Aggressive: show all relevant pathways up to 6
+      filteredPathways = relevantPathways.slice(0, 6);
     }
     
     setPathways(filteredPathways);
-  }, [activeApproach]);
+  }, [activeApproach, selectedObjectives]);
   
   // Handle adopting a pathway - would typically create a delivery bundle
   const handleAdoptPathway = (pathway: ExecutionPathway) => {
@@ -280,6 +349,23 @@ const ThinkPage: React.FC = () => {
   // Update the approach based on strategy builder selection
   const handleApproachChange = (approach: 'conservative' | 'balanced' | 'aggressive') => {
     setActiveApproach(approach);
+  };
+  
+  // Handle updates from the strategy builder
+  const handleStrategyBuilderCompute = (approach: string, objectiveIds?: number[]) => {
+    // Update approach
+    setActiveApproach(approach as 'conservative' | 'balanced' | 'aggressive');
+    
+    // Update objectives if provided
+    if (objectiveIds) {
+      setSelectedObjectives(objectiveIds);
+    }
+    
+    toast({
+      title: t("strategyUpdated"),
+      description: t("pathwaysRecalculated"),
+      duration: 2000,
+    });
   };
 
   return (
