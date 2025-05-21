@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import CytoScape from 'react-cytoscapejs';
 import { Actor } from '../types/sna-types';
@@ -19,7 +18,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
   const cytoElements = [
     ...nodes.map(node => {
       // Determine position - either use existing position or calculate in a grid/circle
-      const position = node.position || calculateNodePosition(node.id, nodes.length);
+      const position = calculateNodePosition(node.id, nodes.length);
       
       return {
         data: {
