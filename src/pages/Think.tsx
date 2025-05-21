@@ -193,7 +193,7 @@ const ThinkPage: React.FC = () => {
   const [activeApproach, setActiveApproach] = useState<'conservative' | 'balanced' | 'aggressive'>('balanced');
   const [pathways, setPathways] = useState<ExecutionPathway[]>([]);
   const [selectedObjectives, setSelectedObjectives] = useState<number[]>([1]);
-  const [activeTab, setActiveTab] = useState('framing');
+  const [activeTab, setActiveTab] = useState('dei');
   const [showAiAdvisor, setShowAiAdvisor] = useState(false);
   
   // Reference for the network visualization
@@ -401,16 +401,21 @@ const ThinkPage: React.FC = () => {
         </div>
       </motion.header>
       
+      {/* System Framing Studio (Always visible at the top) */}
+      <GlassCard className="p-6 mb-6">
+        <h2 className="text-xl font-bold mb-4 text-left flex items-center text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">
+          <Layout className="mr-2 text-teal-400" size={20} />
+          {t("systemFramingStudio").toUpperCase()}
+        </h2>
+        <SystemFramingStudio 
+          cldData={mockCldData} 
+          snaData={adaptSNADataToSystemFraming(mockSnaData)} 
+        />
+      </GlassCard>
+      
       {/* Main Tabbed Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
         <TabsList className="w-full bg-white/5 backdrop-blur-sm rounded-full p-1 mb-6 flex justify-center">
-          <TabsTrigger 
-            value="framing" 
-            className="rounded-full px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
-          >
-            <Layout className="mr-2 h-4 w-4" />
-            {t("systemFraming").toUpperCase()}
-          </TabsTrigger>
           <TabsTrigger 
             value="dei" 
             className="rounded-full px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
@@ -434,18 +439,6 @@ const ThinkPage: React.FC = () => {
           </TabsTrigger>
         </TabsList>
 
-        {/* System Framing Studio (Always visible at the top) */}
-        <GlassCard className="p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
-            <Layout className="mr-2" size={20} />
-            {t("systemFramingStudio").toUpperCase()}
-          </h2>
-          <SystemFramingStudio 
-            cldData={mockCldData} 
-            snaData={adaptSNADataToSystemFraming(mockSnaData)} 
-          />
-        </GlassCard>
-
         {/* DEI & Foresight Hub */}
         <TabsContent value="dei" className="mt-0">
           <DeiAndForesightHub 
@@ -467,8 +460,8 @@ const ThinkPage: React.FC = () => {
         {/* Strategy Builder with SNA-driven Execution Pathways */}
         <TabsContent value="strategy" className="mt-0">
           <GlassCard className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
-              <GitBranch className="mr-2" size={20} />
+            <h2 className="text-xl font-bold mb-4 text-left flex items-center text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">
+              <GitBranch className="mr-2 text-teal-400" size={20} />
               {t("strategyBuilder").toUpperCase()}
             </h2>
             <StrategyBuilder 

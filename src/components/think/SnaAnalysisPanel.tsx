@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Network, Users, GitCommit, Filter } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
@@ -67,12 +68,13 @@ const SnaAnalysisPanel: React.FC<SnaAnalysisPanelProps> = ({ snaData, onHighligh
 
       {activeView === 'network' ? (
         <NetworkView 
-          snaData={snaData} 
-          onNodeClick={handleNodeClick} 
-          highlightedActors={[]}
+          nodes={snaData.nodes}
+          edges={snaData.edges}
+          onNodeClick={handleNodeClick}
+          highlightedActors={selectedNode ? [selectedNode] : []}
         />
       ) : (
-        <SnaAnalysisTab snaData={snaData} />
+        <SnaAnalysisTab metrics={snaData.metrics} />
       )}
     </GlassCard>
   );

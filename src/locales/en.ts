@@ -1,3 +1,4 @@
+
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -42,7 +43,6 @@ const en = {
   "systemFramingStudio": "System Framing Studio",
   "deiAndForesightHub": "DEI & Foresight Hub",
   "strategyZone": "Strategy Zone",
-  "thinkCoreDesc": "Analyze, visualize, and strategize for dynamic equilibrium",
   "thinkFooterCta": "Ready to shape the future? Dive into the ACT zone to bring your strategies to life.",
   "actZone": "ACT Zone",
   "actCoreDesc": "Execute strategies, manage resources, and drive progress towards a sustainable future.",
@@ -188,6 +188,10 @@ const en = {
   "scenarioLoaded": "Scenario Loaded",
   "scenarioApplied": "scenario has been applied to metrics",
   "approachSelected": "{{ approach }} approach selected",
+  "networkView": "Network View",
+  "metrics": "Metrics",
+  "overview": "Overview",
+  "simulation": "Simulation",
 };
 
 export default en;
