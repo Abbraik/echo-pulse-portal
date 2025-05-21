@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import CytoScape from 'react-cytoscapejs';
 import { Actor } from '../types/sna-types';
@@ -17,8 +18,8 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
   // Convert nodes and edges to cytoscape format
   const cytoElements = [
     ...nodes.map(node => {
-      // Determine position - either use existing position or calculate in a grid/circle
-      const position = calculateNodePosition(node.id, nodes.length);
+      // Use new deterministic layered position calculation
+      const position = calculateNodePosition(node.id, node.type);
       
       return {
         data: {
@@ -31,7 +32,9 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
           closeness: node.closeness,
           // Store position data to maintain consistency
           positionX: position.x,
-          positionY: position.y
+          positionY: position.y,
+          // Add z-index related to degree (more connected nodes on top)
+          zIndex: node.degree || 1
         },
         position: position,
         // Add classes for selection and grabbing
@@ -63,24 +66,38 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
     }
   }
   
-  // Calculate a deterministic position for a node based on its id
-  function calculateNodePosition(id: string, totalNodes: number) {
-    // Use the node id's character codes to create a deterministic position
-    // This ensures nodes will always be positioned the same way
+  // Calculate a deterministic position for nodes with layered stacking effect
+  function calculateNodePosition(id: string, type: "government" | "private" | "ngo" | "academic") {
+    // Use the node id's character codes to create a deterministic position within type groups
     let idSum = 0;
     for (let i = 0; i < id.length; i++) {
       idSum += id.charCodeAt(i);
     }
     
-    // Create a circular layout with more spacing
-    const radius = 180; // Increased from 150 for better spacing
-    const index = idSum % totalNodes; // Get a consistent index
-    const angleStep = (2 * Math.PI) / totalNodes;
-    const angle = index * angleStep;
+    // Base positioning adjustments to create a clustered, layered effect by node type
+    let baseX = 250; // Center x
+    let baseY = 200; // Center y
+    
+    // Organize nodes into distinct clusters by type
+    const typeOffsets = {
+      'government': { x: -80, y: -60 },
+      'private': { x: 80, y: -60 },
+      'ngo': { x: -80, y: 60 },
+      'academic': { x: 80, y: 60 },
+    };
+    
+    // Apply basic offset based on node type for clustering
+    baseX += typeOffsets[type].x;
+    baseY += typeOffsets[type].y;
+    
+    // Use idSum to create variance within each cluster (but not too much)
+    // This creates a more organic, stacked appearance within each group
+    const angleVariance = (idSum % 360) * Math.PI / 180; // Convert to radians
+    const radiusVariance = 20 + (idSum % 30); // Small radius variance 
     
     return {
-      x: Math.cos(angle) * radius + 250, // Center x = 250
-      y: Math.sin(angle) * radius + 200  // Center y = 200
+      x: baseX + Math.cos(angleVariance) * radiusVariance,
+      y: baseY + Math.sin(angleVariance) * radiusVariance
     };
   }
 
@@ -88,7 +105,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
     {
       selector: 'node',
       style: {
-        'width': 'mapData(degree, 1, 10, 30, 60)', // Slightly reduced size range for less chaos
+        'width': 'mapData(degree, 1, 10, 30, 60)', 
         'height': 'mapData(degree, 1, 10, 30, 60)',
         'background-color': isDarkMode ? 'rgba(42, 42, 42, 0.7)' : 'rgba(255, 255, 255, 0.7)',
         'background-opacity': 0.7,
@@ -109,6 +126,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         'font-weight': 500,
         'text-outline-color': isDarkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
         'text-outline-width': '2px',
+        'z-index': 'data(zIndex)' // Use the z-index for stacking nodes
       }
     },
     {
@@ -119,13 +137,14 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         'color': isDarkMode ? '#FFFFFF' : '#000000',
         'text-outline-opacity': 0.8,
         'overlay-opacity': 0.2,
-        'overlay-color': 'data(color)'
+        'overlay-color': 'data(color)',
+        'z-index': 9999 // Bring hovered nodes to the front
       }
     },
     {
       selector: 'edge',
       style: {
-        'width': 'mapData(weight, 0, 1, 2, 6)', // Thinner edges for less visual chaos
+        'width': 'mapData(weight, 0, 1, 2, 6)', 
         'line-color': 'rgba(203, 213, 225, 0.5)', 
         'curve-style': 'bezier',
         'opacity': 0.6,
@@ -137,7 +156,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       selector: 'edge:hover',
       style: {
         'width': function(ele: any) {
-          return Math.min(ele.data('weight') * 8 + 2, 8); // More moderate hover effect
+          return Math.min(ele.data('weight') * 8 + 2, 8);
         },
         'opacity': 1,
         'overlay-opacity': 0.2
@@ -156,7 +175,8 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         'overlay-color': function(ele: any) {
           return ele.data('color');
         },
-        'box-shadow': '0px 6px 10px rgba(0, 0, 0, 0.2)'
+        'box-shadow': '0px 6px 10px rgba(0, 0, 0, 0.2)',
+        'z-index': 10000 // Always bring selected nodes to the absolute front
       }
     }
   ];
@@ -195,7 +215,8 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         e.target.style({
           'border-width': '3px', 
           'border-opacity': 1, 
-          'overlay-opacity': 0.1
+          'overlay-opacity': 0.1,
+          'z-index': 9999 // Ensure the hovered node is on top
         });
       });
       
@@ -204,7 +225,8 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
           e.target.style({
             'border-width': '2px', 
             'border-opacity': 0.9, 
-            'overlay-opacity': 0
+            'overlay-opacity': 0,
+            'z-index': e.target.data('zIndex') // Return to original z-index
           });
         }
       });
