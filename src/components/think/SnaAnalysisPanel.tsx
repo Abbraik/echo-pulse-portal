@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Network, Users, GitCommit, Filter } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,6 +18,7 @@ const SnaAnalysisPanel: React.FC<SnaAnalysisPanelProps> = ({ snaData, onHighligh
   const [activeView, setActiveView] = useState<'network' | 'metrics'>('network');
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string | null>(null);
+  const cyRef = useRef<any>(null);
 
   const handleNodeClick = (nodeId: string) => {
     setSelectedNode(nodeId);
@@ -72,6 +73,7 @@ const SnaAnalysisPanel: React.FC<SnaAnalysisPanelProps> = ({ snaData, onHighligh
           edges={snaData.edges}
           onNodeClick={handleNodeClick}
           highlightedActors={selectedNode ? [selectedNode] : []}
+          cyRef={cyRef}
         />
       ) : (
         <SnaAnalysisTab metrics={snaData.metrics} />

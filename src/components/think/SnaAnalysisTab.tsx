@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Info, Network } from 'lucide-react';
 import CytoscapeComponent from 'react-cytoscapejs';
@@ -90,7 +89,11 @@ const mockSNAData: SNAData = {
   }
 };
 
-const SnaAnalysisTab: React.FC = () => {
+interface SnaAnalysisTabProps {
+  metrics: SNAMetrics;
+}
+
+const SnaAnalysisTab: React.FC<SnaAnalysisTabProps> = ({ metrics }) => {
   const cyRef = useRef<any>(null);
   const [selectedActor, setSelectedActor] = useState<Actor | null>(null);
   const [isInfoOpen, setIsInfoOpen] = useState({
@@ -258,7 +261,7 @@ const SnaAnalysisTab: React.FC = () => {
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 text-white">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold">{mockSNAData.metrics.density.toFixed(2)}</h3>
+                <h3 className="text-xl font-bold">{metrics.density.toFixed(2)}</h3>
                 <p className="text-sm text-gray-300">Network Density</p>
               </div>
               <TooltipProvider>
@@ -291,7 +294,7 @@ const SnaAnalysisTab: React.FC = () => {
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 text-white">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold">{mockSNAData.metrics.avgClustering.toFixed(2)}</h3>
+                <h3 className="text-xl font-bold">{metrics.avgClustering.toFixed(2)}</h3>
                 <p className="text-sm text-gray-300">Avg. Clustering Coefficient</p>
               </div>
               <TooltipProvider>
@@ -324,7 +327,7 @@ const SnaAnalysisTab: React.FC = () => {
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 text-white">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold">{mockSNAData.metrics.avgPathLength.toFixed(1)}</h3>
+                <h3 className="text-xl font-bold">{metrics.avgPathLength.toFixed(1)}</h3>
                 <p className="text-sm text-gray-300">Avg. Path Length</p>
               </div>
               <TooltipProvider>
@@ -357,7 +360,7 @@ const SnaAnalysisTab: React.FC = () => {
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 text-white">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold">{mockSNAData.metrics.centralization.toFixed(2)}</h3>
+                <h3 className="text-xl font-bold">{metrics.centralization.toFixed(2)}</h3>
                 <p className="text-sm text-gray-300">Network Centralization</p>
               </div>
               <TooltipProvider>

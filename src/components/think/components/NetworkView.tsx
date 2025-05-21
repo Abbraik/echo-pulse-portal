@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import CytoScape from 'react-cytoscapejs';
 import { Actor } from '../types/sna-types';
 import { useTheme } from '@/hooks/use-theme';
@@ -7,12 +7,23 @@ interface NetworkViewProps {
   nodes: Actor[];
   edges: { source: string; target: string; weight: number }[];
   onNodeClick: (nodeId: string) => void;
-  cyRef: React.MutableRefObject<any>;
+  highlightedActors?: string[]; // Added this prop
+  cyRef?: React.MutableRefObject<any>; // Made optional
 }
 
-const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cyRef }) => {
+const NetworkView: React.FC<NetworkViewProps> = ({ 
+  nodes, 
+  edges, 
+  onNodeClick, 
+  highlightedActors = [], // Default to empty array
+  cyRef: externalCyRef 
+}) => {
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === 'dark';
+  const internalCyRef = useRef<any>(null);
+  
+  // Use external ref if provided, otherwise use internal
+  const cyRef = externalCyRef || internalCyRef;
 
   // Convert nodes and edges to cytoscape format
   const cytoElements = [
@@ -213,17 +224,6 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         });
       });
       
-      cy.on('mouseout', 'node', function(e: any) {
-        if (!e.target.selected()) {
-          e.target.style({
-            'border-width': '2px', 
-            'border-opacity': 0.9, 
-            'overlay-opacity': 0,
-            'z-index': e.target.data('zIndex') // Return to original z-index
-          });
-        }
-      });
-      
       // Edge hover - simplified with no animations
       cy.on('mouseover', 'edge', function(e: any) {
         e.target.style({
@@ -238,6 +238,32 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
           'overlay-opacity': 0.1
         });
       });
+
+      // Highlight selected actors if provided
+      if (highlightedActors && highlightedActors.length > 0) {
+        // Reset all nodes to default style first
+        cy.nodes().forEach((node: any) => {
+          node.style({
+            'border-width': '2px',
+            'border-opacity': 0.9,
+            'background-opacity': 0.7
+          });
+        });
+        
+        // Highlight the selected nodes
+        highlightedActors.forEach(actorId => {
+          const node = cy.getElementById(actorId);
+          if (node) {
+            node.style({
+              'border-width': '4px',
+              'border-color': node.data('color'),
+              'border-opacity': 1,
+              'background-opacity': 0.9,
+              'z-index': 10000
+            });
+          }
+        });
+      }
 
       // Enable manual node movement but initially keep them fixed
       cy.autoungrabify(false); // Allow nodes to be moved manually
@@ -265,7 +291,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         cy.removeListener('dragfree');
       };
     }
-  }, [onNodeClick]);
+  }, [onNodeClick, highlightedActors]); // Added highlightedActors dependency
 
   return (
     <div className="w-full h-full">
