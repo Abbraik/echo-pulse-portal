@@ -1,4 +1,3 @@
-
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { useRef } from 'react';
 import CytoScape from 'react-cytoscapejs';
@@ -312,22 +311,40 @@ export const KnowledgeGraph = forwardRef<any, KnowledgeGraphProps>((props, ref) 
     }
   }, [nodeTypeFilter]);
   
+  // CSS styles for the component
+  const styles = {
+    highlighted: {
+      opacity: 1,
+    },
+    faded: {
+      opacity: 0.25,
+    },
+    cytoscapeContainer: {
+      cursor: 'grab',
+    },
+    cytoscapeContainerActive: {
+      cursor: 'grabbing',
+    }
+  };
+  
   return (
     <div className="w-full h-full">
-      <style jsx global>{`
-        .highlighted {
-          opacity: 1 !important;
-        }
-        .faded {
-          opacity: 0.25 !important;
-        }
-        .cytoscape-container:hover {
-          cursor: grab;
-        }
-        .cytoscape-container:active {
-          cursor: grabbing;
-        }
-      `}</style>
+      <style>
+        {`
+          .highlighted {
+            opacity: 1 !important;
+          }
+          .faded {
+            opacity: 0.25 !important;
+          }
+          .cytoscape-container:hover {
+            cursor: grab;
+          }
+          .cytoscape-container:active {
+            cursor: grabbing;
+          }
+        `}
+      </style>
       <CytoScape
         elements={getFilteredElements()}
         className="cytoscape-container"
