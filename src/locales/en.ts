@@ -1,3 +1,4 @@
+
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -265,7 +266,6 @@ const en = {
   "quickActions": "Quick Actions",
   "overdueTask": "Overdue Task",
   "abandonedBundle": "Abandoned Bundle",
-  "pendingApproval": "Pending Approval",
   "daysOverdue": "days overdue",
   "daysInactive": "days inactive",
   "daysWaiting": "days waiting",
@@ -291,11 +291,14 @@ const en = {
   "systemImpactProjection": "System Impact Projection",
   "equityImpact": "Equity Impact",
   "coherenceEffect": "Coherence Effect",
-  "timeToEquilibrium": "Time to Equilibrium",
-  "recalibrationNote": "Note: Recalibrations may take 24-48 hours to fully propagate through the system.",
-  "applyChanges": "Apply Changes",
+  "recalibration": "Recalibration",
   "changesApplied": "Changes Applied",
   "recalibrationSuccess": "System recalibration changes have been successfully applied",
+  "applyChanges": "Apply Changes",
+  "recalibrationNote": "Note: Recalibrations may take 24-48 hours to fully propagate through the system.",
+  "recommendationOne": "Consider reviewing the Social Cohesion metrics for optimization opportunities",
+  "recommendationTwo": "Water conservation efforts may benefit from targeted community outreach",
+  "recommendationThree": "Economic activity showing promising trends in previously underserved areas"
 };
 
 export default en;

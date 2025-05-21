@@ -102,7 +102,7 @@ export const MicroSimPanel: React.FC<MicroSimPanelProps> = ({
                   <Gauge 
                     value={impactScore} 
                     size="md" 
-                    color={impactScore > 80 ? "teal" : impactScore > 60 ? "blue" : impactScore > 40 ? "amber" : "red"} 
+                    color={impactScore > 80 ? "teal" : impactScore > 60 ? "blue" : impactScore > 40 ? "amber" : "rose"} 
                   />
                 </div>
                 

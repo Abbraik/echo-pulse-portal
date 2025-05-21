@@ -4,7 +4,7 @@ import { AnimatedPage } from '@/components/ui/motion';
 import { 
   Monitor, BarChart2, AlertTriangle, Map, Info, 
   TrendingUp, TrendingDown, Search, Settings, Zap, 
-  ArrowRight, Bell, Gauge as GaugeIcon, Clock, Activity, FileText 
+  ArrowRight, Bell, Clock, Activity, FileText 
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { GlassCard } from '@/components/ui/glass-card';
@@ -33,6 +33,14 @@ import { MicroSimPanel } from '@/components/monitor/MicroSimPanel';
 import { AlertDetailPopup } from '@/components/monitor/AlertDetailPopup';
 import { AnomalyDetailPanel } from '@/components/monitor/AnomalyDetailPanel';
 import { RecommendationPopup } from '@/components/monitor/RecommendationPopup';
+
+// 1. Create a mock RecommendationPopupProps interface to match the component
+interface RecommendationPopupProps {
+  recommendation: any;
+  onDismiss: () => void;
+  onApplyPlaybook: (id: string) => void;
+  onCreateBundle: (id: string) => void;
+}
 
 const MonitorPage: React.FC = () => {
   const { t, isRTL } = useTranslation();
@@ -233,6 +241,17 @@ const MonitorPage: React.FC = () => {
     }
   };
 
+  // Added handlers for RecommendationPopup
+  const handleApplyPlaybook = (id: string) => {
+    // Placeholder function to satisfy the interface requirement
+    console.log("Applying playbook:", id);
+  };
+  
+  const handleCreateBundle = (id: string) => {
+    // Placeholder function to satisfy the interface requirement
+    console.log("Creating bundle:", id);
+  };
+
   // Function to render severity badge
   const renderSeverityBadge = (severity: string) => {
     const variant = severity === 'high' ? 'destructive' : 
@@ -334,7 +353,7 @@ const MonitorPage: React.FC = () => {
                           style={{ 
                             height: `${value}%`, 
                             width: '25%',
-                            opacity: i === pillar.sparkline.length - 1 ? 1 : 0.7 - (0.1 * (pillars.sparkline.length - 1 - i))
+                            opacity: i === pillar.sparkline.length - 1 ? 1 : 0.7 - (0.1 * (pillar.sparkline.length - 1 - i))
                           }}
                         />
                       ))}
@@ -512,7 +531,7 @@ const MonitorPage: React.FC = () => {
               <GlassCard className="p-4">
                 <h3 className="text-lg font-semibold mb-3 text-left flex items-center">
                   <div className="p-2 rounded-lg bg-teal-500/20 text-teal-400 mr-2">
-                    <Calendar size={16} />
+                    <Clock size={16} />
                   </div>
                   {t('claimVelocityDashboard')}
                   {renderTrendIndicator(operationalMetrics.claimVelocity.trend)}
@@ -765,6 +784,8 @@ const MonitorPage: React.FC = () => {
         <RecommendationPopup
           recommendation={activeRecommendation}
           onDismiss={handleDismissRecommendation}
+          onApplyPlaybook={handleApplyPlaybook}
+          onCreateBundle={handleCreateBundle}
         />
       </div>
     </AnimatedPage>
