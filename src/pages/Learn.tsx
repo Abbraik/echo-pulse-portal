@@ -44,17 +44,17 @@ const Learn: React.FC = () => {
       
       <div className="space-y-8 pb-20">
         {/* Smart Library Panel - 35% viewport height */}
-        <section className="h-[35vh]">
+        <section className="h-auto mb-8">
           <SmartLibraryPanel />
         </section>
         
         {/* Knowledge Graph Diagnostics Panel - 35% viewport height */}
-        <section className="h-[35vh]">
+        <section className="h-auto mb-8">
           <KnowledgeGraphPanel />
         </section>
         
         {/* Insight Review Panel - 25% viewport height */}
-        <section className="h-[25vh]">
+        <section className="h-auto">
           <InsightReviewPanel />
         </section>
       </div>

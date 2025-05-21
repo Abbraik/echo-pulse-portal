@@ -1,16 +1,20 @@
 
 import React, { useState } from 'react';
-import { Search, Tag, Calendar, ArrowRight, Star } from 'lucide-react';
+import { Search, Tag, Calendar, ArrowRight, Star, Maximize2, Minimize2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { GlassCard, GlassCardHeader, GlassCardTitle, GlassCardContent } from '@/components/ui/glass-card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { motion } from 'framer-motion';
 
 export const SmartLibraryPanel: React.FC = () => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   // Sample data for the library
   const libraryItems = [
@@ -62,121 +66,148 @@ export const SmartLibraryPanel: React.FC = () => {
     'engagement', 'budget', 'finance', 'management', 'technology', 
     'equity', 'access', 'governance', 'collaboration', 'ministry'
   ];
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
   
   return (
-    <GlassCard className="overflow-hidden h-full">
-      <GlassCardHeader className="pb-4">
-        <GlassCardTitle gradient>{t('smartLibrary')}</GlassCardTitle>
-      </GlassCardHeader>
-      
-      <GlassCardContent>
-        {/* Header with Search and Filters */}
-        <div className="flex flex-wrap gap-4 mb-4">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t('searchLibraryPlaceholder')}
-              className="pl-9 bg-white/5 border-white/10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
+    <motion.div
+      layout
+      className={`transition-all duration-300 ease-in-out ${isExpanded ? 'fixed inset-0 z-50 p-4' : ''}`}
+    >
+      <GlassCard className={`overflow-hidden h-full ${isExpanded ? 'h-full' : ''}`}>
+        <GlassCardHeader className="pb-4 flex justify-between items-center">
+          <GlassCardTitle gradient>{t('smartLibrary')}</GlassCardTitle>
           <div className="flex gap-2">
-            <Select>
-              <SelectTrigger className="w-[150px] bg-white/5 border-white/10">
-                <div className="flex items-center gap-2">
-                  <Tag size={14} />
-                  <SelectValue placeholder={t('filterByTag')} />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                {availableTags.map(tag => (
-                  <SelectItem key={tag} value={tag}>{tag}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
-            <Select>
-              <SelectTrigger className="w-[150px] bg-white/5 border-white/10">
-                <div className="flex items-center gap-2">
-                  <Calendar size={14} />
-                  <SelectValue placeholder={t('dateRange')} />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="week">{t('lastWeek')}</SelectItem>
-                <SelectItem value="month">{t('lastMonth')}</SelectItem>
-                <SelectItem value="quarter">{t('lastQuarter')}</SelectItem>
-                <SelectItem value="year">{t('lastYear')}</SelectItem>
-                <SelectItem value="custom">{t('custom')}</SelectItem>
-              </SelectContent>
-            </Select>
+            <CollapsibleTrigger asChild onClick={toggleCollapse}>
+              <Button variant="ghost" size="icon">
+                {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+              </Button>
+            </CollapsibleTrigger>
+            <Button variant="ghost" size="icon" onClick={toggleExpand}>
+              {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+            </Button>
           </div>
-        </div>
+        </GlassCardHeader>
         
-        {/* Results List */}
-        <div className="overflow-auto max-h-[calc(35vh-160px)]">
-          <table className="w-full">
-            <thead className="text-left text-xs border-b border-white/10">
-              <tr>
-                <th className="py-3 px-4">{t('title')}</th>
-                <th className="py-3 px-4">{t('sourceEvent')}</th>
-                <th className="py-3 px-4">{t('usageCount')}</th>
-                <th className="py-3 px-4">{t('successRate')}</th>
-                <th className="py-3 px-4"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {libraryItems.map((item) => (
-                <tr 
-                  key={item.id} 
-                  className="group border-b border-white/5 hover:bg-white/5 transition-all duration-200 hover:shadow-md"
-                >
-                  <td className="py-3 px-4">
-                    <div className="font-medium">{item.title}</div>
-                    <div className="flex gap-1 mt-1">
-                      {item.tags.map(tag => (
-                        <Badge key={tag} variant="outline" className="bg-white/10 text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-sm">{item.sourceEvent}</td>
-                  <td className="py-3 px-4">{item.usageCount}</td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full rounded-full ${
-                            item.successRate > 80 ? 'bg-emerald-500' : 
-                            item.successRate > 60 ? 'bg-amber-500' : 'bg-rose-500'
-                          }`}
-                          style={{ width: `${item.successRate}%` }}
-                        />
+        <Collapsible open={!isCollapsed}>
+          <CollapsibleContent>
+            <GlassCardContent className={isExpanded ? 'h-[calc(100vh-160px)]' : ''}>
+              {/* Header with Search and Filters */}
+              <div className="flex flex-wrap gap-4 mb-4">
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder={t('searchLibraryPlaceholder')}
+                    className="pl-9 bg-white/5 border-white/10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                
+                <div className="flex gap-2">
+                  <Select>
+                    <SelectTrigger className="w-[150px] bg-white/5 border-white/10">
+                      <div className="flex items-center gap-2">
+                        <Tag size={14} />
+                        <SelectValue placeholder={t('filterByTag')} />
                       </div>
-                      <span className="text-xs">{item.successRate}%</span>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="sm" className="h-8 gap-1">
-                        <span>{t('trace')}</span>
-                        <ArrowRight size={14} />
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 gap-1">
-                        <span>{t('promote')}</span>
-                        <ArrowRight size={14} />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </GlassCardContent>
-    </GlassCard>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableTags.map(tag => (
+                        <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select>
+                    <SelectTrigger className="w-[150px] bg-white/5 border-white/10">
+                      <div className="flex items-center gap-2">
+                        <Calendar size={14} />
+                        <SelectValue placeholder={t('dateRange')} />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="week">{t('lastWeek')}</SelectItem>
+                      <SelectItem value="month">{t('lastMonth')}</SelectItem>
+                      <SelectItem value="quarter">{t('lastQuarter')}</SelectItem>
+                      <SelectItem value="year">{t('lastYear')}</SelectItem>
+                      <SelectItem value="custom">{t('custom')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              {/* Results List */}
+              <div className={`overflow-auto ${isExpanded ? 'max-h-[calc(100vh-240px)]' : 'max-h-[calc(35vh-160px)]'}`}>
+                <table className="w-full">
+                  <thead className="text-left text-xs border-b border-white/10">
+                    <tr>
+                      <th className="py-3 px-4">{t('title')}</th>
+                      <th className="py-3 px-4">{t('sourceEvent')}</th>
+                      <th className="py-3 px-4">{t('usageCount')}</th>
+                      <th className="py-3 px-4">{t('successRate')}</th>
+                      <th className="py-3 px-4"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {libraryItems.map((item) => (
+                      <tr 
+                        key={item.id} 
+                        className="group border-b border-white/5 hover:bg-white/5 transition-all duration-200 hover:shadow-md"
+                      >
+                        <td className="py-3 px-4">
+                          <div className="font-medium">{item.title}</div>
+                          <div className="flex gap-1 mt-1">
+                            {item.tags.map(tag => (
+                              <Badge key={tag} variant="outline" className="bg-white/10 text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{item.sourceEvent}</td>
+                        <td className="py-3 px-4">{item.usageCount}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full rounded-full ${
+                                  item.successRate > 80 ? 'bg-emerald-500' : 
+                                  item.successRate > 60 ? 'bg-amber-500' : 'bg-rose-500'
+                                }`}
+                                style={{ width: `${item.successRate}%` }}
+                              />
+                            </div>
+                            <span className="text-xs">{item.successRate}%</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="sm" className="h-8 gap-1">
+                              <span>{t('trace')}</span>
+                              <ArrowRight size={14} />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 gap-1">
+                              <span>{t('promote')}</span>
+                              <ArrowRight size={14} />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </GlassCardContent>
+          </CollapsibleContent>
+        </Collapsible>
+      </GlassCard>
+    </motion.div>
   );
 };
