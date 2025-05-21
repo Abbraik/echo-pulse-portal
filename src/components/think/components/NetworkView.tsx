@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import CytoScape from 'react-cytoscapejs';
 import { Actor } from '../types/sna-types';
@@ -16,23 +17,28 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
 
   // Convert nodes and edges to cytoscape format
   const cytoElements = [
-    ...nodes.map(node => ({
-      data: {
-        id: node.id,
-        label: node.label,
-        type: node.type,
-        color: node.color || getNodeColor(node.type),
-        degree: node.degree,
-        betweenness: node.betweenness,
-        closeness: node.closeness
-      },
-      position: {
-        x: Math.random() * 500, // Random initial position if no position exists
-        y: Math.random() * 400
-      },
-      // Add classes for selection and grabbing
-      classes: []
-    })),
+    ...nodes.map(node => {
+      // Determine position - either use existing position or calculate in a grid/circle
+      const position = node.position || calculateNodePosition(node.id, nodes.length);
+      
+      return {
+        data: {
+          id: node.id,
+          label: node.label,
+          type: node.type,
+          color: node.color || getNodeColor(node.type),
+          degree: node.degree,
+          betweenness: node.betweenness,
+          closeness: node.closeness,
+          // Store position data to maintain consistency
+          positionX: position.x,
+          positionY: position.y
+        },
+        position: position,
+        // Add classes for selection and grabbing
+        classes: []
+      };
+    }),
     ...edges.map((edge, index) => ({
       data: {
         id: `e${index}`,
@@ -57,31 +63,48 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         return '#64748b'; // slate-500
     }
   }
+  
+  // Calculate a deterministic position for a node based on its index
+  function calculateNodePosition(id: string, totalNodes: number) {
+    // Use the node id's character codes to create a deterministic position
+    // This ensures nodes will always be positioned the same way
+    let idSum = 0;
+    for (let i = 0; i < id.length; i++) {
+      idSum += id.charCodeAt(i);
+    }
+    
+    // Create a circular layout
+    const radius = 150;
+    const index = idSum % totalNodes; // Get a consistent index
+    const angleStep = (2 * Math.PI) / totalNodes;
+    const angle = index * angleStep;
+    
+    return {
+      x: Math.cos(angle) * radius + 250, // Center x = 250
+      y: Math.sin(angle) * radius + 200  // Center y = 200
+    };
+  }
 
   const cytoStyle = [
     {
       selector: 'node',
       style: {
-        'width': 'mapData(degree, 1, 10, 30, 64)', // Min 24px, max 64px as requested
-        'height': 'mapData(degree, 1, 10, 30, 64)',
-        'background-color': isDarkMode ? 'rgba(42, 42, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)',
-        'background-opacity': 0.5,
+        'width': 'mapData(degree, 1, 10, 30, 60)', // Slightly reduced size range for less chaos
+        'height': 'mapData(degree, 1, 10, 30, 60)',
+        'background-color': isDarkMode ? 'rgba(42, 42, 42, 0.7)' : 'rgba(255, 255, 255, 0.7)',
+        'background-opacity': 0.7,
         'background-blur': '8px',
-        'shape': 'ellipse', // Perfect circle as requested
+        'shape': 'ellipse',
         'border-width': '2px',
         'border-color': 'data(color)',
         'border-opacity': 0.9,
-        'ghost': 'yes',
-        'ghost-opacity': 0.2,
-        'ghost-offset-x': 0,
-        'ghost-offset-y': 2,
         'box-shadow': '0px 4px 8px rgba(0, 0, 0, 0.1)',
         'label': 'data(label)',
         'color': isDarkMode ? '#F5F7FA' : '#1E1E1E',
         'text-valign': 'center',
         'text-halign': 'center',
         'text-wrap': 'wrap',
-        'text-max-width': '70px',
+        'text-max-width': '80px',
         'font-size': '11px',
         'font-family': 'Inter, Noto Sans, sans-serif',
         'font-weight': 500,
@@ -103,12 +126,10 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
     {
       selector: 'edge',
       style: {
-        'width': 'mapData(weight, 0, 1, 6, 12)', // Edge width proportional to weight, 6-12px
-        'line-color': 'rgba(203, 213, 225, 0.3)', 
+        'width': 'mapData(weight, 0, 1, 2, 6)', // Thinner edges for less visual chaos
+        'line-color': 'rgba(203, 213, 225, 0.5)', 
         'curve-style': 'bezier',
-        'line-gradient-stop-colors': ['#3b82f6', '#14b8a6', '#3b82f6'], // Electric Blue → Teal → Electric Blue
-        'line-gradient-stop-positions': [0, 50, 100],
-        'opacity': 0.7,
+        'opacity': 0.6,
         'overlay-color': 'rgba(203, 213, 225, 0.7)',
         'overlay-opacity': 0.1
       }
@@ -117,7 +138,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       selector: 'edge:hover',
       style: {
         'width': function(ele: any) {
-          return Math.min(ele.data('weight') * 10 + 6, 14);
+          return Math.min(ele.data('weight') * 8 + 2, 8); // More moderate hover effect
         },
         'opacity': 1,
         'overlay-opacity': 0.2
@@ -131,22 +152,12 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
           return ele.data('color');
         },
         'border-opacity': 1,
-        'background-opacity': 0.7,
+        'background-opacity': 0.8,
         'overlay-opacity': 0.3,
         'overlay-color': function(ele: any) {
           return ele.data('color');
         },
         'box-shadow': '0px 6px 10px rgba(0, 0, 0, 0.2)'
-      }
-    },
-    {
-      selector: '.pulse',
-      style: {
-        'width': 6,
-        'height': 6,
-        'background-color': '#FFFFFF',
-        'border-width': 0,
-        'opacity': 0.8
       }
     }
   ];
@@ -156,17 +167,12 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
     onNodeClick(nodeId);
   };
 
-  // Disable all automatic layout forces
+  // Use a more static layout with reduced forces for stability
   const cytoOptions = {
     layout: {
-      name: 'preset',
-      fit: false,
-      padding: 30,
-      animate: false,
-      positions: function(node: any) {
-        // Use the exact positions from node data
-        return { x: node.position().x, y: node.position().y };
-      }
+      name: 'preset', // Use preset layout to maintain positions
+      fit: true,
+      padding: 30
     }
   };
 
@@ -181,7 +187,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       cy.on('mouseover', 'node', function(e: any) {
         e.target.animate({
           style: { 'border-width': '3px', 'border-opacity': 1, 'overlay-opacity': 0.1 },
-          duration: 200
+          duration: 150
         });
       });
       
@@ -189,7 +195,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         if (!e.target.selected()) {
           e.target.animate({
             style: { 'border-width': '2px', 'border-opacity': 0.9, 'overlay-opacity': 0 },
-            duration: 200
+            duration: 150
           });
         }
       });
@@ -198,62 +204,46 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       cy.on('mouseover', 'edge', function(e: any) {
         e.target.animate({
           style: { 'opacity': 1, 'overlay-opacity': 0.2 },
-          duration: 200
+          duration: 150
         });
       });
       
       cy.on('mouseout', 'edge', function(e: any) {
         e.target.animate({
-          style: { 'opacity': 0.7, 'overlay-opacity': 0.1 },
-          duration: 200
+          style: { 'opacity': 0.6, 'overlay-opacity': 0.1 },
+          duration: 150
         });
       });
 
-      // Setup flow pulses on edges
-      const setupEdgePulses = () => {
-        cy.edges().forEach((edge) => {
-          const source = edge.source();
-          const target = edge.target();
-          
-          setInterval(() => {
-            if (!cy || cy.destroyed()) return;
-            
-            const pulseDot = cy.add({
-              group: 'nodes',
-              data: { id: `pulse-${Date.now()}-${Math.random()}` },
-              position: source.position(),
-              classes: 'pulse'
-            });
-            
-            pulseDot.animate({
-              position: target.position(),
-              style: { 'opacity': 0 },
-              duration: 1000,
-              easing: 'ease-in-out',
-              complete: function() {
-                if (!cy || cy.destroyed()) return;
-                cy.remove(pulseDot);
-              }
-            });
-          }, 3000);
-        });
-      };
-      
-      // Start pulse animations
-      setupEdgePulses();
+      // Removed the flow pulses on edges which were causing visual chaos
 
       // This is crucial: save positions after node movement
       cy.on('dragfree', 'node', function(e: any) {
         const node = e.target;
         // Update the node's position data to maintain its position
-        node.data('position', { x: node.position().x, y: node.position().y });
+        node.data('positionX', node.position().x);
+        node.data('positionY', node.position().y);
       });
       
-      // Disable any automatic layout forces
+      // Configure user interaction
       cy.userZoomingEnabled(true);
       cy.userPanningEnabled(true);
-      cy.autoungrabify(false);
-      // Removed: cy.autopanOnDrag(true) - This function doesn't exist in the current Cytoscape version
+      cy.autoungrabify(false); // Allow nodes to be grabbed
+      cy.autounselectify(false); // Allow nodes to be selected
+      
+      // Add resistance to node movements to make dragging feel more stable
+      cy.nodes().on('drag', function() {
+        const draggedNode = this;
+        // Add damping/resistance factor to make movement more controlled
+        const dampingFactor = 0.8;
+        const dx = (draggedNode.position().x - draggedNode.data('positionX')) * dampingFactor;
+        const dy = (draggedNode.position().y - draggedNode.data('positionY')) * dampingFactor;
+        
+        draggedNode.position({
+          x: draggedNode.data('positionX') + dx,
+          y: draggedNode.data('positionY') + dy
+        });
+      });
 
       return () => {
         cy.removeListener('tap');
@@ -262,7 +252,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         cy.removeListener('dragfree');
       };
     }
-  }, []);
+  }, [onNodeClick]);
 
   return (
     <div className="w-full h-full">
@@ -272,17 +262,27 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         stylesheet={cytoStyle}
         cy={(cy) => {
           cyRef.current = cy;
+          
+          // Configure the initial rendering
           cy.on('tap', 'node', handleCyNodeClick);
           
-          // Completely disable auto layout
+          // Use preset layout to maintain node positions
           cy.layout({
             name: 'preset',
-            fit: false,
-            animate: false
+            fit: true,
+            padding: 30,
+            animate: false,
           }).run();
           
-          // Set nodes to be draggable
+          // Make nodes draggable
           cy.nodes().grabify();
+          
+          // Fit the view to the elements with some padding
+          cy.fit(undefined, 40);
+          
+          // Limit the zoom level to prevent extreme zooming
+          cy.minZoom(0.5);
+          cy.maxZoom(2.5);
         }}
         userZoomingEnabled={true}
         userPanningEnabled={true}

@@ -7,19 +7,29 @@ import { SNAData as SNADataFromSystemFraming, Node, Edge } from '../types/system
  */
 export const adaptSNADataToSystemFraming = (snaData: SNADataFromSNATypes): SNADataFromSystemFraming => {
   // Convert Actor[] to Node[]
-  const nodes: Node[] = snaData.nodes.map(actor => ({
-    id: actor.id,
-    label: actor.label,
-    // Map the government/private/ngo/academic type to stock/subIndicator/auxiliary
-    // Using 'stock' as the default type
-    type: 'stock' as const,
-    // Set color from the actor or generate based on type
-    color: actor.color || getColorForActorType(actor.type),
-    // Add additional properties that Node requires
-    size: actor.degree * 10, // Scale the size based on degree
-    position: { x: Math.random() * 500, y: Math.random() * 400 },
-    subIndicators: []
-  }));
+  const nodes: Node[] = snaData.nodes.map((actor, index) => {
+    // Calculate deterministic positions in a circular layout
+    // This creates a more stable, less chaotic initial positioning
+    const angleStep = (2 * Math.PI) / snaData.nodes.length;
+    const radius = 180; // Fixed radius for the circle
+    const angle = index * angleStep;
+    const x = Math.cos(angle) * radius + 250; // Center x = 250
+    const y = Math.sin(angle) * radius + 200; // Center y = 200
+    
+    return {
+      id: actor.id,
+      label: actor.label,
+      // Map the government/private/ngo/academic type to stock/subIndicator/auxiliary
+      // Using 'stock' as the default type
+      type: 'stock' as const,
+      // Set color from the actor or generate based on type
+      color: actor.color || getColorForActorType(actor.type),
+      // Add additional properties that Node requires
+      size: 30 + (actor.degree * 5), // Scale the size based on degree, but more moderately
+      position: { x, y }, // Use deterministic positions instead of random
+      subIndicators: []
+    };
+  });
 
   // Convert Connection[] to Edge[]
   const edges: Edge[] = snaData.edges.map((connection, index) => ({
