@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -66,7 +65,7 @@ interface ExecutionImpact {
 interface StrategyBuilderProps {
   sensitivityParameters: SensitivityParameter[];
   executionImpact: ExecutionImpact;
-  onCompute: (approach: string) => void;
+  onCompute: (approach: string, objectiveIds?: number[]) => void;
 }
 
 type Approach = 'conservative' | 'balanced' | 'aggressive';
@@ -341,11 +340,13 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
 
   const handleObjectiveToggle = (objectiveId: number) => {
     setSelectedObjectives(prev => {
-      if (prev.includes(objectiveId)) {
-        return prev.filter(id => id !== objectiveId);
-      } else {
-        return [...prev, objectiveId];
-      }
+      const updated = prev.includes(objectiveId)
+        ? prev.filter(id => id !== objectiveId)
+        : [...prev, objectiveId];
+      
+      // Notify parent about objective change
+      onCompute(selectedApproach, updated);
+      return updated;
     });
   };
   
@@ -356,11 +357,14 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       id: newId
     };
     
-    setObjectives([...objectives, objectiveToAdd]);
-    setSelectedObjectives([...selectedObjectives, newId]);
+    const updatedObjectives = [...objectives, objectiveToAdd];
+    const updatedSelectedObjectives = [...selectedObjectives, newId];
     
-    // Notify parent about new pathway detection needs
-    onCompute(selectedApproach);
+    setObjectives(updatedObjectives);
+    setSelectedObjectives(updatedSelectedObjectives);
+    
+    // Notify parent about new objective
+    onCompute(selectedApproach, updatedSelectedObjectives);
   };
   
   const handleCreateBundle = () => {
@@ -502,9 +506,9 @@ const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       setSelectedLeveragePoints(newLeveragePoints);
       
       // Notify the parent component about the approach change and currently selected objectives
-      onCompute(selectedApproach);
+      onCompute(selectedApproach, selectedObjectives);
     }
-  }, [selectedApproach, selectedObjectives]);
+  }, [selectedApproach]);
   
   return (
     <div className="space-y-6">

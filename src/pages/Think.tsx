@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Layout, Layers, Network, BarChart3, ArrowRight, GitBranch } from 'lucide-react';
@@ -284,9 +283,10 @@ const ThinkPage: React.FC = () => {
   
   // Handle approach and objective changes - update pathways based on selected approach
   useEffect(() => {
-    // Filter and prioritize pathways based on:
-    // 1. Selected objectives (by showing related ones first)
-    // 2. Selected approach (conservative shows fewer, aggressive shows more)
+    console.log("Effect triggered: Objectives or approach changed", { 
+      selectedObjectives, 
+      activeApproach 
+    });
     
     // Step 1: Filter pathways related to selected objectives
     let relevantPathways = allMockPathways.filter(pathway => {
@@ -305,6 +305,8 @@ const ThinkPage: React.FC = () => {
         
       return isRelatedToSelectedObjective || isGenerallyRelevant;
     });
+    
+    console.log("Filtered pathways after objective check:", relevantPathways);
     
     // Step 2: Sort by impact and then by relation to selected objectives
     relevantPathways.sort((a, b) => {
@@ -333,6 +335,7 @@ const ThinkPage: React.FC = () => {
       filteredPathways = relevantPathways.slice(0, 6);
     }
     
+    console.log("Final filtered pathways:", filteredPathways);
     setPathways(filteredPathways);
   }, [activeApproach, selectedObjectives]);
   
@@ -353,6 +356,8 @@ const ThinkPage: React.FC = () => {
   
   // Handle updates from the strategy builder
   const handleStrategyBuilderCompute = (approach: string, objectiveIds?: number[]) => {
+    console.log("Strategy builder computed with:", { approach, objectiveIds });
+    
     // Update approach
     setActiveApproach(approach as 'conservative' | 'balanced' | 'aggressive');
     
@@ -429,13 +434,7 @@ const ThinkPage: React.FC = () => {
           <StrategyBuilder 
             sensitivityParameters={mockSensitivity} 
             executionImpact={mockExecutionImpact}
-            onCompute={(approach) => {
-              handleApproachChange(approach as 'conservative' | 'balanced' | 'aggressive');
-              toast({
-                title: t("approachSelected", { approach }),
-                duration: 3000,
-              });
-            }}
+            onCompute={handleStrategyBuilderCompute}
           />
           
           {/* SNA-Driven Execution Pathways */}
