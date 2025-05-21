@@ -35,6 +35,7 @@ export interface ExecutionPathway {
   actors: string[];
   coordinationTime: number;
   impact: number;
+  relatedObjectives: number[]; // Added missing property for objectives relationship
 }
 
 export interface ActorInfluence {
