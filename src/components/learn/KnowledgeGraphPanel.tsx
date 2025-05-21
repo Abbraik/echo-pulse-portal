@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { GlassCard, GlassCardHeader, GlassCardTitle, GlassCardContent } from '@/components/ui/glass-card';
@@ -86,21 +85,21 @@ export const KnowledgeGraphPanel: React.FC = () => {
       className={`transition-all duration-300 ease-in-out ${isExpanded ? 'fixed inset-0 z-50 p-4' : ''}`}
     >
       <GlassCard className={`overflow-hidden h-full ${isExpanded ? 'h-full' : ''}`}>
-        <GlassCardHeader className="pb-4 flex justify-between items-center">
-          <GlassCardTitle gradient>{t('knowledgeGraphDiagnostics')}</GlassCardTitle>
-          <div className="flex gap-2">
-            <CollapsibleTrigger asChild onClick={toggleCollapse}>
-              <Button variant="ghost" size="icon">
-                {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-              </Button>
-            </CollapsibleTrigger>
-            <Button variant="ghost" size="icon" onClick={toggleExpand}>
-              {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-            </Button>
-          </div>
-        </GlassCardHeader>
-        
         <Collapsible open={!isCollapsed}>
+          <GlassCardHeader className="pb-4 flex justify-between items-center">
+            <GlassCardTitle gradient>{t('knowledgeGraphDiagnostics')}</GlassCardTitle>
+            <div className="flex gap-2">
+              <CollapsibleTrigger asChild onClick={toggleCollapse}>
+                <Button variant="ghost" size="icon">
+                  {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                </Button>
+              </CollapsibleTrigger>
+              <Button variant="ghost" size="icon" onClick={toggleExpand}>
+                {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              </Button>
+            </div>
+          </GlassCardHeader>
+          
           <CollapsibleContent>
             <GlassCardContent className={`${isExpanded ? 'h-[calc(100vh-160px)]' : 'h-[calc(100%-84px)]'}`}>
               <div className="flex h-full">

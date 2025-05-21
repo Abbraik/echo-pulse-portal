@@ -43,23 +43,23 @@ const Learn: React.FC = () => {
       </header>
       
       <div className="space-y-8 pb-20">
-        {/* Smart Library Panel - 35% viewport height */}
+        {/* Smart Library Panel */}
         <section className="h-auto mb-8">
           <SmartLibraryPanel />
         </section>
         
-        {/* Knowledge Graph Diagnostics Panel - 35% viewport height */}
+        {/* Knowledge Graph Diagnostics Panel */}
         <section className="h-auto mb-8">
           <KnowledgeGraphPanel />
         </section>
         
-        {/* Insight Review Panel - 25% viewport height */}
+        {/* Insight Review Panel */}
         <section className="h-auto">
           <InsightReviewPanel />
         </section>
       </div>
       
-      {/* Top Lessons to Prototype - 5% viewport height (Footer) */}
+      {/* Top Lessons to Prototype - Fixed Footer */}
       <div className="fixed bottom-0 left-0 right-0 p-4 h-[5vh] flex justify-center">
         <TopLessonsFooter />
       </div>
