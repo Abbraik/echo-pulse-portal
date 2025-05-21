@@ -57,11 +57,13 @@ export const PatternIntelligenceLayer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-3">{t('patternSheet')}</h3>
             
             <div className="flex items-center mb-3 space-x-2">
-              <Input 
-                className="flex-1 bg-white/5 border border-white/10" 
-                placeholder={t('searchPatterns')}
-                startIcon={<Search className="h-4 w-4" />}
-              />
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  className="flex-1 bg-white/5 border border-white/10 pl-9" 
+                  placeholder={t('searchPatterns')}
+                />
+              </div>
               
               <Select>
                 <SelectTrigger className="w-[180px] bg-white/5 border border-white/10">

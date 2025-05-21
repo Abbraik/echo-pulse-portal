@@ -1,3 +1,4 @@
+
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -327,11 +328,9 @@ const en = {
   "toggleSimulation": "Toggle Simulation",
   "viewBundleGenetics": "View Bundle Genetics",
   "causalInsights": "Causal Insights",
-  "confidence": "Confidence",
   "explore": "Explore",
   "bundleEffectiveness": "Bundle Effectiveness",
   "component": "Component",
-  "target": "Target",
   "actual": "Actual",
   "variance": "Variance",
   "fatigueAlerts": "Fatigue Alerts",
