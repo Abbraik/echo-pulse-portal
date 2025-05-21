@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Layout, Layers, Network, BarChart3, ArrowRight, GitBranch } from 'lucide-react';
@@ -14,6 +13,7 @@ import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { motion } from 'framer-motion';
 import { SNAData, ExecutionPathway } from '@/components/think/types/sna-types';
+import { adaptSNADataToSystemFraming } from '@/components/think/utils/sna-adapter';
 
 // Mock data for DEI metrics and scenarios
 const mockDEIMetrics = { 
@@ -314,7 +314,10 @@ const ThinkPage: React.FC = () => {
             <Layout className="mr-2" size={20} />
             {t("systemFramingStudio")}
           </h2>
-          <SystemFramingStudio cldData={mockCldData} snaData={mockSnaData} />
+          <SystemFramingStudio 
+            cldData={mockCldData} 
+            snaData={adaptSNADataToSystemFraming(mockSnaData)} 
+          />
         </GlassCard>
         
         {/* DEI & Foresight Hub (Full Width) */}
