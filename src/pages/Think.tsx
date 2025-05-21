@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Layout, Layers, Network, BarChart3, ArrowRight } from 'lucide-react';
+import { Layout, Layers, Network, BarChart3, ArrowRight, GitBranch } from 'lucide-react';
 import SystemFramingStudio from '@/components/think/SystemFramingStudio';
-import OverallDeiIndicator from '@/components/think/OverallDeiIndicator';
-import PillarBreakouts from '@/components/think/PillarBreakouts';
-import StrategyBuilder from '@/components/think/StrategyBuilder';
-import SimulationLab from '@/components/think/SimulationLab';
 import AiAdvisorSidebar from '@/components/think/AiAdvisorSidebar';
 import FooterCTA from '@/components/think/FooterCTA';
+import DeiAndForesightHub from '@/components/think/DeiAndForesightHub';
+import SnaAnalysisPanel from '@/components/think/SnaAnalysisPanel';
+import StrategyBuilder from '@/components/think/StrategyBuilder';
+import ExecutionPathwayPanel from '@/components/think/ExecutionPathwayPanel';
 import { GlassCard } from '@/components/ui/glass-card';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { motion } from 'framer-motion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import DeiForesightTab from '@/components/think/DeiForesightTab';
+import { SNAData, ExecutionPathway } from '@/components/think/types/sna-types';
 
 // Mock data for DEI metrics and scenarios
 const mockDEIMetrics = { 
@@ -69,10 +69,66 @@ const mockCldData = {
   edges: []
 };
 
-const mockSnaData = {
-  nodes: [],
-  edges: []
+// Mock SNA data
+const mockSnaData: SNAData = {
+  nodes: [
+    { id: 'MOE', type: 'government', label: 'Ministry of Economy', degree: 8, betweenness: 0.4, closeness: 0.8 },
+    { id: 'MOF', type: 'government', label: 'Ministry of Finance', degree: 7, betweenness: 0.35, closeness: 0.75 },
+    { id: 'ADNOC', type: 'private', label: 'ADNOC', degree: 6, betweenness: 0.3, closeness: 0.7 },
+    { id: 'EAD', type: 'ngo', label: 'Environment Agency', degree: 5, betweenness: 0.25, closeness: 0.65 },
+    { id: 'UAEU', type: 'academic', label: 'UAE University', degree: 4, betweenness: 0.2, closeness: 0.6 },
+    { id: 'DMT', type: 'government', label: 'Dept. of Transport', degree: 3, betweenness: 0.15, closeness: 0.55 },
+    { id: 'EDB', type: 'private', label: 'Emirates Dev. Bank', degree: 5, betweenness: 0.28, closeness: 0.68 },
+    { id: 'RTA', type: 'government', label: 'Roads Authority', degree: 4, betweenness: 0.22, closeness: 0.63 },
+  ],
+  edges: [
+    { source: 'MOE', target: 'MOF', weight: 0.9 },
+    { source: 'MOE', target: 'ADNOC', weight: 0.7 },
+    { source: 'MOE', target: 'EAD', weight: 0.5 },
+    { source: 'MOF', target: 'EDB', weight: 0.8 },
+    { source: 'ADNOC', target: 'EAD', weight: 0.6 },
+    { source: 'EAD', target: 'UAEU', weight: 0.4 },
+    { source: 'UAEU', target: 'DMT', weight: 0.3 },
+    { source: 'DMT', target: 'RTA', weight: 0.9 },
+    { source: 'EDB', target: 'ADNOC', weight: 0.5 },
+    { source: 'RTA', target: 'MOE', weight: 0.4 },
+    { source: 'MOF', target: 'DMT', weight: 0.6 },
+  ],
+  metrics: {
+    density: 0.42,
+    avgClustering: 0.38,
+    avgPathLength: 2.1,
+    centralization: 0.52
+  }
 };
+
+// Mock execution pathways
+const mockPathways: ExecutionPathway[] = [
+  {
+    id: 'path1',
+    title: 'Energy Policy Reform',
+    description: 'Coordinate across agencies to reform energy subsidy structure',
+    actors: ['MOF', 'ADNOC', 'EAD'],
+    coordinationTime: 8,
+    impact: 4.2
+  },
+  {
+    id: 'path2',
+    title: 'Environmental Standards',
+    description: 'Establish integrated environmental standards across sectors',
+    actors: ['EAD', 'UAEU', 'MOE'],
+    coordinationTime: 6,
+    impact: 3.8
+  },
+  {
+    id: 'path3',
+    title: 'Transportation Initiative',
+    description: 'Develop sustainable transportation initiative with key stakeholders',
+    actors: ['DMT', 'RTA', 'EAD'],
+    coordinationTime: 12,
+    impact: 5.1
+  }
+];
 
 // Initial mockScenarios - moved from DeiForesightTab to be shared
 const mockScenarios = [
@@ -99,9 +155,14 @@ const ThinkPage: React.FC = () => {
   const [hideHeader, setHideHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { t, isRTL } = useTranslation();
-  const [activeTab, setActiveTab] = useState("simulation");
   const [scenarios, setScenarios] = useState(mockScenarios);
   const [currentMetrics, setCurrentMetrics] = useState(mockDEIMetrics);
+  const [highlightedActors, setHighlightedActors] = useState<string[]>([]);
+  const [activeApproach, setActiveApproach] = useState<'conservative' | 'balanced' | 'aggressive'>('balanced');
+  const [pathways, setPathways] = useState<ExecutionPathway[]>([]);
+  
+  // Reference for the network visualization
+  const networkRef = useRef<any>(null);
 
   // Handle scroll behavior for header
   useEffect(() => {
@@ -183,6 +244,43 @@ const ThinkPage: React.FC = () => {
       duration: 3000,
     });
   };
+  
+  // Handle highlighting actors in the network
+  const handleHighlightActors = (actorIds: string[]) => {
+    setHighlightedActors(actorIds);
+  };
+  
+  // Handle approach change - update pathways based on selected approach
+  useEffect(() => {
+    // In a real app, we would call an API to get the appropriate pathways
+    // Here we'll just simulate different pathways for each approach
+    let filteredPathways: ExecutionPathway[] = [];
+    
+    if (activeApproach === 'conservative') {
+      filteredPathways = [mockPathways[1]]; // Just the environmental standards pathway
+    } else if (activeApproach === 'balanced') {
+      filteredPathways = [mockPathways[0], mockPathways[1]]; // Energy and environmental pathways
+    } else {
+      filteredPathways = mockPathways; // All pathways
+    }
+    
+    setPathways(filteredPathways);
+  }, [activeApproach]);
+  
+  // Handle adopting a pathway - would typically create a delivery bundle
+  const handleAdoptPathway = (pathway: ExecutionPathway) => {
+    // In a real app, this would create a bundle in the ACT zone
+    toast({
+      title: t("pathwayAdopted"),
+      description: t("redirectToAct"),
+      duration: 3000,
+    });
+  };
+  
+  // Update the approach based on strategy builder selection
+  const handleApproachChange = (approach: 'conservative' | 'balanced' | 'aggressive') => {
+    setActiveApproach(approach);
+  };
 
   return (
     <AnimatedPage>
@@ -219,76 +317,44 @@ const ThinkPage: React.FC = () => {
           <SystemFramingStudio cldData={mockCldData} snaData={mockSnaData} />
         </GlassCard>
         
-        {/* Tabbed Interface for Other Components */}
+        {/* DEI & Foresight Hub (Full Width) */}
+        <DeiAndForesightHub 
+          metrics={currentMetrics}
+          scenarios={scenarios}
+          onSaveScenario={handleSaveScenario}
+          onSelectScenario={handleScenarioSelect}
+        />
+        
+        {/* SNA Analysis Panel (Full Width) */}
+        <SnaAnalysisPanel 
+          snaData={mockSnaData}
+          onHighlightActors={handleHighlightActors}
+        />
+        
+        {/* Strategy Builder with SNA-driven Execution Pathways */}
         <GlassCard className="p-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="mb-4 w-full justify-start">
-              <TabsTrigger value="simulation" className="flex items-center gap-2">
-                <BarChart3 size={16} />
-                <span>{t("simulationLab")}</span>
-              </TabsTrigger>
-              <TabsTrigger value="dei" className="flex items-center gap-2">
-                <Network size={16} />
-                <span>{t("deiHubTitle")}</span>
-              </TabsTrigger>
-              <TabsTrigger value="strategy" className="flex items-center gap-2">
-                <ArrowRight size={16} />
-                <span>{t("strategyBuilder")}</span>
-              </TabsTrigger>
-            </TabsList>
-            
-            {/* Simulation Lab Tab */}
-            <TabsContent value="simulation">
-              <SimulationLab 
-                metrics={currentMetrics} 
-                scenarios={scenarios}
-                onSaveScenario={handleSaveScenario}
-                onSelectScenario={handleScenarioSelect}
-              />
-            </TabsContent>
-            
-            {/* DEI & Foresight Hub Tab */}
-            <TabsContent value="dei">
-              <div className="flex flex-col md:flex-row">
-                {/* Overall DEI Indicator (Central Orb) */}
-                <div className="w-full md:w-1/3 flex justify-center items-center py-6">
-                  <OverallDeiIndicator 
-                    value={currentMetrics.overall} 
-                    minBand={currentMetrics.equilibriumBands.overall.min} 
-                    maxBand={currentMetrics.equilibriumBands.overall.max}
-                    pillars={currentMetrics.pillars}
-                    equilibriumBands={currentMetrics.equilibriumBands}
-                  />
-                </div>
-                
-                {/* Four Pillar Breakouts */}
-                <div className="w-full md:w-2/3">
-                  <PillarBreakouts 
-                    pillars={currentMetrics.pillars} 
-                    equilibriumBands={currentMetrics.equilibriumBands}
-                  />
-                </div>
-              </div>
-              <DeiForesightTab metrics={currentMetrics} scenarios={scenarios} />
-            </TabsContent>
-            
-            {/* Strategy Builder Tab */}
-            <TabsContent value="strategy">
-              <StrategyBuilder 
-                sensitivityParameters={mockSensitivity} 
-                executionImpact={mockExecutionImpact}
-                onCompute={(approach) => {
-                  toast({
-                    title: t("strategyComputeToast", { 
-                      approach, 
-                      impact: mockExecutionImpact.budgetChange / 1000000
-                    }),
-                    duration: 5000,
-                  });
-                }}
-              />
-            </TabsContent>
-          </Tabs>
+          <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
+            <GitBranch className="mr-2" size={20} />
+            {t("strategyBuilder")}
+          </h2>
+          <StrategyBuilder 
+            sensitivityParameters={mockSensitivity} 
+            executionImpact={mockExecutionImpact}
+            onCompute={(approach) => {
+              handleApproachChange(approach as 'conservative' | 'balanced' | 'aggressive');
+              toast({
+                title: t("approachSelected", { approach }),
+                duration: 3000,
+              });
+            }}
+          />
+          
+          {/* SNA-Driven Execution Pathways */}
+          <ExecutionPathwayPanel 
+            pathways={pathways} 
+            onHighlightPathway={handleHighlightActors}
+            onAdoptPathway={handleAdoptPathway}
+          />
         </GlassCard>
         
         {/* AI Advisor (Full-Width) */}

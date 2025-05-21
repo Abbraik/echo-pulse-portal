@@ -27,3 +27,23 @@ export interface SNAData {
   edges: Connection[];
   metrics: SNAMetrics;
 }
+
+export interface ExecutionPathway {
+  id: string;
+  title: string;
+  description: string;
+  actors: string[];
+  coordinationTime: number;
+  impact: number;
+}
+
+export interface ActorInfluence {
+  actorId: string;
+  score: number;
+}
+
+export interface PathwayAnalysis {
+  pathways: ExecutionPathway[];
+  topInfluencers: ActorInfluence[];
+  bottlenecks: ActorInfluence[];
+}
