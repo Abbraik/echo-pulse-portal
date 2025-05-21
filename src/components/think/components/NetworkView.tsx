@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import CytoScape from 'react-cytoscapejs';
 import { Actor } from '../types/sna-types';
@@ -66,7 +65,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
     }
   }
   
-  // Calculate a deterministic position for nodes with layered stacking effect
+  // Calculate a deterministic position for nodes with better spacing to avoid stacking
   function calculateNodePosition(id: string, type: "government" | "private" | "ngo" | "academic") {
     // Use the node id's character codes to create a deterministic position within type groups
     let idSum = 0;
@@ -74,26 +73,26 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       idSum += id.charCodeAt(i);
     }
     
-    // Base positioning adjustments to create a clustered, layered effect by node type
-    let baseX = 250; // Center x
-    let baseY = 200; // Center y
+    // Base positioning adjustments for wider spacing
+    let baseX = 300; // Increased center x
+    let baseY = 250; // Increased center y
     
-    // Organize nodes into distinct clusters by type
+    // Organize nodes into distinct clusters by type with more spacing
     const typeOffsets = {
-      'government': { x: -80, y: -60 },
-      'private': { x: 80, y: -60 },
-      'ngo': { x: -80, y: 60 },
-      'academic': { x: 80, y: 60 },
+      'government': { x: -120, y: -100 },
+      'private': { x: 120, y: -100 },
+      'ngo': { x: -120, y: 100 },
+      'academic': { x: 120, y: 100 },
     };
     
     // Apply basic offset based on node type for clustering
     baseX += typeOffsets[type].x;
     baseY += typeOffsets[type].y;
     
-    // Use idSum to create variance within each cluster (but not too much)
-    // This creates a more organic, stacked appearance within each group
+    // Use idSum to create variance within each cluster (with more spacing)
+    // This prevents nodes from stacking directly on top of each other
     const angleVariance = (idSum % 360) * Math.PI / 180; // Convert to radians
-    const radiusVariance = 20 + (idSum % 30); // Small radius variance 
+    const radiusVariance = 40 + (idSum % 50); // Increased radius variance for better distribution
     
     return {
       x: baseX + Math.cos(angleVariance) * radiusVariance,
@@ -193,13 +192,7 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
       fit: true,
       padding: 30,
       animate: false,
-      animationDuration: 0,
-      stop: function() {
-        // After layout completes, ensure nodes are locked in place
-        if (cyRef.current) {
-          cyRef.current.nodes().lock();
-        }
-      }
+      animationDuration: 0
     }
   };
 
@@ -246,22 +239,30 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
         });
       });
 
-      // Disable drag movement for stability
-      cy.autoungrabify(true); // Prevent nodes from being moved
+      // Enable manual node movement but initially keep them fixed
+      cy.autoungrabify(false); // Allow nodes to be moved manually
 
-      // Configure user interaction - allow pan and zoom only
+      // Configure user interaction - allow pan, zoom and dragging
       cy.userZoomingEnabled(true);
       cy.userPanningEnabled(true);
-      cy.autounselectify(false); // Still allow selection
+      cy.autounselectify(false); // Allow selection
       
       // Set strict zoom limits for stability
       cy.minZoom(0.5);
       cy.maxZoom(2.0);
 
+      // Save node positions after manual movement
+      cy.on('dragfree', 'node', function(e: any) {
+        const node = e.target;
+        node.data('positionX', node.position().x);
+        node.data('positionY', node.position().y);
+      });
+
       return () => {
         cy.removeListener('tap');
         cy.removeListener('mouseover');
         cy.removeListener('mouseout');
+        cy.removeListener('dragfree');
       };
     }
   }, [onNodeClick]);
@@ -286,8 +287,8 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
             animate: false,
           }).run();
           
-          // Lock nodes in position
-          cy.nodes().lock();
+          // Don't lock nodes so they can be manually moved
+          cy.nodes().ungrabify(); // Initially make nodes not draggable
           
           // Fit the view to the elements with some padding
           cy.fit(undefined, 40);
@@ -295,6 +296,11 @@ const NetworkView: React.FC<NetworkViewProps> = ({ nodes, edges, onNodeClick, cy
           // Limit the zoom level to prevent extreme zooming
           cy.minZoom(0.5);
           cy.maxZoom(2.0);
+          
+          // Make nodes manually draggable after a delay
+          setTimeout(() => {
+            cy.nodes().grabify(); // Allow manual movement after initial render
+          }, 500);
         }}
         userZoomingEnabled={true}
         userPanningEnabled={true}
