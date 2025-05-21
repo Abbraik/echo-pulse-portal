@@ -42,7 +42,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
             <BarChart3 size={20} />
           </div>
           <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">
-            {t("deiAndForesightHub")}
+            {t("deiAndForesightHub").toUpperCase()}
           </h2>
         </div>
         
@@ -58,14 +58,14 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
                 className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
               >
                 <Layout className="mr-2 h-4 w-4" />
-                {t("overview")}
+                {t("overview").toUpperCase()}
               </TabsTrigger>
               <TabsTrigger 
                 value="simulation" 
                 className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
               >
                 <BarChart3 className="mr-2 h-4 w-4" />
-                {t("simulation")}
+                {t("simulation").toUpperCase()}
               </TabsTrigger>
             </TabsList>
           </Tabs>

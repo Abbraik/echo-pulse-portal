@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Layout, Layers, Network, BarChart3, ArrowRight, GitBranch } from 'lucide-react';
+import { Layout, Layers, Network, BarChart3, ArrowRight, GitBranch, MessageSquare } from 'lucide-react';
 import SystemFramingStudio from '@/components/think/SystemFramingStudio';
-import AiAdvisorSidebar from '@/components/think/AiAdvisorSidebar';
 import FooterCTA from '@/components/think/FooterCTA';
 import DeiAndForesightHub from '@/components/think/DeiAndForesightHub';
 import SnaAnalysisPanel from '@/components/think/SnaAnalysisPanel';
@@ -14,6 +13,9 @@ import { useTranslation } from '@/hooks/use-translation';
 import { motion } from 'framer-motion';
 import { SNAData, ExecutionPathway } from '@/components/think/types/sna-types';
 import { adaptSNADataToSystemFraming } from '@/components/think/utils/sna-adapter';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import AiAdvisorChat from '@/components/think/AiAdvisorChat';
+import { Button } from '@/components/ui/button';
 
 // Mock data for DEI metrics and scenarios
 const mockDEIMetrics = { 
@@ -191,6 +193,8 @@ const ThinkPage: React.FC = () => {
   const [activeApproach, setActiveApproach] = useState<'conservative' | 'balanced' | 'aggressive'>('balanced');
   const [pathways, setPathways] = useState<ExecutionPathway[]>([]);
   const [selectedObjectives, setSelectedObjectives] = useState<number[]>([1]);
+  const [activeTab, setActiveTab] = useState('framing');
+  const [showAiAdvisor, setShowAiAdvisor] = useState(false);
   
   // Reference for the network visualization
   const networkRef = useRef<any>(null);
@@ -388,7 +392,7 @@ const ThinkPage: React.FC = () => {
               <Layers size={24} />
             </div>
             <div className="text-left">
-              <h1 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">THINK 🔍: {t("strategyZone")}</h1>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">THINK 🔍: {t("strategyZone").toUpperCase()}</h1>
               <p className="text-sm md:text-base text-gray-400">
                 {t("thinkCoreDesc")}
               </p>
@@ -397,62 +401,108 @@ const ThinkPage: React.FC = () => {
         </div>
       </motion.header>
       
-      {/* Main Content Layout */}
-      <div className="flex flex-col gap-6">
-        {/* System Framing Studio (Full Width) */}
-        <GlassCard className="p-6">
+      {/* Main Tabbed Content */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+        <TabsList className="w-full bg-white/5 backdrop-blur-sm rounded-full p-1 mb-6 flex justify-center">
+          <TabsTrigger 
+            value="framing" 
+            className="rounded-full px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
+          >
+            <Layout className="mr-2 h-4 w-4" />
+            {t("systemFraming").toUpperCase()}
+          </TabsTrigger>
+          <TabsTrigger 
+            value="dei" 
+            className="rounded-full px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            {t("deiAndForesight").toUpperCase()}
+          </TabsTrigger>
+          <TabsTrigger 
+            value="sna" 
+            className="rounded-full px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
+          >
+            <Network className="mr-2 h-4 w-4" />
+            {t("snaAnalysis").toUpperCase()}
+          </TabsTrigger>
+          <TabsTrigger 
+            value="strategy" 
+            className="rounded-full px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
+          >
+            <GitBranch className="mr-2 h-4 w-4" />
+            {t("strategyBuilder").toUpperCase()}
+          </TabsTrigger>
+        </TabsList>
+
+        {/* System Framing Studio (Always visible at the top) */}
+        <GlassCard className="p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
             <Layout className="mr-2" size={20} />
-            {t("systemFramingStudio")}
+            {t("systemFramingStudio").toUpperCase()}
           </h2>
           <SystemFramingStudio 
             cldData={mockCldData} 
             snaData={adaptSNADataToSystemFraming(mockSnaData)} 
           />
         </GlassCard>
+
+        {/* DEI & Foresight Hub */}
+        <TabsContent value="dei" className="mt-0">
+          <DeiAndForesightHub 
+            metrics={currentMetrics}
+            scenarios={scenarios}
+            onSaveScenario={handleSaveScenario}
+            onSelectScenario={handleScenarioSelect}
+          />
+        </TabsContent>
         
-        {/* DEI & Foresight Hub (Full Width) */}
-        <DeiAndForesightHub 
-          metrics={currentMetrics}
-          scenarios={scenarios}
-          onSaveScenario={handleSaveScenario}
-          onSelectScenario={handleScenarioSelect}
-        />
-        
-        {/* SNA Analysis Panel (Full Width) */}
-        <SnaAnalysisPanel 
-          snaData={mockSnaData}
-          onHighlightActors={handleHighlightActors}
-        />
+        {/* SNA Analysis Panel */}
+        <TabsContent value="sna" className="mt-0">
+          <SnaAnalysisPanel 
+            snaData={mockSnaData}
+            onHighlightActors={handleHighlightActors}
+          />
+        </TabsContent>
         
         {/* Strategy Builder with SNA-driven Execution Pathways */}
-        <GlassCard className="p-6">
-          <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
-            <GitBranch className="mr-2" size={20} />
-            {t("strategyBuilder")}
-          </h2>
-          <StrategyBuilder 
-            sensitivityParameters={mockSensitivity} 
-            executionImpact={mockExecutionImpact}
-            onCompute={handleStrategyBuilderCompute}
-          />
-          
-          {/* SNA-Driven Execution Pathways */}
-          <ExecutionPathwayPanel 
-            pathways={pathways} 
-            onHighlightPathway={handleHighlightActors}
-            onAdoptPathway={handleAdoptPathway}
-          />
-        </GlassCard>
-        
-        {/* AI Advisor (Full-Width) */}
-        <AiAdvisorSidebar className="glass-panel p-4" />
-      </div>
+        <TabsContent value="strategy" className="mt-0">
+          <GlassCard className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-left flex items-center">
+              <GitBranch className="mr-2" size={20} />
+              {t("strategyBuilder").toUpperCase()}
+            </h2>
+            <StrategyBuilder 
+              sensitivityParameters={mockSensitivity} 
+              executionImpact={mockExecutionImpact}
+              onCompute={handleStrategyBuilderCompute}
+            />
+            
+            {/* SNA-Driven Execution Pathways */}
+            <ExecutionPathwayPanel 
+              pathways={pathways} 
+              onHighlightPathway={handleHighlightActors}
+              onAdoptPathway={handleAdoptPathway}
+            />
+          </GlassCard>
+        </TabsContent>
+      </Tabs>
 
       {/* Footer CTA */}
       <div className="mt-8">
         <FooterCTA />
       </div>
+      
+      {/* AI Advisor Chat Button and Panel */}
+      <div className="fixed left-4 bottom-4 z-50">
+        <Button 
+          onClick={() => setShowAiAdvisor(!showAiAdvisor)} 
+          className={`rounded-full p-3 ${showAiAdvisor ? 'bg-red-500/80 hover:bg-red-600/80' : 'bg-teal-500/80 hover:bg-teal-600/80'}`}
+        >
+          <MessageSquare size={24} />
+        </Button>
+      </div>
+      
+      {showAiAdvisor && <AiAdvisorChat onClose={() => setShowAiAdvisor(false)} />}
     </AnimatedPage>
   );
 };
