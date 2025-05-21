@@ -1,4 +1,3 @@
-
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -298,7 +297,77 @@ const en = {
   "recalibrationNote": "Note: Recalibrations may take 24-48 hours to fully propagate through the system.",
   "recommendationOne": "Consider reviewing the Social Cohesion metrics for optimization opportunities",
   "recommendationTwo": "Water conservation efforts may benefit from targeted community outreach",
-  "recommendationThree": "Economic activity showing promising trends in previously underserved areas"
+  "recommendationThree": "Economic activity showing promising trends in previously underserved areas",
+  
+  // Learn Zone Translations
+  "learnZoneTitle": "LEARN",
+  "reflexiveMemoryTitle": "Reflexive Memory & Diagnostics",
+  "learnZoneDescription": "The LEARN zone ingests monitoring outputs and feeds deep insights into innovation, serving as the reflexive memory layer of the PDS.",
+  "learnZoneSubtitle": "Analyze patterns, diagnose causes, and drive system learning",
+  
+  // Memory & Pattern Intelligence
+  "memoryPatternIntelligence": "Memory & Pattern Intelligence",
+  "patternSheet": "Pattern Sheet",
+  "searchPatterns": "Search patterns...",
+  "filterByDrift": "Filter by drift type",
+  "driftType": "Drift Type",
+  "bundle": "Bundle",
+  "deiThreshold": "DEI Threshold",
+  "reuseIndex": "Reuse Index",
+  "topReusedBundles": "Top Reused Bundles",
+  "viewDetails": "View Details",
+  "delayLog": "Delay Log",
+  "interMinisterialLatency": "Inter-Ministerial Latency",
+  "taggingLayer": "Tagging Layer",
+  "popularCategories": "Popular Categories",
+  
+  // Diagnostic & Causal Analysis
+  "diagnosticCausalAnalysis": "Diagnostic & Causal Analysis",
+  "causalInferenceEngine": "Causal Inference Engine",
+  "toggleSimulation": "Toggle Simulation",
+  "viewBundleGenetics": "View Bundle Genetics",
+  "causalInsights": "Causal Insights",
+  "confidence": "Confidence",
+  "explore": "Explore",
+  "bundleEffectiveness": "Bundle Effectiveness",
+  "component": "Component",
+  "target": "Target",
+  "actual": "Actual",
+  "variance": "Variance",
+  "fatigueAlerts": "Fatigue Alerts",
+  "reconciliationReport": "Reconciliation Report",
+  "forecast": "Forecast",
+  
+  // Human-AI Reflex Integration
+  "humanAiReflexIntegration": "Human-AI Reflex Integration",
+  "collaborativeDriftHub": "Collaborative Drift Hub",
+  "reply": "Reply",
+  "classifyDrift": "Classify Drift Type",
+  "consensus": "Consensus",
+  "policyDrift": "Policy Drift",
+  "resourceDrift": "Resource Drift",
+  "timingDrift": "Timing Drift",
+  "stakeholderDrift": "Stakeholder Drift",
+  "ethicalDriftLog": "Ethical Drift Log",
+  "flagForReview": "Flag for Review",
+  "metaLearningAudit": "Meta-Learning Audit",
+  "reflexHealth": "Reflex Health Score",
+  "goodStanding": "Good Standing",
+  "runAudit": "Run Audit",
+  "lastAudit": "Last Audit",
+  "daysAgo": "days ago",
+  "simulationTraceability": "Simulation Traceability",
+  "viewAll": "View All",
+  "export": "Export",
+  
+  // Learning Flow Diagram
+  "learningFlowDiagram": "Learning Flow Diagram",
+  "signalsIn": "Signals In",
+  "reflexiveMemory": "Reflexive Memory",
+  "systemRedesign": "System Redesign",
+  "monitorToLearn": "Monitoring data feeds into learning processes",
+  "learnToInnovate": "Learning insights drive innovation and system redesign",
+  "directModificationBlocked": "Direct modification of Think and Act zones is blocked to maintain system integrity"
 };
 
 export default en;
