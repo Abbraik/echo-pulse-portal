@@ -1,4 +1,3 @@
-
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -369,7 +368,80 @@ const en = {
   "directModificationBlocked": "Direct modification of Think and Act zones is blocked to maintain system integrity",
   
   // Common strings 
-  "confidence": "Confidence"
+  "confidence": "Confidence",
+  
+  // Innovate Zone
+  innovateZoneTitle: 'INNOVATE',
+  evolutionaryRevolutionaryParadigms: 'Evolutionary ↔ Revolutionary Paradigms',
+  innovateZoneDescription: 'R&D lab for creating and testing policy innovations and systemic paradigm shifts',
+  innovateZoneDesc: 'Design experiments that enhance National Development Index across various timeframes and complexity levels',
+  evolutionarySandbox: 'Evolutionary Sandbox',
+  revolutionarySandbox: 'Revolutionary Sandbox',
+  
+  // Evolutionary Sandbox
+  modelCanvas: 'Model Canvas',
+  dragElementsToCreateModel: 'Drag elements to create your model',
+  addStock: 'Add Stock',
+  addFlow: 'Add Flow',
+  addVariable: 'Add Variable',
+  parameterEditor: 'Parameter Editor',
+  simulatorControls: 'Simulator Controls',
+  impactDashboard: 'Impact Dashboard',
+  intensity: 'Intensity',
+  duration: 'Duration',
+  integration: 'Integration',
+  visualRuleBlocks: 'Visual Rule Blocks',
+  ifDemandIncreases: 'If Demand Increases',
+  thenPriceRises: 'Then Price Rises',
+  byFactorOf: 'By Factor Of',
+  addRuleBlock: 'Add Rule Block',
+  simulationMode: 'Simulation Mode',
+  selectMode: 'Select Mode',
+  singleRun: 'Single Run',
+  batchSweep: 'Batch Sweep',
+  monteCarlo: 'Monte Carlo',
+  timeHorizon: 'Time Horizon',
+  selectTimespan: 'Select Timespan',
+  year: 'Year',
+  years: 'Years',
+  timeStep: 'Time Step',
+  fine: 'Fine',
+  coarse: 'Coarse',
+  runSimulation: 'Run Simulation',
+  batchRun: 'Batch Run',
+  ndiImpact: 'NDI Impact',
+  points: 'points',
+  deiBreakdown: 'DEI Breakdown',
+  diversity: 'Diversity',
+  equity: 'Equity',
+  inclusion: 'Inclusion',
+  pillarBreakdown: 'Pillar Breakdown',
+  pillarVisualizationPlaceholder: 'Pillar Visualization Chart',
+  saveAsPlaybook: 'Save as Playbook',
+  publishToLibrary: 'Publish to Library',
+  
+  // Revolutionary Sandbox
+  systemDynamics: 'System Dynamics',
+  agentBased: 'Agent-Based',
+  econometric: 'Econometric',
+  scenarioFork: 'Scenario Fork',
+  parameterControls: 'Parameter Controls',
+  scenarioVariants: 'Scenario Variants',
+  mergeForks: 'Merge Forks',
+  loadSelected: 'Load Selected',
+  forkSummary: 'Fork Summary',
+  modelParameters: 'Model Parameters',
+  setBaseline: 'Set as Baseline',
+  compare: 'Compare',
+  comparativeChart: 'Comparative Chart',
+  baselineVsForkChart: 'Baseline vs Fork Trajectories',
+  keyMetrics: 'Key Metrics',
+  timeToEquilibrium: 'Time to Equilibrium',
+  bundlesImpacted: 'Bundles Impacted',
+  saveFork: 'Save Fork',
+  promoteToBlueprint: 'Promote to Blueprint',
+  exportForkJSON: 'Export Fork JSON',
+  generateMetaDesignBlueprint: 'Generate Meta-Design Blueprint'
 };
 
 export default en;
