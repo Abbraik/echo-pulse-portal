@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, PlusSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
 
 type ConceptBlock = {
   id: string;
@@ -46,53 +47,58 @@ export const ConceptBlocksPalette: React.FC = () => {
   };
   
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-medium">{t('conceptBlocksPalette')}</h3>
-        <div className="relative w-1/3">
+    <div className="flex flex-col h-full gap-3">
+      {/* Search and filters section */}
+      <div className="flex flex-col gap-2">
+        <div className="relative w-full">
           <Input
             placeholder={t('searchConceptBlocks')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8 h-8"
+            className="pl-8 h-8 bg-black/20 border-white/10"
           />
           <Search className="absolute left-2 top-1.5 h-4 w-4 text-muted-foreground" />
         </div>
+        
+        <div className="flex gap-1.5 flex-wrap">
+          {categories.map(category => (
+            <Badge 
+              key={category}
+              variant={activeCategory === category ? "default" : "outline"}
+              className={`cursor-pointer text-xs ${activeCategory === category ? 'bg-teal-500/30 hover:bg-teal-500/40 text-white' : 'text-muted-foreground'}`}
+              onClick={() => setActiveCategory(activeCategory === category ? null : category)}
+            >
+              {t(getCategoryTranslationKey(category))}
+            </Badge>
+          ))}
+        </div>
       </div>
       
-      <div className="flex gap-2 mb-2 flex-wrap">
-        {categories.map(category => (
-          <Badge 
-            key={category}
-            variant={activeCategory === category ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setActiveCategory(activeCategory === category ? null : category)}
-          >
-            {t(getCategoryTranslationKey(category))}
-          </Badge>
-        ))}
-      </div>
-      
-      <div className="grid grid-cols-4 gap-2 pb-1 overflow-y-auto">
-        {filteredBlocks.map(block => (
-          <div 
+      {/* Concept blocks grid */}
+      <div className="grid grid-cols-2 gap-2 pb-1 overflow-y-auto">
+        {filteredBlocks.map((block, index) => (
+          <motion.div 
             key={block.id} 
-            className="flex flex-col items-center p-2 rounded-2xl bg-white/10 dark:bg-white/5 border 
+            className="flex flex-col items-center p-2 rounded-xl bg-white/10 dark:bg-white/5 border 
                       border-white/20 cursor-move hover:bg-white/20 
                       transition-all hover:scale-[1.03] group"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
             draggable="true"
             title={block.description}
           >
             <div className="text-sm font-medium truncate w-full text-center">{block.name}</div>
             <Badge variant="outline" className="mt-1 text-xs">{t(getCategoryTranslationKey(block.category))}</Badge>
-            <div className="absolute inset-0 rounded-2xl bg-teal-500/0 group-hover:bg-teal-500/5 transition-all"></div>
-          </div>
+            <motion.div 
+              className="absolute inset-0 rounded-xl bg-teal-500/0 group-hover:bg-teal-500/5 transition-all"
+              whileHover={{ 
+                boxShadow: "0 0 15px rgba(20,184,166,0.3)",
+                scale: 1.03
+              }}
+            ></motion.div>
+          </motion.div>
         ))}
-        
-        <Button variant="ghost" className="flex-col h-auto min-w-[80px] border border-dashed border-muted-foreground/30 rounded-2xl hover:shadow-[0_0_10px_rgba(20,184,166,0.3)] hover:border-teal-500/30 transition-all">
-          <PlusSquare className="h-5 w-5 mb-1" />
-          <span className="text-xs">{t('customConcept')}</span>
-        </Button>
       </div>
     </div>
   );

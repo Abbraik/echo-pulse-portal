@@ -11,6 +11,7 @@ import { CLDSketchCanvas } from './revolutionary/CLDSketchCanvas';
 import { RequestSimulationPanel } from './revolutionary/RequestSimulationPanel';
 import { ResultsInnovationTools } from './revolutionary/ResultsInnovationTools';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { motion } from 'framer-motion';
 
 export const RevolutionarySandbox: React.FC = () => {
   const { t } = useTranslation();
@@ -84,42 +85,60 @@ export const RevolutionarySandbox: React.FC = () => {
         </div>
       </div>
       
-      {/* Main content with flex layout to ensure proper spacing */}
-      <div className="flex flex-col flex-1 gap-4 overflow-hidden">
-        {/* Concept Blocks Palette (10% height) */}
-        <div className="h-[10%] min-h-[100px] flex-shrink-0">
-          <GlassCard className="p-3 h-full shadow-[inset_0_0_15px_rgba(20,184,166,0.2)] backdrop-blur-xl">
-            <ScrollArea className="h-full w-full">
+      {/* Two-column layout for main content */}
+      <div className="flex flex-1 gap-4 overflow-hidden">
+        {/* Left Column - Concept Blocks Sidebar (35%) */}
+        <motion.div 
+          className="w-[35%] flex-shrink-0 flex flex-col"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <GlassCard className="flex-1 p-3 h-full shadow-[inset_0_0_15px_rgba(20,184,166,0.2)] backdrop-blur-xl overflow-hidden flex flex-col">
+            <h3 className="text-lg font-semibold mb-3">{t('buildingBlocks')}</h3>
+            <ScrollArea className="flex-1">
               <ConceptBlocksPalette />
             </ScrollArea>
+            <Button className="mt-4 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 transition-all duration-300 shadow-md">
+              <PlusSquare size={16} />
+              {t('createNewConcept')}
+            </Button>
           </GlassCard>
-        </div>
+        </motion.div>
         
-        {/* CLD Sketch Canvas (40% height) */}
-        <div className="h-[40%] min-h-[250px] flex-shrink-0">
-          <GlassCard className="p-3 h-full glass-glow shadow-[inset_0_0_20px_rgba(20,184,166,0.25)]">
-            <CLDSketchCanvas />
-          </GlassCard>
-        </div>
-        
-        {/* Request Simulation Panel (20% height) */}
-        <div className="h-[20%] min-h-[150px] flex-shrink-0">
-          <RequestSimulationPanel 
-            engineMode={engineMode}
-            setEngineMode={setEngineMode}
-            onGenerateSimulation={handleGenerateSimulation}
-            isGenerating={simulationInProgress}
-            isGenerated={simulationGenerated}
-          />
-        </div>
-        
-        {/* Results & Innovation Tools (30% height) */}
-        <div className="h-[30%] min-h-[180px] flex-shrink-0">
-          <ResultsInnovationTools 
-            showResults={simulationGenerated}
-            engine={engineMode}
-          />
-        </div>
+        {/* Right Column - Main Content Area (65%) */}
+        <motion.div 
+          className="w-[65%] flex flex-col gap-4"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          {/* CLD Sketch Canvas (45% height) */}
+          <div className="h-[45%] min-h-[250px]">
+            <GlassCard className="p-3 h-full glass-glow shadow-[inset_0_0_20px_rgba(20,184,166,0.25)]">
+              <CLDSketchCanvas />
+            </GlassCard>
+          </div>
+          
+          {/* Request Simulation Panel (15% height) */}
+          <div className="h-[15%] min-h-[120px]">
+            <RequestSimulationPanel 
+              engineMode={engineMode}
+              setEngineMode={setEngineMode}
+              onGenerateSimulation={handleGenerateSimulation}
+              isGenerating={simulationInProgress}
+              isGenerated={simulationGenerated}
+            />
+          </div>
+          
+          {/* Results & Innovation Tools (40% height) - Now using tabs */}
+          <div className="h-[40%] min-h-[200px]">
+            <ResultsInnovationTools 
+              showResults={simulationGenerated}
+              engine={engineMode}
+            />
+          </div>
+        </motion.div>
       </div>
     </div>
   );
