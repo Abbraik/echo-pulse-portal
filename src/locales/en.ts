@@ -1,4 +1,3 @@
-
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -482,7 +481,7 @@ const en = {
   "analyze": "Analyze",
   "spiderChartPlaceholder": "Spider Chart Visualization",
   "barChartPlaceholder": "Bar Chart Visualization",
-  "equity": "Equity",
+  "equityMetric": "Equity",
   "resilience": "Resilience",
   "sustainability": "Sustainability",
   "cohesion": "Cohesion",
