@@ -9,8 +9,8 @@ import {
 } from 'lucide-react';
 
 type Point = { x: number; y: number };
-type Node = { id: string; type: 'stock' | 'variable'; label: string; position: Point; };
-type Link = { id: string; from: string; to: string; polarity: '+' | '-'; };
+type Node = { id: string; type: 'stock' | 'variable'; label: string; value?: string; unit?: string; position: Point; };
+type Link = { id: string; from: string; to: string; polarity: '+' | '-'; label?: string; };
 
 export const CLDSketchCanvas: React.FC = () => {
   const { t } = useTranslation();
@@ -26,17 +26,18 @@ export const CLDSketchCanvas: React.FC = () => {
   // Add mock data when component mounts
   useEffect(() => {
     const mockNodes: Node[] = [
-      { id: 'node-1', type: 'stock', label: 'Resources', position: { x: 150, y: 150 } },
-      { id: 'node-2', type: 'variable', label: 'Consumption', position: { x: 300, y: 100 } },
-      { id: 'node-3', type: 'variable', label: 'Recycling', position: { x: 300, y: 200 } },
-      { id: 'node-4', type: 'stock', label: 'Waste', position: { x: 450, y: 150 } }
+      { id: 'population', type: 'stock', label: 'Population', value: '500', unit: 'k', position: { x: 150, y: 150 } },
+      { id: 'wellbeing', type: 'stock', label: 'Well-Being Index', value: '72', position: { x: 350, y: 100 } },
+      { id: 'tax', type: 'variable', label: 'Resource Tax', value: '30', unit: '%', position: { x: 250, y: 250 } },
+      { id: 'trust', type: 'variable', label: 'Trust', position: { x: 450, y: 200 } },
+      { id: 'adoption', type: 'variable', label: 'Adoption', position: { x: 550, y: 150 } }
     ];
     
     const mockLinks: Link[] = [
-      { id: 'link-1', from: 'node-1', to: 'node-2', polarity: '-' as const },
-      { id: 'link-2', from: 'node-2', to: 'node-4', polarity: '+' as const },
-      { id: 'link-3', from: 'node-4', to: 'node-3', polarity: '+' as const },
-      { id: 'link-4', from: 'node-3', to: 'node-1', polarity: '+' as const }
+      { id: 'service-trust', from: 'population', to: 'trust', polarity: '+', label: 'Service Provision' },
+      { id: 'tax-wellbeing', from: 'tax', to: 'wellbeing', polarity: '-' },
+      { id: 'trust-adoption', from: 'trust', to: 'adoption', polarity: '+' },
+      { id: 'adoption-trust', from: 'adoption', to: 'trust', polarity: '+' }
     ];
     
     setNodes(mockNodes);
@@ -112,7 +113,7 @@ export const CLDSketchCanvas: React.FC = () => {
           id: `link-${Date.now()}`,
           from: linkStart,
           to: nodeId,
-          polarity: '+' as const // Explicitly typed as '+' to satisfy the type constraint
+          polarity: '+' as const
         };
         
         const newLinks = [...links, newLink];
@@ -222,7 +223,7 @@ export const CLDSketchCanvas: React.FC = () => {
               selectedNodeId === node.id ? 'ring-2 ring-teal-500' : ''
             } ${
               linkStart === node.id ? 'ring-2 ring-blue-500 animate-pulse' : ''
-            }`}
+            } hover:shadow-[0_0_10px_rgba(20,184,166,0.5)] transition-all group`}
             style={{ 
               left: node.position.x - (node.type === 'stock' ? 40 : 30),
               top: node.position.y - (node.type === 'stock' ? 25 : 30),
@@ -233,14 +234,25 @@ export const CLDSketchCanvas: React.FC = () => {
             }}
           >
             {node.type === 'stock' ? (
-              <div className="h-[50px] w-[80px] bg-white/20 dark:bg-white/10 border border-white/30 rounded flex items-center justify-center text-sm">
-                {node.label}
+              <div className="h-[50px] w-[80px] bg-white/20 dark:bg-white/10 border border-white/30 rounded flex flex-col items-center justify-center text-sm p-1">
+                <div>{node.label}</div>
+                {node.value && (
+                  <div className="text-xs font-bold text-teal-400">
+                    {node.value} {node.unit || ''}
+                  </div>
+                )}
               </div>
             ) : (
-              <div className="h-[60px] w-[60px] rounded-full bg-white/20 dark:bg-white/10 border border-white/30 flex items-center justify-center text-sm">
-                {node.label}
+              <div className="h-[60px] w-[60px] rounded-full bg-white/20 dark:bg-white/10 border border-white/30 flex flex-col items-center justify-center text-sm p-1">
+                <div>{node.label}</div>
+                {node.value && (
+                  <div className="text-xs font-bold text-blue-400">
+                    {node.value} {node.unit || ''}
+                  </div>
+                )}
               </div>
             )}
+            <div className="absolute inset-0 bg-teal-500/0 group-hover:bg-teal-500/10 rounded-full transition-all duration-300"></div>
           </div>
         ))}
 
@@ -266,6 +278,11 @@ export const CLDSketchCanvas: React.FC = () => {
               const x2 = toNode.position.x;
               const y2 = toNode.position.y;
               
+              // Check if this is part of a feedback loop (simplified detection)
+              const isFeedbackLoop = links.some(l => 
+                l.from === link.to && l.to === link.from
+              );
+              
               return (
                 <g key={link.id}>
                   <line
@@ -275,6 +292,7 @@ export const CLDSketchCanvas: React.FC = () => {
                     y2={y2}
                     stroke="currentColor"
                     strokeWidth="1.5"
+                    className={isFeedbackLoop ? "animate-pulse-subtle" : ""}
                     markerEnd={link.polarity === '+' ? 'url(#arrow-positive)' : 'url(#arrow-negative)'}
                   />
                   {/* Polarity indicators */}
@@ -305,6 +323,43 @@ export const CLDSketchCanvas: React.FC = () => {
                       >−</text>
                     )}
                   </g>
+                  
+                  {/* Link label if available */}
+                  {link.label && (
+                    <g transform={`translate(${(x1 + x2) / 2 - 15}, ${(y1 + y2) / 2 - 15})`}>
+                      <rect
+                        x="-5"
+                        y="-10"
+                        width="70"
+                        height="20"
+                        rx="4"
+                        fill="white"
+                        opacity="0.8"
+                      />
+                      <text
+                        textAnchor="start"
+                        dominantBaseline="central"
+                        fontSize="10"
+                        fill="black"
+                      >
+                        {link.label}
+                      </text>
+                    </g>
+                  )}
+                  
+                  {/* Add "R1" loop annotation */}
+                  {link.from === 'adoption' && link.to === 'trust' && (
+                    <g transform={`translate(${(x1 + x2) / 2 + 20}, ${(y1 + y2) / 2 - 20})`}>
+                      <circle r="15" fill="rgba(20,184,166,0.3)" />
+                      <text
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fontSize="12"
+                        fontWeight="bold"
+                        fill="teal"
+                      >R1</text>
+                    </g>
+                  )}
                 </g>
               );
             }

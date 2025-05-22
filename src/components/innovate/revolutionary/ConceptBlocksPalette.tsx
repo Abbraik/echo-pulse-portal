@@ -28,7 +28,7 @@ const CONCEPT_BLOCKS: ConceptBlock[] = [
 export const ConceptBlocksPalette: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>('economic');
   
   const filteredBlocks = CONCEPT_BLOCKS.filter(block => {
     const matchesSearch = block.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -73,22 +73,23 @@ export const ConceptBlocksPalette: React.FC = () => {
         ))}
       </div>
       
-      <div className="flex flex-wrap gap-2 pb-1 overflow-y-auto">
+      <div className="grid grid-cols-4 gap-2 pb-1 overflow-y-auto">
         {filteredBlocks.map(block => (
           <div 
             key={block.id} 
-            className="flex flex-col items-center p-2 rounded-lg bg-white/10 dark:bg-white/5 border 
-                      border-white/20 min-w-[120px] w-[120px] cursor-move hover:bg-white/20 
-                      transition-all animate-pulse-subtle"
+            className="flex flex-col items-center p-2 rounded-2xl bg-white/10 dark:bg-white/5 border 
+                      border-white/20 cursor-move hover:bg-white/20 
+                      transition-all hover:scale-[1.03] group"
             draggable="true"
             title={block.description}
           >
             <div className="text-sm font-medium truncate w-full text-center">{block.name}</div>
             <Badge variant="outline" className="mt-1 text-xs">{t(getCategoryTranslationKey(block.category))}</Badge>
+            <div className="absolute inset-0 rounded-2xl bg-teal-500/0 group-hover:bg-teal-500/5 transition-all"></div>
           </div>
         ))}
         
-        <Button variant="ghost" className="flex-col h-auto min-w-[80px] border border-dashed border-muted-foreground/30">
+        <Button variant="ghost" className="flex-col h-auto min-w-[80px] border border-dashed border-muted-foreground/30 rounded-2xl hover:shadow-[0_0_10px_rgba(20,184,166,0.3)] hover:border-teal-500/30 transition-all">
           <PlusSquare className="h-5 w-5 mb-1" />
           <span className="text-xs">{t('customConcept')}</span>
         </Button>

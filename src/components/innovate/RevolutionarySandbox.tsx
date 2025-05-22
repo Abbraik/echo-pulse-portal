@@ -87,8 +87,8 @@ export const RevolutionarySandbox: React.FC = () => {
       {/* Main content with flex layout to ensure proper spacing */}
       <div className="flex flex-col flex-1 gap-4 overflow-hidden">
         {/* Concept Blocks Palette (10% height) */}
-        <div className="h-[15%] min-h-[120px] flex-shrink-0">
-          <GlassCard className="p-3 h-full">
+        <div className="h-[10%] min-h-[100px] flex-shrink-0">
+          <GlassCard className="p-3 h-full shadow-[inset_0_0_15px_rgba(20,184,166,0.2)] backdrop-blur-xl">
             <ScrollArea className="h-full w-full">
               <ConceptBlocksPalette />
             </ScrollArea>
@@ -96,14 +96,14 @@ export const RevolutionarySandbox: React.FC = () => {
         </div>
         
         {/* CLD Sketch Canvas (40% height) */}
-        <div className="h-[35%] min-h-[200px] flex-shrink-0">
-          <GlassCard className="p-3 h-full glass-glow">
+        <div className="h-[40%] min-h-[250px] flex-shrink-0">
+          <GlassCard className="p-3 h-full glass-glow shadow-[inset_0_0_20px_rgba(20,184,166,0.25)]">
             <CLDSketchCanvas />
           </GlassCard>
         </div>
         
-        {/* Request Simulation Panel (15% height) */}
-        <div className="h-[15%] min-h-[100px] flex-shrink-0">
+        {/* Request Simulation Panel (20% height) */}
+        <div className="h-[20%] min-h-[150px] flex-shrink-0">
           <RequestSimulationPanel 
             engineMode={engineMode}
             setEngineMode={setEngineMode}
@@ -113,8 +113,8 @@ export const RevolutionarySandbox: React.FC = () => {
           />
         </div>
         
-        {/* Results & Innovation Tools (35% height) */}
-        <div className="h-[35%] min-h-[180px] flex-shrink-0">
+        {/* Results & Innovation Tools (30% height) */}
+        <div className="h-[30%] min-h-[180px] flex-shrink-0">
           <ResultsInnovationTools 
             showResults={simulationGenerated}
             engine={engineMode}

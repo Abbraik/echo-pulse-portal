@@ -9,6 +9,7 @@ import {
   MessageSquare, Share2, Download
 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { motion } from 'framer-motion';
 
 interface ResultsInnovationToolsProps {
   showResults: boolean;
@@ -35,9 +36,19 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
   }
   
   return (
-    <div className="grid grid-cols-4 gap-4 h-full">
+    <motion.div 
+      className="grid grid-cols-4 gap-4 h-full"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, staggerChildren: 0.1 }}
+    >
       {/* Impact Dashboard Card */}
-      <GlassCard className="p-4 relative overflow-hidden flex flex-col">
+      <GlassCard className="p-4 relative overflow-hidden flex flex-col shadow-[inset_0_0_15px_rgba(20,184,166,0.15)]" 
+        as={motion.div}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold flex items-center">
             <BarChartHorizontal size={16} className="mr-1.5 text-teal-400" />
@@ -88,12 +99,16 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
         
         <div className="flex justify-between items-center text-xs">
           <div className="flex flex-col">
-            <span className="text-muted-foreground">ΔNDI</span>
-            <span className="font-bold text-teal-400">+3.7 pts</span>
+            <span className="text-muted-foreground">NDI</span>
+            <span className="font-bold text-teal-400">68 → 70.4 (+2.4)</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-muted-foreground">{t('confidence')}</span>
-            <span className="font-medium">82%</span>
+            <span className="text-muted-foreground">DEI</span>
+            <span className="font-medium">65 → 66.7 (+1.7)</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-muted-foreground">Trust</span>
+            <span className="font-medium">69 → 72 (+3)</span>
           </div>
           <Button size="sm" variant="outline" className="text-xs h-7 px-2">
             {t('analyze')} 
@@ -102,7 +117,12 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
       </GlassCard>
       
       {/* Meta-Design Blueprint Card */}
-      <GlassCard className="p-4 relative overflow-hidden flex flex-col">
+      <GlassCard className="p-4 relative overflow-hidden flex flex-col shadow-[inset_0_0_15px_rgba(20,184,166,0.15)]"
+        as={motion.div}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
         <h3 className="font-bold flex items-center mb-3">
           <FileSpreadsheet size={16} className="mr-1.5 text-purple-400" />
           {t('metaDesignBlueprint')}
@@ -112,28 +132,33 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
           <div className="bg-black/10 dark:bg-white/5 rounded-md p-2 flex-1">
             <div className="font-medium text-purple-300 mb-1">{t('coreAssumptions')}</div>
             <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
-              <li>{t('assumptionExample1')}</li>
-              <li>{t('assumptionExample2')}</li>
+              <li>UBI → Equitable Access</li>
+              <li>Commons → Shared Resources</li>
             </ul>
           </div>
           
           <div className="bg-black/10 dark:bg-white/5 rounded-md p-2 flex-1">
-            <div className="font-medium text-blue-300 mb-1">{t('outcomes')}</div>
+            <div className="font-medium text-blue-300 mb-1">{t('newStocksFlows')}</div>
             <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
-              <li>{t('outcomeExample1')}</li>
-              <li>{t('outcomeExample2')}</li>
+              <li>Well-Being stock added</li>
+              <li>Resilience loop added</li>
             </ul>
           </div>
         </div>
         
         <Button size="sm" className="w-full flex items-center justify-center gap-1 bg-purple-600 hover:bg-purple-700">
-          <Rocket size={14} />
-          {t('generateBlueprint')}
+          <Download size={14} />
+          {t('exportBlueprint')}
         </Button>
       </GlassCard>
       
       {/* Comparative Innovation Dashboard */}
-      <GlassCard className="p-4 relative overflow-hidden flex flex-col">
+      <GlassCard className="p-4 relative overflow-hidden flex flex-col shadow-[inset_0_0_15px_rgba(20,184,166,0.15)]"
+        as={motion.div}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
         <h3 className="font-bold flex items-center mb-3">
           <Share2 size={16} className="mr-1.5 text-blue-400" />
           {t('comparativeInnovationDashboard')}
@@ -155,9 +180,16 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
               <line x1="38" y1="38" x2="162" y2="162" stroke="rgba(255,255,255,0.1)" />
               <line x1="38" y1="162" x2="162" y2="38" stroke="rgba(255,255,255,0.1)" />
               
+              {/* Labels */}
+              <text x="100" y="15" textAnchor="middle" fontSize="10" fill="white">Equity (8.5)</text>
+              <text x="185" y="100" textAnchor="start" fontSize="10" fill="white">Resilience (7.2)</text>
+              <text x="100" y="190" textAnchor="middle" fontSize="10" fill="white">Sustainability (6.8)</text>
+              <text x="15" y="100" textAnchor="end" fontSize="10" fill="white">Cohesion (7.9)</text>
+              <text x="30" y="30" textAnchor="end" fontSize="10" fill="white">Growth (5.5)</text>
+              
               {/* Data polygon - current */}
               <polygon 
-                points="100,40 140,80 120,140 80,140 60,80" 
+                points="100,30 160,60 130,140 70,140 40,60" 
                 fill="rgba(45, 212, 191, 0.3)" 
                 stroke="rgb(45, 212, 191)" 
                 strokeWidth="2"
@@ -169,6 +201,7 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
                 fill="rgba(79, 70, 229, 0.3)" 
                 stroke="rgb(79, 70, 229)" 
                 strokeWidth="2"
+                className="animate-pulse-subtle"
               />
             </svg>
           </div>
@@ -188,9 +221,14 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
       </GlassCard>
       
       {/* Futures Co-Creation Forum */}
-      <GlassCard className="p-4 relative overflow-hidden flex flex-col">
+      <GlassCard className="p-4 relative overflow-hidden flex flex-col shadow-[inset_0_0_15px_rgba(20,184,166,0.15)]"
+        as={motion.div}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
         <h3 className="font-bold flex items-center mb-3">
-          <MessageSquare size={16} className="mr-1.5 text-gold-400" />
+          <MessageSquare size={16} className="mr-1.5 text-amber-400" />
           {t('futuresCoCreationForum')}
         </h3>
         
@@ -204,7 +242,8 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
           
           <div className="bg-black/10 dark:bg-white/5 rounded-md p-2 flex-1">
             <div className="font-medium text-sm mb-1">{t('insightSparks')}</div>
-            <div className="text-xs text-muted-foreground italic">"{t('insightSparkExample1')}"</div>
+            <div className="text-xs text-muted-foreground italic">"How would UBI affect migration patterns?"</div>
+            <div className="text-xs text-muted-foreground mt-2 italic">"Can circular economy principles scale globally?"</div>
           </div>
         </div>
         
@@ -213,6 +252,6 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
           {t('recordInsight')}
         </Button>
       </GlassCard>
-    </div>
+    </motion.div>
   );
 };
