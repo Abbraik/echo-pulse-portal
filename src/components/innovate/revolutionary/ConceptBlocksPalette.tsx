@@ -36,6 +36,12 @@ export const ConceptBlocksPalette: React.FC = () => {
   });
   
   const categories = Array.from(new Set(CONCEPT_BLOCKS.map(block => block.category)));
+
+  // Helper function to get the correct translation key for categories
+  const getCategoryTranslationKey = (category: string) => {
+    const keySuffix = 'Category';
+    return `${category}${keySuffix}`;
+  };
   
   return (
     <div className="flex flex-col h-full">
@@ -60,7 +66,7 @@ export const ConceptBlocksPalette: React.FC = () => {
             className="cursor-pointer"
             onClick={() => setActiveCategory(activeCategory === category ? null : category)}
           >
-            {t(category)}
+            {t(getCategoryTranslationKey(category))}
           </Badge>
         ))}
       </div>
@@ -76,7 +82,7 @@ export const ConceptBlocksPalette: React.FC = () => {
             title={block.description}
           >
             <div className="text-sm font-medium truncate w-full text-center">{block.name}</div>
-            <Badge variant="outline" className="mt-1 text-xs">{t(block.category)}</Badge>
+            <Badge variant="outline" className="mt-1 text-xs">{t(getCategoryTranslationKey(block.category))}</Badge>
           </div>
         ))}
         

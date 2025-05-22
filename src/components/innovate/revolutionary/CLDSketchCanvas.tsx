@@ -23,6 +23,30 @@ export const CLDSketchCanvas: React.FC = () => {
   const [history, setHistory] = useState<{ nodes: Node[], links: Link[] }[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
 
+  // Add mock data when component mounts
+  useEffect(() => {
+    const mockNodes: Node[] = [
+      { id: 'node-1', type: 'stock', label: 'Resources', position: { x: 150, y: 150 } },
+      { id: 'node-2', type: 'variable', label: 'Consumption', position: { x: 300, y: 100 } },
+      { id: 'node-3', type: 'variable', label: 'Recycling', position: { x: 300, y: 200 } },
+      { id: 'node-4', type: 'stock', label: 'Waste', position: { x: 450, y: 150 } }
+    ];
+    
+    const mockLinks: Link[] = [
+      { id: 'link-1', from: 'node-1', to: 'node-2', polarity: '-' as const },
+      { id: 'link-2', from: 'node-2', to: 'node-4', polarity: '+' as const },
+      { id: 'link-3', from: 'node-4', to: 'node-3', polarity: '+' as const },
+      { id: 'link-4', from: 'node-3', to: 'node-1', polarity: '+' as const }
+    ];
+    
+    setNodes(mockNodes);
+    setLinks(mockLinks);
+    
+    // Initialize history with mock data
+    setHistory([{ nodes: mockNodes, links: mockLinks }]);
+    setHistoryIndex(0);
+  }, []);
+
   // Save current state to history
   const saveToHistory = (newNodes: Node[], newLinks: Link[]) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -112,11 +136,6 @@ export const CLDSketchCanvas: React.FC = () => {
     setLinks(newLinks);
     saveToHistory(nodes, newLinks);
   };
-
-  // Initialize history with empty state
-  useEffect(() => {
-    saveToHistory([], []);
-  }, []);
 
   return (
     <div className="flex flex-col h-full">
@@ -293,7 +312,7 @@ export const CLDSketchCanvas: React.FC = () => {
           })}
         </svg>
         
-        {/* Canvas instructions */}
+        {/* Canvas instructions - only show when no nodes */}
         {nodes.length === 0 && (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
             <div className="text-lg mb-2">{t('startDrawingCLD')}</div>
