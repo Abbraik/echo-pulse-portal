@@ -173,9 +173,6 @@ const en = {
   "constantsRationale": "Adjust numerical values that affect system behavior",
   "systemRulesRationale": "Modify policies and incentives that govern behavior",
   
-  // Additional needed translations
-  "infoFlowsRationale": "Change who has access to what information",
-  
   // AI Advisor
   "askYourAdvisor": "Ask your AI advisor...",
   "pathwayAdopted": "Pathway Adopted",
@@ -380,6 +377,13 @@ const en = {
   "revolutionarySandbox": "Revolutionary Sandbox",
   
   // Evolutionary Sandbox
+  "lessonLaunchpad": "Lesson Launchpad",
+  "freeformExperiment": "Freeform Experiment",
+  "newBlankStart": "New Blank Start",
+  "beginAdHocPolicy": "Begin ad-hoc policy tweaks and experiments",
+  "startNewExperiment": "Start New Experiment",
+  "launchExperiment": "Launch Experiment",
+  "archiveAsMemory": "Archive as Memory",
   "modelCanvas": "Model Canvas",
   "dragElementsToCreateModel": "Drag elements to create your model",
   "addStock": "Add Stock",
@@ -422,16 +426,21 @@ const en = {
   "publishToLibrary": "Publish to Library",
   
   // Revolutionary Sandbox
+  "archiveRadicalScenario": "Archive Scenario",
+  "archiveRadicalScenarioTooltip": "Archive this scenario as a Future Memory in Learn Zone",
+  "promoteRadicalBlueprint": "Promote Blueprint",
+  "promoteRadicalBlueprintTooltip": "Promote this blueprint into Strategy Builder as a High-Leverage Experiment",
+  "scenarioFork": "Scenario Fork",
+  "scenarioForkTooltip": "Create a new fork of the current scenario",
   "systemDynamics": "System Dynamics",
   "agentBased": "Agent-Based",
   "econometric": "Econometric",
-  "scenarioFork": "Scenario Fork",
   "parameterControls": "Parameter Controls",
   "scenarioVariants": "Scenario Variants",
   "mergeForks": "Merge Forks",
   "loadSelected": "Load Selected",
   "forkSummary": "Fork Summary",
-  "setBaseline": "Set as Baseline",
+  "setAsBaseline": "Set as Baseline",
   "compare": "Compare",
   "comparativeChart": "Comparative Chart",
   "baselineVsForkChart": "Baseline vs Fork Trajectories",
@@ -440,7 +449,60 @@ const en = {
   "saveFork": "Save Fork",
   "promoteToBlueprint": "Promote to Blueprint",
   "exportForkJSON": "Export Fork JSON",
-  "generateMetaDesignBlueprint": "Generate Meta-Design Blueprint"
+  
+  // New components
+  "scenarioLibrary": "Scenario Library",
+  "searchScenarios": "Search scenarios...",
+  "archiveSelected": "Archive Selected",
+  "promoteSelected": "Promote Selected",
+  "newScenario": "New Scenario",
+  "moonshot": "Moonshot",
+  "lessonDriven": "Lesson-Driven",
+  "metaDesignBlueprint": "Meta-Design Blueprint",
+  "generateMetaDesignBlueprint": "Generate Meta-Design Blueprint",
+  "coreAssumptions": "Core Assumptions",
+  "coreAssumptionsDescription": "Fundamental premises that shape the system model",
+  "newStocksFlows": "New Stocks & Flows",
+  "newStocksFlowsDescription": "System elements introduced or modified in this model",
+  "outcomes": "Outcomes",
+  "outcomesDescription": "Projected high-level results from this paradigm shift",
+  "risks": "Risks",
+  "risksDescription": "Key challenges and potential drawbacks to consider",
+  "blueprintSource": "Source",
+  "addAssumption": "Add Assumption",
+  "name": "Name",
+  "initial": "Initial",
+  "change": "Change",
+  
+  // Comparative Innovation Dashboard
+  "comparativeInnovationDashboard": "Comparative Innovation Dashboard",
+  "spiderGraph": "Spider Graph",
+  "barMatrix": "Bar Matrix",
+  "frameworkPicker": "Framework Picker",
+  "analyze": "Analyze",
+  "spiderChartPlaceholder": "Spider Chart Visualization",
+  "barChartPlaceholder": "Bar Chart Visualization",
+  "equity": "Equity",
+  "resilience": "Resilience",
+  "sustainability": "Sustainability",
+  "cohesion": "Cohesion",
+  "growth": "Growth",
+  
+  // Futures Co-Creation Forum
+  "futuresCoCreationForum": "Futures Co-Creation Forum",
+  "liveDebateArena": "Live Debate Arena",
+  "joinVideoRoom": "Join Video Room",
+  "participants": "Participants",
+  "joinRoom": "Join Room",
+  "collectiveWisdomEngine": "Collective Wisdom Engine",
+  "livePollsAndVotes": "Live Polls & Votes",
+  "insightSparks": "Insight Sparks",
+  "shouldWeCapResourcePrices": "Should we cap resource prices?",
+  "yes": "Yes",
+  "no": "No",
+  "insightSparkExample1": "Consider circular economy principles as a backbone for resource allocation",
+  "insightSparkExample2": "What if we treated knowledge as a renewable resource with increasing returns?",
+  "recordInsight": "Record Insight"
 };
 
 export default en;

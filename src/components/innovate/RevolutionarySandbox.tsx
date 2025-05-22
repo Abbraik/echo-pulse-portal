@@ -1,85 +1,139 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { GlassCard, GlassCardHeader, GlassCardTitle, GlassCardContent } from '@/components/ui/glass-card';
-import { ChevronDown, ChevronUp, GitBranch, Book, BarChart4, Network, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useTranslation } from '@/hooks/use-translation';
+import { GlassCard } from '@/components/ui/glass-card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Archive, Rocket, RefreshCw } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ScenarioFork } from './revolutionary/ScenarioFork';
 import { ParameterControls } from './revolutionary/ParameterControls';
 import { ImpactDashboardRev } from './revolutionary/ImpactDashboardRev';
+import { ComparativeInnovationDashboard } from './revolutionary/ComparativeInnovationDashboard';
+import { CoCreationForum } from './revolutionary/CoCreationForum';
 
 export const RevolutionarySandbox: React.FC = () => {
   const { t } = useTranslation();
-  const [modelEngine, setModelEngine] = useState('systemDynamics');
-
+  const [engineMode, setEngineMode] = useState('system-dynamics');
+  const [showCoDashboard, setShowCoDashboard] = useState(false);
+  const [showCoForum, setShowCoForum] = useState(false);
+  
   return (
-    <div className="flex flex-col h-full">
-      {/* Engine Switcher */}
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Header with actions */}
+      <div className="glass-panel p-4 mb-4 flex justify-between items-center">
+        <h2 className="text-xl font-semibold">{t('revolutionarySandbox')}</h2>
+        <div className="flex space-x-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="sm" variant="outline" className="flex items-center gap-1">
+                <RefreshCw size={16} />
+                <span>{t('scenarioFork')}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('scenarioForkTooltip')}</p>
+            </TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="sm" variant="outline" className="flex items-center gap-1">
+                <Archive size={16} />
+                <span>{t('archiveRadicalScenario')}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('archiveRadicalScenarioTooltip')}</p>
+            </TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="sm" variant="outline" className="flex items-center gap-1">
+                <Rocket size={16} />
+                <span>{t('promoteRadicalBlueprint')}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('promoteRadicalBlueprintTooltip')}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+      
+      {/* Engine Mode Switcher */}
       <div className="mb-4">
-        <Tabs defaultValue="systemDynamics" onValueChange={setModelEngine} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="systemDynamics" className="text-xs">
-              {t('systemDynamics')}
-            </TabsTrigger>
-            <TabsTrigger value="agentBased" className="text-xs">
-              {t('agentBased')}
-            </TabsTrigger>
-            <TabsTrigger value="econometric" className="text-xs">
-              {t('econometric')}
-            </TabsTrigger>
+        <Tabs value={engineMode} onValueChange={setEngineMode}>
+          <TabsList className="glass-panel">
+            <TabsTrigger value="system-dynamics">{t('systemDynamics')}</TabsTrigger>
+            <TabsTrigger value="agent-based">{t('agentBased')}</TabsTrigger>
+            <TabsTrigger value="econometric">{t('econometric')}</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
       
-      {/* Main Panel Layout */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 overflow-y-auto pb-6">
-        {/* Scenario Fork (25% width) */}
-        <div className="lg:col-span-1">
-          <GlassCard className="h-full">
-            <GlassCardHeader className="pb-2">
-              <div className="flex items-center">
-                <GitBranch className="mr-2 h-5 w-5 text-purple-400" />
-                <GlassCardTitle gradient>{t('scenarioFork')}</GlassCardTitle>
-              </div>
-            </GlassCardHeader>
-            <GlassCardContent>
-              <ScenarioFork />
-            </GlassCardContent>
-          </GlassCard>
-        </div>
+      {/* Main Scenario Runner (50% height) */}
+      <div className="flex gap-4 h-[50%] mb-4">
+        {/* Scenario Fork Tool (25% width) */}
+        <GlassCard className="w-1/4 p-4 overflow-hidden">
+          <h3 className="text-lg font-semibold mb-2">{t('scenarioFork')}</h3>
+          <div className="h-[calc(100%-2rem)] overflow-y-auto">
+            <ScenarioFork />
+          </div>
+        </GlassCard>
         
         {/* Parameter Controls (45% width) */}
-        <div className="lg:col-span-2">
-          <GlassCard className="h-full">
-            <GlassCardHeader className="pb-2">
-              <div className="flex items-center">
-                <Book className="mr-2 h-5 w-5 text-purple-400" />
-                <GlassCardTitle gradient>{t('parameterControls')}</GlassCardTitle>
-              </div>
-            </GlassCardHeader>
-            <GlassCardContent>
-              <ParameterControls engine={modelEngine} />
-            </GlassCardContent>
-          </GlassCard>
-        </div>
+        <GlassCard className="w-[45%] p-4 overflow-hidden">
+          <h3 className="text-lg font-semibold mb-2">{t('parameterControls')}</h3>
+          <div className="h-[calc(100%-2rem)] overflow-y-auto">
+            <ParameterControls />
+          </div>
+        </GlassCard>
         
         {/* Impact Dashboard (30% width) */}
-        <div className="lg:col-span-1">
-          <GlassCard className="h-full">
-            <GlassCardHeader className="pb-2">
-              <div className="flex items-center">
-                <BarChart4 className="mr-2 h-5 w-5 text-purple-400" />
-                <GlassCardTitle gradient>{t('impactDashboard')}</GlassCardTitle>
-              </div>
-            </GlassCardHeader>
-            <GlassCardContent>
-              <ImpactDashboardRev />
-            </GlassCardContent>
+        <GlassCard className="w-[30%] p-4 overflow-hidden">
+          <h3 className="text-lg font-semibold mb-2">{t('impactDashboard')}</h3>
+          <div className="h-[calc(100%-2rem)] overflow-y-auto">
+            <ImpactDashboardRev />
+          </div>
+        </GlassCard>
+      </div>
+      
+      {/* Expandable Panels */}
+      <div className="flex gap-4">
+        <Button 
+          onClick={() => setShowCoDashboard(!showCoDashboard)} 
+          variant={showCoDashboard ? "default" : "outline"}
+          className="flex items-center gap-1"
+        >
+          {t('comparativeInnovationDashboard')}
+        </Button>
+        <Button 
+          onClick={() => setShowCoForum(!showCoForum)} 
+          variant={showCoForum ? "default" : "outline"}
+          className="flex items-center gap-1"
+        >
+          {t('futuresCoCreationForum')}
+        </Button>
+      </div>
+      
+      {/* Conditional Expandable Panels */}
+      {showCoDashboard && (
+        <div className="mt-4 h-[30%]">
+          <GlassCard className="h-full p-4 overflow-hidden">
+            <ComparativeInnovationDashboard />
           </GlassCard>
         </div>
-      </div>
+      )}
+      
+      {showCoForum && (
+        <div className="mt-4 h-[30%]">
+          <GlassCard className="h-full p-4 overflow-hidden">
+            <CoCreationForum />
+          </GlassCard>
+        </div>
+      )}
     </div>
   );
 };

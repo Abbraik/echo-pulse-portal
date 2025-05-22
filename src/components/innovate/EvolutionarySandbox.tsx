@@ -1,140 +1,85 @@
 
-import React, { useState } from 'react';
-import { GlassCard, GlassCardHeader, GlassCardTitle, GlassCardContent } from '@/components/ui/glass-card';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronUp, MousePointer, Play, Save, BookOpen, BarChart4 } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from '@/hooks/use-translation';
+import { GlassCard } from '@/components/ui/glass-card';
+import { LessonLaunchpad } from './evolutionary/LessonLaunchpad';
+import { FreeformExperiment } from './evolutionary/FreeformExperiment';
+import { ModelCanvas } from './evolutionary/ModelCanvas';
 import { ParameterEditor } from './evolutionary/ParameterEditor';
 import { SimulatorControls } from './evolutionary/SimulatorControls';
 import { ImpactDashboard } from './evolutionary/ImpactDashboard';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export const EvolutionarySandbox: React.FC = () => {
   const { t } = useTranslation();
-  const [isCanvasCollapsed, setIsCanvasCollapsed] = useState(false);
-  const [isParametersCollapsed, setIsParametersCollapsed] = useState(false);
-  const [isControlsCollapsed, setIsControlsCollapsed] = useState(false);
-  const [isDashboardCollapsed, setIsDashboardCollapsed] = useState(false);
-
+  const [isLaunchpadOpen, setIsLaunchpadOpen] = React.useState(true);
+  
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full overflow-y-auto pb-6">
-      {/* Canvas + Parameters (Left Column) */}
-      <div className="lg:col-span-2 space-y-6">
-        {/* Canvas Panel */}
-        <Collapsible open={!isCanvasCollapsed} onOpenChange={setIsCanvasCollapsed}>
-          <GlassCard className="overflow-hidden">
-            <GlassCardHeader className="flex justify-between items-center pb-2">
-              <div className="flex items-center">
-                <MousePointer className="mr-2 h-5 w-5 text-teal-400" />
-                <GlassCardTitle gradient>{t('modelCanvas')}</GlassCardTitle>
-              </div>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  {isCanvasCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                </Button>
-              </CollapsibleTrigger>
-            </GlassCardHeader>
-            <CollapsibleContent>
-              <GlassCardContent>
-                <div className="bg-gray-900/50 border border-white/10 rounded-lg h-[300px] flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-gray-400 mb-2">{t('dragElementsToCreateModel')}</p>
-                    <div className="flex space-x-2 justify-center">
-                      <Button variant="outline" size="sm" className="text-xs">
-                        {t('addStock')}
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-xs">
-                        {t('addFlow')}
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-xs">
-                        {t('addVariable')}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </GlassCardContent>
-            </CollapsibleContent>
-          </GlassCard>
-        </Collapsible>
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Lesson Launchpad & Freeform Start (20% height) */}
+      <Collapsible
+        open={isLaunchpadOpen}
+        onOpenChange={setIsLaunchpadOpen}
+        className="mb-4"
+      >
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-semibold">{t('lessonLaunchpad')}</h2>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm">
+              {isLaunchpadOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </Button>
+          </CollapsibleTrigger>
+        </div>
         
-        {/* Parameter Editor Panel */}
-        <Collapsible open={!isParametersCollapsed} onOpenChange={setIsParametersCollapsed}>
-          <GlassCard>
-            <GlassCardHeader className="flex justify-between items-center pb-2">
-              <div className="flex items-center">
-                <BarChart4 className="mr-2 h-5 w-5 text-teal-400" />
-                <GlassCardTitle gradient>{t('parameterEditor')}</GlassCardTitle>
-              </div>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  {isParametersCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                </Button>
-              </CollapsibleTrigger>
-            </GlassCardHeader>
-            <CollapsibleContent>
-              <GlassCardContent>
-                <ParameterEditor />
-              </GlassCardContent>
-            </CollapsibleContent>
-          </GlassCard>
-        </Collapsible>
-        
-        {/* Simulator Controls Panel */}
-        <Collapsible open={!isControlsCollapsed} onOpenChange={setIsControlsCollapsed}>
-          <GlassCard>
-            <GlassCardHeader className="flex justify-between items-center pb-2">
-              <div className="flex items-center">
-                <Play className="mr-2 h-5 w-5 text-teal-400" />
-                <GlassCardTitle gradient>{t('simulatorControls')}</GlassCardTitle>
-              </div>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  {isControlsCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                </Button>
-              </CollapsibleTrigger>
-            </GlassCardHeader>
-            <CollapsibleContent>
-              <GlassCardContent>
-                <SimulatorControls />
-              </GlassCardContent>
-            </CollapsibleContent>
-          </GlassCard>
-        </Collapsible>
-      </div>
+        <CollapsibleContent className="overflow-hidden transition-all duration-300">
+          <div className="flex gap-4 h-[20vh]">
+            <div className="w-[45%] glass-panel p-4 rounded-xl">
+              <LessonLaunchpad />
+            </div>
+            <div className="w-[45%] glass-panel p-4 rounded-xl">
+              <FreeformExperiment />
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
       
-      {/* Right Column - Impact Dashboard */}
-      <div>
-        <Collapsible open={!isDashboardCollapsed} onOpenChange={setIsDashboardCollapsed} className="h-full">
-          <GlassCard className="h-full">
-            <GlassCardHeader className="flex justify-between items-center pb-2">
-              <div className="flex items-center">
-                <BarChart4 className="mr-2 h-5 w-5 text-teal-400" />
-                <GlassCardTitle gradient>{t('impactDashboard')}</GlassCardTitle>
-              </div>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  {isDashboardCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                </Button>
-              </CollapsibleTrigger>
-            </GlassCardHeader>
-            <CollapsibleContent>
-              <GlassCardContent className="h-[calc(100%-4rem)]">
-                <ImpactDashboard />
-                
-                <div className="mt-6 space-y-2">
-                  <Button className="w-full bg-teal-600 hover:bg-teal-500 flex items-center">
-                    <Save size={16} className="mr-2" />
-                    {t('saveAsPlaybook')}
-                  </Button>
-                  <Button variant="outline" className="w-full flex items-center">
-                    <BookOpen size={16} className="mr-2" />
-                    {t('publishToLibrary')}
-                  </Button>
-                </div>
-              </GlassCardContent>
-            </CollapsibleContent>
+      {/* Main Sandbox Area (80% height when launchpad is closed) */}
+      <div className={`flex-1 flex flex-col ${isLaunchpadOpen ? 'h-[60%]' : 'h-[80%]'}`}>
+        {/* Model Canvas (50% height) */}
+        <div className="h-1/2 mb-4">
+          <GlassCard className="h-full p-4 overflow-hidden">
+            <h2 className="text-xl font-semibold mb-2">{t('modelCanvas')}</h2>
+            <div className="h-[calc(100%-2rem)]">
+              <ModelCanvas />
+            </div>
           </GlassCard>
-        </Collapsible>
+        </div>
+        
+        {/* Controls and Dashboard (50% height) */}
+        <div className="h-1/2 flex gap-4">
+          <GlassCard className="w-1/3 p-4 overflow-hidden">
+            <h2 className="text-xl font-semibold mb-2">{t('parameterEditor')}</h2>
+            <div className="h-[calc(100%-2rem)] overflow-y-auto">
+              <ParameterEditor />
+            </div>
+          </GlassCard>
+          
+          <GlassCard className="w-1/3 p-4 overflow-hidden">
+            <h2 className="text-xl font-semibold mb-2">{t('simulatorControls')}</h2>
+            <div className="h-[calc(100%-2rem)] overflow-y-auto">
+              <SimulatorControls />
+            </div>
+          </GlassCard>
+          
+          <GlassCard className="w-1/3 p-4 overflow-hidden">
+            <h2 className="text-xl font-semibold mb-2">{t('impactDashboard')}</h2>
+            <div className="h-[calc(100%-2rem)] overflow-y-auto">
+              <ImpactDashboard />
+            </div>
+          </GlassCard>
+        </div>
       </div>
     </div>
   );

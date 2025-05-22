@@ -1,17 +1,21 @@
 
 import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Lightbulb, Info, Layout, Activity, Calendar, Bot, MousePointer, Zap, FlaskConical, GitBranch } from 'lucide-react';
+import { Lightbulb, Info, Zap, FlaskConical, Archive, Rocket, RefreshCw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { GlassCard, GlassCardHeader, GlassCardTitle, GlassCardContent } from '@/components/ui/glass-card';
+import { GlassCard } from '@/components/ui/glass-card';
 import { EvolutionarySandbox } from '@/components/innovate/EvolutionarySandbox';
 import { RevolutionarySandbox } from '@/components/innovate/RevolutionarySandbox';
+import { ScenarioLibrary } from '@/components/innovate/ScenarioLibrary';
+import { FabButton } from '@/components/innovate/FabButton';
+import { MetaDesignModal } from '@/components/innovate/MetaDesignModal';
 
 const Innovate: React.FC = () => {
   const [activeTab, setActiveTab] = useState('evolutionary');
+  const [isMetaDesignOpen, setIsMetaDesignOpen] = useState(false);
   const { t, isRTL } = useTranslation();
 
   return (
@@ -72,19 +76,37 @@ const Innovate: React.FC = () => {
               </TabsTrigger>
             </TabsList>
             
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden flex flex-col">
               {/* Evolutionary Sandbox Content */}
-              <TabsContent value="evolutionary" className="mt-0 h-full">
+              <TabsContent value="evolutionary" className="mt-0 h-full flex-1 flex flex-col">
                 <EvolutionarySandbox />
               </TabsContent>
               
               {/* Revolutionary Sandbox Content */}
-              <TabsContent value="revolutionary" className="mt-0 h-full">
+              <TabsContent value="revolutionary" className="mt-0 h-full flex-1 flex flex-col">
                 <RevolutionarySandbox />
               </TabsContent>
             </div>
           </Tabs>
+          
+          {/* Shared Scenario Library - Always visible */}
+          <div className="h-[20%] mt-4">
+            <ScenarioLibrary />
+          </div>
         </div>
+        
+        {/* Floating Action Button for Meta Design Blueprint Generator */}
+        <FabButton 
+          onClick={() => setIsMetaDesignOpen(true)}
+          tooltip={t('generateMetaDesignBlueprint')}
+          icon={<Rocket size={20} />}
+        />
+        
+        {/* Meta Design Blueprint Generator Modal */}
+        <MetaDesignModal 
+          open={isMetaDesignOpen} 
+          onOpenChange={setIsMetaDesignOpen} 
+        />
       </div>
     </AnimatedPage>
   );
