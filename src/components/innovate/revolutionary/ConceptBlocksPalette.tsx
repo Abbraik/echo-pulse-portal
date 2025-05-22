@@ -21,6 +21,8 @@ const CONCEPT_BLOCKS: ConceptBlock[] = [
   { id: 'circular', name: 'Circular Economy', description: 'Eliminate waste and continual resource use', category: 'environmental' },
   { id: 'timebank', name: 'Time Banking', description: 'Exchange time and skills, not money', category: 'social' },
   { id: 'participatory', name: 'Participatory Budgeting', description: 'Community decides on budget allocation', category: 'governance' },
+  { id: 'platform', name: 'Platform Cooperatives', description: 'User-owned digital platforms', category: 'economic' },
+  { id: 'commons2', name: 'Knowledge Commons', description: 'Shared intellectual resources', category: 'social' },
 ];
 
 export const ConceptBlocksPalette: React.FC = () => {
@@ -58,7 +60,7 @@ export const ConceptBlocksPalette: React.FC = () => {
         </div>
       </div>
       
-      <div className="flex gap-2 mb-2">
+      <div className="flex gap-2 mb-2 flex-wrap">
         {categories.map(category => (
           <Badge 
             key={category}
@@ -71,12 +73,12 @@ export const ConceptBlocksPalette: React.FC = () => {
         ))}
       </div>
       
-      <div className="flex overflow-x-auto gap-2 pb-1">
+      <div className="flex flex-wrap gap-2 pb-1 overflow-y-auto">
         {filteredBlocks.map(block => (
           <div 
             key={block.id} 
             className="flex flex-col items-center p-2 rounded-lg bg-white/10 dark:bg-white/5 border 
-                      border-white/20 min-w-[120px] cursor-move hover:bg-white/20 
+                      border-white/20 min-w-[120px] w-[120px] cursor-move hover:bg-white/20 
                       transition-all animate-pulse-subtle"
             draggable="true"
             title={block.description}

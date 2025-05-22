@@ -10,6 +10,7 @@ import { ConceptBlocksPalette } from './revolutionary/ConceptBlocksPalette';
 import { CLDSketchCanvas } from './revolutionary/CLDSketchCanvas';
 import { RequestSimulationPanel } from './revolutionary/RequestSimulationPanel';
 import { ResultsInnovationTools } from './revolutionary/ResultsInnovationTools';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const RevolutionarySandbox: React.FC = () => {
   const { t } = useTranslation();
@@ -84,22 +85,24 @@ export const RevolutionarySandbox: React.FC = () => {
       </div>
       
       {/* Main content with flex layout to ensure proper spacing */}
-      <div className="flex flex-col flex-1 overflow-hidden space-y-4">
+      <div className="flex flex-col flex-1 gap-4 overflow-hidden">
         {/* Concept Blocks Palette (10% height) */}
-        <div className="h-[10%] min-h-[80px] flex-shrink-0">
+        <div className="h-[15%] min-h-[120px] flex-shrink-0">
           <GlassCard className="p-3 h-full">
-            <ConceptBlocksPalette />
+            <ScrollArea className="h-full w-full">
+              <ConceptBlocksPalette />
+            </ScrollArea>
           </GlassCard>
         </div>
         
         {/* CLD Sketch Canvas (40% height) */}
-        <div className="h-[40%] min-h-[200px] flex-shrink-0">
+        <div className="h-[35%] min-h-[200px] flex-shrink-0">
           <GlassCard className="p-3 h-full glass-glow">
             <CLDSketchCanvas />
           </GlassCard>
         </div>
         
-        {/* Request Simulation Panel (20% height) */}
+        {/* Request Simulation Panel (15% height) */}
         <div className="h-[15%] min-h-[100px] flex-shrink-0">
           <RequestSimulationPanel 
             engineMode={engineMode}
@@ -110,7 +113,7 @@ export const RevolutionarySandbox: React.FC = () => {
           />
         </div>
         
-        {/* Results & Innovation Tools (30% height) */}
+        {/* Results & Innovation Tools (35% height) */}
         <div className="h-[35%] min-h-[180px] flex-shrink-0">
           <ResultsInnovationTools 
             showResults={simulationGenerated}
