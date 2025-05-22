@@ -1,4 +1,3 @@
-
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -535,8 +534,8 @@ const en = {
   // Results & Innovation Tools
   "resultsWillAppearHere": "Results will appear here",
   "generateSimulationFirst": "Generate a simulation from your CLD sketch first",
-  "charts": "Charts",
-  "metrics": "Metrics",
+  "chartsResults": "Charts",
+  "metricsResults": "Metrics", // This is a duplicate key fixed
   "simulationResultsChart": "Simulation Results Chart",
   "generateBlueprint": "Generate Blueprint",
   "assumptionExample1": "Resources are finite but knowledge is not",
@@ -545,11 +544,11 @@ const en = {
   "outcomeExample2": "Improved resource efficiency by 23%",
   
   // Categories
-  "economic": "Economic",
-  "sustainability": "Sustainability",
-  "governance": "Governance",
-  "environmental": "Environmental",
-  "social": "Social",
+  "economicCategory": "Economic", // This is a duplicate key fixed
+  "sustainabilityCategory": "Sustainability", // Renamed to avoid conflict
+  "governanceCategory": "Governance", // This is a duplicate key fixed
+  "environmentalCategory": "Environmental", // This is a duplicate key fixed
+  "socialCategory": "Social", // This is a duplicate key fixed
 };
 
 export default en;

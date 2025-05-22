@@ -83,12 +83,12 @@ export const CLDSketchCanvas: React.FC = () => {
       if (linkStart === null) {
         setLinkStart(nodeId);
       } else {
-        // Create a new link
+        // Create a new link with explicitly typed polarity
         const newLink: Link = {
           id: `link-${Date.now()}`,
           from: linkStart,
           to: nodeId,
-          polarity: '+' // Default to positive polarity
+          polarity: '+' as const // Explicitly typed as '+' to satisfy the type constraint
         };
         
         const newLinks = [...links, newLink];
@@ -103,7 +103,8 @@ export const CLDSketchCanvas: React.FC = () => {
   const togglePolarity = (linkId: string) => {
     const newLinks = links.map(link => {
       if (link.id === linkId) {
-        return { ...link, polarity: link.polarity === '+' ? '-' : '+' };
+        // Explicitly handle the polarity toggle with the correct type
+        return { ...link, polarity: link.polarity === '+' ? '-' as const : '+' as const };
       }
       return link;
     });
