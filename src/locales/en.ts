@@ -1,3 +1,4 @@
+
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -374,6 +375,8 @@ const en = {
   "innovateZoneDesc": "Design experiments that enhance National Development Index across various timeframes and complexity levels",
   "evolutionarySandbox": "Evolutionary Sandbox",
   "revolutionarySandbox": "Revolutionary Sandbox",
+  "revolutionarySandboxTitle": "Revolutionary Sandbox: Moonshot Lab",
+  "revolutionarySandboxTooltip": "Draw Causal-Loop Diagrams (CLDs) by hand then convert to simulation templates",
   
   // Evolutionary Sandbox
   "lessonLaunchpad": "Lesson Launchpad",
@@ -501,7 +504,52 @@ const en = {
   "no": "No",
   "insightSparkExample1": "Consider circular economy principles as a backbone for resource allocation",
   "insightSparkExample2": "What if we treated knowledge as a renewable resource with increasing returns?",
-  "recordInsight": "Record Insight"
+  "recordInsight": "Record Insight",
+  
+  // CLD Sketch Canvas
+  "conceptBlocksPalette": "Concept Blocks Palette",
+  "searchConceptBlocks": "Search concepts...",
+  "customConcept": "Custom",
+  "cldSketchCanvas": "CLD Sketch Canvas",
+  "startDrawingCLD": "Start drawing your causal loop diagram",
+  "cldInstructions": "Use the tools above to add stocks, variables, and connections",
+  "selectDestinationNode": "Select destination node",
+  "selectTool": "Select",
+  "stockTool": "Stock",
+  "variableTool": "Variable",
+  "linkTool": "Link",
+  "saveDiagram": "Save Diagram",
+  
+  // Revolutionary Sandbox - CLD to Simulation
+  "requestSimulationModel": "Request Simulation Model",
+  "requestSimulationDesc": "Translate your CLD into a runnable simulation template",
+  "selectEngine": "Select Engine",
+  "parameterDefaults": "Parameter Defaults",
+  "autoPopulate": "Auto-populate",
+  "manualUpload": "Manual upload",
+  "fromBaseline": "From baseline",
+  "generateSimulation": "Generate Simulation",
+  "buildingSimulation": "Building simulation...",
+  "viewResults": "View Results",
+  
+  // Results & Innovation Tools
+  "resultsWillAppearHere": "Results will appear here",
+  "generateSimulationFirst": "Generate a simulation from your CLD sketch first",
+  "charts": "Charts",
+  "metrics": "Metrics",
+  "simulationResultsChart": "Simulation Results Chart",
+  "generateBlueprint": "Generate Blueprint",
+  "assumptionExample1": "Resources are finite but knowledge is not",
+  "assumptionExample2": "Feedback delays cause oscillation",
+  "outcomeExample1": "Reduced inequality with 78% confidence",
+  "outcomeExample2": "Improved resource efficiency by 23%",
+  
+  // Categories
+  "economic": "Economic",
+  "sustainability": "Sustainability",
+  "governance": "Governance",
+  "environmental": "Environmental",
+  "social": "Social",
 };
 
 export default en;
