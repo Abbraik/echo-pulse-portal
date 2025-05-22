@@ -23,11 +23,13 @@ export const ScenarioLibrary: React.FC = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">{t('scenarioLibrary')}</h2>
         <div className="flex items-center space-x-2">
-          <Input 
-            placeholder={t('searchScenarios')} 
-            className="w-64 h-8" 
-            startContent={<Search size={16} />} 
-          />
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input 
+              placeholder={t('searchScenarios')} 
+              className="w-64 h-8 pl-9" 
+            />
+          </div>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="outline" size="sm">

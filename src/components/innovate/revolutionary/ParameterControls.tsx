@@ -14,13 +14,13 @@ export const ParameterControls: React.FC<ParameterControlsProps> = ({ engine }) 
   // Sample parameters based on the engine type
   const getParameters = () => {
     switch (engine) {
-      case 'systemDynamics':
+      case 'system-dynamics':
         return [
           { id: 'p1', name: 'Resource Rights', value: 50, min: 0, max: 100, baseline: 30, unit: '%' },
           { id: 'p2', name: 'Commons Access', value: 70, min: 0, max: 100, baseline: 40, unit: '%' },
           { id: 'p3', name: 'Governance Model', value: 3, min: 1, max: 5, baseline: 2, unit: 'level' },
         ];
-      case 'agentBased':
+      case 'agent-based':
         return [
           { id: 'a1', name: 'Agent Count', value: 100, min: 10, max: 1000, baseline: 100, unit: '' },
           { id: 'a2', name: 'Cooperation Weight', value: 0.7, min: 0, max: 1, baseline: 0.5, unit: '' },

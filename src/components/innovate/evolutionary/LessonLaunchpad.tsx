@@ -19,10 +19,11 @@ export const LessonLaunchpad: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex gap-2 mb-3">
-        <div className="flex-1">
+        <div className="flex-1 relative">
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
           <Input 
             placeholder={t('searchLibraryPlaceholder')}
-            startContent={<Search className="w-4 h-4 text-gray-400" />}
+            className="pl-9"
           />
         </div>
         <Select defaultValue="all">

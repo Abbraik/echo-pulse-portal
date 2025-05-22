@@ -440,7 +440,7 @@ const en = {
   "mergeForks": "Merge Forks",
   "loadSelected": "Load Selected",
   "forkSummary": "Fork Summary",
-  "setAsBaseline": "Set as Baseline",
+  "setBaseline": "Set Baseline",
   "compare": "Compare",
   "comparativeChart": "Comparative Chart",
   "baselineVsForkChart": "Baseline vs Fork Trajectories",

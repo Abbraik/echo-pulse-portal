@@ -87,7 +87,7 @@ export const RevolutionarySandbox: React.FC = () => {
         <GlassCard className="w-[45%] p-4 overflow-hidden">
           <h3 className="text-lg font-semibold mb-2">{t('parameterControls')}</h3>
           <div className="h-[calc(100%-2rem)] overflow-y-auto">
-            <ParameterControls />
+            <ParameterControls engine={engineMode} />
           </div>
         </GlassCard>
         
