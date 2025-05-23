@@ -20,9 +20,9 @@ const Innovate: React.FC = () => {
 
   return (
     <AnimatedPage>
-      <div className="flex flex-col h-[calc(100vh-5rem)] overflow-hidden">
-        <header className="mb-4">
-          <div className="glass-panel p-4 flex items-center space-x-4">
+      <div className="flex flex-col h-screen overflow-hidden">
+        <header className="h-auto mb-2">
+          <div className="glass-panel p-3 flex items-center space-x-4">
             <div className="p-3 rounded-xl bg-purple-500/20 text-purple-400">
               <Lightbulb size={24} />
             </div>
@@ -55,7 +55,7 @@ const Innovate: React.FC = () => {
             className="w-full h-full flex flex-col" 
             onValueChange={setActiveTab}
           >
-            <TabsList className="grid w-full grid-cols-2 mb-3">
+            <TabsList className="grid w-full grid-cols-2 mb-2">
               <TabsTrigger
                 value="evolutionary"
                 className={`text-sm font-medium py-2 flex items-center justify-center gap-2 ${
@@ -78,19 +78,19 @@ const Innovate: React.FC = () => {
             
             <div className="flex-1 overflow-hidden flex flex-col">
               {/* Evolutionary Sandbox Content */}
-              <TabsContent value="evolutionary" className="mt-0 h-full flex-1 flex flex-col">
+              <TabsContent value="evolutionary" className="mt-0 h-full flex-1 flex flex-col overflow-hidden">
                 <EvolutionarySandbox />
               </TabsContent>
               
               {/* Revolutionary Sandbox Content */}
-              <TabsContent value="revolutionary" className="mt-0 h-full flex-1 flex flex-col">
+              <TabsContent value="revolutionary" className="mt-0 h-full flex-1 flex flex-col overflow-hidden">
                 <RevolutionarySandbox />
               </TabsContent>
             </div>
           </Tabs>
           
           {/* Shared Scenario Library - Always visible but smaller */}
-          <div className="h-[15%] mt-2">
+          <div className="h-48 mt-2 flex-shrink-0">
             <ScenarioLibrary />
           </div>
         </div>

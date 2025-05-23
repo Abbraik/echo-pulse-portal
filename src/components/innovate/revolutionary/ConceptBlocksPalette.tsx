@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Search, PlusSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type ConceptBlock = {
   id: string;
@@ -47,9 +48,9 @@ export const ConceptBlocksPalette: React.FC = () => {
   };
   
   return (
-    <div className="flex flex-col h-full gap-3">
+    <div className="flex flex-col h-full p-3">
       {/* Search and filters section */}
-      <div className="flex flex-col gap-2 sticky top-0 z-10">
+      <div className="flex flex-col gap-2 sticky top-0 z-10 mb-3">
         <div className="relative w-full">
           <Input
             placeholder={t('searchConceptBlocks')}
@@ -75,31 +76,39 @@ export const ConceptBlocksPalette: React.FC = () => {
       </div>
       
       {/* Concept blocks list - vertical list for sidebar */}
-      <div className="flex flex-col gap-2 overflow-y-auto">
-        {filteredBlocks.map((block, index) => (
-          <motion.div 
-            key={block.id} 
-            className="flex flex-col items-center p-2 rounded-lg bg-white/10 dark:bg-white/5 border 
-                      border-white/20 cursor-move hover:bg-white/20 
-                      transition-all hover:scale-[1.03] group"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            draggable="true"
-            title={block.description}
-          >
-            <div className="text-sm font-medium truncate w-full text-center">{block.name}</div>
-            <Badge variant="outline" className="mt-1 text-xs">{t(getCategoryTranslationKey(block.category))}</Badge>
+      <ScrollArea className="flex-1">
+        <div className="flex flex-col gap-2 pr-3">
+          {filteredBlocks.map((block, index) => (
             <motion.div 
-              className="absolute inset-0 rounded-lg bg-teal-500/0 group-hover:bg-teal-500/5 transition-all"
-              whileHover={{ 
-                boxShadow: "0 0 15px rgba(20,184,166,0.3)",
-                scale: 1.03
-              }}
-            ></motion.div>
-          </motion.div>
-        ))}
-      </div>
+              key={block.id} 
+              className="flex flex-col items-center p-2 rounded-lg bg-white/10 dark:bg-white/5 border 
+                        border-white/20 cursor-move hover:bg-white/20 
+                        transition-all hover:scale-[1.03] group"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              draggable="true"
+              title={block.description}
+            >
+              <div className="text-sm font-medium truncate w-full text-center">{block.name}</div>
+              <Badge variant="outline" className="mt-1 text-xs">{t(getCategoryTranslationKey(block.category))}</Badge>
+              <motion.div 
+                className="absolute inset-0 rounded-lg bg-teal-500/0 group-hover:bg-teal-500/5 transition-all"
+                whileHover={{ 
+                  boxShadow: "0 0 15px rgba(20,184,166,0.3)",
+                  scale: 1.03
+                }}
+              ></motion.div>
+            </motion.div>
+          ))}
+        </div>
+      </ScrollArea>
+      
+      {/* Add New Concept button at bottom */}
+      <Button className="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 transition-all duration-300 shadow-md">
+        <PlusSquare size={16} />
+        {t('createNewConcept')}
+      </Button>
     </div>
   );
 };

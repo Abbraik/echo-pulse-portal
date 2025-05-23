@@ -6,6 +6,7 @@ import { Search, Archive, Rocket, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const ScenarioLibrary: React.FC = () => {
   const { t } = useTranslation();
@@ -19,8 +20,8 @@ export const ScenarioLibrary: React.FC = () => {
   ];
   
   return (
-    <GlassCard className="backdrop-blur-xl p-4 h-full overflow-hidden">
-      <div className="flex justify-between items-center mb-4">
+    <GlassCard className="backdrop-blur-xl h-full overflow-hidden">
+      <div className="flex justify-between items-center p-3">
         <h2 className="text-xl font-semibold">{t('scenarioLibrary')}</h2>
         <div className="flex items-center space-x-2">
           <div className="relative">
@@ -49,40 +50,42 @@ export const ScenarioLibrary: React.FC = () => {
         </div>
       </div>
       
-      <div className="grid grid-cols-4 gap-3 overflow-y-auto h-[calc(100%-2.5rem)]">
-        {scenarios.map(scenario => (
-          <div 
-            key={scenario.id} 
-            className={`glass-panel p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02] hover-lift
-              ${scenario.type === 'revolutionary' ? 'border-l-4 border-l-purple-400' : 'border-l-4 border-l-teal-400'}`}
-          >
-            <div className="flex justify-between items-start">
-              <h3 className="text-sm font-medium">{scenario.name}</h3>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700/30">
-                {scenario.type === 'revolutionary' ? t('moonshot') : t('lesson')}
-              </span>
+      <ScrollArea className="h-[calc(100%-3rem)]">
+        <div className="grid grid-cols-4 gap-3 p-3 pt-0">
+          {scenarios.map(scenario => (
+            <div 
+              key={scenario.id} 
+              className={`glass-panel p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02] hover-lift
+                ${scenario.type === 'revolutionary' ? 'border-l-4 border-l-purple-400' : 'border-l-4 border-l-teal-400'}`}
+            >
+              <div className="flex justify-between items-start">
+                <h3 className="text-sm font-medium">{scenario.name}</h3>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700/30">
+                  {scenario.type === 'revolutionary' ? t('moonshot') : t('lesson')}
+                </span>
+              </div>
+              <div className="mt-2 flex justify-between items-center text-xs text-gray-400">
+                <span>{scenario.origin}</span>
+                <span>{scenario.date}</span>
+              </div>
+              <div className="mt-2 pt-2 border-t border-gray-700/30 flex justify-end gap-1">
+                <button className="text-gray-400 hover:text-teal-400 transition-colors">
+                  <Archive size={14} />
+                </button>
+                <button className="text-gray-400 hover:text-purple-400 transition-colors">
+                  <Rocket size={14} />
+                </button>
+              </div>
             </div>
-            <div className="mt-2 flex justify-between items-center text-xs text-gray-400">
-              <span>{scenario.origin}</span>
-              <span>{scenario.date}</span>
-            </div>
-            <div className="mt-2 pt-2 border-t border-gray-700/30 flex justify-end gap-1">
-              <button className="text-gray-400 hover:text-teal-400 transition-colors">
-                <Archive size={14} />
-              </button>
-              <button className="text-gray-400 hover:text-purple-400 transition-colors">
-                <Rocket size={14} />
-              </button>
-            </div>
+          ))}
+          
+          {/* Add new scenario card */}
+          <div className="glass-panel p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02] hover-lift flex flex-col items-center justify-center border border-dashed border-gray-700/50 min-h-[100px]">
+            <Plus size={24} className="mb-2 text-gray-400" />
+            <span className="text-sm text-gray-400">{t('newScenario')}</span>
           </div>
-        ))}
-        
-        {/* Add new scenario card */}
-        <div className="glass-panel p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02] hover-lift flex flex-col items-center justify-center border border-dashed border-gray-700/50 min-h-[120px]">
-          <Plus size={24} className="mb-2 text-gray-400" />
-          <span className="text-sm text-gray-400">{t('newScenario')}</span>
         </div>
-      </div>
+      </ScrollArea>
     </GlassCard>
   );
 };
