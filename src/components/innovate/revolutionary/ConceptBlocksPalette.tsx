@@ -49,7 +49,7 @@ export const ConceptBlocksPalette: React.FC = () => {
   return (
     <div className="flex flex-col h-full gap-3">
       {/* Search and filters section */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 sticky top-0 z-10">
         <div className="relative w-full">
           <Input
             placeholder={t('searchConceptBlocks')}
@@ -74,12 +74,12 @@ export const ConceptBlocksPalette: React.FC = () => {
         </div>
       </div>
       
-      {/* Concept blocks list - changed from grid to vertical list for sidebar */}
-      <div className="flex flex-col gap-2 pb-1 overflow-y-auto">
+      {/* Concept blocks list - vertical list for sidebar */}
+      <div className="flex flex-col gap-2 overflow-y-auto">
         {filteredBlocks.map((block, index) => (
           <motion.div 
             key={block.id} 
-            className="flex flex-col items-center p-2 rounded-xl bg-white/10 dark:bg-white/5 border 
+            className="flex flex-col items-center p-2 rounded-lg bg-white/10 dark:bg-white/5 border 
                       border-white/20 cursor-move hover:bg-white/20 
                       transition-all hover:scale-[1.03] group"
             initial={{ opacity: 0, y: 10 }}
@@ -91,7 +91,7 @@ export const ConceptBlocksPalette: React.FC = () => {
             <div className="text-sm font-medium truncate w-full text-center">{block.name}</div>
             <Badge variant="outline" className="mt-1 text-xs">{t(getCategoryTranslationKey(block.category))}</Badge>
             <motion.div 
-              className="absolute inset-0 rounded-xl bg-teal-500/0 group-hover:bg-teal-500/5 transition-all"
+              className="absolute inset-0 rounded-lg bg-teal-500/0 group-hover:bg-teal-500/5 transition-all"
               whileHover={{ 
                 boxShadow: "0 0 15px rgba(20,184,166,0.3)",
                 scale: 1.03

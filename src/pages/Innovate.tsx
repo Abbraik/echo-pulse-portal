@@ -21,14 +21,14 @@ const Innovate: React.FC = () => {
   return (
     <AnimatedPage>
       <div className="flex flex-col h-[calc(100vh-5rem)] overflow-hidden">
-        <header className="mb-6">
-          <div className="glass-panel p-6 flex items-center space-x-4">
+        <header className="mb-4">
+          <div className="glass-panel p-4 flex items-center space-x-4">
             <div className="p-3 rounded-xl bg-purple-500/20 text-purple-400">
               <Lightbulb size={24} />
             </div>
             <div className="text-left">
               <div className="flex items-center">
-                <h1 className="text-3xl font-extrabold">
+                <h1 className="text-2xl font-extrabold">
                   {t('innovateZoneTitle')}: {t('evolutionaryRevolutionaryParadigms')}
                 </h1>
                 <Tooltip>
@@ -42,7 +42,7 @@ const Innovate: React.FC = () => {
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <p className="text-gray-400">
+              <p className="text-gray-400 text-sm">
                 {t('innovateZoneDesc')}
               </p>
             </div>
@@ -55,10 +55,10 @@ const Innovate: React.FC = () => {
             className="w-full h-full flex flex-col" 
             onValueChange={setActiveTab}
           >
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsList className="grid w-full grid-cols-2 mb-3">
               <TabsTrigger
                 value="evolutionary"
-                className={`text-sm font-medium py-3 flex items-center justify-center gap-2 ${
+                className={`text-sm font-medium py-2 flex items-center justify-center gap-2 ${
                   activeTab === 'evolutionary' ? 'bg-teal-500/30 text-teal-300' : ''
                 }`}
               >
@@ -67,7 +67,7 @@ const Innovate: React.FC = () => {
               </TabsTrigger>
               <TabsTrigger
                 value="revolutionary"
-                className={`text-sm font-medium py-3 flex items-center justify-center gap-2 ${
+                className={`text-sm font-medium py-2 flex items-center justify-center gap-2 ${
                   activeTab === 'revolutionary' ? 'bg-purple-500/30 text-purple-300' : ''
                 }`}
               >
@@ -89,8 +89,8 @@ const Innovate: React.FC = () => {
             </div>
           </Tabs>
           
-          {/* Shared Scenario Library - Always visible */}
-          <div className="h-[20%] mt-4">
+          {/* Shared Scenario Library - Always visible but smaller */}
+          <div className="h-[15%] mt-2">
             <ScenarioLibrary />
           </div>
         </div>

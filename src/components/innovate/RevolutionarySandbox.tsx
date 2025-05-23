@@ -87,11 +87,11 @@ export const RevolutionarySandbox: React.FC = () => {
         </div>
       </div>
       
-      {/* Two-column layout for main content */}
-      <div className="flex flex-1 gap-4 overflow-hidden">
+      {/* Two-column layout for main content - Fill available height */}
+      <div className="flex flex-1 gap-4 overflow-hidden h-[calc(100vh-13rem)]">
         {/* Left Column - Concept Blocks Sidebar (25%) */}
         <motion.div 
-          className="w-[25%] flex-shrink-0 flex flex-col"
+          className="w-[22%] flex-shrink-0 flex flex-col"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -110,7 +110,7 @@ export const RevolutionarySandbox: React.FC = () => {
         
         {/* Right Column - Main Content Area (75%) */}
         <motion.div 
-          className="w-[75%] flex flex-col gap-4"
+          className="w-[78%] flex flex-col gap-4"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
