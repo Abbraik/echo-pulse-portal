@@ -1,3 +1,4 @@
+
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -392,7 +393,6 @@ const en = {
   "addVariable": "Add Variable",
   "parameterEditor": "Parameter Editor",
   "simulatorControls": "Simulator Controls",
-  "impactDashboard": "Impact Dashboard",
   "intensity": "Intensity",
   "duration": "Duration",
   "integration": "Integration",
@@ -459,6 +459,7 @@ const en = {
   "newScenario": "New Scenario",
   "moonshot": "Moonshot",
   "lessonDriven": "Lesson-Driven",
+  "freeform": "Freeform",
   "metaDesignBlueprint": "Meta-Design Blueprint",
   "generateMetaDesignBlueprint": "Generate Meta-Design Blueprint",
   "coreAssumptions": "Core Assumptions",
@@ -535,7 +536,7 @@ const en = {
   "resultsWillAppearHere": "Results will appear here",
   "generateSimulationFirst": "Generate a simulation from your CLD sketch first",
   "chartsResults": "Charts",
-  "metricsResults": "Metrics", // This is a duplicate key fixed
+  "metricsResultsTab": "Metrics",
   "simulationResultsChart": "Simulation Results Chart",
   "generateBlueprint": "Generate Blueprint",
   "assumptionExample1": "Resources are finite but knowledge is not",
@@ -544,44 +545,31 @@ const en = {
   "outcomeExample2": "Improved resource efficiency by 23%",
   
   // Categories
-  "economicCategory": "Economic", // This is a duplicate key fixed
-  "sustainabilityCategory": "Sustainability", // Renamed to avoid conflict
-  "governanceCategory": "Governance", // This is a duplicate key fixed
-  "environmentalCategory": "Environmental", // This is a duplicate key fixed
-  "socialCategory": "Social", // This is a duplicate key fixed
+  "economicCategory": "Economic",
+  "sustainabilityCategory": "Sustainability",
+  "governanceCategory": "Governance",
+  "environmentalCategory": "Environmental",
+  "socialCategory": "Social",
   
   // Innovate Zone - System Redesign Hub
-  systemRedesignHub: 'System Redesign Hub',
-  lessonDriven: 'Lesson-Driven',
-  freeform: 'Freeform',
-  moonshot: 'Moonshot',
-  systemDesignToolbox: 'System Design Toolbox',
-  searchToolbox: 'Search tools, concepts, scenarios...',
-  lessons: 'Lessons',
-  concepts: 'Concepts',
-  scenarios: 'Scenarios',
-  newExperiment: 'New Experiment',
+  "systemRedesignHub": "System Redesign Hub",
+  "moonshot": "Moonshot",
+  "searchToolbox": "Search tools, concepts, scenarios...",
   
   // Experiment Simulation Panel
-  experimentSimulation: 'Experiment Simulation',
-  forkScenario: 'Fork Scenario',
-  activeFork: 'Active Fork',
-  simulationEngine: 'Simulation Engine',
-  newFork: 'New Fork',
+  "experimentSimulation": "Experiment Simulation",
+  "forkScenario": "Fork Scenario",
+  "activeFork": "Active Fork",
+  "simulationEngine": "Simulation Engine",
+  "newFork": "New Fork",
   
   // Tabs and Content
-  impactDashboard: 'Impact',
-  metaDesignBlueprint: 'Blueprint',
-  comparativeInnovation: 'Compare',
-  futuresCoCreation: 'Co-Create',
-  compareScenarios: 'Compare Scenarios',
-  coreAssumptions: 'Core Assumptions',
-  newStocksFlows: 'New Stocks & Flows',
-  outcomesRisks: 'Outcomes & Risks',
-  liveDebateArena: 'Live Debate Arena',
-  insightSparks: 'Insight Sparks',
-  joinRoom: 'Join Room',
-  recordInsight: 'Record Insight',
+  "impactDashboardTab": "Impact",
+  "metaDesignBlueprintTab": "Blueprint",
+  "comparativeInnovationTab": "Compare",
+  "futuresCoCreationTab": "Co-Create",
+  "compareScenarios": "Compare Scenarios",
+  "outcomesRisks": "Outcomes & Risks"
 };
 
 export default en;

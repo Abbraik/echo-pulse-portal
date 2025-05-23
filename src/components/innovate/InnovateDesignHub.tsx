@@ -80,16 +80,16 @@ export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) =>
           >
             <TabsList className="grid grid-cols-4 mx-3 mt-3 mb-2">
               <TabsTrigger value="impact">
-                {t('impactDashboard')}
+                {t('impactDashboardTab')}
               </TabsTrigger>
               <TabsTrigger value="blueprint">
-                {t('metaDesignBlueprint')}
+                {t('metaDesignBlueprintTab')}
               </TabsTrigger>
               <TabsTrigger value="compare">
-                {t('comparativeInnovation')}
+                {t('comparativeInnovationTab')}
               </TabsTrigger>
               <TabsTrigger value="co-create">
-                {t('futuresCoCreation')}
+                {t('futuresCoCreationTab')}
               </TabsTrigger>
             </TabsList>
 

@@ -1,3 +1,4 @@
+
 const ar = {
   "Welcome to PDS": "مرحبا بكم في PDS",
   "Select your language": "اختر لغتك",
@@ -264,7 +265,6 @@ const ar = {
   mergeForks: 'دمج التفرعات',
   loadSelected: 'تحميل المحدد',
   forkSummary: 'ملخص التفرع',
-  modelParameters: 'معلمات النموذج',
   setBaseline: 'تعيين كخط أساس',
   compare: 'مقارنة',
   comparativeChart: 'مخطط مقارن',
@@ -297,10 +297,10 @@ const ar = {
   newFork: 'تفرع جديد',
   
   // Tabs and Content
-  impactDashboard: 'التأثير',
-  metaDesignBlueprint: 'المخطط',
-  comparativeInnovation: 'المقارنة',
-  futuresCoCreation: 'الإبداع المشترك',
+  impactDashboardTab: 'التأثير',
+  metaDesignBlueprintTab: 'المخطط',
+  comparativeInnovationTab: 'المقارنة',
+  futuresCoCreationTab: 'الإبداع المشترك',
   compareScenarios: 'مقارنة السيناريوهات',
   coreAssumptions: 'الافتراضات الأساسية',
   newStocksFlows: 'المخزون والتدفقات الجديدة',
