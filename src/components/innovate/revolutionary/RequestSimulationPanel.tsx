@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { CirclePlay, Check, Loader2, GitBranch, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-interface RequestSimulationPanelProps {
+export interface RequestSimulationPanelProps {
   engineMode: string;
   setEngineMode: (mode: string) => void;
   onGenerateSimulation: () => void;

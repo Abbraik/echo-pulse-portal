@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { InnovateToolbox } from './InnovateToolbox';
 import { GlassCard } from '../ui/glass-card';
 import { useTranslation } from '@/hooks/use-translation';
@@ -17,6 +17,21 @@ interface InnovateDesignHubProps {
 
 export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) => {
   const { t, isRTL } = useTranslation();
+  const [engineMode, setEngineMode] = useState<string>('system-dynamics');
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [isGenerated, setIsGenerated] = useState<boolean>(false);
+  const [showResults, setShowResults] = useState<boolean>(false);
+  
+  const handleGenerateSimulation = () => {
+    setIsGenerating(true);
+    
+    // Simulate API call or processing delay
+    setTimeout(() => {
+      setIsGenerating(false);
+      setIsGenerated(true);
+      setShowResults(true);
+    }, 2000);
+  };
   
   return (
     <div className={`flex ${isRTL ? 'flex-row-reverse' : 'flex-row'} h-full`}>
@@ -37,7 +52,13 @@ export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) =>
         {/* Middle section: Scenario Fork & Simulation Request */}
         <div className="h-[20%]">
           <GlassCard className="h-full">
-            <RequestSimulationPanel />
+            <RequestSimulationPanel 
+              engineMode={engineMode}
+              setEngineMode={setEngineMode}
+              onGenerateSimulation={handleGenerateSimulation}
+              isGenerating={isGenerating}
+              isGenerated={isGenerated}
+            />
           </GlassCard>
         </div>
 
@@ -56,7 +77,11 @@ export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) =>
                   <ImpactDashboard />
                 </TabsContent>
                 <TabsContent value="blueprint">
-                  <ResultsInnovationTools />
+                  <ResultsInnovationTools 
+                    showResults={showResults} 
+                    engine={engineMode} 
+                    activeTab="blueprint"
+                  />
                 </TabsContent>
                 <TabsContent value="compare">
                   <ComparativeInnovationDashboard />

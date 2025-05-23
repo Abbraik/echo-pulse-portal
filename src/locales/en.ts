@@ -1,3 +1,4 @@
+
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -529,7 +530,11 @@ const en = {
   "fromBaseline": "From baseline",
   "generateSimulation": "Generate Simulation",
   "buildingSimulation": "Building simulation...",
+  "buildingSimulationStatus": "Processing diagram relationships...",
   "viewResults": "View Results",
+  "autoDetect": "Auto-detect",
+  "manualEntry": "Manual entry",
+  "analyzeResults": "Analyze Results",
   
   // Results & Innovation Tools
   "resultsWillAppearHere": "Results will appear here",
@@ -542,6 +547,7 @@ const en = {
   "assumptionExample2": "Feedback delays cause oscillation",
   "outcomeExample1": "Reduced inequality with 78% confidence",
   "outcomeExample2": "Improved resource efficiency by 23%",
+  "exportBlueprint": "Export Blueprint",
   
   // Categories
   "economicCategory": "Economic",
@@ -552,7 +558,6 @@ const en = {
   
   // Innovate Zone - System Redesign Hub
   "systemRedesignHub": "System Redesign Hub",
-  "moonshot": "Moonshot",
   "searchToolbox": "Search tools, concepts, scenarios...",
   
   // Experiment Simulation Panel
@@ -568,7 +573,6 @@ const en = {
   "comparativeInnovationTab": "Compare",
   "futuresCoCreationTab": "Co-Create",
   "compareScenarios": "Compare Scenarios",
-  "outcomesRisks": "Outcomes & Risks",
   
   // Button labels for innovate zone
   "scenarioForkButton": 'Scenario Fork',
@@ -579,6 +583,13 @@ const en = {
   "scenarioForkTooltip": 'Create a new variant of this scenario',
   "archiveScenarioTooltip": 'Save this scenario to the archive',
   "promoteBlueprintTooltip": 'Promote this design to a blueprint',
+  
+  // Tools and components
+  "systemDesignToolbox": "System Design Toolbox",
+  "lessons": "Lessons",
+  "concepts": "Concepts",
+  "scenarios": "Scenarios",
+  "newExperiment": "New Experiment"
 };
 
 export default en;

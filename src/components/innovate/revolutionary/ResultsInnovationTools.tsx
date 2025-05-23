@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-interface ResultsInnovationToolsProps {
+export interface ResultsInnovationToolsProps {
   showResults: boolean;
   engine: string;
   activeTab?: string;
@@ -43,7 +42,7 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
       return <BlueprintContent />;
     case 'compare':
       return <ComparativeContent />;
-    case 'cocreate':
+    case 'co-create':
       return <CoCreateContent />;
     default:
       return <ImpactDashboardContent engine={engine} />;
@@ -146,7 +145,7 @@ const BlueprintContent: React.FC = () => {
         </div>
         
         <div className="bg-black/10 dark:bg-white/5 rounded-md p-3 flex-1">
-          <div className="font-medium text-amber-300 mb-1">{t('outcomesRisks')}</div>
+          <div className="font-medium text-amber-300 mb-1">{t('outcomesDescription')}</div>
           <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
             <li>+3.2% Trust</li>
             <li>-1.5% Resource Consumption</li>

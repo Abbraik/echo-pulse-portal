@@ -11,9 +11,10 @@ import { Badge } from '@/components/ui/badge';
 
 interface ScenarioLibraryProps {
   vertical?: boolean;
+  mode?: 'lesson-driven' | 'freeform' | 'moonshot';
 }
 
-export const ScenarioLibrary: React.FC<ScenarioLibraryProps> = ({ vertical = false }) => {
+export const ScenarioLibrary: React.FC<ScenarioLibraryProps> = ({ vertical = false, mode = 'moonshot' }) => {
   const { t } = useTranslation();
   
   // Mock scenario data
