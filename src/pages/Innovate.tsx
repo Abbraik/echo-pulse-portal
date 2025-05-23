@@ -51,7 +51,7 @@ const Innovate: React.FC = () => {
                           flex items-center gap-2 px-4 py-1`}
                       >
                         <BookOpen size={16} />
-                        {t('lessonDriven')}
+                        {t('lessonDrivenMode')} {/* Updated key name */}
                       </TabsTrigger>
                       <TabsTrigger
                         value="freeform"
@@ -59,7 +59,7 @@ const Innovate: React.FC = () => {
                           flex items-center gap-2 px-4 py-1`}
                       >
                         <FlaskConical size={16} />
-                        {t('freeform')}
+                        {t('freeformMode')} {/* Updated key name */}
                       </TabsTrigger>
                       <TabsTrigger
                         value="moonshot"
@@ -67,7 +67,7 @@ const Innovate: React.FC = () => {
                           flex items-center gap-2 px-4 py-1`}
                       >
                         <Zap size={16} />
-                        {t('moonshot')}
+                        {t('moonshotMode')} {/* Updated key name */}
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>

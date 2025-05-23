@@ -278,9 +278,9 @@ const ar = {
   
   // Innovate Zone - System Redesign Hub
   systemRedesignHub: 'مركز إعادة تصميم النظام',
-  lessonDriven: 'تعلم من الدروس',
-  freeform: 'تجارب حرة',
-  moonshot: 'رؤى مستقبلية',
+  lessonDrivenMode: 'تعلم من الدروس', // Renamed from lessonDriven to avoid duplicate
+  freeformMode: 'تجارب حرة', // Renamed from freeform to avoid duplicate
+  moonshotMode: 'رؤى مستقبلية', // Renamed from moonshot to avoid duplicate
   systemDesignToolbox: 'أدوات تصميم النظام',
   searchToolbox: 'البحث عن أدوات ومفاهيم وسيناريوهات...',
   lessons: 'الدروس',
