@@ -74,8 +74,8 @@ export const ConceptBlocksPalette: React.FC = () => {
         </div>
       </div>
       
-      {/* Concept blocks grid */}
-      <div className="grid grid-cols-2 gap-2 pb-1 overflow-y-auto">
+      {/* Concept blocks list - changed from grid to vertical list for sidebar */}
+      <div className="flex flex-col gap-2 pb-1 overflow-y-auto">
         {filteredBlocks.map((block, index) => (
           <motion.div 
             key={block.id} 

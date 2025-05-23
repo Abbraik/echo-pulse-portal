@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useTranslation } from '@/hooks/use-translation';
-import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import {
   BarChartHorizontal,
@@ -24,19 +23,19 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
   
   if (!showResults) {
     return (
-      <GlassCard className="p-6 flex flex-col items-center justify-center h-full text-center">
+      <div className="p-6 flex flex-col items-center justify-center h-full text-center">
         <div className="text-3xl font-bold text-muted-foreground/50 mb-2">
           {t('resultsWillAppearHere')}
         </div>
         <p className="text-muted-foreground max-w-md">
           {t('generateSimulationFirst')}
         </p>
-      </GlassCard>
+      </div>
     );
   }
   
   return (
-    <GlassCard className="p-4 h-full flex flex-col shadow-[inset_0_0_15px_rgba(20,184,166,0.15)]">
+    <div className="p-4 h-full flex flex-col">
       <Tabs defaultValue="impact" className="flex-1 flex flex-col">
         <TabsList className="grid grid-cols-4 mb-4 bg-background/30">
           <TabsTrigger value="impact" className="flex items-center gap-1.5">
@@ -60,7 +59,12 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
         <div className="flex-1 overflow-hidden">
           {/* Impact Dashboard Tab */}
           <TabsContent value="impact" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
-            <div className="flex-1 bg-black/10 dark:bg-white/5 rounded-md p-3 mb-3 relative overflow-hidden">
+            <motion.div 
+              className="flex-1 bg-black/10 dark:bg-white/5 rounded-md p-3 mb-3 relative overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
               {/* Mock Chart */}
               <div className="absolute inset-0 p-3">
                 <div className="h-full w-full relative">
@@ -93,7 +97,7 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
             
             <div className="flex justify-between items-center text-xs">
               <div className="flex flex-col">
@@ -116,7 +120,12 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
 
           {/* Meta-Design Blueprint Tab */}
           <TabsContent value="blueprint" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
-            <div className="flex-1 flex flex-col gap-3 mb-3 text-xs">
+            <motion.div 
+              className="flex-1 flex flex-col gap-3 mb-3 text-xs"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
               <div className="bg-black/10 dark:bg-white/5 rounded-md p-3 flex-1">
                 <div className="font-medium text-purple-300 mb-1">{t('coreAssumptions')}</div>
                 <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
@@ -140,7 +149,7 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
                   <li>-1.5% Resource Consumption</li>
                 </ul>
               </div>
-            </div>
+            </motion.div>
             
             <Button size="sm" className="w-full flex items-center justify-center gap-1 bg-purple-600 hover:bg-purple-700">
               <Download size={14} />
@@ -150,7 +159,12 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
 
           {/* Comparative Innovation Tab */}
           <TabsContent value="compare" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
-            <div className="flex-1 mb-3 relative">
+            <motion.div 
+              className="flex-1 mb-3 relative"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
               {/* Mock Spider Chart */}
               <div className="h-full w-full bg-black/10 dark:bg-white/5 rounded-md p-3 flex items-center justify-center">
                 <svg width="90%" height="90%" viewBox="0 0 200 200">
@@ -191,7 +205,7 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
                   />
                 </svg>
               </div>
-            </div>
+            </motion.div>
             
             <div className="flex gap-1 text-xs">
               <Tabs defaultValue="spider" className="w-full">
@@ -208,7 +222,12 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
 
           {/* Futures Co-Creation Tab */}
           <TabsContent value="cocreate" className="h-full m-0 data-[state=active]:flex data-[state=active]:flex-col">
-            <div className="flex flex-col flex-1 gap-3 mb-3">
+            <motion.div 
+              className="flex flex-col flex-1 gap-3 mb-3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
               <div className="bg-black/10 dark:bg-white/5 rounded-md p-3 flex-1 flex flex-col items-center justify-center gap-1 text-center">
                 <div className="text-sm font-medium mb-1">{t('liveDebateArena')}</div>
                 <Button size="sm" variant="outline" className="text-xs">
@@ -221,7 +240,7 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
                 <div className="text-xs text-muted-foreground italic">"How would UBI affect migration patterns?"</div>
                 <div className="text-xs text-muted-foreground mt-2 italic">"Can circular economy principles scale globally?"</div>
               </div>
-            </div>
+            </motion.div>
             
             <Button size="sm" variant="outline" className="w-full flex items-center justify-center gap-1">
               <Download size={14} />
@@ -230,6 +249,6 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
           </TabsContent>
         </div>
       </Tabs>
-    </GlassCard>
+    </div>
   );
 };

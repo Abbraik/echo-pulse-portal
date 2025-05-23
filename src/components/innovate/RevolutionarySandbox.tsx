@@ -18,6 +18,7 @@ export const RevolutionarySandbox: React.FC = () => {
   const [engineMode, setEngineMode] = useState('system-dynamics');
   const [simulationGenerated, setSimulationGenerated] = useState(false);
   const [simulationInProgress, setSimulationInProgress] = useState(false);
+  const [activeTab, setActiveTab] = useState('sketch');
   
   const handleGenerateSimulation = () => {
     setSimulationInProgress(true);
@@ -25,6 +26,7 @@ export const RevolutionarySandbox: React.FC = () => {
     setTimeout(() => {
       setSimulationInProgress(false);
       setSimulationGenerated(true);
+      setActiveTab('results');
     }, 2500);
   };
   
@@ -87,9 +89,9 @@ export const RevolutionarySandbox: React.FC = () => {
       
       {/* Two-column layout for main content */}
       <div className="flex flex-1 gap-4 overflow-hidden">
-        {/* Left Column - Concept Blocks Sidebar (35%) */}
+        {/* Left Column - Concept Blocks Sidebar (25%) */}
         <motion.div 
-          className="w-[35%] flex-shrink-0 flex flex-col"
+          className="w-[25%] flex-shrink-0 flex flex-col"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -106,38 +108,71 @@ export const RevolutionarySandbox: React.FC = () => {
           </GlassCard>
         </motion.div>
         
-        {/* Right Column - Main Content Area (65%) */}
+        {/* Right Column - Main Content Area (75%) */}
         <motion.div 
-          className="w-[65%] flex flex-col gap-4"
+          className="w-[75%] flex flex-col gap-4"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          {/* CLD Sketch Canvas (45% height) */}
-          <div className="h-[45%] min-h-[250px]">
-            <GlassCard className="p-3 h-full glass-glow shadow-[inset_0_0_20px_rgba(20,184,166,0.25)]">
-              <CLDSketchCanvas />
-            </GlassCard>
-          </div>
-          
-          {/* Request Simulation Panel (15% height) */}
-          <div className="h-[15%] min-h-[120px]">
-            <RequestSimulationPanel 
-              engineMode={engineMode}
-              setEngineMode={setEngineMode}
-              onGenerateSimulation={handleGenerateSimulation}
-              isGenerating={simulationInProgress}
-              isGenerated={simulationGenerated}
-            />
-          </div>
-          
-          {/* Results & Innovation Tools (40% height) - Now using tabs */}
-          <div className="h-[40%] min-h-[200px]">
-            <ResultsInnovationTools 
-              showResults={simulationGenerated}
-              engine={engineMode}
-            />
-          </div>
+          <GlassCard className="flex-1 p-4 shadow-[inset_0_0_15px_rgba(20,184,166,0.2)] overflow-hidden flex flex-col">
+            <Tabs 
+              value={activeTab} 
+              onValueChange={setActiveTab} 
+              className="flex-1 flex flex-col"
+            >
+              <TabsList className="grid grid-cols-3 mb-4">
+                <TabsTrigger value="sketch" className="flex items-center gap-1.5">
+                  <PlusSquare size={16} />
+                  {t('cldSketchCanvas')}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="simulate" 
+                  className="flex items-center gap-1.5"
+                >
+                  <CirclePlay size={16} />
+                  {t('requestSimulation')}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="results" 
+                  className="flex items-center gap-1.5"
+                  disabled={!simulationGenerated}
+                >
+                  <Download size={16} />
+                  {t('resultsInnovation')}
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="flex-1 overflow-hidden">
+                <TabsContent value="sketch" className="h-full m-0 p-0">
+                  <div className="h-full">
+                    <CLDSketchCanvas />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="simulate" className="h-full m-0 p-0">
+                  <div className="h-full flex flex-col justify-center">
+                    <RequestSimulationPanel 
+                      engineMode={engineMode}
+                      setEngineMode={setEngineMode}
+                      onGenerateSimulation={handleGenerateSimulation}
+                      isGenerating={simulationInProgress}
+                      isGenerated={simulationGenerated}
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="results" className="h-full m-0 p-0">
+                  <div className="h-full">
+                    <ResultsInnovationTools 
+                      showResults={simulationGenerated}
+                      engine={engineMode}
+                    />
+                  </div>
+                </TabsContent>
+              </div>
+            </Tabs>
+          </GlassCard>
         </motion.div>
       </div>
     </div>
