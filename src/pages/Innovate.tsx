@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Lightbulb, Info, Zap, FlaskConical, Archive, Rocket, RefreshCw, BookOpen } from 'lucide-react';
@@ -51,7 +50,7 @@ const Innovate: React.FC = () => {
                           flex items-center gap-2 px-4 py-1`}
                       >
                         <BookOpen size={16} />
-                        {t('lessonDrivenMode')} {/* Updated key name */}
+                        {t('lessonDrivenMode')}
                       </TabsTrigger>
                       <TabsTrigger
                         value="freeform"
@@ -59,7 +58,7 @@ const Innovate: React.FC = () => {
                           flex items-center gap-2 px-4 py-1`}
                       >
                         <FlaskConical size={16} />
-                        {t('freeformMode')} {/* Updated key name */}
+                        {t('freeformMode')}
                       </TabsTrigger>
                       <TabsTrigger
                         value="moonshot"
@@ -67,7 +66,7 @@ const Innovate: React.FC = () => {
                           flex items-center gap-2 px-4 py-1`}
                       >
                         <Zap size={16} />
-                        {t('moonshotMode')} {/* Updated key name */}
+                        {t('moonshotModeText')}
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>

@@ -1,4 +1,3 @@
-
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -457,7 +456,7 @@ const en = {
   "archiveSelected": "Archive Selected",
   "promoteSelected": "Promote Selected",
   "newScenario": "New Scenario",
-  "moonshotMode": "Moonshot",
+  "moonshotModeText": "Moonshot",
   "lessonDrivenMode": "Lesson-Driven",
   "freeformMode": "Freeform",
   "metaDesignBlueprint": "Meta-Design Blueprint",
