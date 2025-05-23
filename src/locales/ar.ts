@@ -1,4 +1,3 @@
-
 const ar = {
   "Welcome to PDS": "مرحبا بكم في PDS",
   "Select your language": "اختر لغتك",
@@ -309,6 +308,16 @@ const ar = {
   insightSparks: 'شرارات الرؤى',
   joinRoom: 'انضم للغرفة',
   recordInsight: 'سجل رؤية',
+  
+  // Button labels for innovate zone
+  scenarioForkButton: 'تفرع السيناريو',
+  archiveScenarioButton: 'أرشفة السيناريو',
+  promoteBlueprintButton: 'ترقية المخطط',
+  
+  // Tooltips
+  scenarioForkTooltip: 'إنشاء متغير جديد من هذا السيناريو',
+  archiveScenarioTooltip: 'حفظ هذا السيناريو في الأرشيف',
+  promoteBlueprintTooltip: 'ترقية هذا التصميم إلى مخطط',
 };
 
 export default ar;

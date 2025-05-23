@@ -43,35 +43,34 @@ const Innovate: React.FC = () => {
                   </Tooltip>
                 </div>
                 <div className="flex mt-2">
-                  <TabsList className="grid w-auto grid-cols-3 bg-background/30">
-                    <TabsTrigger
-                      value="lesson-driven"
-                      onClick={() => setActiveMode('lesson-driven')}
-                      className={`${activeMode === 'lesson-driven' ? 'bg-teal-500/30 text-teal-300' : ''} 
-                        flex items-center gap-2 px-4 py-1`}
-                    >
-                      <BookOpen size={16} />
-                      {t('lessonDriven')}
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="freeform"
-                      onClick={() => setActiveMode('freeform')}
-                      className={`${activeMode === 'freeform' ? 'bg-blue-500/30 text-blue-300' : ''} 
-                        flex items-center gap-2 px-4 py-1`}
-                    >
-                      <FlaskConical size={16} />
-                      {t('freeform')}
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="moonshot"
-                      onClick={() => setActiveMode('moonshot')}
-                      className={`${activeMode === 'moonshot' ? 'bg-purple-500/30 text-purple-300' : ''} 
-                        flex items-center gap-2 px-4 py-1`}
-                    >
-                      <Zap size={16} />
-                      {t('moonshot')}
-                    </TabsTrigger>
-                  </TabsList>
+                  <Tabs value={activeMode} onValueChange={(value) => setActiveMode(value as 'lesson-driven' | 'freeform' | 'moonshot')}>
+                    <TabsList className="grid w-auto grid-cols-3 bg-background/30">
+                      <TabsTrigger
+                        value="lesson-driven"
+                        className={`${activeMode === 'lesson-driven' ? 'bg-teal-500/30 text-teal-300' : ''} 
+                          flex items-center gap-2 px-4 py-1`}
+                      >
+                        <BookOpen size={16} />
+                        {t('lessonDriven')}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="freeform"
+                        className={`${activeMode === 'freeform' ? 'bg-blue-500/30 text-blue-300' : ''} 
+                          flex items-center gap-2 px-4 py-1`}
+                      >
+                        <FlaskConical size={16} />
+                        {t('freeform')}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="moonshot"
+                        className={`${activeMode === 'moonshot' ? 'bg-purple-500/30 text-purple-300' : ''} 
+                          flex items-center gap-2 px-4 py-1`}
+                      >
+                        <Zap size={16} />
+                        {t('moonshot')}
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
               </div>
             </div>
@@ -81,7 +80,7 @@ const Innovate: React.FC = () => {
                 <TooltipTrigger asChild>
                   <Button size="sm" variant="outline" className="flex items-center gap-1">
                     <RefreshCw size={16} />
-                    <span>{t('scenarioFork')}</span>
+                    <span>{t('scenarioForkButton')}</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -93,7 +92,7 @@ const Innovate: React.FC = () => {
                 <TooltipTrigger asChild>
                   <Button size="sm" variant="outline" className="flex items-center gap-1">
                     <Archive size={16} />
-                    <span>{t('archiveScenario')}</span>
+                    <span>{t('archiveScenarioButton')}</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -105,7 +104,7 @@ const Innovate: React.FC = () => {
                 <TooltipTrigger asChild>
                   <Button size="sm" variant="outline" className="flex items-center gap-1">
                     <Rocket size={16} />
-                    <span>{t('promoteBlueprint')}</span>
+                    <span>{t('promoteBlueprintButton')}</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>

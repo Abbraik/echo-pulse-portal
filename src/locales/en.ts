@@ -1,4 +1,3 @@
-
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -569,7 +568,17 @@ const en = {
   "comparativeInnovationTab": "Compare",
   "futuresCoCreationTab": "Co-Create",
   "compareScenarios": "Compare Scenarios",
-  "outcomesRisks": "Outcomes & Risks"
+  "outcomesRisks": "Outcomes & Risks",
+  
+  // Button labels for innovate zone
+  "scenarioForkButton": 'Scenario Fork',
+  "archiveScenarioButton": 'Archive Scenario',
+  "promoteBlueprintButton": 'Promote Blueprint',
+  
+  // Tooltips
+  "scenarioForkTooltip": 'Create a new variant of this scenario',
+  "archiveScenarioTooltip": 'Save this scenario to the archive',
+  "promoteBlueprintTooltip": 'Promote this design to a blueprint',
 };
 
 export default en;
