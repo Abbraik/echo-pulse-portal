@@ -1,98 +1,124 @@
 
 import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Lightbulb, Info, Zap, FlaskConical, Archive, Rocket, RefreshCw } from 'lucide-react';
+import { Lightbulb, Info, Zap, FlaskConical, Archive, Rocket, RefreshCw, BookOpen } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { GlassCard } from '@/components/ui/glass-card';
-import { EvolutionarySandbox } from '@/components/innovate/EvolutionarySandbox';
-import { RevolutionarySandbox } from '@/components/innovate/RevolutionarySandbox';
-import { ScenarioLibrary } from '@/components/innovate/ScenarioLibrary';
+import { InnovateDesignHub } from '@/components/innovate/InnovateDesignHub';
 import { FabButton } from '@/components/innovate/FabButton';
 import { MetaDesignModal } from '@/components/innovate/MetaDesignModal';
 
 const Innovate: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('evolutionary');
+  const [activeMode, setActiveMode] = useState<'lesson-driven' | 'freeform' | 'moonshot'>('moonshot');
   const [isMetaDesignOpen, setIsMetaDesignOpen] = useState(false);
   const { t, isRTL } = useTranslation();
 
   return (
     <AnimatedPage>
       <div className="flex flex-col h-screen overflow-hidden">
+        {/* Header with title and mode selector */}
         <header className="h-auto mb-2">
-          <div className="glass-panel p-3 flex items-center space-x-4">
-            <div className="p-3 rounded-xl bg-purple-500/20 text-purple-400">
-              <Lightbulb size={24} />
-            </div>
-            <div className="text-left">
-              <div className="flex items-center">
-                <h1 className="text-2xl font-extrabold">
-                  {t('innovateZoneTitle')}: {t('evolutionaryRevolutionaryParadigms')}
-                </h1>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="ml-2 h-6 w-6">
-                      <Info size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs">{t('innovateZoneDescription')}</p>
-                  </TooltipContent>
-                </Tooltip>
+          <div className="glass-panel p-3 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 rounded-xl bg-purple-500/20 text-purple-400">
+                <Lightbulb size={24} />
               </div>
-              <p className="text-gray-400 text-sm">
-                {t('innovateZoneDesc')}
-              </p>
+              <div className="text-left">
+                <div className="flex items-center">
+                  <h1 className="text-2xl font-extrabold">
+                    {t('innovateZoneTitle')}: {t('systemRedesignHub')}
+                  </h1>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="ml-2 h-6 w-6">
+                        <Info size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{t('innovateZoneDescription')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <div className="flex mt-2">
+                  <TabsList className="grid w-auto grid-cols-3 bg-background/30">
+                    <TabsTrigger
+                      value="lesson-driven"
+                      onClick={() => setActiveMode('lesson-driven')}
+                      className={`${activeMode === 'lesson-driven' ? 'bg-teal-500/30 text-teal-300' : ''} 
+                        flex items-center gap-2 px-4 py-1`}
+                    >
+                      <BookOpen size={16} />
+                      {t('lessonDriven')}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="freeform"
+                      onClick={() => setActiveMode('freeform')}
+                      className={`${activeMode === 'freeform' ? 'bg-blue-500/30 text-blue-300' : ''} 
+                        flex items-center gap-2 px-4 py-1`}
+                    >
+                      <FlaskConical size={16} />
+                      {t('freeform')}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="moonshot"
+                      onClick={() => setActiveMode('moonshot')}
+                      className={`${activeMode === 'moonshot' ? 'bg-purple-500/30 text-purple-300' : ''} 
+                        flex items-center gap-2 px-4 py-1`}
+                    >
+                      <Zap size={16} />
+                      {t('moonshot')}
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex space-x-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="sm" variant="outline" className="flex items-center gap-1">
+                    <RefreshCw size={16} />
+                    <span>{t('scenarioFork')}</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('scenarioForkTooltip')}</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="sm" variant="outline" className="flex items-center gap-1">
+                    <Archive size={16} />
+                    <span>{t('archiveScenario')}</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('archiveScenarioTooltip')}</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="sm" variant="outline" className="flex items-center gap-1">
+                    <Rocket size={16} />
+                    <span>{t('promoteBlueprint')}</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('promoteBlueprintTooltip')}</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </header>
         
-        <div className="flex-1 overflow-hidden flex flex-col">
-          <Tabs 
-            defaultValue="evolutionary" 
-            className="w-full h-full flex flex-col" 
-            onValueChange={setActiveTab}
-          >
-            <TabsList className="grid w-full grid-cols-2 mb-2">
-              <TabsTrigger
-                value="evolutionary"
-                className={`text-sm font-medium py-2 flex items-center justify-center gap-2 ${
-                  activeTab === 'evolutionary' ? 'bg-teal-500/30 text-teal-300' : ''
-                }`}
-              >
-                <FlaskConical size={16} />
-                {t('evolutionarySandbox')}
-              </TabsTrigger>
-              <TabsTrigger
-                value="revolutionary"
-                className={`text-sm font-medium py-2 flex items-center justify-center gap-2 ${
-                  activeTab === 'revolutionary' ? 'bg-purple-500/30 text-purple-300' : ''
-                }`}
-              >
-                <Zap size={16} />
-                {t('revolutionarySandbox')}
-              </TabsTrigger>
-            </TabsList>
-            
-            <div className="flex-1 overflow-hidden flex flex-col">
-              {/* Evolutionary Sandbox Content */}
-              <TabsContent value="evolutionary" className="mt-0 h-full flex-1 flex flex-col overflow-hidden">
-                <EvolutionarySandbox />
-              </TabsContent>
-              
-              {/* Revolutionary Sandbox Content */}
-              <TabsContent value="revolutionary" className="mt-0 h-full flex-1 flex flex-col overflow-hidden">
-                <RevolutionarySandbox />
-              </TabsContent>
-            </div>
-          </Tabs>
-          
-          {/* Shared Scenario Library - Always visible but smaller */}
-          <div className="h-48 mt-2 flex-shrink-0">
-            <ScenarioLibrary />
-          </div>
+        {/* Main content area */}
+        <div className="flex-1 overflow-hidden">
+          <InnovateDesignHub mode={activeMode} />
         </div>
         
         {/* Floating Action Button for Meta Design Blueprint Generator */}

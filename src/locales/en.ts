@@ -549,6 +549,39 @@ const en = {
   "governanceCategory": "Governance", // This is a duplicate key fixed
   "environmentalCategory": "Environmental", // This is a duplicate key fixed
   "socialCategory": "Social", // This is a duplicate key fixed
+  
+  // Innovate Zone - System Redesign Hub
+  systemRedesignHub: 'System Redesign Hub',
+  lessonDriven: 'Lesson-Driven',
+  freeform: 'Freeform',
+  moonshot: 'Moonshot',
+  systemDesignToolbox: 'System Design Toolbox',
+  searchToolbox: 'Search tools, concepts, scenarios...',
+  lessons: 'Lessons',
+  concepts: 'Concepts',
+  scenarios: 'Scenarios',
+  newExperiment: 'New Experiment',
+  
+  // Experiment Simulation Panel
+  experimentSimulation: 'Experiment Simulation',
+  forkScenario: 'Fork Scenario',
+  activeFork: 'Active Fork',
+  simulationEngine: 'Simulation Engine',
+  newFork: 'New Fork',
+  
+  // Tabs and Content
+  impactDashboard: 'Impact',
+  metaDesignBlueprint: 'Blueprint',
+  comparativeInnovation: 'Compare',
+  futuresCoCreation: 'Co-Create',
+  compareScenarios: 'Compare Scenarios',
+  coreAssumptions: 'Core Assumptions',
+  newStocksFlows: 'New Stocks & Flows',
+  outcomesRisks: 'Outcomes & Risks',
+  liveDebateArena: 'Live Debate Arena',
+  insightSparks: 'Insight Sparks',
+  joinRoom: 'Join Room',
+  recordInsight: 'Record Insight',
 };
 
 export default en;

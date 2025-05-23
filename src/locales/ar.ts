@@ -275,7 +275,40 @@ const ar = {
   saveFork: 'حفظ التفرع',
   promoteToBlueprint: 'ترقية إلى مخطط',
   exportForkJSON: 'تصدير JSON التفرع',
-  generateMetaDesignBlueprint: 'إنشاء مخطط التصميم الفوقي'
+  generateMetaDesignBlueprint: 'إنشاء مخطط التصميم الفوقي',
+  
+  // Innovate Zone - System Redesign Hub
+  systemRedesignHub: 'مركز إعادة تصميم النظام',
+  lessonDriven: 'تعلم من الدروس',
+  freeform: 'تجارب حرة',
+  moonshot: 'رؤى مستقبلية',
+  systemDesignToolbox: 'أدوات تصميم النظام',
+  searchToolbox: 'البحث عن أدوات ومفاهيم وسيناريوهات...',
+  lessons: 'الدروس',
+  concepts: 'المفاهيم',
+  scenarios: 'السيناريوهات',
+  newExperiment: 'تجربة جديدة',
+  
+  // Experiment Simulation Panel
+  experimentSimulation: 'محاكاة التجربة',
+  forkScenario: 'تفرع السيناريو',
+  activeFork: 'التفرع النشط',
+  simulationEngine: 'محرك المحاكاة',
+  newFork: 'تفرع جديد',
+  
+  // Tabs and Content
+  impactDashboard: 'التأثير',
+  metaDesignBlueprint: 'المخطط',
+  comparativeInnovation: 'المقارنة',
+  futuresCoCreation: 'الإبداع المشترك',
+  compareScenarios: 'مقارنة السيناريوهات',
+  coreAssumptions: 'الافتراضات الأساسية',
+  newStocksFlows: 'المخزون والتدفقات الجديدة',
+  outcomesRisks: 'النتائج والمخاطر',
+  liveDebateArena: 'منصة النقاش المباشر',
+  insightSparks: 'شرارات الرؤى',
+  joinRoom: 'انضم للغرفة',
+  recordInsight: 'سجل رؤية',
 };
 
 export default ar;

@@ -25,12 +25,14 @@ const CONCEPT_BLOCKS: ConceptBlock[] = [
   { id: 'participatory', name: 'Participatory Budgeting', description: 'Community decides on budget allocation', category: 'governance' },
   { id: 'platform', name: 'Platform Cooperatives', description: 'User-owned digital platforms', category: 'economic' },
   { id: 'commons2', name: 'Knowledge Commons', description: 'Shared intellectual resources', category: 'social' },
+  { id: 'publicTrust', name: 'Public Goods Trust', description: 'Collective stewardship of shared resources', category: 'sustainability' },
+  { id: 'localcurrency', name: 'Local Currencies', description: 'Community-specific exchange medium', category: 'economic' },
 ];
 
 export const ConceptBlocksPalette: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string | null>('economic');
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   
   const filteredBlocks = CONCEPT_BLOCKS.filter(block => {
     const matchesSearch = block.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -52,13 +54,13 @@ export const ConceptBlocksPalette: React.FC = () => {
       {/* Search and filters section */}
       <div className="flex flex-col gap-2 sticky top-0 z-10 mb-3">
         <div className="relative w-full">
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t('searchConceptBlocks')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-8 h-8 bg-black/20 border-white/10"
           />
-          <Search className="absolute left-2 top-1.5 h-4 w-4 text-muted-foreground" />
         </div>
         
         <div className="flex gap-1.5 flex-wrap">
@@ -75,13 +77,13 @@ export const ConceptBlocksPalette: React.FC = () => {
         </div>
       </div>
       
-      {/* Concept blocks list - vertical list for sidebar */}
+      {/* Concept blocks list - vertical list */}
       <ScrollArea className="flex-1">
         <div className="flex flex-col gap-2 pr-3">
           {filteredBlocks.map((block, index) => (
             <motion.div 
               key={block.id} 
-              className="flex flex-col items-center p-2 rounded-lg bg-white/10 dark:bg-white/5 border 
+              className="flex flex-col p-2 rounded-lg bg-white/10 dark:bg-white/5 border 
                         border-white/20 cursor-move hover:bg-white/20 
                         transition-all hover:scale-[1.03] group"
               initial={{ opacity: 0, y: 10 }}
@@ -90,8 +92,13 @@ export const ConceptBlocksPalette: React.FC = () => {
               draggable="true"
               title={block.description}
             >
-              <div className="text-sm font-medium truncate w-full text-center">{block.name}</div>
-              <Badge variant="outline" className="mt-1 text-xs">{t(getCategoryTranslationKey(block.category))}</Badge>
+              <div className="flex justify-between items-start">
+                <div className="text-sm font-medium">{block.name}</div>
+                <Badge variant="outline" className="text-xs">{t(getCategoryTranslationKey(block.category))}</Badge>
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {block.description}
+              </div>
               <motion.div 
                 className="absolute inset-0 rounded-lg bg-teal-500/0 group-hover:bg-teal-500/5 transition-all"
                 whileHover={{ 
@@ -103,12 +110,6 @@ export const ConceptBlocksPalette: React.FC = () => {
           ))}
         </div>
       </ScrollArea>
-      
-      {/* Add New Concept button at bottom */}
-      <Button className="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 transition-all duration-300 shadow-md">
-        <PlusSquare size={16} />
-        {t('createNewConcept')}
-      </Button>
     </div>
   );
 };
