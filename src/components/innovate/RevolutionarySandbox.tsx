@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { GlassCard } from '@/components/ui/glass-card';
@@ -142,7 +141,7 @@ export const RevolutionarySandbox: React.FC = () => {
               <div className="flex-1 overflow-hidden px-3 pb-3">
                 <TabsContent value="sketch" className="h-full m-0 p-0">
                   <div className="h-full">
-                    <CLDSketchCanvas />
+                    <CLDSketchCanvas mode="moonshot" />
                   </div>
                 </TabsContent>
 

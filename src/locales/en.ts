@@ -588,7 +588,10 @@ const en = {
   "lessons": "Lessons",
   "concepts": "Concepts",
   "scenarios": "Scenarios",
-  "newExperiment": "New Experiment"
+  "newExperiment": "New Experiment",
+  
+  // Revolutionary Sandbox components
+  "buildingBlocks": "Building Blocks"
 };
 
 export default en;
