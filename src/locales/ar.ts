@@ -1,3 +1,4 @@
+
 const ar = {
   "Welcome to PDS": "مرحبا بكم في PDS",
   "Select your language": "اختر لغتك",
@@ -353,13 +354,11 @@ const ar = {
   "emailSent": "تم إرسال البريد الإلكتروني!",
   "checkEmailForReset": "تحقق من بريدك الإلكتروني للحصول على رابط إعادة تعيين كلمة المرور. إذا لم يظهر خلال بضع دقائق، تحقق من مجلد الرسائل المزعجة.",
   "backToLogin": "العودة لتسجيل الدخول",
-  "close": "إغلاق",
   "deiTrajectoryComparison": "مقارنة مسار التنوع والإنصاف والشمول",
   "baselineVsRedesignScenario": "السيناريو الأساسي مقابل سيناريو إعادة التصميم",
   "months": "أشهر",
   "baseline": "خط الأساس",
-  "redesign": "إعادة التصميم",
-  "confidence": "الثقة"
+  "redesign": "إعادة التصميم"
 };
 
 export default ar;
