@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe } from 'lucide-react';
@@ -17,9 +16,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavbarProps {
   hidden?: boolean;
+  onLogout: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
+const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { theme, resolvedTheme, setTheme } = useTheme();
@@ -226,7 +226,10 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                   <DropdownMenuSeparator className={
                     resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300'
                   } />
-                  <DropdownMenuItem className="text-red-600 dark:text-red-400 cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">
+                  <DropdownMenuItem 
+                    onClick={onLogout}
+                    className="text-red-600 dark:text-red-400 cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100"
+                  >
                     {t('logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
