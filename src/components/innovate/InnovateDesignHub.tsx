@@ -41,9 +41,9 @@ export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) =>
   };
 
   return (
-    <div className={`flex ${isRTL ? 'flex-row-reverse' : 'flex-row'} h-full gap-4`}>
-      {/* Left sidebar: Toolbox */}
-      <div className="w-[30%] min-h-0">
+    <div className={`flex ${isRTL ? 'flex-row-reverse' : 'flex-row'} h-full gap-4 relative`}>
+      {/* Left sidebar: Enhanced Toolbox */}
+      <div className={`w-[25%] min-h-0 ${selectedItem ? 'z-10' : 'z-20'}`}>
         <GlassCard className="h-full">
           <ScrollArea className="h-full">
             <InnovateToolbox 
@@ -55,13 +55,13 @@ export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) =>
         </GlassCard>
       </div>
 
-      {/* Right side: Dynamic workspace */}
-      <div className="w-[70%] min-h-0">
+      {/* Right side: Enhanced Dynamic workspace */}
+      <div className="w-[75%] min-h-0 relative">
         <GlassCard className="h-full relative overflow-hidden">
           <AnimatePresence mode="wait">
             {selectedItem ? (
               <WorkingCanvas 
-                key="working-canvas"
+                key="enhanced-working-canvas"
                 selectedItem={selectedItem}
                 onClose={handleCloseCanvas}
               />

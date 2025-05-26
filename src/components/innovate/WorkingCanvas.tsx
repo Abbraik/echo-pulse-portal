@@ -1,15 +1,16 @@
 
-import React, { useState } from 'react';
-import { X, Pencil, Play, BarChart3, BookOpen, Radar, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Download, Share2, Archive, Rocket } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CLDSketchCanvas } from './revolutionary/CLDSketchCanvas';
-import { RequestSimulationPanel } from './revolutionary/RequestSimulationPanel';
+import { TriggerPanel } from './enhanced/TriggerPanel';
+import { StepBar } from './enhanced/StepBar';
+import { UnifiedCanvas } from './enhanced/UnifiedCanvas';
+import { ScenarioForkSimulationPanel } from './enhanced/ScenarioForkSimulationPanel';
+import { KeyInsightCard } from './enhanced/KeyInsightCard';
 import { ResultsInnovationTools } from './revolutionary/ResultsInnovationTools';
-import { ComparativeInnovationDashboard } from './revolutionary/ComparativeInnovationDashboard';
-import { CoCreationForum } from './revolutionary/CoCreationForum';
 
 interface ConceptBlock {
   id: string;
@@ -34,160 +35,272 @@ interface WorkingCanvasProps {
 
 export const WorkingCanvas: React.FC<WorkingCanvasProps> = ({ selectedItem, onClose }) => {
   const { t, isRTL } = useTranslation();
-  const [activeTab, setActiveTab] = useState('sketch');
-  const [engineMode, setEngineMode] = useState('system-dynamics');
+  const [currentStep, setCurrentStep] = useState(1); // Start at sketch
+  const [activeTrigger, setActiveTrigger] = useState<'learn' | 'monitor' | 'freeform' | null>('freeform');
+  const [canvasViewMode, setCanvasViewMode] = useState<'cld' | 'sna'>('cld');
+  const [overlayMode, setOverlayMode] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [isGenerated, setIsGenerated] = useState(false);
-  const [showResults, setShowResults] = useState(false);
+  const [activeResultsTab, setActiveResultsTab] = useState('impact');
+
+  // Mock data for trigger notifications
+  const [learnPatterns] = useState(2);
+  const [monitorAlerts] = useState(1);
+
+  // Timer for simulation
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isGenerating) {
+      interval = setInterval(() => {
+        setElapsedTime(prev => prev + 100);
+      }, 100);
+    }
+    return () => clearInterval(interval);
+  }, [isGenerating]);
 
   const handleGenerateSimulation = () => {
     setIsGenerating(true);
+    setElapsedTime(0);
     setTimeout(() => {
       setIsGenerating(false);
       setIsGenerated(true);
-      setShowResults(true);
-    }, 2000);
+      setCurrentStep(3); // Jump to results
+    }, 3000);
   };
 
-  // Helper functions to safely get item properties
   const getItemName = (item: ConceptBlock | ScenarioForkData | null): string => {
     if (!item) return 'System Redesign';
     return item.name;
   };
 
-  const getItemType = (item: ConceptBlock | ScenarioForkData | null): string => {
-    if (!item) return '';
-    if ('type' in item) return item.type;
-    return 'Scenario';
-  };
+  const mockInsights = [
+    {
+      type: 'opportunity' as const,
+      title: 'Leverage Point Detected',
+      description: 'Self-organizing feedback loop identified in youth engagement',
+      confidence: 87
+    },
+    {
+      type: 'risk' as const,
+      title: 'System Delay Warning',
+      description: 'Policy implementation lag may reduce intervention effectiveness',
+      confidence: 73
+    }
+  ];
 
-  const isConceptBlock = (item: ConceptBlock | ScenarioForkData | null): item is ConceptBlock => {
-    return item !== null && 'type' in item;
-  };
-
-  const isScenarioFork = (item: ConceptBlock | ScenarioForkData | null): item is ScenarioForkData => {
-    return item !== null && 'active' in item;
-  };
-
-  const itemTitle = getItemName(selectedItem);
-  const itemType = getItemType(selectedItem);
-
-  const tabs = [
-    { id: 'sketch', label: t('sketch'), icon: <Pencil size={16} /> },
-    { id: 'simulate', label: t('simulate'), icon: <Play size={16} /> },
-    { id: 'results', label: t('results'), icon: <BarChart3 size={16} /> },
-    { id: 'blueprint', label: t('blueprint'), icon: <BookOpen size={16} /> },
-    { id: 'compare', label: t('compare'), icon: <Radar size={16} /> },
-    { id: 'co-create', label: t('coCreate'), icon: <Users size={16} /> }
+  const enhancedTabs = [
+    { id: 'impact', label: t('impact') },
+    { id: 'blueprint', label: t('blueprint') },
+    { id: 'compare', label: t('compare') },
+    { id: 'co-create', label: t('coCreate') },
+    { id: 'ensemble', label: t('ensemble') },
+    { id: 'breakpoints', label: t('breakpoints') },
+    { id: 'pathways', label: t('pathways') }
   ];
 
   return (
     <motion.div
-      className="h-full w-full glass-panel overflow-hidden flex flex-col"
+      className="h-full w-full glass-panel overflow-hidden flex flex-col relative"
       initial={{ opacity: 0, x: 50 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 50 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
+      {/* Step Bar */}
+      <StepBar currentStep={currentStep} onStepChange={setCurrentStep} />
+
       {/* Header */}
       <div className="flex-none p-4 border-b border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold">{itemTitle}</h2>
-            {itemType && (
-              <span className="text-xs px-2 py-1 rounded bg-teal-500/20 text-teal-300">
-                {itemType}
-              </span>
-            )}
+            <h2 className="text-xl font-bold">{getItemName(selectedItem)}</h2>
+            <span className="text-xs px-2 py-1 rounded bg-teal-500/20 text-teal-300">
+              {t('systemRedesign')}
+            </span>
           </div>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onClose}
-            className="h-8 w-8"
-          >
-            <X size={16} />
-          </Button>
-        </div>
+          <div className="flex items-center gap-2">
+            {/* Feed-Forward Controls */}
+            <Button 
+              size="sm" 
+              variant="outline"
+              disabled={!isGenerated}
+              className={`flex items-center gap-2 ${
+                isGenerated ? 'hover:bg-purple-500/20' : 'opacity-50'
+              }`}
+            >
+              <Rocket size={16} />
+              <span className="hidden sm:inline">{t('promoteToStrategy')}</span>
+            </Button>
+            
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Archive size={16} />
+              <span className="hidden sm:inline">{t('archiveToLearn')}</span>
+            </Button>
 
-        {/* Breadcrumb */}
-        <div className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-          <span>Home</span>
-          <span>›</span>
-          <span>System Redesign</span>
-          <span>›</span>
-          <span>{itemTitle}</span>
-          <span>›</span>
-          <span className="capitalize">{tabs.find(tab => tab.id === activeTab)?.label}</span>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose}
+              className="h-8 w-8"
+            >
+              <X size={16} />
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Tab Bar */}
-      <div className="flex-none">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 glass-panel m-0 rounded-none border-b border-white/10">
-            {tabs.map(tab => (
-              <TabsTrigger 
-                key={tab.id} 
-                value={tab.id}
-                className="flex items-center gap-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-300"
-              >
-                {tab.icon}
-                <span className="hidden sm:inline">{tab.label}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+      {/* Trigger Panel */}
+      <div className="flex-none px-4">
+        <TriggerPanel
+          activeTrigger={activeTrigger}
+          onTriggerSelect={setActiveTrigger}
+          learnPatterns={learnPatterns}
+          monitorAlerts={monitorAlerts}
+        />
+      </div>
 
-          {/* Tab Content */}
-          <div className="flex-1 min-h-0 h-[calc(100vh-12rem)]">
-            <TabsContent value="sketch" className="h-full m-0">
-              <CLDSketchCanvas 
-                mode="moonshot" 
-                selectedBlock={isConceptBlock(selectedItem) ? selectedItem : undefined}
-                selectedFork={isScenarioFork(selectedItem) ? selectedItem : undefined}
-              />
-            </TabsContent>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-h-0 p-4 gap-4">
+        {/* Unified Canvas - Top ¾ */}
+        <div className="h-3/4">
+          <UnifiedCanvas
+            viewMode={canvasViewMode}
+            onViewModeChange={setCanvasViewMode}
+            overlayMode={overlayMode}
+            onOverlayToggle={() => setOverlayMode(!overlayMode)}
+          />
+        </div>
 
-            <TabsContent value="simulate" className="h-full m-0 p-4">
-              <RequestSimulationPanel
-                engineMode={engineMode}
-                setEngineMode={setEngineMode}
-                onGenerateSimulation={handleGenerateSimulation}
-                isGenerating={isGenerating}
-                isGenerated={isGenerated}
-              />
-            </TabsContent>
+        {/* Bottom Section - ¼ */}
+        <div className="h-1/4 flex flex-col gap-4">
+          {/* Scenario Fork + Simulation Panel */}
+          <ScenarioForkSimulationPanel
+            onGenerateSimulation={handleGenerateSimulation}
+            isGenerating={isGenerating}
+            elapsedTime={elapsedTime}
+          />
 
-            <TabsContent value="results" className="h-full m-0">
-              <ResultsInnovationTools
-                showResults={showResults}
-                engine={engineMode}
-                activeTab="impact"
-                selectedBlock={isConceptBlock(selectedItem) ? selectedItem : undefined}
-                selectedFork={isScenarioFork(selectedItem) ? selectedItem : undefined}
-              />
-            </TabsContent>
+          {/* Results Section */}
+          {isGenerated && (
+            <div className="glass-panel">
+              {/* Key Insight Card */}
+              <KeyInsightCard insights={mockInsights} />
 
-            <TabsContent value="blueprint" className="h-full m-0">
-              <ResultsInnovationTools
-                showResults={showResults}
-                engine={engineMode}
-                activeTab="blueprint"
-                selectedBlock={isConceptBlock(selectedItem) ? selectedItem : undefined}
-                selectedFork={isScenarioFork(selectedItem) ? selectedItem : undefined}
-              />
-            </TabsContent>
+              {/* Enhanced Results Tabs */}
+              <Tabs value={activeResultsTab} onValueChange={setActiveResultsTab}>
+                <TabsList className="grid grid-cols-7 glass-panel-deep m-4 mb-0">
+                  {enhancedTabs.map(tab => (
+                    <TabsTrigger 
+                      key={tab.id} 
+                      value={tab.id}
+                      className="text-xs data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-300"
+                    >
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
 
-            <TabsContent value="compare" className="h-full m-0 p-4">
-              <ComparativeInnovationDashboard />
-            </TabsContent>
-
-            <TabsContent value="co-create" className="h-full m-0 p-4">
-              <CoCreationForum />
-            </TabsContent>
-          </div>
-        </Tabs>
+                <div className="p-4 h-64 overflow-hidden">
+                  {enhancedTabs.map(tab => (
+                    <TabsContent key={tab.id} value={tab.id} className="h-full m-0">
+                      {tab.id === 'ensemble' ? (
+                        <EnsembleContent />
+                      ) : tab.id === 'breakpoints' ? (
+                        <BreakpointsContent />
+                      ) : tab.id === 'pathways' ? (
+                        <PathwaysContent />
+                      ) : (
+                        <ResultsInnovationTools
+                          showResults={isGenerated}
+                          engine="system-dynamics"
+                          activeTab={tab.id}
+                          selectedBlock={selectedItem && 'type' in selectedItem ? selectedItem : undefined}
+                          selectedFork={selectedItem && 'active' in selectedItem ? selectedItem : undefined}
+                        />
+                      )}
+                    </TabsContent>
+                  ))}
+                </div>
+              </Tabs>
+            </div>
+          )}
+        </div>
       </div>
     </motion.div>
+  );
+};
+
+// New tab components for enhanced functionality
+const EnsembleContent: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="h-full flex items-center justify-center">
+      <div className="text-center">
+        <div className="text-lg font-medium mb-2">{t('monteCarloEnsemble')}</div>
+        <div className="text-sm text-muted-foreground">
+          Histogram of 1000 simulation outcomes
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BreakpointsContent: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="h-full p-4">
+      <div className="text-sm font-medium mb-3">{t('systemBreakpoints')}</div>
+      <div className="space-y-2">
+        <div className="flex justify-between items-center p-2 bg-white/5 rounded">
+          <span className="text-sm">Trust threshold</span>
+          <span className="text-sm text-amber-400">72%</span>
+        </div>
+        <div className="flex justify-between items-center p-2 bg-white/5 rounded">
+          <span className="text-sm">Engagement saturation</span>
+          <span className="text-sm text-red-400">85%</span>
+        </div>
+        <div className="flex justify-between items-center p-2 bg-white/5 rounded">
+          <span className="text-sm">Resource constraint</span>
+          <span className="text-sm text-orange-400">$2.3M</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PathwaysContent: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="h-full p-4">
+      <div className="text-sm font-medium mb-3">{t('executionPathways')}</div>
+      <div className="space-y-3">
+        <div className="p-3 bg-white/5 rounded-lg">
+          <div className="font-medium text-sm text-green-400">Path 1: Community-First</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Start with grassroots → Build trust → Scale programs
+          </div>
+        </div>
+        <div className="p-3 bg-white/5 rounded-lg">
+          <div className="font-medium text-sm text-blue-400">Path 2: Policy-Led</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Establish framework → Deploy resources → Monitor outcomes
+          </div>
+        </div>
+        <div className="p-3 bg-white/5 rounded-lg">
+          <div className="font-medium text-sm text-purple-400">Path 3: Hybrid Approach</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Parallel tracks → Convergence point → Amplified impact
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
