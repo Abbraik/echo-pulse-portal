@@ -3,10 +3,9 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/hooks/use-translation';
-import { Package, Layers, GitBranch } from 'lucide-react';
+import { Package, GitBranch } from 'lucide-react';
 import { ConceptBlocksPalette } from './revolutionary/ConceptBlocksPalette';
 import { ScenarioFork } from './revolutionary/ScenarioFork';
-import { ScenarioLibrary } from './ScenarioLibrary';
 
 interface InnovateToolboxProps {
   mode: 'lesson-driven' | 'freeform' | 'moonshot';
@@ -20,14 +19,10 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ mode }) => {
       <h2 className="text-lg font-semibold mb-4">{t('buildingBlocks')}</h2>
       
       <Tabs defaultValue="blocks" className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-3 mb-4">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="blocks" className="flex items-center gap-1">
             <Package size={14} />
             <span className="hidden sm:inline">Blocks</span>
-          </TabsTrigger>
-          <TabsTrigger value="scenarios" className="flex items-center gap-1">
-            <Layers size={14} />
-            <span className="hidden sm:inline">Library</span>
           </TabsTrigger>
           <TabsTrigger value="forks" className="flex items-center gap-1">
             <GitBranch size={14} />
@@ -40,10 +35,6 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ mode }) => {
             <ScrollArea className="h-full">
               <ConceptBlocksPalette mode={mode} />
             </ScrollArea>
-          </TabsContent>
-          
-          <TabsContent value="scenarios" className="h-full m-0">
-            <ScenarioLibrary vertical={true} mode={mode} />
           </TabsContent>
           
           <TabsContent value="forks" className="h-full m-0">
