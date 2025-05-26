@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { MousePointer2, Circle, ArrowRight, Plus, Save, RotateCcw, Redo2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
@@ -22,58 +22,241 @@ interface CLDFlow {
   label: string;
 }
 
-interface CLDSketchCanvasProps {
-  mode: 'lesson-driven' | 'freeform' | 'moonshot';
+interface ConceptBlock {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  category: string;
+  type: string;
 }
 
-export const CLDSketchCanvas: React.FC<CLDSketchCanvasProps> = ({ mode }) => {
+interface ScenarioForkData {
+  id: string;
+  name: string;
+  active: boolean;
+}
+
+interface CLDSketchCanvasProps {
+  mode: 'lesson-driven' | 'freeform' | 'moonshot';
+  selectedBlock?: ConceptBlock | null;
+  selectedFork?: ScenarioForkData | null;
+}
+
+export const CLDSketchCanvas: React.FC<CLDSketchCanvasProps> = ({ 
+  mode, 
+  selectedBlock,
+  selectedFork 
+}) => {
   const { t } = useTranslation();
   const [selectedTool, setSelectedTool] = useState<'select' | 'stock' | 'variable' | 'link'>('select');
   
-  // Mock CLD data
-  const [nodes] = useState<CLDNode[]>([
-    {
-      id: 'social-trust',
-      name: t('socialTrustNode'),
-      value: 72,
-      x: 120,
-      y: 80,
-      type: 'stock'
-    },
-    {
-      id: 'youth-engagement',
-      name: t('youthEngagementNode'),
-      value: 45,
-      x: 280,
-      y: 140,
-      type: 'variable'
-    },
-    {
-      id: 'community-programs',
-      name: t('communityProgramsNode'),
-      value: 30,
-      x: 200,
-      y: 220,
-      type: 'stock'
+  // Dynamic CLD data based on selected context
+  const contextualData = useMemo(() => {
+    if (selectedBlock) {
+      // Return different node configurations based on the selected block
+      switch (selectedBlock.id) {
+        case 'uba':
+          return {
+            nodes: [
+              {
+                id: 'basic-access',
+                name: 'Basic Access Coverage',
+                value: 68,
+                x: 120,
+                y: 80,
+                type: 'stock' as const
+              },
+              {
+                id: 'equality-index',
+                name: 'Equality Index',
+                value: 72,
+                x: 280,
+                y: 140,
+                type: 'variable' as const
+              },
+              {
+                id: 'policy-support',
+                name: 'Policy Support',
+                value: 45,
+                x: 200,
+                y: 220,
+                type: 'stock' as const
+              }
+            ],
+            flows: [
+              {
+                id: 'flow-1',
+                from: 'basic-access',
+                to: 'equality-index',
+                type: 'positive' as const,
+                label: 'Access → + Equality'
+              },
+              {
+                id: 'flow-2',
+                from: 'policy-support',
+                to: 'basic-access',
+                type: 'positive' as const,
+                label: 'Policy → + Access'
+              }
+            ],
+            loopLabel: 'UBA Loop'
+          };
+        case 'doughnut':
+          return {
+            nodes: [
+              {
+                id: 'ecological-ceiling',
+                name: 'Ecological Ceiling',
+                value: 78,
+                x: 120,
+                y: 80,
+                type: 'stock' as const
+              },
+              {
+                id: 'social-foundation',
+                name: 'Social Foundation',
+                value: 65,
+                x: 280,
+                y: 140,
+                type: 'variable' as const
+              },
+              {
+                id: 'regenerative-practices',
+                name: 'Regenerative Practices',
+                value: 52,
+                x: 200,
+                y: 220,
+                type: 'stock' as const
+              }
+            ],
+            flows: [
+              {
+                id: 'flow-1',
+                from: 'regenerative-practices',
+                to: 'ecological-ceiling',
+                type: 'positive' as const,
+                label: 'Practices → + Ceiling'
+              },
+              {
+                id: 'flow-2',
+                from: 'social-foundation',
+                to: 'regenerative-practices',
+                type: 'positive' as const,
+                label: 'Foundation → + Practices'
+              }
+            ],
+            loopLabel: 'Doughnut Loop'
+          };
+        default:
+          return getDefaultData();
+      }
+    } else if (selectedFork) {
+      // Return different configurations based on the selected fork
+      switch (selectedFork.id) {
+        case 'fork2':
+          return {
+            nodes: [
+              {
+                id: 'resource-rights',
+                name: 'Resource Rights',
+                value: 85,
+                x: 120,
+                y: 80,
+                type: 'stock' as const
+              },
+              {
+                id: 'community-ownership',
+                name: 'Community Ownership',
+                value: 70,
+                x: 280,
+                y: 140,
+                type: 'variable' as const
+              },
+              {
+                id: 'legal-framework',
+                name: 'Legal Framework',
+                value: 60,
+                x: 200,
+                y: 220,
+                type: 'stock' as const
+              }
+            ],
+            flows: [
+              {
+                id: 'flow-1',
+                from: 'legal-framework',
+                to: 'resource-rights',
+                type: 'positive' as const,
+                label: 'Legal → + Rights'
+              },
+              {
+                id: 'flow-2',
+                from: 'resource-rights',
+                to: 'community-ownership',
+                type: 'positive' as const,
+                label: 'Rights → + Ownership'
+              }
+            ],
+            loopLabel: 'Resource Rights Loop'
+          };
+        default:
+          return getDefaultData();
+      }
     }
-  ]);
+    return getDefaultData();
+  }, [selectedBlock, selectedFork, t]);
 
-  const [flows] = useState<CLDFlow[]>([
-    {
-      id: 'flow-1',
-      from: 'youth-engagement',
-      to: 'social-trust',
-      type: 'positive',
-      label: 'Youth → + Trust'
-    },
-    {
-      id: 'flow-2',
-      from: 'community-programs',
-      to: 'youth-engagement',
-      type: 'positive',
-      label: 'Programs → + Engagement'
-    }
-  ]);
+  function getDefaultData() {
+    return {
+      nodes: [
+        {
+          id: 'social-trust',
+          name: t('socialTrustNode'),
+          value: 72,
+          x: 120,
+          y: 80,
+          type: 'stock' as const
+        },
+        {
+          id: 'youth-engagement',
+          name: t('youthEngagementNode'),
+          value: 45,
+          x: 280,
+          y: 140,
+          type: 'variable' as const
+        },
+        {
+          id: 'community-programs',
+          name: t('communityProgramsNode'),
+          value: 30,
+          x: 200,
+          y: 220,
+          type: 'stock' as const
+        }
+      ],
+      flows: [
+        {
+          id: 'flow-1',
+          from: 'youth-engagement',
+          to: 'social-trust',
+          type: 'positive' as const,
+          label: 'Youth → + Trust'
+        },
+        {
+          id: 'flow-2',
+          from: 'community-programs',
+          to: 'youth-engagement',
+          type: 'positive' as const,
+          label: 'Programs → + Engagement'
+        }
+      ],
+      loopLabel: t('engagementLoop')
+    };
+  }
+
+  const { nodes, flows, loopLabel } = contextualData;
 
   const tools = [
     { id: 'select', icon: <MousePointer2 size={16} />, label: t('selectTool') },
@@ -89,11 +272,6 @@ export const CLDSketchCanvas: React.FC<CLDSketchCanvasProps> = ({ mode }) => {
     const toNode = getNodeById(flow.to);
     
     if (!fromNode || !toNode) return null;
-
-    const dx = toNode.x - fromNode.x;
-    const dy = toNode.y - fromNode.y;
-    const length = Math.sqrt(dx * dx + dy * dy);
-    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
     return (
       <g key={flow.id}>
@@ -128,6 +306,11 @@ export const CLDSketchCanvas: React.FC<CLDSketchCanvasProps> = ({ mode }) => {
           <span className="text-xs px-2 py-1 rounded bg-purple-500/20 text-purple-300 capitalize">
             {mode}
           </span>
+          {(selectedBlock || selectedFork) && (
+            <span className="text-xs px-2 py-1 rounded bg-teal-500/20 text-teal-300">
+              {selectedBlock ? selectedBlock.name : selectedFork?.name}
+            </span>
+          )}
         </div>
         
         <div className="flex items-center gap-1">
@@ -261,18 +444,20 @@ export const CLDSketchCanvas: React.FC<CLDSketchCanvasProps> = ({ mode }) => {
                 textAnchor="middle"
                 className="text-sm fill-purple-400 font-medium"
               >
-                R1: {t('engagementLoop')}
+                R1: {loopLabel}
               </text>
             </motion.g>
           </svg>
           
           {/* Instructions overlay when no content */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center text-muted-foreground max-w-md">
-              <p className="text-sm mb-2">{t('startDrawingCLD')}</p>
-              <p className="text-xs">{t('cldInstructions')}</p>
+          {!selectedBlock && !selectedFork && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="text-center text-muted-foreground max-w-md">
+                <p className="text-sm mb-2">{t('selectBlockOrFork')}</p>
+                <p className="text-xs">{t('dynamicContentInstructions')}</p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

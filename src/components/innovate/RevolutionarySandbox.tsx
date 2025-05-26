@@ -13,12 +13,33 @@ import { ResultsInnovationTools } from './revolutionary/ResultsInnovationTools';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { motion } from 'framer-motion';
 
+interface ConceptBlock {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  category: string;
+  type: string;
+}
+
+interface ScenarioForkData {
+  id: string;
+  name: string;
+  active: boolean;
+}
+
 export const RevolutionarySandbox: React.FC = () => {
   const { t } = useTranslation();
   const [engineMode, setEngineMode] = useState('system-dynamics');
   const [simulationGenerated, setSimulationGenerated] = useState(false);
   const [simulationInProgress, setSimulationInProgress] = useState(false);
   const [activeTab, setActiveTab] = useState('sketch');
+  
+  // New state for dynamic content
+  const [selectedBlock, setSelectedBlock] = useState<ConceptBlock | null>(null);
+  const [selectedFork, setSelectedFork] = useState<ScenarioForkData | null>(null);
+  const [activeToolboxTab, setActiveToolboxTab] = useState('blocks');
   
   const handleGenerateSimulation = () => {
     setSimulationInProgress(true);
@@ -28,6 +49,16 @@ export const RevolutionarySandbox: React.FC = () => {
       setSimulationGenerated(true);
       setActiveTab('results');
     }, 2500);
+  };
+
+  const handleBlockSelect = (block: ConceptBlock) => {
+    setSelectedBlock(block);
+    setActiveToolboxTab('blocks'); // Ensure we're on blocks tab when selecting a block
+  };
+
+  const handleForkSelect = (fork: ScenarioForkData) => {
+    setSelectedFork(fork);
+    setActiveToolboxTab('forks'); // Ensure we're on forks tab when selecting a fork
   };
   
   return (
@@ -46,6 +77,18 @@ export const RevolutionarySandbox: React.FC = () => {
               <p className="max-w-xs">{t('revolutionarySandboxTooltip')}</p>
             </TooltipContent>
           </Tooltip>
+          
+          {/* Dynamic context indicator */}
+          {(selectedBlock || selectedFork) && (
+            <div className="ml-4 px-3 py-1 bg-white/10 rounded-full text-sm">
+              {selectedBlock && (
+                <span className="text-teal-300">Block: {selectedBlock.name}</span>
+              )}
+              {selectedFork && (
+                <span className="text-purple-300">Fork: {selectedFork.name}</span>
+              )}
+            </div>
+          )}
         </div>
         
         <div className="flex space-x-2">
@@ -97,10 +140,33 @@ export const RevolutionarySandbox: React.FC = () => {
           transition={{ duration: 0.5 }}
         >
           <GlassCard className="h-full shadow-[inset_0_0_15px_rgba(20,184,166,0.2)] backdrop-blur-xl flex flex-col">
-            <h3 className="text-lg font-semibold p-3 pb-2">{t('buildingBlocks')}</h3>
-            <div className="flex-1 overflow-hidden">
-              <ConceptBlocksPalette mode="moonshot" />
-            </div>
+            <Tabs value={activeToolboxTab} onValueChange={setActiveToolboxTab} className="flex-1 flex flex-col">
+              <TabsList className="grid w-full grid-cols-2 m-3 mb-2">
+                <TabsTrigger value="blocks" className="flex items-center gap-1">
+                  <span className="hidden sm:inline">Blocks</span>
+                </TabsTrigger>
+                <TabsTrigger value="forks" className="flex items-center gap-1">
+                  <span className="hidden sm:inline">Forks</span>
+                </TabsTrigger>
+              </TabsList>
+              
+              <div className="flex-1 overflow-hidden">
+                <TabsContent value="blocks" className="h-full m-0">
+                  <ConceptBlocksPalette 
+                    mode="moonshot" 
+                    onBlockSelect={handleBlockSelect}
+                    selectedBlockId={selectedBlock?.id}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="forks" className="h-full m-0">
+                  <div className="px-3">
+                    <h3 className="text-lg font-semibold mb-4">{t('scenarioVariants')}</h3>
+                  </div>
+                  {/* ScenarioFork component would go here with selection props */}
+                </TabsContent>
+              </div>
+            </Tabs>
           </GlassCard>
         </motion.div>
         
@@ -142,7 +208,11 @@ export const RevolutionarySandbox: React.FC = () => {
               <div className="flex-1 overflow-hidden px-3 pb-3">
                 <TabsContent value="sketch" className="h-full m-0 p-0">
                   <div className="h-full">
-                    <CLDSketchCanvas mode="moonshot" />
+                    <CLDSketchCanvas 
+                      mode="moonshot"
+                      selectedBlock={selectedBlock}
+                      selectedFork={selectedFork}
+                    />
                   </div>
                 </TabsContent>
 
@@ -154,6 +224,8 @@ export const RevolutionarySandbox: React.FC = () => {
                       onGenerateSimulation={handleGenerateSimulation}
                       isGenerating={simulationInProgress}
                       isGenerated={simulationGenerated}
+                      selectedBlock={selectedBlock}
+                      selectedFork={selectedFork}
                     />
                   </div>
                 </TabsContent>
@@ -163,6 +235,8 @@ export const RevolutionarySandbox: React.FC = () => {
                     <ResultsInnovationTools 
                       showResults={simulationGenerated}
                       engine={engineMode}
+                      selectedBlock={selectedBlock}
+                      selectedFork={selectedFork}
                     />
                   </div>
                 </TabsContent>

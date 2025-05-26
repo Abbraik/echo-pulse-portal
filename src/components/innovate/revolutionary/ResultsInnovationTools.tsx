@@ -9,16 +9,36 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+interface ConceptBlock {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  category: string;
+  type: string;
+}
+
+interface ScenarioForkData {
+  id: string;
+  name: string;
+  active: boolean;
+}
+
 export interface ResultsInnovationToolsProps {
   showResults: boolean;
   engine: string;
   activeTab?: string;
+  selectedBlock?: ConceptBlock | null;
+  selectedFork?: ScenarioForkData | null;
 }
 
 export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
   showResults,
   engine,
-  activeTab = 'impact'
+  activeTab = 'impact',
+  selectedBlock,
+  selectedFork
 }) => {
   const { t } = useTranslation();
   
@@ -29,7 +49,10 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
           {t('resultsWillAppearHere')}
         </div>
         <p className="text-muted-foreground max-w-md">
-          {t('generateSimulationFirst')}
+          {selectedBlock || selectedFork 
+            ? `Selected: ${selectedBlock?.name || selectedFork?.name}. ${t('generateSimulationFirst')}`
+            : t('generateSimulationFirst')
+          }
         </p>
       </div>
     );
@@ -38,24 +61,79 @@ export const ResultsInnovationTools: React.FC<ResultsInnovationToolsProps> = ({
   // Render the appropriate tab content based on activeTab
   switch (activeTab) {
     case 'impact':
-      return <ImpactDashboardContent engine={engine} />;
+      return <ImpactDashboardContent engine={engine} selectedBlock={selectedBlock} selectedFork={selectedFork} />;
     case 'blueprint':
-      return <BlueprintContent />;
+      return <BlueprintContent selectedBlock={selectedBlock} selectedFork={selectedFork} />;
     case 'compare':
-      return <ComparativeContent />;
+      return <ComparativeContent selectedBlock={selectedBlock} selectedFork={selectedFork} />;
     case 'co-create':
-      return <CoCreateContent />;
+      return <CoCreateContent selectedBlock={selectedBlock} selectedFork={selectedFork} />;
     default:
-      return <ImpactDashboardContent engine={engine} />;
+      return <ImpactDashboardContent engine={engine} selectedBlock={selectedBlock} selectedFork={selectedFork} />;
   }
 };
 
 // Impact Dashboard Tab Content
-const ImpactDashboardContent: React.FC<{ engine: string }> = ({ engine }) => {
+const ImpactDashboardContent: React.FC<{ 
+  engine: string; 
+  selectedBlock?: ConceptBlock | null;
+  selectedFork?: ScenarioForkData | null;
+}> = ({ engine, selectedBlock, selectedFork }) => {
   const { t } = useTranslation();
+  
+  // Dynamic metrics based on selected context
+  const getContextualMetrics = () => {
+    if (selectedBlock) {
+      switch (selectedBlock.id) {
+        case 'uba':
+          return {
+            primary: { label: 'Access Coverage', before: 68, after: 82, change: +14 },
+            secondary: { label: 'Equality Index', before: 65, after: 75, change: +10 },
+            impact: 'Very High'
+          };
+        case 'doughnut':
+          return {
+            primary: { label: 'Ecological Balance', before: 58, after: 71, change: +13 },
+            secondary: { label: 'Social Foundation', before: 62, after: 68, change: +6 },
+            impact: 'High'
+          };
+        default:
+          return getDefaultMetrics();
+      }
+    } else if (selectedFork) {
+      switch (selectedFork.id) {
+        case 'fork2':
+          return {
+            primary: { label: 'Resource Rights', before: 55, after: 75, change: +20 },
+            secondary: { label: 'Community Control', before: 48, after: 65, change: +17 },
+            impact: 'Very High'
+          };
+        default:
+          return getDefaultMetrics();
+      }
+    }
+    return getDefaultMetrics();
+  };
+
+  function getDefaultMetrics() {
+    return {
+      primary: { label: 'DEI', before: 72, after: 75, change: +3 },
+      secondary: { label: t('socialTrustMetric'), before: 69, after: 72, change: +3 },
+      impact: 'High'
+    };
+  }
+
+  const metrics = getContextualMetrics();
   
   return (
     <div className="p-4 h-full flex flex-col">
+      {/* Context indicator */}
+      {(selectedBlock || selectedFork) && (
+        <div className="mb-2 px-3 py-1 bg-white/10 rounded-md text-xs text-center">
+          Analyzing: {selectedBlock?.name || selectedFork?.name}
+        </div>
+      )}
+      
       <motion.div 
         className="flex-1 bg-black/10 dark:bg-white/5 rounded-md p-3 mb-3 relative overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
@@ -66,14 +144,14 @@ const ImpactDashboardContent: React.FC<{ engine: string }> = ({ engine }) => {
         <div className="absolute inset-0 p-3">
           <div className="h-full w-full relative">
             <svg width="100%" height="100%" viewBox="0 0 300 100" preserveAspectRatio="none">
-              {/* DEI Line */}
+              {/* Primary metric line */}
               <path
                 d="M0,80 C50,75 100,70 150,60 C200,55 250,50 300,45"
                 fill="none"
                 stroke="rgba(45, 212, 191, 0.8)"
                 strokeWidth="3"
               />
-              {/* Social Trust Line */}
+              {/* Secondary metric line */}
               <path
                 d="M0,85 C50,80 100,75 150,65 C200,60 250,55 300,50"
                 fill="none"
@@ -100,11 +178,11 @@ const ImpactDashboardContent: React.FC<{ engine: string }> = ({ engine }) => {
             <div className="absolute bottom-1 right-1 bg-black/30 backdrop-blur-sm rounded px-2 py-1 text-xs flex items-center gap-3">
               <div className="flex items-center">
                 <div className="w-3 h-0.5 bg-teal-400 rounded-full mr-1"></div>
-                <span>DEI: 72 → 75 (+3)</span>
+                <span>{metrics.primary.label}: {metrics.primary.before} → {metrics.primary.after} ({metrics.primary.change > 0 ? '+' : ''}{metrics.primary.change})</span>
               </div>
               <div className="flex items-center">
                 <div className="w-3 h-0.5 bg-blue-500 rounded-full mr-1"></div>
-                <span>{t('socialTrustMetric')}: 69 → 72 (+3)</span>
+                <span>{metrics.secondary.label}: {metrics.secondary.before} → {metrics.secondary.after} ({metrics.secondary.change > 0 ? '+' : ''}{metrics.secondary.change})</span>
               </div>
             </div>
           </div>
@@ -113,16 +191,16 @@ const ImpactDashboardContent: React.FC<{ engine: string }> = ({ engine }) => {
       
       <div className="flex justify-between items-center text-xs">
         <div className="flex flex-col">
-          <span className="text-muted-foreground">DEI</span>
-          <span className="font-bold text-teal-400">72 → 75 (+3)</span>
+          <span className="text-muted-foreground">{metrics.primary.label}</span>
+          <span className="font-bold text-teal-400">{metrics.primary.before} → {metrics.primary.after} ({metrics.primary.change > 0 ? '+' : ''}{metrics.primary.change})</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-muted-foreground">{t('socialTrustMetric')}</span>
-          <span className="font-medium">69 → 72 (+3)</span>
+          <span className="text-muted-foreground">{metrics.secondary.label}</span>
+          <span className="font-medium">{metrics.secondary.before} → {metrics.secondary.after} ({metrics.secondary.change > 0 ? '+' : ''}{metrics.secondary.change})</span>
         </div>
         <div className="flex flex-col">
           <span className="text-muted-foreground">Impact</span>
-          <span className="font-medium text-green-400">High</span>
+          <span className="font-medium text-green-400">{metrics.impact}</span>
         </div>
         <Button size="sm" variant="outline" className="text-xs h-7 px-2">
           <TrendingUp size={12} className="mr-1" />
@@ -134,11 +212,53 @@ const ImpactDashboardContent: React.FC<{ engine: string }> = ({ engine }) => {
 };
 
 // Blueprint Tab Content
-const BlueprintContent: React.FC = () => {
+const BlueprintContent: React.FC<{
+  selectedBlock?: ConceptBlock | null;
+  selectedFork?: ScenarioForkData | null;
+}> = ({ selectedBlock, selectedFork }) => {
   const { t } = useTranslation();
+  
+  const getContextualBlueprint = () => {
+    if (selectedBlock) {
+      switch (selectedBlock.id) {
+        case 'uba':
+          return {
+            assumptions: ['Universal access increases equality', 'Policy support scales linearly'],
+            stocks: ['Access Coverage stock', 'Policy Implementation flow'],
+            risks: ['Implementation complexity', 'Political resistance']
+          };
+        case 'doughnut':
+          return {
+            assumptions: ['Regenerative practices improve both social and ecological outcomes', 'Circular feedback loops strengthen over time'],
+            stocks: ['Ecological Health stock', 'Social Foundation reinforcement flow'],
+            risks: ['System complexity', 'Transition costs']
+          };
+        default:
+          return getDefaultBlueprint();
+      }
+    }
+    return getDefaultBlueprint();
+  };
+
+  function getDefaultBlueprint() {
+    return {
+      assumptions: [t('increasedYouthEngagement'), 'Community programs scale effectively'],
+      stocks: [t('engagementPrograms') + ' stock', 'Trust feedback loop added'],
+      risks: [t('volunteerBurnout'), 'Funding sustainability']
+    };
+  }
+
+  const blueprint = getContextualBlueprint();
   
   return (
     <div className="p-4 h-full flex flex-col">
+      {/* Context indicator */}
+      {(selectedBlock || selectedFork) && (
+        <div className="mb-3 px-3 py-1 bg-white/10 rounded-md text-xs text-center">
+          Blueprint for: {selectedBlock?.name || selectedFork?.name}
+        </div>
+      )}
+      
       <motion.div 
         className="flex-1 flex flex-col gap-3 mb-3 text-xs"
         initial={{ opacity: 0, y: 20 }}
@@ -148,24 +268,27 @@ const BlueprintContent: React.FC = () => {
         <div className="bg-black/10 dark:bg-white/5 rounded-md p-3 flex-1">
           <div className="font-medium text-purple-300 mb-1">{t('coreAssumptions')}</div>
           <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
-            <li>{t('increasedYouthEngagement')}</li>
-            <li>Community programs scale effectively</li>
+            {blueprint.assumptions.map((assumption, index) => (
+              <li key={index}>{assumption}</li>
+            ))}
           </ul>
         </div>
         
         <div className="bg-black/10 dark:bg-white/5 rounded-md p-3 flex-1">
           <div className="font-medium text-blue-300 mb-1">{t('newStocksFlows')}</div>
           <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
-            <li>{t('engagementPrograms')} stock</li>
-            <li>Trust feedback loop added</li>
+            {blueprint.stocks.map((stock, index) => (
+              <li key={index}>{stock}</li>
+            ))}
           </ul>
         </div>
         
         <div className="bg-black/10 dark:bg-white/5 rounded-md p-3 flex-1">
           <div className="font-medium text-amber-300 mb-1">{t('risks')}</div>
           <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
-            <li>{t('volunteerBurnout')}</li>
-            <li>Funding sustainability</li>
+            {blueprint.risks.map((risk, index) => (
+              <li key={index}>{risk}</li>
+            ))}
           </ul>
         </div>
       </motion.div>
