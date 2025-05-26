@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Package, GitBranch, Wrench } from 'lucide-react';
 import { ConceptBlocksPalette } from './revolutionary/ConceptBlocksPalette';
 import { ScenarioFork } from './revolutionary/ScenarioFork';
+import { AddCustomBlocksModal } from './AddCustomBlocksModal';
 
 interface ConceptBlock {
   id: string;
@@ -24,18 +25,33 @@ interface ScenarioForkData {
   active: boolean;
 }
 
+interface CustomBlock {
+  id: string;
+  title: string;
+  type: 'text' | 'image' | 'chart' | 'widget' | 'html';
+  content: string;
+}
+
 interface InnovateToolboxProps {
   mode: 'lesson-driven' | 'freeform' | 'moonshot';
   onBlockSelect?: (block: ConceptBlock) => void;
   onForkSelect?: (fork: ScenarioForkData) => void;
+  onCustomBlocksAdded?: (blocks: CustomBlock[]) => void;
 }
 
 export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ 
   mode, 
   onBlockSelect,
-  onForkSelect 
+  onForkSelect,
+  onCustomBlocksAdded
 }) => {
   const { t } = useTranslation();
+  const [isCustomBlocksModalOpen, setIsCustomBlocksModalOpen] = useState(false);
+
+  const handleCustomBlocksSave = (blocks: CustomBlock[]) => {
+    onCustomBlocksAdded?.(blocks);
+    console.log('Custom blocks saved:', blocks);
+  };
 
   return (
     <div className="h-full flex flex-col p-4">
@@ -71,14 +87,22 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({
         </div>
       </Tabs>
       
-      {/* System Redesign Button */}
+      {/* System Redesign Button with Custom Blocks functionality */}
       <Button 
+        onClick={() => setIsCustomBlocksModalOpen(true)}
         className="w-full flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
         size="lg"
       >
         <Wrench size={18} />
         New system redesign
       </Button>
+
+      {/* Custom Blocks Modal */}
+      <AddCustomBlocksModal
+        open={isCustomBlocksModalOpen}
+        onOpenChange={setIsCustomBlocksModalOpen}
+        onSaveBlocks={handleCustomBlocksSave}
+      />
     </div>
   );
 };

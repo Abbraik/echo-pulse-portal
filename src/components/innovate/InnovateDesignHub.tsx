@@ -24,6 +24,13 @@ interface ScenarioForkData {
   active: boolean;
 }
 
+interface CustomBlock {
+  id: string;
+  title: string;
+  type: 'text' | 'image' | 'chart' | 'widget' | 'html';
+  content: string;
+}
+
 interface InnovateDesignHubProps {
   mode: 'lesson-driven' | 'freeform' | 'moonshot';
 }
@@ -40,6 +47,11 @@ export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) =>
     setSelectedItem(null);
   };
 
+  const handleCustomBlocksAdded = (blocks: CustomBlock[]) => {
+    console.log('Custom blocks received in InnovateDesignHub:', blocks);
+    // Here you would typically integrate the blocks into your system
+  };
+
   return (
     <div className={`flex ${isRTL ? 'flex-row-reverse' : 'flex-row'} h-full gap-4 relative`}>
       {/* Left sidebar: Enhanced Toolbox */}
@@ -50,6 +62,7 @@ export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) =>
               mode={mode}
               onBlockSelect={handleItemSelect}
               onForkSelect={handleItemSelect}
+              onCustomBlocksAdded={handleCustomBlocksAdded}
             />
           </ScrollArea>
         </GlassCard>
