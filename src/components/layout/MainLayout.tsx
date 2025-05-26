@@ -8,7 +8,11 @@ import WelcomeOverlay from '../home/WelcomeOverlay';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 
-const MainLayout = () => {
+interface MainLayoutProps {
+  onLogout: () => void;
+}
+
+const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [hideNav, setHideNav] = useState(false);
@@ -107,7 +111,7 @@ const MainLayout = () => {
       </AnimatePresence>
       
       {showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
-      <Navbar hidden={hideNav && !isInnovatePage} />
+      <Navbar hidden={hideNav && !isInnovatePage} onLogout={onLogout} />
       
       <main className={`flex-grow ${isInnovatePage ? 'pt-16' : 'container mx-auto px-4 py-6 pt-20'} ${isRTL ? 'font-noto-arabic' : ''}`}>
         <Outlet />
