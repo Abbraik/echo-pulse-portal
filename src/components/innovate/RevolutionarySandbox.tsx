@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { GlassCard } from '@/components/ui/glass-card';
@@ -98,7 +99,7 @@ export const RevolutionarySandbox: React.FC = () => {
           <GlassCard className="h-full shadow-[inset_0_0_15px_rgba(20,184,166,0.2)] backdrop-blur-xl flex flex-col">
             <h3 className="text-lg font-semibold p-3 pb-2">{t('buildingBlocks')}</h3>
             <div className="flex-1 overflow-hidden">
-              <ConceptBlocksPalette />
+              <ConceptBlocksPalette mode="moonshot" />
             </div>
           </GlassCard>
         </motion.div>
