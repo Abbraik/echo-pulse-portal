@@ -1,8 +1,7 @@
 
 import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Lightbulb, Info, Zap, FlaskConical, Archive, Rocket, RefreshCw, BookOpen } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Lightbulb, Info, Archive, Rocket, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,14 +11,13 @@ import { FabButton } from '@/components/innovate/FabButton';
 import { MetaDesignModal } from '@/components/innovate/MetaDesignModal';
 
 const Innovate: React.FC = () => {
-  const [activeMode, setActiveMode] = useState<'lesson-driven' | 'freeform' | 'moonshot'>('moonshot');
   const [isMetaDesignOpen, setIsMetaDesignOpen] = useState(false);
   const { t, isRTL } = useTranslation();
 
   return (
     <AnimatedPage>
       <div className="flex flex-col h-[calc(100vh-5rem)] overflow-hidden">
-        {/* Header with title and mode selector */}
+        {/* Header with title */}
         <header className="flex-none mb-4">
           <div className="glass-panel p-4">
             <div className="flex items-center justify-between">
@@ -42,36 +40,6 @@ const Innovate: React.FC = () => {
                         <p className="max-w-xs">{t('innovateZoneDescription')}</p>
                       </TooltipContent>
                     </Tooltip>
-                  </div>
-                  <div className="flex mt-3">
-                    <Tabs value={activeMode} onValueChange={(value) => setActiveMode(value as 'lesson-driven' | 'freeform' | 'moonshot')}>
-                      <TabsList className="grid w-auto grid-cols-3 bg-background/30">
-                        <TabsTrigger
-                          value="lesson-driven"
-                          className={`${activeMode === 'lesson-driven' ? 'bg-teal-500/30 text-teal-300' : ''} 
-                            flex items-center gap-2 px-4 py-1`}
-                        >
-                          <BookOpen size={16} />
-                          {t('lessonDrivenMode')}
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="freeform"
-                          className={`${activeMode === 'freeform' ? 'bg-blue-500/30 text-blue-300' : ''} 
-                            flex items-center gap-2 px-4 py-1`}
-                        >
-                          <FlaskConical size={16} />
-                          {t('freeformMode')}
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="moonshot"
-                          className={`${activeMode === 'moonshot' ? 'bg-purple-500/30 text-purple-300' : ''} 
-                            flex items-center gap-2 px-4 py-1`}
-                        >
-                          <Zap size={16} />
-                          {t('moonshotModeText')}
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
                   </div>
                 </div>
               </div>
@@ -119,7 +87,7 @@ const Innovate: React.FC = () => {
         
         {/* Main content area */}
         <div className="flex-1 overflow-hidden">
-          <InnovateDesignHub mode={activeMode} />
+          <InnovateDesignHub mode="moonshot" />
         </div>
         
         {/* Floating Action Button for Meta Design Blueprint Generator */}
