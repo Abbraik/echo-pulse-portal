@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
-import { Package, GitBranch } from 'lucide-react';
+import { Package, GitBranch, Wrench } from 'lucide-react';
 import { ConceptBlocksPalette } from './revolutionary/ConceptBlocksPalette';
 import { ScenarioFork } from './revolutionary/ScenarioFork';
 
@@ -30,7 +31,7 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ mode }) => {
           </TabsTrigger>
         </TabsList>
         
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden mb-4">
           <TabsContent value="blocks" className="h-full m-0">
             <ScrollArea className="h-full">
               <ConceptBlocksPalette mode={mode} />
@@ -44,6 +45,15 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ mode }) => {
           </TabsContent>
         </div>
       </Tabs>
+      
+      {/* System Redesign Button */}
+      <Button 
+        className="w-full flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+        size="lg"
+      >
+        <Wrench size={18} />
+        System Redesign
+      </Button>
     </div>
   );
 };

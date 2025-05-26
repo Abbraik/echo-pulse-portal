@@ -22,7 +22,8 @@ export const ConceptBlocksPalette: React.FC<ConceptBlocksPaletteProps> = ({ mode
       description: t('universalBasicAccessDesc'),
       icon: <Building size={16} />,
       color: 'teal',
-      category: 'social'
+      category: 'social',
+      type: 'Lesson'
     },
     {
       id: 'doughnut',
@@ -30,7 +31,8 @@ export const ConceptBlocksPalette: React.FC<ConceptBlocksPaletteProps> = ({ mode
       description: t('doughnutEconomyDesc'),
       icon: <Leaf size={16} />,
       color: 'emerald',
-      category: 'environmental'
+      category: 'environmental',
+      type: 'Freeform'
     },
     {
       id: 'commons',
@@ -38,7 +40,8 @@ export const ConceptBlocksPalette: React.FC<ConceptBlocksPaletteProps> = ({ mode
       description: t('commonsGovernanceDesc'),
       icon: <Users size={16} />,
       color: 'blue',
-      category: 'governance'
+      category: 'governance',
+      type: 'Lesson'
     },
     {
       id: 'circular',
@@ -46,7 +49,8 @@ export const ConceptBlocksPalette: React.FC<ConceptBlocksPaletteProps> = ({ mode
       description: t('circularValueStreamsDesc'),
       icon: <Recycle size={16} />,
       color: 'purple',
-      category: 'economic'
+      category: 'economic',
+      type: 'Freeform'
     }
   ];
 
@@ -63,6 +67,10 @@ export const ConceptBlocksPalette: React.FC<ConceptBlocksPaletteProps> = ({ mode
       purple: 'bg-purple-500/20 border-purple-500/30 text-purple-300'
     };
     return colorMap[color as keyof typeof colorMap] || colorMap.teal;
+  };
+
+  const getTypeColor = (type: string) => {
+    return type === 'Lesson' ? 'bg-orange-500/20 text-orange-300' : 'bg-cyan-500/20 text-cyan-300';
   };
 
   return (
@@ -98,6 +106,9 @@ export const ConceptBlocksPalette: React.FC<ConceptBlocksPaletteProps> = ({ mode
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-medium truncate">{concept.name}</h4>
                 </div>
+                <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${getTypeColor(concept.type)}`}>
+                  {concept.type}
+                </span>
               </div>
               <p className="text-xs text-gray-300 line-clamp-2">{concept.description}</p>
               <div className="mt-2 flex justify-between items-center">
