@@ -99,7 +99,7 @@ export const ResultsTab: React.FC = () => {
                 y={75} 
                 stroke="rgba(251, 191, 36, 0.8)" 
                 strokeDasharray="5 5"
-                label={{ value: "Target", position: "topRight" }}
+                label={{ value: "Target", position: "top" }}
               />
             </LineChart>
           </ResponsiveContainer>

@@ -37,6 +37,7 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
   const { t, isRTL } = useTranslation();
   const [activeTab, setActiveTab] = useState('sketch');
   const [leverageSidebarOpen, setLeverageSidebarOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'cld' | 'sna'>('cld');
 
   const getItemType = (item: ConceptBlock | ScenarioForkData | null): string => {
     if (!item) return 'Unknown';
@@ -94,6 +95,7 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
                   >
                     <LeveragePointSidebar
                       onClose={() => setLeverageSidebarOpen(false)}
+                      viewMode={viewMode}
                     />
                   </motion.div>
                 )}
