@@ -9,10 +9,16 @@ import { GlassCard } from '@/components/ui/glass-card';
 import { InnovateDesignHub } from '@/components/innovate/InnovateDesignHub';
 import { FabButton } from '@/components/innovate/FabButton';
 import { MetaDesignModal } from '@/components/innovate/MetaDesignModal';
+import { AddCustomBlocksButton } from '@/components/innovate/AddCustomBlocksButton';
 
 const Innovate: React.FC = () => {
   const [isMetaDesignOpen, setIsMetaDesignOpen] = useState(false);
   const { t, isRTL } = useTranslation();
+
+  const handleCustomBlocksAdded = (blocks: any[]) => {
+    console.log('Custom blocks received in Innovate page:', blocks);
+    // Here you would typically integrate the blocks into your system
+  };
 
   return (
     <AnimatedPage>
@@ -45,6 +51,11 @@ const Innovate: React.FC = () => {
               </div>
               
               <div className="flex space-x-2">
+                <AddCustomBlocksButton 
+                  onBlocksAdded={handleCustomBlocksAdded}
+                  className="mr-2"
+                />
+                
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button size="sm" variant="outline" className="flex items-center gap-1">
