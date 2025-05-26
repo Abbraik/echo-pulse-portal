@@ -43,12 +43,12 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
   }, [scrolled]);
 
   const navLinks = [
-    { name: t('navigation.home'), path: '/' },
-    { name: t('navigation.think'), path: '/think' },
-    { name: t('navigation.act'), path: '/act' },
-    { name: t('navigation.monitor'), path: '/monitor' },
-    { name: t('navigation.learn'), path: '/learn' },
-    { name: t('navigation.innovate'), path: '/innovate' },
+    { name: 'HOME', path: '/' },
+    { name: 'THINK', path: '/think' },
+    { name: 'ACT', path: '/act' },
+    { name: 'MONITOR', path: '/monitor' },
+    { name: 'LEARN', path: '/learn' },
+    { name: 'INNOVATE', path: '/innovate' },
   ];
 
   const toggleLanguage = () => {
@@ -62,7 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
           scrolled
             ? resolvedTheme === 'dark' 
               ? 'bg-navy-900/80 backdrop-blur-lg shadow-lg' 
-              : 'bg-white/90 backdrop-blur-lg shadow-lg' // Increased opacity for better contrast
+              : 'bg-white/90 backdrop-blur-lg shadow-lg'
             : 'bg-transparent'
         }`}
         initial={{ y: 0 }}
@@ -71,44 +71,54 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
       >
         <div className="container mx-auto px-4">
           <div className={`flex items-center justify-between h-16 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            {/* Brand Logo & Title */}
             <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <NavLink to="/" className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
+              <NavLink to="/" className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
                 <div className="h-8 w-8 bg-gradient-to-br from-teal-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold relative overflow-hidden group">
                   <span className="relative z-10">PD</span>
                   <div className="absolute inset-0 bg-gradient-to-br from-teal-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <span className="hidden md:block text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">
-                  {t('appName')}
+                <span className="hidden md:block text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">
+                  POPULATION DYNAMICS SYSTEM
                 </span>
               </NavLink>
             </div>
 
+            {/* Navigation Links */}
             <div className={`hidden md:flex items-center justify-center flex-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <div className={`flex ${isRTL ? 'flex-row-reverse space-x-reverse' : ''} space-x-1`}>
+              <div className={`flex ${isRTL ? 'flex-row-reverse space-x-reverse' : ''} space-x-8`}>
                 {navLinks.map((link) => (
                   <NavLink
                     key={link.path}
                     to={link.path}
                     className={({ isActive }) =>
-                      `group relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                      `group relative px-3 py-2 text-sm font-bold transition-all duration-300 ${
                         isActive
-                          ? 'bg-teal-500/30 text-teal-700 dark:text-teal-300' // Better contrast in light mode
+                          ? 'text-teal-600 dark:text-teal-400'
                           : resolvedTheme === 'dark'
-                            ? 'text-gray-300 hover:bg-white/5 hover:text-white'
-                            : 'text-gray-700 hover:bg-black/10 hover:text-gray-900' // Darker text for better contrast
+                            ? 'text-gray-300 hover:text-white'
+                            : 'text-gray-700 hover:text-gray-900'
                       }`
                     }
                     onMouseEnter={() => setIsHovering(link.path)}
                     onMouseLeave={() => setIsHovering(null)}
                   >
                     {link.name}
+                    {/* Active state underline */}
+                    <NavLink
+                      to={link.path}
+                      className={({ isActive }) =>
+                        isActive ? 'absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-teal-500 to-blue-600' : 'hidden'
+                      }
+                    />
+                    {/* Hover underline */}
                     {isHovering === link.path && (
                       <motion.span
                         layoutId="nav-hover"
-                        className="absolute bottom-0 left-0 h-[2px] w-full bg-gradient-to-r from-teal-500 to-blue-600"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-teal-500/60 to-blue-600/60"
+                        initial={{ opacity: 0, scaleX: 0 }}
+                        animate={{ opacity: 1, scaleX: 1 }}
+                        exit={{ opacity: 0, scaleX: 0 }}
                         transition={{ duration: 0.2 }}
                       />
                     )}
@@ -117,15 +127,17 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
               </div>
             </div>
 
-            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
+            {/* Utility Icons */}
+            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-4 ${isRTL ? 'space-x-reverse' : ''}`}>
               {/* Language Toggle */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleLanguage}
                 className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5 relative"
+                aria-label="Toggle language"
               >
-                <Globe size={18} className="text-gray-600 dark:text-gray-300" /> {/* Darker color for better contrast */}
+                <Globe size={18} className="text-gray-600 dark:text-gray-300" />
                 <span className="absolute -top-1 -right-1 text-[10px] font-bold bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
                   {language === 'en' ? 'AR' : 'EN'}
                 </span>
@@ -137,8 +149,9 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                   variant="ghost"
                   size="icon"
                   className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5"
+                  aria-label="Notifications"
                 >
-                  <Bell size={18} className="text-gray-600 dark:text-gray-300" /> {/* Darker color for better contrast */}
+                  <Bell size={18} className="text-gray-600 dark:text-gray-300" />
                 </Button>
                 {notifications > 0 && (
                   <motion.span 
@@ -157,6 +170,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                 size="icon"
                 onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                 className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/10"
+                aria-label="Toggle theme"
               >
                 <AnimatePresence mode="wait">
                   {resolvedTheme === 'dark' ? (
@@ -177,7 +191,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                       exit={{ rotate: 90, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Sun size={18} className="text-gray-600" /> {/* Darker color for better contrast */}
+                      <Sun size={18} className="text-gray-600" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -189,27 +203,28 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                   <Button
                     variant="ghost"
                     className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5 flex items-center space-x-1"
+                    aria-label="User menu"
                   >
                     <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500/30 to-teal-500/30 flex items-center justify-center">
-                      <User size={16} className="text-gray-700 dark:text-gray-300" /> {/* Darker color for better contrast */}
+                      <User size={16} className="text-gray-700 dark:text-gray-300" />
                     </div>
-                    <ChevronDown size={14} className="text-gray-700 dark:text-gray-300" /> {/* Darker color for better contrast */}
+                    <ChevronDown size={14} className="text-gray-700 dark:text-gray-300" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className={`w-56 mt-2 ${
                   resolvedTheme === 'dark' 
                     ? 'glass-panel-dark' 
-                    : 'bg-white border-gray-300 shadow-md' /* Darker border for better contrast */
+                    : 'bg-white border-gray-300 shadow-md'
                 }`}>
                   <DropdownMenuLabel className="text-gray-800 dark:text-gray-200">{t('myAccount')}</DropdownMenuLabel>
                   <DropdownMenuSeparator className={
-                    resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300' /* Darker separator for better contrast */
+                    resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300'
                   } />
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100 text-gray-700 dark:text-gray-300">{t('profile')}</DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100 text-gray-700 dark:text-gray-300">{t('settings')}</DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100 text-gray-700 dark:text-gray-300">{t('support')}</DropdownMenuItem>
                   <DropdownMenuSeparator className={
-                    resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300' /* Darker separator for better contrast */
+                    resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300'
                   } />
                   <DropdownMenuItem className="text-red-600 dark:text-red-400 cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100">
                     {t('logout')}
@@ -217,12 +232,14 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false }) => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              {/* Mobile Menu */}
               <Button
                 variant="ghost"
                 size="icon"
                 className="md:hidden rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5"
+                aria-label="Mobile menu"
               >
-                <Menu size={20} className="text-gray-700 dark:text-gray-300" /> {/* Darker color for better contrast */}
+                <Menu size={20} className="text-gray-700 dark:text-gray-300" />
               </Button>
             </div>
           </div>
