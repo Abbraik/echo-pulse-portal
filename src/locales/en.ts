@@ -1,5 +1,4 @@
 
-
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -574,24 +573,55 @@ const en = {
   "compareScenarios": "Compare Scenarios",
   
   // Button labels for innovate zone
-  "scenarioForkButton": 'Scenario Fork',
-  "archiveScenarioButton": 'Archive Scenario',
-  "promoteBlueprintButton": 'Promote Blueprint',
+  "scenarioForkButton": "Scenario Fork",
+  "archiveScenarioButton": "Archive Scenario",
+  "promoteBlueprintButton": "Promote Blueprint",
   
   // Tooltips
-  "scenarioForkTooltip": 'Create a new variant of this scenario',
-  "archiveScenarioTooltip": 'Save this scenario to the archive',
-  "promoteBlueprintTooltip": 'Promote this design to a blueprint',
+  "scenarioForkTooltip": "Create a new variant of this scenario",
+  "archiveScenarioTooltip": "Save this scenario to the archive",
+  "promoteBlueprintTooltip": "Promote this design to a blueprint",
   
   // Tools and components
   "systemDesignToolbox": "System Design Toolbox",
   "lessons": "Lessons",
   "concepts": "Concepts",
   "newExperiment": "New Experiment",
+  "scenarios": "Scenarios",
   
   // Revolutionary Sandbox components
-  "buildingBlocks": "Building Blocks"
+  "buildingBlocks": "Building Blocks",
+  
+  // Mock data translations
+  "universalBasicAccess": "Universal Basic Access (UBA)",
+  "universalBasicAccessDesc": "Guarantees minimum service levels",
+  "doughnutEconomy": "Doughnut Economy",
+  "doughnutEconomyDesc": "Balances social floors & planetary ceilings",
+  "commonsGovernance": "Commons Governance",
+  "commonsGovernanceDesc": "Community-led resource management",
+  "circularValueStreams": "Circular Value Streams", 
+  "circularValueStreamsDesc": "Closed-loop production cycles",
+  "youthSocialTrustCampaign": "Youth Social Trust Campaign",
+  "waterConservationIncentives": "Water Conservation Incentives",
+  "socialTrustRevamp": "SocialTrust-Revamp #1",
+  "waterTaxAdjust": "WaterTax-Adjust #2",
+  "ubaModelV1": "UBA-Model-V1",
+  "doughnutTestV2": "Doughnut-Test-V2",
+  "socialTrustNode": "Social Trust",
+  "youthEngagementNode": "Youth Engagement", 
+  "communityProgramsNode": "Community Programs",
+  "engagementLoop": "Engagement Loop",
+  "launchBtn": "Launch",
+  "archiveBtn": "Archive",
+  "builtIn12s": "Built in 12 s",
+  "socialTrustMetric": "Social Trust",
+  "increasedYouthEngagement": "Increased Youth Engagement drives trust",
+  "engagementPrograms": "Engagement Programs",
+  "volunteerBurnout": "Volunteer burnout",
+  "trustRedesign": "Trust Redesign",
+  "unintendedEffectsOnCohesion": "What unintended effects on cohesion?",
+  "requestSimulation": "Request Simulation",
+  "resultsInnovation": "Results"
 };
 
 export default en;
-

@@ -1,14 +1,12 @@
 
 import React from 'react';
+import { Play, Settings, Zap, LoaderIcon } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { CirclePlay, Check, Loader2, GitBranch, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export interface RequestSimulationPanelProps {
+interface RequestSimulationPanelProps {
   engineMode: string;
   setEngineMode: (mode: string) => void;
   onGenerateSimulation: () => void;
@@ -24,63 +22,52 @@ export const RequestSimulationPanel: React.FC<RequestSimulationPanelProps> = ({
   isGenerated
 }) => {
   const { t } = useTranslation();
-  
-  // Mock scenario forks for dropdown
-  const scenarioForks = [
-    { id: 'base', name: 'Base Scenario' },
-    { id: 'fork1', name: 'Resource Rights Reform' },
-    { id: 'fork2', name: 'Commons Governance' },
-    { id: 'fork3', name: 'Circular Economy' },
-  ];
-  
+
   return (
-    <div className="p-3 h-full">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-medium">{t('experimentSimulation')}</h3>
-        <Button size="sm" variant="outline" className="flex items-center gap-1">
-          <GitBranch size={14} />
-          <span>{t('forkScenario')}</span>
-        </Button>
+    <div className="p-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Zap size={20} className="text-purple-400" />
+          {t('requestSimulationModel')}
+        </h3>
+        
+        {isGenerated && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex items-center gap-2 text-green-400 text-sm"
+          >
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            {t('builtIn12s')}
+          </motion.div>
+        )}
       </div>
       
-      <div className="grid grid-cols-3 gap-3 h-[calc(100%-2.75rem)]">
-        {/* Scenario Fork Selection */}
-        <div className="col-span-1 flex flex-col gap-2">
-          <Label className="text-xs text-muted-foreground">{t('activeFork')}</Label>
-          <Select defaultValue="base">
-            <SelectTrigger className="bg-black/20 border-white/10">
+      <p className="text-sm text-muted-foreground mb-4">
+        {t('requestSimulationDesc')}
+      </p>
+      
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        {/* Scenario Fork Dropdown */}
+        <div>
+          <label className="block text-sm font-medium mb-2">{t('scenarioFork')}</label>
+          <Select defaultValue="social-trust-revamp">
+            <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {scenarioForks.map(fork => (
-                <SelectItem key={fork.id} value={fork.id}>
-                  {fork.name}
-                </SelectItem>
-              ))}
+              <SelectItem value="social-trust-revamp">{t('socialTrustRevamp')}</SelectItem>
+              <SelectItem value="water-tax-adjust">{t('waterTaxAdjust')}</SelectItem>
+              <SelectItem value="baseline">Baseline</SelectItem>
             </SelectContent>
           </Select>
-          
-          <div className="flex-grow"></div>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="w-full mt-auto flex items-center justify-center gap-1"
-          >
-            <Plus size={14} />
-            {t('newFork')}
-          </Button>
         </div>
         
-        {/* Simulation Engine */}
-        <div className="col-span-1 flex flex-col gap-2">
-          <Label className="text-xs text-muted-foreground">{t('simulationEngine')}</Label>
-          <Select 
-            value={engineMode} 
-            onValueChange={setEngineMode}
-            disabled={isGenerating || isGenerated}
-          >
-            <SelectTrigger className="bg-black/20 border-white/10">
+        {/* Engine Selection */}
+        <div>
+          <label className="block text-sm font-medium mb-2">{t('selectEngine')}</label>
+          <Select value={engineMode} onValueChange={setEngineMode}>
+            <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -89,71 +76,75 @@ export const RequestSimulationPanel: React.FC<RequestSimulationPanelProps> = ({
               <SelectItem value="econometric">{t('econometric')}</SelectItem>
             </SelectContent>
           </Select>
-          
-          <RadioGroup defaultValue="auto" disabled={isGenerating || isGenerated} className="flex justify-center gap-4 pt-2">
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="auto" id="auto" />
-              <Label htmlFor="auto">{t('autoDetect')}</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="manual" id="manual" />
-              <Label htmlFor="manual">{t('manualEntry')}</Label>
-            </div>
-          </RadioGroup>
-        </div>
-        
-        {/* Generate Button */}
-        <div className="col-span-1 flex flex-col items-center justify-center">
-          {!isGenerated ? (
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                onClick={onGenerateSimulation} 
-                disabled={isGenerating}
-                className="w-full h-10 relative overflow-hidden group button-glow"
-                size="lg"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    {t('buildingSimulation')}
-                  </>
-                ) : (
-                  <>
-                    <CirclePlay className="mr-2 h-5 w-5 group-hover:animate-pulse" />
-                    {t('generateSimulation')}
-                  </>
-                )}
-                <span className="absolute inset-0 rounded-md overflow-hidden">
-                  <span className="absolute inset-0 rounded-md bg-gradient-to-r from-teal-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
-                </span>
-              </Button>
-            </motion.div>
-          ) : (
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <Button 
-                variant="default" 
-                className="bg-green-500 hover:bg-green-600 w-full"
-                size="lg"
-              >
-                <Check className="mr-2 h-5 w-5" />
-                {t('viewResults')}
-              </Button>
-            </motion.div>
-          )}
-          
-          {/* Status line */}
-          {isGenerating && (
-            <div className="mt-2 flex items-center text-sm text-muted-foreground animate-pulse">
-              <div className="w-2 h-2 bg-teal-500 rounded-full mr-2"></div>
-              {t('buildingSimulationStatus')}
-            </div>
-          )}
         </div>
       </div>
+      
+      {/* Parameter Defaults */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-2">{t('parameterDefaults')}</label>
+        <div className="grid grid-cols-3 gap-2">
+          <Button variant="outline" size="sm" className="text-xs">
+            {t('autoPopulate')}
+          </Button>
+          <Button variant="outline" size="sm" className="text-xs">
+            {t('fromBaseline')}
+          </Button>
+          <Button variant="outline" size="sm" className="text-xs">
+            {t('manualUpload')}
+          </Button>
+        </div>
+      </div>
+      
+      {/* Generate Button */}
+      <div className="flex gap-2">
+        <Button
+          onClick={onGenerateSimulation}
+          disabled={isGenerating}
+          className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+        >
+          {isGenerating ? (
+            <>
+              <LoaderIcon size={16} className="mr-2 animate-spin" />
+              {t('buildingSimulation')}
+            </>
+          ) : (
+            <>
+              <Play size={16} className="mr-2" />
+              {t('generateSimulation')}
+            </>
+          )}
+        </Button>
+        
+        <Button variant="outline" size="icon">
+          <Settings size={16} />
+        </Button>
+        
+        <Button variant="outline" className="gap-1">
+          <span>+ {t('forkScenario')}</span>
+        </Button>
+      </div>
+      
+      {/* Status */}
+      {isGenerating && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-3 p-2 bg-purple-500/20 rounded-lg border border-purple-500/30"
+        >
+          <div className="flex items-center gap-2 text-sm text-purple-300">
+            <LoaderIcon size={14} className="animate-spin" />
+            {t('buildingSimulationStatus')}
+          </div>
+          <div className="mt-1 w-full bg-purple-900/30 rounded-full h-1.5">
+            <motion.div
+              className="bg-purple-500 h-1.5 rounded-full"
+              initial={{ width: '0%' }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 2 }}
+            />
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };
