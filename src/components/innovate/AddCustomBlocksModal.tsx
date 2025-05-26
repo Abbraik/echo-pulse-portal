@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, GripVertical, Sun, Moon, Globe, Image, BarChart3, Code, Type, Widget } from 'lucide-react';
+import { X, Plus, GripVertical, Sun, Moon, Globe, Image, BarChart3, Code, Type, Puzzle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,7 +27,7 @@ const blockTypeOptions = [
   { value: 'text', label: 'Text', labelAr: 'نص', icon: Type },
   { value: 'image', label: 'Image', labelAr: 'صورة', icon: Image },
   { value: 'chart', label: 'Data Chart', labelAr: 'مخطط البيانات', icon: BarChart3 },
-  { value: 'widget', label: 'Widget', labelAr: 'ودجت', icon: Widget },
+  { value: 'widget', label: 'Widget', labelAr: 'ودجت', icon: Puzzle },
   { value: 'html', label: 'Custom HTML/Markdown', labelAr: 'HTML/Markdown مخصص', icon: Code },
 ];
 
