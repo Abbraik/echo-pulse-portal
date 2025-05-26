@@ -1,7 +1,6 @@
-
 import { useLanguage } from '@/hooks/use-language';
-import en from '@/locales/en';
-import ar from '@/locales/ar';
+import { en } from '@/locales/en';
+import { ar } from '@/locales/ar';
 
 // Define the type for all translation keys
 export type TranslationKey = keyof typeof en;
