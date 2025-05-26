@@ -1,4 +1,5 @@
 
+
 const en = {
   "homePageTitle": "PDS UI",
   "homePageDescription": "Welcome to the PDS UI",
@@ -33,7 +34,6 @@ const en = {
   "weeks": "Weeks",
   "viewInAct": "View in ACT Zone",
   "computeNewBands": "Compute New Bands",
-  "strategicZone": "Strategy Zone",
   "thinkCoreDesc": "Analyze, visualize, and strategize for dynamic equilibrium",
   "systemFraming": "System Framing",
   "deiAndForesight": "DEI & Foresight",
@@ -594,3 +594,4 @@ const en = {
 };
 
 export default en;
+
