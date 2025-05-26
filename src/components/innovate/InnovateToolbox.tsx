@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -52,7 +51,7 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ mode }) => {
         size="lg"
       >
         <Wrench size={18} />
-        System Redesign
+        New system redesign
       </Button>
     </div>
   );
