@@ -16,7 +16,7 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ mode }) => {
 
   return (
     <div className="h-full flex flex-col p-4">
-      <h2 className="text-lg font-semibold mb-4">{t('buildingBlocks')}</h2>
+      <h2 className="text-lg font-semibold mb-4">System Redesign</h2>
       
       <Tabs defaultValue="blocks" className="flex-1 flex flex-col">
         <TabsList className="grid w-full grid-cols-2 mb-4">
