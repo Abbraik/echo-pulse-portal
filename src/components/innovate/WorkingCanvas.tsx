@@ -49,13 +49,28 @@ export const WorkingCanvas: React.FC<WorkingCanvasProps> = ({ selectedItem, onCl
     }, 2000);
   };
 
-  const itemTitle = selectedItem ? 
-    ('name' in selectedItem ? selectedItem.name : selectedItem.name) : 
-    'System Redesign';
+  // Helper functions to safely get item properties
+  const getItemName = (item: ConceptBlock | ScenarioForkData | null): string => {
+    if (!item) return 'System Redesign';
+    return item.name;
+  };
 
-  const itemType = selectedItem ? 
-    ('type' in selectedItem ? selectedItem.type : 'Scenario') : 
-    '';
+  const getItemType = (item: ConceptBlock | ScenarioForkData | null): string => {
+    if (!item) return '';
+    if ('type' in item) return item.type;
+    return 'Scenario';
+  };
+
+  const isConceptBlock = (item: ConceptBlock | ScenarioForkData | null): item is ConceptBlock => {
+    return item !== null && 'type' in item;
+  };
+
+  const isScenarioFork = (item: ConceptBlock | ScenarioForkData | null): item is ScenarioForkData => {
+    return item !== null && 'active' in item;
+  };
+
+  const itemTitle = getItemName(selectedItem);
+  const itemType = getItemType(selectedItem);
 
   const tabs = [
     { id: 'sketch', label: t('sketch'), icon: <Pencil size={16} /> },
@@ -128,8 +143,8 @@ export const WorkingCanvas: React.FC<WorkingCanvasProps> = ({ selectedItem, onCl
             <TabsContent value="sketch" className="h-full m-0">
               <CLDSketchCanvas 
                 mode="moonshot" 
-                selectedBlock={'type' in selectedItem ? selectedItem : undefined}
-                selectedFork={'active' in selectedItem ? selectedItem : undefined}
+                selectedBlock={isConceptBlock(selectedItem) ? selectedItem : undefined}
+                selectedFork={isScenarioFork(selectedItem) ? selectedItem : undefined}
               />
             </TabsContent>
 
@@ -148,8 +163,8 @@ export const WorkingCanvas: React.FC<WorkingCanvasProps> = ({ selectedItem, onCl
                 showResults={showResults}
                 engine={engineMode}
                 activeTab="impact"
-                selectedBlock={'type' in selectedItem ? selectedItem : undefined}
-                selectedFork={'active' in selectedItem ? selectedItem : undefined}
+                selectedBlock={isConceptBlock(selectedItem) ? selectedItem : undefined}
+                selectedFork={isScenarioFork(selectedItem) ? selectedItem : undefined}
               />
             </TabsContent>
 
@@ -158,8 +173,8 @@ export const WorkingCanvas: React.FC<WorkingCanvasProps> = ({ selectedItem, onCl
                 showResults={showResults}
                 engine={engineMode}
                 activeTab="blueprint"
-                selectedBlock={'type' in selectedItem ? selectedItem : undefined}
-                selectedFork={'active' in selectedItem ? selectedItem : undefined}
+                selectedBlock={isConceptBlock(selectedItem) ? selectedItem : undefined}
+                selectedFork={isScenarioFork(selectedItem) ? selectedItem : undefined}
               />
             </TabsContent>
 
