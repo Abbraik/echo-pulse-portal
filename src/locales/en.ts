@@ -41,7 +41,6 @@ const en = {
   "strategyBuilder": "Strategy Builder",
   "systemFramingStudio": "System Framing Studio",
   "deiAndForesightHub": "DEI & Foresight Hub",
-  "strategyZone": "Strategy Zone",
   "thinkFooterCta": "Ready to shape the future? Dive into the ACT zone to bring your strategies to life.",
   "actZone": "ACT Zone",
   "actCoreDesc": "Execute strategies, manage resources, and drive progress towards a sustainable future.",
@@ -588,7 +587,6 @@ const en = {
   "systemDesignToolbox": "System Design Toolbox",
   "lessons": "Lessons",
   "concepts": "Concepts",
-  "scenarios": "Scenarios",
   "newExperiment": "New Experiment",
   
   // Revolutionary Sandbox components
