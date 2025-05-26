@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Lightbulb, Info, Zap, FlaskConical, Archive, Rocket, RefreshCw, BookOpen } from 'lucide-react';
@@ -19,8 +20,8 @@ const Innovate: React.FC = () => {
     <AnimatedPage>
       <div className="flex flex-col h-screen overflow-hidden">
         {/* Header with title and mode selector */}
-        <header className="h-auto mb-2">
-          <div className="glass-panel p-3 flex items-center justify-between">
+        <header className="mb-3">
+          <div className="glass-panel p-4 flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="p-3 rounded-xl bg-purple-500/20 text-purple-400">
                 <Lightbulb size={24} />
@@ -41,7 +42,7 @@ const Innovate: React.FC = () => {
                     </TooltipContent>
                   </Tooltip>
                 </div>
-                <div className="flex mt-2">
+                <div className="flex mt-3">
                   <Tabs value={activeMode} onValueChange={(value) => setActiveMode(value as 'lesson-driven' | 'freeform' | 'moonshot')}>
                     <TabsList className="grid w-auto grid-cols-3 bg-background/30">
                       <TabsTrigger
@@ -115,7 +116,7 @@ const Innovate: React.FC = () => {
         </header>
         
         {/* Main content area */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden px-2">
           <InnovateDesignHub mode={activeMode} />
         </div>
         
