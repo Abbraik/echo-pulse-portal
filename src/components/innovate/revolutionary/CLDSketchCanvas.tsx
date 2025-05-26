@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { MousePointer2, Circle, ArrowRight, Plus, Save, RotateCcw, Redo2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
@@ -303,9 +302,6 @@ export const CLDSketchCanvas: React.FC<CLDSketchCanvasProps> = ({
       <div className="flex items-center justify-between p-3 border-b border-white/10">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-medium">{t('cldSketchCanvas')}</h3>
-          <span className="text-xs px-2 py-1 rounded bg-purple-500/20 text-purple-300 capitalize">
-            {mode}
-          </span>
           {(selectedBlock || selectedFork) && (
             <span className="text-xs px-2 py-1 rounded bg-teal-500/20 text-teal-300">
               {selectedBlock ? selectedBlock.name : selectedFork?.name}
