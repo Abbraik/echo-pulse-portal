@@ -34,23 +34,23 @@ export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) =>
   };
   
   return (
-    <div className={`flex ${isRTL ? 'flex-row-reverse' : 'flex-row'} h-full gap-3`}>
+    <div className={`flex ${isRTL ? 'flex-row-reverse' : 'flex-row'} h-full gap-4`}>
       {/* Left sidebar: Toolbox */}
       <div className="w-1/3">
         <InnovateToolbox mode={mode} />
       </div>
 
       {/* Right side: Canvas & Controls */}
-      <div className="w-2/3 flex flex-col gap-3">
+      <div className="w-2/3 flex flex-col gap-4">
         {/* Top section: CLD Sketch & Diagram Tools */}
-        <div className="h-[45%]">
+        <div className="h-[40%]">
           <GlassCard className="h-full">
             <CLDSketchCanvas mode={mode} />
           </GlassCard>
         </div>
 
         {/* Middle section: Scenario Fork & Simulation Request */}
-        <div className="h-[20%]">
+        <div className="h-[25%]">
           <GlassCard className="h-full">
             <RequestSimulationPanel 
               engineMode={engineMode}
