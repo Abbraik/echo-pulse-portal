@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,11 +8,33 @@ import { Package, GitBranch, Wrench } from 'lucide-react';
 import { ConceptBlocksPalette } from './revolutionary/ConceptBlocksPalette';
 import { ScenarioFork } from './revolutionary/ScenarioFork';
 
-interface InnovateToolboxProps {
-  mode: 'lesson-driven' | 'freeform' | 'moonshot';
+interface ConceptBlock {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  category: string;
+  type: string;
 }
 
-export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ mode }) => {
+interface ScenarioForkData {
+  id: string;
+  name: string;
+  active: boolean;
+}
+
+interface InnovateToolboxProps {
+  mode: 'lesson-driven' | 'freeform' | 'moonshot';
+  onBlockSelect?: (block: ConceptBlock) => void;
+  onForkSelect?: (fork: ScenarioForkData) => void;
+}
+
+export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ 
+  mode, 
+  onBlockSelect,
+  onForkSelect 
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -33,13 +56,16 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ mode }) => {
         <div className="flex-1 overflow-hidden mb-4">
           <TabsContent value="blocks" className="h-full m-0">
             <ScrollArea className="h-full">
-              <ConceptBlocksPalette mode={mode} />
+              <ConceptBlocksPalette 
+                mode={mode} 
+                onBlockSelect={onBlockSelect}
+              />
             </ScrollArea>
           </TabsContent>
           
           <TabsContent value="forks" className="h-full m-0">
             <ScrollArea className="h-full">
-              <ScenarioFork />
+              <ScenarioFork onForkSelect={onForkSelect} />
             </ScrollArea>
           </TabsContent>
         </div>
