@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
@@ -302,7 +301,10 @@ const BlueprintContent: React.FC<{
 };
 
 // Comparative Tab Content
-const ComparativeContent: React.FC = () => {
+const ComparativeContent: React.FC<{
+  selectedBlock?: ConceptBlock | null;
+  selectedFork?: ScenarioForkData | null;
+}> = ({ selectedBlock, selectedFork }) => {
   const { t } = useTranslation();
   
   return (
@@ -375,7 +377,10 @@ const ComparativeContent: React.FC = () => {
 };
 
 // Co-Create Tab Content
-const CoCreateContent: React.FC = () => {
+const CoCreateContent: React.FC<{
+  selectedBlock?: ConceptBlock | null;
+  selectedFork?: ScenarioForkData | null;
+}> = ({ selectedBlock, selectedFork }) => {
   const { t } = useTranslation();
   
   return (

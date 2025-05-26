@@ -6,12 +6,30 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion } from 'framer-motion';
 
+interface ConceptBlock {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  category: string;
+  type: string;
+}
+
+interface ScenarioForkData {
+  id: string;
+  name: string;
+  active: boolean;
+}
+
 interface RequestSimulationPanelProps {
   engineMode: string;
   setEngineMode: (mode: string) => void;
   onGenerateSimulation: () => void;
   isGenerating: boolean;
   isGenerated: boolean;
+  selectedBlock?: ConceptBlock | null;
+  selectedFork?: ScenarioForkData | null;
 }
 
 export const RequestSimulationPanel: React.FC<RequestSimulationPanelProps> = ({
@@ -19,7 +37,9 @@ export const RequestSimulationPanel: React.FC<RequestSimulationPanelProps> = ({
   setEngineMode,
   onGenerateSimulation,
   isGenerating,
-  isGenerated
+  isGenerated,
+  selectedBlock,
+  selectedFork
 }) => {
   const { t } = useTranslation();
 
@@ -42,6 +62,13 @@ export const RequestSimulationPanel: React.FC<RequestSimulationPanelProps> = ({
           </motion.div>
         )}
       </div>
+      
+      {/* Context indicator */}
+      {(selectedBlock || selectedFork) && (
+        <div className="mb-4 px-3 py-2 bg-white/10 rounded-md text-sm">
+          Simulating: {selectedBlock?.name || selectedFork?.name}
+        </div>
+      )}
       
       <p className="text-sm text-muted-foreground mb-4">
         {t('requestSimulationDesc')}
