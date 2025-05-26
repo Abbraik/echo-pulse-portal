@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -15,6 +15,10 @@ const MainLayout = () => {
   const { resolvedTheme } = useTheme();
   const { isRTL } = useTranslation();
   const [isPageChanging, setIsPageChanging] = useState(false);
+  const location = useLocation();
+  
+  // Check if we're on the innovate page
+  const isInnovatePage = location.pathname === '/innovate';
   
   // Handle welcome overlay
   useEffect(() => {
@@ -103,13 +107,13 @@ const MainLayout = () => {
       </AnimatePresence>
       
       {showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
-      <Navbar hidden={hideNav} />
+      <Navbar hidden={hideNav && !isInnovatePage} />
       
-      <main className={`flex-grow container mx-auto px-4 py-6 pt-20 ${isRTL ? 'font-noto-arabic' : ''}`}>
+      <main className={`flex-grow ${isInnovatePage ? 'pt-16' : 'container mx-auto px-4 py-6 pt-20'} ${isRTL ? 'font-noto-arabic' : ''}`}>
         <Outlet />
       </main>
       
-      <Footer />
+      {!isInnovatePage && <Footer />}
     </div>
   );
 };

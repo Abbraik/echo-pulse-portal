@@ -1,12 +1,12 @@
 
-import React from 'react';
-import { Search, Plus } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
-import { GlassCard } from '../ui/glass-card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { ScenarioLibrary } from './ScenarioLibrary';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useTranslation } from '@/hooks/use-translation';
+import { Package, Layers, GitBranch } from 'lucide-react';
+import { ConceptBlocksPalette } from './revolutionary/ConceptBlocksPalette';
+import { ScenarioFork } from './revolutionary/ScenarioFork';
+import { ScenarioLibrary } from './ScenarioLibrary';
 
 interface InnovateToolboxProps {
   mode: 'lesson-driven' | 'freeform' | 'moonshot';
@@ -14,56 +14,45 @@ interface InnovateToolboxProps {
 
 export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({ mode }) => {
   const { t } = useTranslation();
-  
+
   return (
-    <GlassCard className="h-full flex flex-col">
-      <h2 className="text-lg font-semibold mb-2">{t('systemDesignToolbox')}</h2>
+    <div className="h-full flex flex-col p-4">
+      <h2 className="text-lg font-semibold mb-4">{t('buildingBlocks')}</h2>
       
-      {/* Search for tools, concepts, scenarios */}
-      <div className="relative mb-4">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder={t('searchToolbox')}
-          className="pl-8"
-        />
-      </div>
-      
-      {/* Tabs for different toolbox sections */}
-      <Tabs defaultValue="lessons" className="flex-1">
-        <TabsList className="grid grid-cols-3">
-          <TabsTrigger value="lessons">{t('lessons')}</TabsTrigger>
-          <TabsTrigger value="concepts">{t('concepts')}</TabsTrigger>
-          <TabsTrigger value="scenarios">{t('scenarios')}</TabsTrigger>
+      <Tabs defaultValue="blocks" className="flex-1 flex flex-col">
+        <TabsList className="grid w-full grid-cols-3 mb-4">
+          <TabsTrigger value="blocks" className="flex items-center gap-1">
+            <Package size={14} />
+            <span className="hidden sm:inline">Blocks</span>
+          </TabsTrigger>
+          <TabsTrigger value="scenarios" className="flex items-center gap-1">
+            <Layers size={14} />
+            <span className="hidden sm:inline">Library</span>
+          </TabsTrigger>
+          <TabsTrigger value="forks" className="flex items-center gap-1">
+            <GitBranch size={14} />
+            <span className="hidden sm:inline">Forks</span>
+          </TabsTrigger>
         </TabsList>
         
-        <div className="mt-2 overflow-auto flex-1">
-          <TabsContent value="lessons" className="h-full">
-            {/* Placeholder for lessons content */}
-            <div className="h-full flex items-center justify-center text-muted-foreground">
-              <p>Lesson content based on mode: {mode}</p>
-            </div>
+        <div className="flex-1 overflow-hidden">
+          <TabsContent value="blocks" className="h-full m-0">
+            <ScrollArea className="h-full">
+              <ConceptBlocksPalette mode={mode} />
+            </ScrollArea>
           </TabsContent>
           
-          <TabsContent value="concepts" className="h-full">
-            {/* Placeholder for concepts */}
-            <div className="h-full flex items-center justify-center text-muted-foreground">
-              <p>Concept blocks will appear here</p>
-            </div>
+          <TabsContent value="scenarios" className="h-full m-0">
+            <ScenarioLibrary vertical={true} mode={mode} />
           </TabsContent>
           
-          <TabsContent value="scenarios" className="h-full">
-            <ScenarioLibrary mode={mode} />
+          <TabsContent value="forks" className="h-full m-0">
+            <ScrollArea className="h-full">
+              <ScenarioFork />
+            </ScrollArea>
           </TabsContent>
         </div>
       </Tabs>
-      
-      {/* New Experiment Button - fixed at bottom */}
-      <div className="mt-4">
-        <Button className="w-full" size="sm">
-          <Plus size={16} className="mr-2" />
-          {t('newExperiment')}
-        </Button>
-      </div>
-    </GlassCard>
+    </div>
   );
 };
