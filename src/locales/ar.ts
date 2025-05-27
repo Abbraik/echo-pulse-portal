@@ -1,4 +1,3 @@
-
 const ar = {
   "Welcome to PDS": "مرحبا بكم في PDS",
   "Select your language": "اختر لغتك",
@@ -358,7 +357,37 @@ const ar = {
   "baselineVsRedesignScenario": "السيناريو الأساسي مقابل سيناريو إعادة التصميم",
   "months": "أشهر",
   "baseline": "خط الأساس",
-  "redesign": "إعادة التصميم"
+  "redesign": "إعادة التصميم",
+  
+  // New DEI Hub translations
+  "populationDynamics": "ديناميكيات السكان",
+  "resourceMarket": "سوق الموارد",
+  "productsServicesMarket": "سوق المنتجات والخدمات", 
+  "socialOutcomes": "النتائج الاجتماعية",
+  "hasTargets": "لديه أهداف",
+  "clickToSetTargets": "انقر لتحديد الأهداف",
+  "indicators": "مؤشرات",
+  "setTarget": "تحديد الهدف",
+  "pillar": "الركيزة",
+  "indicator": "المؤشر",
+  "currentValue": "القيمة الحالية", 
+  "targetValue": "القيمة المستهدفة",
+  "enterTarget": "أدخل الهدف",
+  "unit": "الوحدة",
+  "saveTarget": "حفظ الهدف",
+  "targetsSet": "أهداف محددة",
+  "applyTargets": "تطبيق الأهداف",
+  "targetSet": "تم تحديد الهدف",
+  "newTargetFor": "هدف جديد لـ",
+  "targetsApplied": "تم تطبيق الأهداف",
+  "deiMetricsRecalculated": "تم إعادة حساب مقاييس DEI",
+  "loopAnalysisTriggered": "تم تشغيل تحليل الحلقة",
+  "checkLoopAnalysisTab": "تحقق من علامة تبويب تحليل الحلقة للتحديثات",
+  "invalidNumber": "يرجى إدخال رقم صحيح",
+  "percentageRange": "يجب أن تكون النسبة المئوية بين 0 و 100",
+  "ratioPositive": "يجب أن تكون النسبة موجبة",
+  "close": "إغلاق",
+  "cancel": "إلغاء"
 };
 
 export default ar;
