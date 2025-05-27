@@ -1,3 +1,4 @@
+
 export const en = {
   "welcome": "Welcome",
   "allRightsReserved": "All Rights Reserved",
@@ -190,7 +191,6 @@ export const en = {
   "promote": "Promote",
   "promoteToAct": "Promote to Act",
   "adjustLever": "Adjust Lever",
-  "baseline": "Baseline",
   "postTarget": "Post-Target",
   "populationDevelopmentLoop": "Population & Development",
   "naturalPopulationGrowthLoop": "Natural Population Growth", 
