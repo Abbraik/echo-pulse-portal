@@ -1,3 +1,4 @@
+
 export const en = {
   "welcome": "Welcome",
   "allRightsReserved": "All Rights Reserved",
@@ -156,6 +157,13 @@ export const en = {
   "invalidNumber": "Please enter a valid number",
   "percentageRange": "Percentage must be between 0 and 100",
   "ratioPositive": "Ratio must be positive",
-  "close": "Close",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "deiAndForesightHub": "DEI & Foresight Hub",
+  "overview": "Overview",
+  "simulation": "Simulation",
+  "deviationFromEquilibrium": "Deviation from Equilibrium",
+  "activeScenarios": "Active Scenarios",
+  "mostProbable": "Most Probable",
+  "mostRecent": "Most Recent",
+  "scenarioDistribution": "Scenario Distribution"
 };
