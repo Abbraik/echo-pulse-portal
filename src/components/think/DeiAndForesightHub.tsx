@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -15,6 +14,7 @@ import SimulationLab from '@/components/think/SimulationLab';
 import EnhancedSimulationTab from '@/components/think/EnhancedSimulationTab';
 import { EnhancedPillarCard } from '@/components/think/components/EnhancedPillarCard';
 import { TargetSettingModal } from '@/components/think/components/TargetSettingModal';
+import LoopAnalysisTab from '@/components/think/LoopAnalysisTab';
 
 interface SubIndicator {
   name: string;
@@ -45,7 +45,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
   onSelectScenario
 }) => {
   const { t, isRTL } = useTranslation();
-  const [activeView, setActiveView] = useState<'overview' | 'simulation'>('overview');
+  const [activeView, setActiveView] = useState<'overview' | 'simulation' | 'loopAnalysis'>('overview');
   const [selectedIndicator, setSelectedIndicator] = useState<{
     pillar: string;
     indicator: SubIndicator;
@@ -248,6 +248,24 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     });
   };
 
+  const handlePromoteToAct = (objectives: string[]) => {
+    toast({
+      title: t('objectivesPromoted'),
+      description: t('checkStrategyBuilder'),
+      duration: 3000,
+    });
+  };
+
+  const handleAdjustLever = (lever: string) => {
+    // Switch to simulation tab and highlight the relevant slider
+    setActiveView('simulation');
+    toast({
+      title: t('navigatingToSimulation'),
+      description: `${t('adjusting')} ${lever}`,
+      duration: 2000,
+    });
+  };
+
   return (
     <GlassCard className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -280,7 +298,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
           <div className="bg-white/5 backdrop-blur-sm rounded-full p-1">
             <Tabs 
               value={activeView} 
-              onValueChange={(v) => setActiveView(v as 'overview' | 'simulation')}
+              onValueChange={(v) => setActiveView(v as 'overview' | 'simulation' | 'loopAnalysis')}
               className="w-full"
             >
               <TabsList className="bg-transparent">
@@ -297,6 +315,13 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
                 >
                   <Play className="mr-2 h-4 w-4" />
                   {t("simulation").toUpperCase()}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="loopAnalysis" 
+                  className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
+                >
+                  <Network className="mr-2 h-4 w-4" />
+                  {t("loopAnalysis").toUpperCase()}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -333,13 +358,19 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
           {/* DEI Foresight Tab */}
           <DeiForesightTab metrics={metrics} scenarios={scenarios} />
         </div>
-      ) : (
+      ) : activeView === 'simulation' ? (
         <EnhancedSimulationTab 
           metrics={metrics} 
           scenarios={scenarios}
           pillars={enhancedPillars}
           onSaveScenario={onSaveScenario}
           onSelectScenario={onSelectScenario}
+        />
+      ) : (
+        <LoopAnalysisTab 
+          hasTargets={hasTargets}
+          onPromoteToAct={handlePromoteToAct}
+          onAdjustLever={handleAdjustLever}
         />
       )}
       
