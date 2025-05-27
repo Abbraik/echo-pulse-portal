@@ -242,8 +242,5 @@ export const en = {
   "checkStrategyBuilder": "Check the Strategy Builder for new objectives",
   "navigatingToSimulation": "Navigating to Simulation",
   "adjusting": "Adjusting",
-  "analyzing": "Analyzing...",
-  "loopVisualization": "Loop Visualization",
-  "loopVisualizationDesc": "Interactive circular diagrams showing feedback loop structures and flows",
-  "promoteObjective": "Promote Objective"
+  "analyzing": "Analyzing..."
 };

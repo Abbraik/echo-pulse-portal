@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -8,8 +9,7 @@ import {
   Filter,
   Clock,
   TrendingUp,
-  Target,
-  Eye
+  Target
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
@@ -31,9 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import LoopVisualization from '@/components/think/LoopVisualization';
 
 interface LoopData {
   id: string;
@@ -66,7 +64,6 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
   const [expandedLoops, setExpandedLoops] = useState<string[]>([]);
   const [hoveredLoop, setHoveredLoop] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [activeView, setActiveView] = useState<'analysis' | 'visualization'>('analysis');
 
   // Mock loop data
   const loopsData: LoopData[] = [
@@ -255,10 +252,6 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
     });
   };
 
-  const handlePromoteFromVisualization = (loopId: string, objective: string) => {
-    handlePromoteObjectives([objective]);
-  };
-
   const getLoopTypeColor = (type: 'reinforcing' | 'balancing') => {
     return type === 'reinforcing' ? 'text-teal-400' : 'text-orange-400';
   };
@@ -288,287 +281,253 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
         </p>
       </motion.div>
 
-      {/* View Toggle Tabs */}
+      {/* Controls */}
       <motion.div 
-        className="flex justify-center"
+        className="glass-panel p-4 border border-white/20"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'analysis' | 'visualization')}>
-          <TabsList className="bg-white/5 backdrop-blur-sm">
-            <TabsTrigger 
-              value="analysis" 
-              className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
-            >
-              <Target className="mr-2 h-4 w-4" />
-              Analysis
-            </TabsTrigger>
-            <TabsTrigger 
-              value="visualization" 
-              className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              Visualization
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </motion.div>
-
-      {/* Tab Content */}
-      <TabsContent value="analysis" className="space-y-6">
-        {/* Controls */}
-        <motion.div 
-          className="glass-panel p-4 border border-white/20"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <Button
-              onClick={handleRecomputeAnalysis}
-              disabled={isAnalyzing || !hasTargets}
-              className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700"
-            >
-              <RotateCcw size={16} className="mr-2" />
-              {isAnalyzing ? t('analyzing') : t('recomputeDynamics')}
-            </Button>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <Button
+            onClick={handleRecomputeAnalysis}
+            disabled={isAnalyzing || !hasTargets}
+            className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700"
+          >
+            <RotateCcw size={16} className="mr-2" />
+            {isAnalyzing ? t('analyzing') : t('recomputeDynamics')}
+          </Button>
+          
+          <div className="flex items-center gap-4 flex-1">
+            <div className="flex items-center gap-2">
+              <Filter size={16} className="text-gray-400" />
+              <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+                <SelectTrigger className="w-[160px] bg-white/10 border-white/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('allLoops')}</SelectItem>
+                  <SelectItem value="reinforcing">{t('reinforcingLoops')}</SelectItem>
+                  <SelectItem value="balancing">{t('balancingLoops')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             
-            <div className="flex items-center gap-4 flex-1">
-              <div className="flex items-center gap-2">
-                <Filter size={16} className="text-gray-400" />
-                <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
-                  <SelectTrigger className="w-[160px] bg-white/10 border-white/20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('allLoops')}</SelectItem>
-                    <SelectItem value="reinforcing">{t('reinforcingLoops')}</SelectItem>
-                    <SelectItem value="balancing">{t('balancingLoops')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="flex items-center gap-2 flex-1 max-w-xs">
-                <Clock size={16} className="text-gray-400" />
-                <span className="text-sm text-gray-400">{t('timeHorizon')}:</span>
-                <Slider
-                  value={timeHorizon}
-                  min={1}
-                  max={10}
-                  step={1}
-                  onValueChange={setTimeHorizon}
-                  className="slider-teal flex-1"
-                />
-                <span className="text-sm text-teal-400 min-w-[60px]">
-                  {timeHorizon[0]} {t('years')}
-                </span>
-              </div>
+            <div className="flex items-center gap-2 flex-1 max-w-xs">
+              <Clock size={16} className="text-gray-400" />
+              <span className="text-sm text-gray-400">{t('timeHorizon')}:</span>
+              <Slider
+                value={timeHorizon}
+                min={1}
+                max={10}
+                step={1}
+                onValueChange={setTimeHorizon}
+                className="slider-teal flex-1"
+              />
+              <span className="text-sm text-teal-400 min-w-[60px]">
+                {timeHorizon[0]} {t('years')}
+              </span>
             </div>
           </div>
-        </motion.div>
+        </div>
+      </motion.div>
 
-        {/* Analysis Table */}
-        <motion.div 
-          className="glass-panel border border-white/20 overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-white/10">
-                  <TableHead className="text-gray-300">{t('loopName')}</TableHead>
-                  <TableHead className="text-gray-300">{t('netEffect')}</TableHead>
-                  <TableHead className="text-gray-300">{t('coverageRatio')}</TableHead>
-                  <TableHead className="text-gray-300">{t('consistencyScore')}</TableHead>
-                  <TableHead className="text-gray-300">{t('actionableObjectives')}</TableHead>
-                  <TableHead className="text-gray-300">{t('promote')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredLoops.map((loop, index) => (
-                  <motion.tr 
-                    key={loop.id}
-                    className="border-white/10 hover:bg-white/5 cursor-pointer"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    onMouseEnter={() => setHoveredLoop(loop.id)}
-                    onMouseLeave={() => setHoveredLoop(null)}
-                    onClick={() => toggleLoopExpansion(loop.id)}
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {expandedLoops.includes(loop.id) ? (
-                          <ChevronDown size={16} className="text-teal-400" />
-                        ) : (
-                          <ChevronRight size={16} className="text-teal-400" />
-                        )}
-                        <div>
-                          <div className="font-medium text-white">{loop.name}</div>
-                          {getLoopTypeBadge(loop.type)}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className={`font-medium ${loop.netEffect >= 0 ? 'text-teal-400' : 'text-orange-400'}`}>
-                        {loop.netEffect >= 0 ? '+' : ''}{loop.netEffect.toFixed(1)}%
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-teal-500 to-teal-400"
-                            style={{ width: `${loop.coverageRatio * 100}%` }}
-                          />
-                        </div>
-                        <span className="text-sm text-gray-400">{(loop.coverageRatio * 100).toFixed(0)}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-blue-500 to-blue-400"
-                            style={{ width: `${loop.consistencyScore * 100}%` }}
-                          />
-                        </div>
-                        <span className="text-sm text-gray-400">{(loop.consistencyScore * 100).toFixed(0)}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        {loop.actionableObjectives.slice(0, 2).map((obj, idx) => (
-                          <div key={idx} className="text-xs text-gray-400 truncate max-w-[200px]">
-                            {obj}
-                          </div>
-                        ))}
-                        {loop.actionableObjectives.length > 2 && (
-                          <div className="text-xs text-teal-400">
-                            +{loop.actionableObjectives.length - 2} more
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-teal-500/50 text-teal-400 hover:bg-teal-500/10"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePromoteObjectives(loop.actionableObjectives);
-                        }}
-                      >
-                        <Target size={12} className="mr-1" />
-                        {t('promote')}
-                      </Button>
-                    </TableCell>
-                  </motion.tr>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </motion.div>
-
-        {/* Expanded Loop Details */}
-        <AnimatePresence>
-          {expandedLoops.map(loopId => {
-            const loop = loopsData.find(l => l.id === loopId);
-            if (!loop) return null;
-            
-            return (
-              <motion.div
-                key={loopId}
-                className="glass-panel-deep p-6 border border-white/30"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-white">{loop.name}</h3>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => toggleLoopExpansion(loopId)}
-                      className="text-gray-400 hover:text-white"
-                    >
-                      <ChevronDown size={16} />
-                    </Button>
-                  </div>
-                  
-                  <p className="text-sm text-gray-400">{loop.description}</p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-white">Control Levers</h4>
-                      <div className="space-y-2">
-                        {loop.levers.map((lever, idx) => (
-                          <Button
-                            key={idx}
-                            size="sm"
-                            variant="outline"
-                            className="w-full justify-between border-white/20 text-gray-300 hover:bg-white/10"
-                            onClick={() => onAdjustLever && onAdjustLever(lever)}
-                          >
-                            {lever}
-                            <ArrowRight size={12} />
-                          </Button>
-                        ))}
+      {/* Analysis Table */}
+      <motion.div 
+        className="glass-panel border border-white/20 overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-white/10">
+                <TableHead className="text-gray-300">{t('loopName')}</TableHead>
+                <TableHead className="text-gray-300">{t('netEffect')}</TableHead>
+                <TableHead className="text-gray-300">{t('coverageRatio')}</TableHead>
+                <TableHead className="text-gray-300">{t('consistencyScore')}</TableHead>
+                <TableHead className="text-gray-300">{t('actionableObjectives')}</TableHead>
+                <TableHead className="text-gray-300">{t('promote')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredLoops.map((loop, index) => (
+                <motion.tr 
+                  key={loop.id}
+                  className="border-white/10 hover:bg-white/5 cursor-pointer"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  onMouseEnter={() => setHoveredLoop(loop.id)}
+                  onMouseLeave={() => setHoveredLoop(null)}
+                  onClick={() => toggleLoopExpansion(loop.id)}
+                >
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {expandedLoops.includes(loop.id) ? (
+                        <ChevronDown size={16} className="text-teal-400" />
+                      ) : (
+                        <ChevronRight size={16} className="text-teal-400" />
+                      )}
+                      <div>
+                        <div className="font-medium text-white">{loop.name}</div>
+                        {getLoopTypeBadge(loop.type)}
                       </div>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-white">Effect Comparison</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">Baseline:</span>
-                          <span className="text-sm text-white">{loop.baselineEffect}%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">{t('postTarget')}:</span>
-                          <span className="text-sm text-teal-400">{loop.postTargetEffect}%</span>
-                        </div>
-                        <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
-                          <div className="h-full flex">
-                            <div 
-                              className="bg-gray-500"
-                              style={{ width: `${(loop.baselineEffect / 100) * 100}%` }}
-                            />
-                            <div 
-                              className="bg-teal-500"
-                              style={{ width: `${((loop.postTargetEffect - loop.baselineEffect) / 100) * 100}%` }}
-                            />
-                          </div>
-                        </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`font-medium ${loop.netEffect >= 0 ? 'text-teal-400' : 'text-orange-400'}`}>
+                      {loop.netEffect >= 0 ? '+' : ''}{loop.netEffect.toFixed(1)}%
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-teal-500 to-teal-400"
+                          style={{ width: `${loop.coverageRatio * 100}%` }}
+                        />
                       </div>
+                      <span className="text-sm text-gray-400">{(loop.coverageRatio * 100).toFixed(0)}%</span>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-white">{t('actionableObjectives')}</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {loop.actionableObjectives.map((obj, idx) => (
-                        <div key={idx} className="glass-panel p-3 text-sm text-gray-300">
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-blue-500 to-blue-400"
+                          style={{ width: `${loop.consistencyScore * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-sm text-gray-400">{(loop.consistencyScore * 100).toFixed(0)}%</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      {loop.actionableObjectives.slice(0, 2).map((obj, idx) => (
+                        <div key={idx} className="text-xs text-gray-400 truncate max-w-[200px]">
                           {obj}
                         </div>
                       ))}
+                      {loop.actionableObjectives.length > 2 && (
+                        <div className="text-xs text-teal-400">
+                          +{loop.actionableObjectives.length - 2} more
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-teal-500/50 text-teal-400 hover:bg-teal-500/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePromoteObjectives(loop.actionableObjectives);
+                      }}
+                    >
+                      <Target size={12} className="mr-1" />
+                      {t('promote')}
+                    </Button>
+                  </TableCell>
+                </motion.tr>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </motion.div>
+
+      {/* Expanded Loop Details */}
+      <AnimatePresence>
+        {expandedLoops.map(loopId => {
+          const loop = loopsData.find(l => l.id === loopId);
+          if (!loop) return null;
+          
+          return (
+            <motion.div
+              key={loopId}
+              className="glass-panel-deep p-6 border border-white/30"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-white">{loop.name}</h3>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => toggleLoopExpansion(loopId)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <ChevronDown size={16} />
+                  </Button>
+                </div>
+                
+                <p className="text-sm text-gray-400">{loop.description}</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-white">Control Levers</h4>
+                    <div className="space-y-2">
+                      {loop.levers.map((lever, idx) => (
+                        <Button
+                          key={idx}
+                          size="sm"
+                          variant="outline"
+                          className="w-full justify-between border-white/20 text-gray-300 hover:bg-white/10"
+                          onClick={() => onAdjustLever && onAdjustLever(lever)}
+                        >
+                          {lever}
+                          <ArrowRight size={12} />
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-white">Effect Comparison</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-400">{t('baseline')}:</span>
+                        <span className="text-sm text-white">{loop.baselineEffect}%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-400">{t('postTarget')}:</span>
+                        <span className="text-sm text-teal-400">{loop.postTargetEffect}%</span>
+                      </div>
+                      <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div className="h-full flex">
+                          <div 
+                            className="bg-gray-500"
+                            style={{ width: `${(loop.baselineEffect / 100) * 100}%` }}
+                          />
+                          <div 
+                            className="bg-teal-500"
+                            style={{ width: `${((loop.postTargetEffect - loop.baselineEffect) / 100) * 100}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </TabsContent>
-
-      <TabsContent value="visualization" className="space-y-6">
-        <LoopVisualization onPromoteObjective={handlePromoteFromVisualization} />
-      </TabsContent>
+                
+                <div className="space-y-2">
+                  <h4 className="font-medium text-white">{t('actionableObjectives')}</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {loop.actionableObjectives.map((obj, idx) => (
+                      <div key={idx} className="glass-panel p-3 text-sm text-gray-300">
+                        {obj}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
     </div>
   );
 };
