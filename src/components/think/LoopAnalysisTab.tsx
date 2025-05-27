@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -9,7 +8,8 @@ import {
   Filter,
   Clock,
   TrendingUp,
-  Target
+  Target,
+  Info
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
@@ -32,12 +32,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { toast } from '@/hooks/use-toast';
+import LoopVisualization from './LoopVisualization';
 
 interface LoopData {
   id: string;
   name: string;
   type: 'reinforcing' | 'balancing';
   description: string;
+  nodes: string[];
   levers: string[];
   netEffect: number;
   coverageRatio: number;
@@ -65,13 +67,14 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
   const [hoveredLoop, setHoveredLoop] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // Mock loop data
+  // Enhanced loop data with node sequences for visualization
   const loopsData: LoopData[] = [
     {
       id: 'pop-dev',
       name: t('populationDevelopmentLoop'),
       type: 'reinforcing',
       description: t('populationDevelopmentDesc'),
+      nodes: ['Population', 'Resource Demand', 'Labor Demand', 'Fertility Confidence', 'Births'],
       levers: [t('childcareSubsidy'), t('migration')],
       netEffect: 12.5,
       coverageRatio: 0.78,
@@ -85,6 +88,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('naturalPopulationGrowthLoop'),
       type: 'reinforcing',
       description: t('naturalPopulationGrowthDesc'),
+      nodes: ['Cohort Size', 'Marriage Rate', 'Births'],
       levers: [t('matchmakingBudget'), t('weddingGrant')],
       netEffect: 8.3,
       coverageRatio: 0.65,
@@ -98,6 +102,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('populationResourceMarketLoop'),
       type: 'reinforcing',
       description: t('populationResourceMarketDesc'),
+      nodes: ['Population', 'Extraction', 'Revenues', 'Regeneration', 'Resource Stock'],
       levers: [t('reinvestmentRatio'), t('extractionQuota')],
       netEffect: -5.2,
       coverageRatio: 0.82,
@@ -111,6 +116,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('economicMigrationGrowthLoop'),
       type: 'reinforcing',
       description: t('economicMigrationGrowthDesc'),
+      nodes: ['GDP', 'Labor Demand', 'Migration Inflow', 'Population'],
       levers: [t('visaIssuance'), t('skillMatch')],
       netEffect: 15.7,
       coverageRatio: 0.91,
@@ -124,6 +130,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('environmentalQualityLoop'),
       type: 'balancing',
       description: t('environmentalQualityDesc'),
+      nodes: ['Population × Emissions', 'Pollution', 'Env Quality', 'Health & Fertility'],
       levers: [t('greenTechInvestment')],
       netEffect: -3.1,
       coverageRatio: 0.55,
@@ -137,6 +144,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('productionProcessLoop'),
       type: 'reinforcing',
       description: t('productionProcessDesc'),
+      nodes: ['Capacity & Labor', 'Production', 'Inventory', 'Revenue', 'Capital Investment'],
       levers: [t('industryGrowthFund'), t('depreciationRate')],
       netEffect: 9.8,
       coverageRatio: 0.74,
@@ -349,89 +357,127 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
                 <TableHead className="text-gray-300">{t('consistencyScore')}</TableHead>
                 <TableHead className="text-gray-300">{t('actionableObjectives')}</TableHead>
                 <TableHead className="text-gray-300">{t('promote')}</TableHead>
+                <TableHead className="text-gray-300 w-16">Details</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredLoops.map((loop, index) => (
-                <motion.tr 
-                  key={loop.id}
-                  className="border-white/10 hover:bg-white/5 cursor-pointer"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  onMouseEnter={() => setHoveredLoop(loop.id)}
-                  onMouseLeave={() => setHoveredLoop(null)}
-                  onClick={() => toggleLoopExpansion(loop.id)}
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {expandedLoops.includes(loop.id) ? (
-                        <ChevronDown size={16} className="text-teal-400" />
-                      ) : (
-                        <ChevronRight size={16} className="text-teal-400" />
-                      )}
-                      <div>
-                        <div className="font-medium text-white">{loop.name}</div>
-                        {getLoopTypeBadge(loop.type)}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className={`font-medium ${loop.netEffect >= 0 ? 'text-teal-400' : 'text-orange-400'}`}>
-                      {loop.netEffect >= 0 ? '+' : ''}{loop.netEffect.toFixed(1)}%
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-teal-500 to-teal-400"
-                          style={{ width: `${loop.coverageRatio * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-sm text-gray-400">{(loop.coverageRatio * 100).toFixed(0)}%</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-blue-500 to-blue-400"
-                          style={{ width: `${loop.consistencyScore * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-sm text-gray-400">{(loop.consistencyScore * 100).toFixed(0)}%</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      {loop.actionableObjectives.slice(0, 2).map((obj, idx) => (
-                        <div key={idx} className="text-xs text-gray-400 truncate max-w-[200px]">
-                          {obj}
+                <React.Fragment key={loop.id}>
+                  <motion.tr 
+                    className="border-white/10 hover:bg-white/5"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    onMouseEnter={() => setHoveredLoop(loop.id)}
+                    onMouseLeave={() => setHoveredLoop(null)}
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <div className="font-medium text-white">{loop.name}</div>
+                          {getLoopTypeBadge(loop.type)}
                         </div>
-                      ))}
-                      {loop.actionableObjectives.length > 2 && (
-                        <div className="text-xs text-teal-400">
-                          +{loop.actionableObjectives.length - 2} more
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`font-medium ${loop.netEffect >= 0 ? 'text-teal-400' : 'text-orange-400'}`}>
+                        {loop.netEffect >= 0 ? '+' : ''}{loop.netEffect.toFixed(1)}%
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-teal-500 to-teal-400"
+                            style={{ width: `${loop.coverageRatio * 100}%` }}
+                          />
                         </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-teal-500/50 text-teal-400 hover:bg-teal-500/10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePromoteObjectives(loop.actionableObjectives);
-                      }}
-                    >
-                      <Target size={12} className="mr-1" />
-                      {t('promote')}
-                    </Button>
-                  </TableCell>
-                </motion.tr>
+                        <span className="text-sm text-gray-400">{(loop.coverageRatio * 100).toFixed(0)}%</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-blue-500 to-blue-400"
+                            style={{ width: `${loop.consistencyScore * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-sm text-gray-400">{(loop.consistencyScore * 100).toFixed(0)}%</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        {loop.actionableObjectives.slice(0, 2).map((obj, idx) => (
+                          <div key={idx} className="text-xs text-gray-400 truncate max-w-[200px]">
+                            {obj}
+                          </div>
+                        ))}
+                        {loop.actionableObjectives.length > 2 && (
+                          <div className="text-xs text-teal-400">
+                            +{loop.actionableObjectives.length - 2} more
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-teal-500/50 text-teal-400 hover:bg-teal-500/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePromoteObjectives(loop.actionableObjectives);
+                        }}
+                      >
+                        <Target size={12} className="mr-1" />
+                        {t('promote')}
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => toggleLoopExpansion(loop.id)}
+                        className="text-gray-400 hover:text-white"
+                        aria-expanded={expandedLoops.includes(loop.id)}
+                      >
+                        {expandedLoops.includes(loop.id) ? (
+                          <ChevronDown size={16} />
+                        ) : (
+                          <ChevronRight size={16} />
+                        )}
+                      </Button>
+                    </TableCell>
+                  </motion.tr>
+                  
+                  {/* Expanded Details Row */}
+                  {expandedLoops.includes(loop.id) && (
+                    <tr>
+                      <td colSpan={7} className="p-0">
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="border-t border-white/10"
+                        >
+                          <div className="p-4">
+                            <LoopVisualization
+                              loopId={loop.id}
+                              name={loop.name}
+                              type={loop.type}
+                              description={loop.description}
+                              nodes={loop.nodes}
+                              coverageRatio={loop.coverageRatio}
+                              netEffect={loop.netEffect}
+                              onPromoteObjective={() => handlePromoteObjectives(loop.actionableObjectives)}
+                            />
+                          </div>
+                        </motion.div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </TableBody>
           </Table>
