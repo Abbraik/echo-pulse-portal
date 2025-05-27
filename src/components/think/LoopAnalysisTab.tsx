@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -158,6 +159,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('economicStabilityLoop'),
       type: 'reinforcing',
       description: t('economicStabilityDesc'),
+      nodes: ['Supply vs Demand', 'Price Stability', 'Consumer Confidence', 'Output'],
       levers: [t('interestRate'), t('reserveRelease')],
       netEffect: 6.4,
       coverageRatio: 0.69,
@@ -171,6 +173,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('globalInfluenceLoop'),
       type: 'reinforcing',
       description: t('globalInfluenceDesc'),
+      nodes: ['Exports', 'Trade Surplus', 'Foreign Investment', 'Capital Stock'],
       levers: [t('exportIncentive'), t('fdiPromotion')],
       netEffect: 11.2,
       coverageRatio: 0.83,
@@ -184,6 +187,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('socialOutcomesLoop'),
       type: 'reinforcing',
       description: t('socialOutcomesDesc'),
+      nodes: ['Education Budget', 'Healthcare Budget', 'Social Outcome Index', 'Labor Productivity', 'Fertility'],
       levers: [t('educationBudget'), t('healthcareBudget')],
       netEffect: 7.9,
       coverageRatio: 0.76,
@@ -197,6 +201,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('migrationEconomicOpportunitiesLoop'),
       type: 'reinforcing',
       description: t('migrationEconomicOpportunitiesDesc'),
+      nodes: ['Wages & Unemployment', 'Net Migration', 'Skill Mix', 'Productivity'],
       levers: [t('wageSupport'), t('upskillingGrant')],
       netEffect: 13.5,
       coverageRatio: 0.88,
@@ -210,6 +215,7 @@ const LoopAnalysisTab: React.FC<LoopAnalysisTabProps> = ({
       name: t('socialStructureLoop'),
       type: 'reinforcing',
       description: t('socialStructureDesc'),
+      nodes: ['Social Cohesion', 'Nuptiality Rate', 'Fertility', 'Tax Revenue', 'Cohesion Funding'],
       levers: [t('engagementFund')],
       netEffect: 4.6,
       coverageRatio: 0.58,

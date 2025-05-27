@@ -1,3 +1,4 @@
+
 export const en = {
   "welcome": "Welcome",
   "allRightsReserved": "All Rights Reserved",
@@ -190,7 +191,6 @@ export const en = {
   "promote": "Promote",
   "promoteToAct": "Promote to Act",
   "adjustLever": "Adjust Lever",
-  "baseline": "Baseline",
   "postTarget": "Post-Target",
   "populationDevelopmentLoop": "Population & Development",
   "naturalPopulationGrowthLoop": "Natural Population Growth", 
@@ -213,7 +213,7 @@ export const en = {
   "globalInfluenceDesc": "Exports → Trade Surplus → Foreign Investment → Capital Stock",
   "socialOutcomesDesc": "Education & Healthcare budgets → Social Outcome Index → Labor Productivity → Fertility",
   "migrationEconomicOpportunitiesDesc": "Wages & Unemployment → Net Migration → Skill Mix → Productivity",
-  "socialStructureDesc": "Social Cohesion → Nuptiality Rate → Fertility → Tax Revenue → Cohesion Funding",
+  "socialStructureDesc": "Social Cohesion → Nuptiality Rate → Fertility → Tax Revenue → Cohesion Funding → Social Cohesion",
   "childcareSubsidy": "Childcare Subsidy",
   "migration": "Migration",
   "matchmakingBudget": "Matchmaking Budget",
