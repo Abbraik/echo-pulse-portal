@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
