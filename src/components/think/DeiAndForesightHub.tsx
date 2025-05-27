@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,6 +12,7 @@ import OverallDeiIndicator from '@/components/think/OverallDeiIndicator';
 import PillarBreakouts from '@/components/think/PillarBreakouts';
 import DeiForesightTab from '@/components/think/DeiForesightTab';
 import SimulationLab from '@/components/think/SimulationLab';
+import EnhancedSimulationTab from '@/components/think/EnhancedSimulationTab';
 import { EnhancedPillarCard } from '@/components/think/components/EnhancedPillarCard';
 import { TargetSettingModal } from '@/components/think/components/TargetSettingModal';
 
@@ -332,9 +334,10 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
           <DeiForesightTab metrics={metrics} scenarios={scenarios} />
         </div>
       ) : (
-        <SimulationLab 
+        <EnhancedSimulationTab 
           metrics={metrics} 
           scenarios={scenarios}
+          pillars={enhancedPillars}
           onSaveScenario={onSaveScenario}
           onSelectScenario={onSelectScenario}
         />

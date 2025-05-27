@@ -124,7 +124,6 @@ export const en = {
   "emailSent": "Email Sent!",
   "checkEmailForReset": "Check your email for a link to reset your password. If it doesn't appear within a few minutes, check your spam folder.",
   "backToLogin": "Back to Login",
-  "close": "Close",
   "deiTrajectoryComparison": "DEI Trajectory Comparison",
   "baselineVsRedesignScenario": "Baseline vs Redesign Scenario",
   "months": "months",
@@ -165,5 +164,14 @@ export const en = {
   "activeScenarios": "Active Scenarios",
   "mostProbable": "Most Probable",
   "mostRecent": "Most Recent",
-  "scenarioDistribution": "Scenario Distribution"
+  "scenarioDistribution": "Scenario Distribution",
+  "currentScenario": "Current Scenario",
+  "runSimulation": "Run Simulation",
+  "saveScenario": "Save Scenario",
+  "resetToOriginal": "Reset to Original",
+  "simulationComplete": "Simulation Complete",
+  "resultsUpdated": "Results have been updated",
+  "scenarioSaved": "Scenario Saved",
+  "scenarioSavedDesc": "Your custom scenario has been saved",
+  "running": "Running..."
 };
