@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, TrendingUp, Activity, Maximize2 } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Activity } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { FullscreenButton } from '@/components/ui/fullscreen-button';
 
 interface TodaysSnapshotProps {
   data?: {
@@ -15,9 +16,16 @@ interface TodaysSnapshotProps {
     hasStrategicAlert: boolean;
   };
   lastUpdate: Date;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
-const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ data, lastUpdate }) => {
+const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ 
+  data, 
+  lastUpdate, 
+  isFullscreen = false,
+  onToggleFullscreen 
+}) => {
   // Mock data if not provided
   const mockData = {
     headline: "DEI out-of-band: Population Volatility",
@@ -60,7 +68,7 @@ const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ data, lastUpdate }) => 
 
   return (
     <GlassCard 
-      className="h-24 p-4 relative overflow-hidden flex items-center group"
+      className={`${isFullscreen ? 'h-full p-8' : 'h-24 p-4'} relative overflow-hidden flex items-center group`}
       style={{ 
         background: 'rgba(255, 255, 255, 0.5)',
         backdropFilter: 'blur(20px)',
@@ -71,51 +79,53 @@ const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ data, lastUpdate }) => 
     >
       {/* Live Sync Indicator */}
       <div className="absolute top-3 right-4 flex items-center space-x-2 z-10">
-        <Button
-          size="sm"
-          variant="ghost"
-          className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 hover:bg-white/20"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Maximize2 size={14} />
-        </Button>
+        {onToggleFullscreen && (
+          <FullscreenButton
+            isFullscreen={isFullscreen}
+            onToggle={onToggleFullscreen}
+          />
+        )}
         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
         <span className="text-xs text-gray-400">Live • {lastUpdate.toLocaleTimeString()}</span>
       </div>
 
-      <div className="flex items-center justify-between w-full">
+      <div className={`flex items-center justify-between w-full ${isFullscreen ? 'flex-col space-y-8' : ''}`}>
         {/* Main Insight */}
-        <div className="flex items-center space-x-4 flex-1 min-w-0">
-          <div className={`p-2 rounded-xl ${config.bg} ${config.pulse} flex-shrink-0`}>
-            <IconComponent size={20} className={config.color} />
+        <div className={`flex items-center space-x-4 flex-1 min-w-0 ${isFullscreen ? 'w-full justify-center' : ''}`}>
+          <div className={`p-2 rounded-xl ${config.bg} ${config.pulse} flex-shrink-0 ${isFullscreen ? 'p-4' : ''}`}>
+            <IconComponent size={isFullscreen ? 32 : 20} className={config.color} />
           </div>
           
-          <div className="space-y-1 flex-1 min-w-0">
-            <h2 className="text-sm font-semibold text-white">Today's Critical Insight</h2>
-            <div className="flex items-center space-x-2 flex-wrap">
-              <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500 truncate">
+          <div className={`space-y-1 flex-1 min-w-0 ${isFullscreen ? 'text-center' : ''}`}>
+            <h2 className={`font-semibold text-white ${isFullscreen ? 'text-2xl' : 'text-sm'}`}>
+              Today's Critical Insight
+            </h2>
+            <div className={`flex items-center space-x-2 ${isFullscreen ? 'justify-center flex-wrap text-center' : 'flex-wrap'}`}>
+              <span className={`font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500 ${isFullscreen ? 'text-3xl' : 'text-lg'} ${isFullscreen ? '' : 'truncate'}`}>
                 {displayData.headline}
               </span>
-              <Badge className={`${config.color} ${config.bg} font-bold text-sm px-2 py-1 flex-shrink-0`}>
+              <Badge className={`${config.color} ${config.bg} font-bold ${isFullscreen ? 'text-lg px-4 py-2' : 'text-sm px-2 py-1'} flex-shrink-0`}>
                 {displayData.metric}
               </Badge>
             </div>
-            <p className="text-xs text-gray-400">{displayData.change}</p>
+            <p className={`text-gray-400 ${isFullscreen ? 'text-lg' : 'text-xs'}`}>
+              {displayData.change}
+            </p>
           </div>
         </div>
 
         {/* Strategic Alert CTA */}
-        <div className="flex items-center space-x-4 flex-shrink-0 ml-4">
+        <div className={`flex items-center space-x-4 flex-shrink-0 ${isFullscreen ? 'w-full justify-center' : 'ml-4'}`}>
           {displayData.hasStrategicAlert && (
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
               <Button
-                size="sm"
-                className={`${config.pulse} ${config.color === 'text-red-400' ? 'bg-red-600 hover:bg-red-700' : 'bg-teal-600 hover:bg-teal-700'} text-white font-semibold px-4 py-2`}
+                size={isFullscreen ? "lg" : "sm"}
+                className={`${config.pulse} ${config.color === 'text-red-400' ? 'bg-red-600 hover:bg-red-700' : 'bg-teal-600 hover:bg-teal-700'} text-white font-semibold ${isFullscreen ? 'px-8 py-4 text-lg' : 'px-4 py-2'}`}
               >
-                <AlertTriangle size={16} className="mr-2" />
+                <AlertTriangle size={isFullscreen ? 20 : 16} className="mr-2" />
                 Review Alert ▶
               </Button>
             </motion.div>

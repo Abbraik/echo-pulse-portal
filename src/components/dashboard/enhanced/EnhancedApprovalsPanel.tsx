@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Pin, Eye, Filter, ChevronDown, ChevronUp, Maximize2 } from 'lucide-react';
@@ -6,17 +5,22 @@ import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FullscreenButton } from '@/components/ui/fullscreen-button';
 
 interface EnhancedApprovalsPanelProps {
   data?: any;
   onViewModeChange: (mode: 'full' | 'approvals' | 'health') => void;
   currentMode: string;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
 const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({ 
   data, 
   onViewModeChange,
-  currentMode 
+  currentMode,
+  isFullscreen = false,
+  onToggleFullscreen
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [pinnedItems, setPinnedItems] = useState<string[]>(['1', '3']); // Mock pinned items
@@ -58,7 +62,7 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
 
   return (
     <GlassCard 
-      className="h-80 p-4 relative overflow-hidden flex flex-col group"
+      className={`${isFullscreen ? 'h-full' : 'h-80'} p-4 relative overflow-hidden flex flex-col group`}
       style={{ 
         background: 'rgba(59, 130, 246, 0.1)',
         backdropFilter: 'blur(20px)',
@@ -69,7 +73,9 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
       {/* Header - Fixed */}
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <div className="flex items-center space-x-3">
-          <h3 className="text-lg font-bold text-blue-400">Approvals & Decisions</h3>
+          <h3 className={`font-bold text-blue-400 ${isFullscreen ? 'text-2xl' : 'text-lg'}`}>
+            Approvals & Decisions
+          </h3>
           <div className="flex items-center space-x-1">
             <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
             <span className="text-xs text-gray-400">Live</span>
@@ -77,14 +83,12 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
         </div>
         
         <div className="flex items-center space-x-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 hover:bg-white/20"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Maximize2 size={14} />
-          </Button>
+          {onToggleFullscreen && (
+            <FullscreenButton
+              isFullscreen={isFullscreen}
+              onToggle={onToggleFullscreen}
+            />
+          )}
           <Button
             size="sm"
             variant={currentMode === 'approvals' ? 'default' : 'outline'}
@@ -106,22 +110,30 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
       </div>
 
       {/* Decision Heatmap - Fixed */}
-      <div className="grid grid-cols-4 gap-2 mb-4 flex-shrink-0">
-        <div className="bg-yellow-500/20 p-2 rounded-lg text-center">
-          <div className="text-lg font-bold text-yellow-400">{displayData.pending}</div>
-          <div className="text-xs text-gray-400">Pending</div>
+      <div className={`grid grid-cols-4 gap-2 mb-4 flex-shrink-0 ${isFullscreen ? 'gap-4' : ''}`}>
+        <div className={`bg-yellow-500/20 rounded-lg text-center ${isFullscreen ? 'p-4' : 'p-2'}`}>
+          <div className={`font-bold text-yellow-400 ${isFullscreen ? 'text-3xl' : 'text-lg'}`}>
+            {displayData.pending}
+          </div>
+          <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>Pending</div>
         </div>
-        <div className="bg-red-500/20 p-2 rounded-lg text-center">
-          <div className="text-lg font-bold text-red-400">{displayData.overdue}</div>
-          <div className="text-xs text-gray-400">Overdue</div>
+        <div className={`bg-red-500/20 rounded-lg text-center ${isFullscreen ? 'p-4' : 'p-2'}`}>
+          <div className={`font-bold text-red-400 ${isFullscreen ? 'text-3xl' : 'text-lg'}`}>
+            {displayData.overdue}
+          </div>
+          <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>Overdue</div>
         </div>
-        <div className="bg-orange-500/20 p-2 rounded-lg text-center">
-          <div className="text-lg font-bold text-orange-400">{displayData.urgent}</div>
-          <div className="text-xs text-gray-400">Urgent</div>
+        <div className={`bg-orange-500/20 rounded-lg text-center ${isFullscreen ? 'p-4' : 'p-2'}`}>
+          <div className={`font-bold text-orange-400 ${isFullscreen ? 'text-3xl' : 'text-lg'}`}>
+            {displayData.urgent}
+          </div>
+          <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>Urgent</div>
         </div>
-        <div className="bg-blue-500/20 p-2 rounded-lg text-center">
-          <div className="text-lg font-bold text-blue-400">{pinnedItems.length}</div>
-          <div className="text-xs text-gray-400">Pinned</div>
+        <div className={`bg-blue-500/20 rounded-lg text-center ${isFullscreen ? 'p-4' : 'p-2'}`}>
+          <div className={`font-bold text-blue-400 ${isFullscreen ? 'text-3xl' : 'text-lg'}`}>
+            {pinnedItems.length}
+          </div>
+          <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>Pinned</div>
         </div>
       </div>
 
