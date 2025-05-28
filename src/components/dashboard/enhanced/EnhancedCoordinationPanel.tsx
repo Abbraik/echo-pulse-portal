@@ -5,12 +5,19 @@ import { Users, AlertCircle, ArrowRight, RefreshCw, ChevronDown, ChevronUp } fro
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { FullscreenButton } from '@/components/ui/fullscreen-button';
 
 interface EnhancedCoordinationPanelProps {
   data?: any;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
-const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ data }) => {
+const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ 
+  data,
+  isFullscreen = false,
+  onToggleFullscreen
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Mock data
@@ -67,7 +74,7 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
 
   return (
     <GlassCard 
-      className="h-80 p-4 relative overflow-hidden flex flex-col"
+      className={`${isFullscreen ? 'h-full' : 'h-80'} p-4 relative overflow-hidden flex flex-col group`}
       style={{ 
         background: 'rgba(139, 92, 246, 0.1)',
         backdropFilter: 'blur(20px)',
@@ -78,7 +85,7 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
       {/* Header - Fixed */}
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <div className="flex items-center space-x-3">
-          <h3 className="text-lg font-bold text-purple-400">Coordination & Triggers</h3>
+          <h3 className={`font-bold text-purple-400 ${isFullscreen ? 'text-2xl' : 'text-lg'}`}>Coordination & Triggers</h3>
           <div className="flex items-center space-x-1">
             <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
             <span className="text-xs text-gray-400">Active</span>
@@ -86,7 +93,13 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
         </div>
         
         <div className="flex items-center space-x-2">
-          <Button size="sm" variant="ghost" className="text-purple-400 text-xs h-7">
+          {onToggleFullscreen && (
+            <FullscreenButton
+              isFullscreen={isFullscreen}
+              onToggle={onToggleFullscreen}
+            />
+          )}
+          <Button size="sm" variant="ghost" className={`text-purple-400 h-7 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
             <RefreshCw size={12} className="mr-1" />
             Refresh
           </Button>
@@ -103,14 +116,14 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
 
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+        <div className={`grid grid-cols-1 ${isFullscreen ? 'lg:grid-cols-2' : 'lg:grid-cols-2'} gap-4 h-full`}>
           {/* Left Column */}
           <div className="space-y-3 overflow-auto pr-1">
             {/* Redesign Flags */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-purple-400">Redesign Flags</h4>
-                <Button size="sm" variant="ghost" className="text-xs text-purple-400 h-6">
+                <h4 className={`font-semibold text-purple-400 ${isFullscreen ? 'text-lg' : 'text-sm'}`}>Redesign Flags</h4>
+                <Button size="sm" variant="ghost" className={`text-purple-400 h-6 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
                   View All ▶
                 </Button>
               </div>
@@ -119,21 +132,21 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
                 {(isExpanded ? displayData.redesignFlags : displayData.redesignFlags.slice(0, 2)).map((flag: any) => (
                   <motion.div
                     key={flag.id}
-                    className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-all group cursor-pointer"
+                    className={`rounded-lg hover:bg-white/10 transition-all group cursor-pointer ${isFullscreen ? 'p-4 bg-white/10' : 'p-2 bg-white/5'}`}
                     whileHover={{ scale: 1.01 }}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2 flex-1 min-w-0">
-                        <Badge className={`${getSeverityColor(flag.severity)} text-xs`}>
+                        <Badge className={`${getSeverityColor(flag.severity)} ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
                           {flag.severity}
                         </Badge>
                         <div className="min-w-0">
-                          <div className="font-medium text-white text-sm truncate">{flag.pattern}</div>
-                          <div className="text-xs text-gray-400">{flag.occurrences}x</div>
+                          <div className={`font-medium text-white truncate ${isFullscreen ? 'text-base' : 'text-sm'}`}>{flag.pattern}</div>
+                          <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>{flag.occurrences}x</div>
                         </div>
                       </div>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="sm" variant="ghost" className="text-xs h-6">
+                        <Button size="sm" variant="ghost" className={`h-6 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
                           Details
                         </Button>
                       </div>
@@ -146,8 +159,8 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
             {/* Facilitator Escalations */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-purple-400">Live Escalations</h4>
-                <Button size="sm" variant="ghost" className="text-xs text-purple-400 h-6">
+                <h4 className={`font-semibold text-purple-400 ${isFullscreen ? 'text-lg' : 'text-sm'}`}>Live Escalations</h4>
+                <Button size="sm" variant="ghost" className={`text-purple-400 h-6 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
                   View All ▶
                 </Button>
               </div>
@@ -156,24 +169,24 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
                 {(isExpanded ? displayData.escalations : displayData.escalations.slice(0, 2)).map((escalation: any) => (
                   <motion.div
                     key={escalation.id}
-                    className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-all group cursor-pointer"
+                    className={`rounded-lg hover:bg-white/10 transition-all group cursor-pointer ${isFullscreen ? 'p-4 bg-white/10' : 'p-2 bg-white/5'}`}
                     whileHover={{ scale: 1.01 }}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-1">
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className={isFullscreen ? 'text-sm' : 'text-xs'}>
                             {escalation.type}
                           </Badge>
-                          <span className={`text-xs font-medium ${getZoneColor(escalation.zone)}`}>
+                          <span className={`font-medium ${getZoneColor(escalation.zone)} ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
                             {escalation.zone}
                           </span>
                         </div>
-                        <div className="text-sm text-white truncate">{escalation.message}</div>
-                        <div className="text-xs text-gray-400">{escalation.time}</div>
+                        <div className={`text-white truncate ${isFullscreen ? 'text-base' : 'text-sm'}`}>{escalation.message}</div>
+                        <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>{escalation.time}</div>
                       </div>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="sm" variant="ghost" className="text-xs h-6">
+                        <Button size="sm" variant="ghost" className={`h-6 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
                           Reassign
                         </Button>
                       </div>
@@ -187,8 +200,8 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
           {/* Right Column - Zone Leads */}
           <div className="space-y-2 overflow-auto pr-1">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold text-purple-400">Zone Leads</h4>
-              <Button size="sm" variant="ghost" className="text-xs text-purple-400 h-6">
+              <h4 className={`font-semibold text-purple-400 ${isFullscreen ? 'text-lg' : 'text-sm'}`}>Zone Leads</h4>
+              <Button size="sm" variant="ghost" className={`text-purple-400 h-6 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
                 <Users size={10} className="mr-1" />
                 Council ▶
               </Button>
@@ -198,22 +211,22 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
               {displayData.zoneLeads.map((lead: any) => (
                 <motion.div
                   key={lead.zone}
-                  className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-all group cursor-pointer"
+                  className={`rounded-lg hover:bg-white/10 transition-all group cursor-pointer ${isFullscreen ? 'p-3 bg-white/10' : 'p-2 bg-white/5'}`}
                   whileHover={{ scale: 1.01 }}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <span className={`font-medium text-xs ${getZoneColor(lead.zone)}`}>
+                      <span className={`font-medium ${getZoneColor(lead.zone)} ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
                         {lead.zone}
                       </span>
-                      <div className="flex space-x-1 text-xs">
+                      <div className={`flex space-x-1 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>
                         <span className={getStatusColor(lead.status)}>
                           {lead.delivery}%
                         </span>
                         <span className="text-gray-400">E:{lead.entropy}</span>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-400">{lead.lastClosure}</div>
+                    <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>{lead.lastClosure}</div>
                   </div>
                 </motion.div>
               ))}

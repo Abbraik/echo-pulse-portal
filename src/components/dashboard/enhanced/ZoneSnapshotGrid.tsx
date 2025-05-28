@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Maximize2 } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { FullscreenButton } from '@/components/ui/fullscreen-button';
 import ThinkSnapshot from '@/components/dashboard/ThinkSnapshot';
 import ActSnapshot from '@/components/dashboard/ActSnapshot';
 import MonitorSnapshot from '@/components/dashboard/MonitorSnapshot';
@@ -13,9 +13,15 @@ import InnovateSnapshot from '@/components/dashboard/InnovateSnapshot';
 
 interface ZoneSnapshotGridProps {
   data?: any;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
-const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({ data }) => {
+const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({ 
+  data,
+  isFullscreen = false,
+  onToggleFullscreen
+}) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [expandedZone, setExpandedZone] = useState<string | null>(null);
 
@@ -32,21 +38,29 @@ const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({ data }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${isFullscreen ? 'h-full flex flex-col' : ''}`}>
       {/* Section Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
+      <div className="flex items-center justify-between flex-shrink-0">
+        <h3 className={`font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500 ${isFullscreen ? 'text-3xl' : 'text-xl'}`}>
           Zone Snapshots
         </h3>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="border-gray-500/50 text-gray-400"
-        >
-          {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-          <span className="ml-2">{isCollapsed ? 'Expand' : 'Collapse'}</span>
-        </Button>
+        <div className="flex items-center space-x-2">
+          {onToggleFullscreen && (
+            <FullscreenButton
+              isFullscreen={isFullscreen}
+              onToggle={onToggleFullscreen}
+            />
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="border-gray-500/50 text-gray-400"
+          >
+            {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+            <span className="ml-2">{isCollapsed ? 'Expand' : 'Collapse'}</span>
+          </Button>
+        </div>
       </div>
 
       {/* Zone Grid */}
@@ -57,7 +71,7 @@ const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({ data }) => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="space-y-4"
+            className={`space-y-4 ${isFullscreen ? 'flex-1 overflow-hidden' : ''}`}
           >
             {expandedZone ? (
               /* Full Screen Zone View */
@@ -86,14 +100,14 @@ const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({ data }) => {
               </motion.div>
             ) : (
               /* Grid View */
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className={`grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 ${isFullscreen ? 'h-full overflow-auto' : ''}`}>
                 {zones.map((zone, index) => (
                   <motion.div
                     key={zone.name}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="h-64 group relative"
+                    className={`group relative ${isFullscreen ? 'h-80' : 'h-64'}`}
                   >
                     <GlassCard 
                       className={`h-full p-4 relative overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200 ${zone.bgColor}`}
@@ -101,7 +115,7 @@ const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({ data }) => {
                     >
                       {/* Zone Header */}
                       <div className="flex items-center justify-between mb-4">
-                        <h4 className={`text-lg font-semibold ${zone.color}`}>
+                        <h4 className={`font-semibold ${zone.color} ${isFullscreen ? 'text-xl' : 'text-lg'}`}>
                           {zone.name}
                         </h4>
                         <div className="flex items-center space-x-2">
@@ -117,13 +131,16 @@ const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({ data }) => {
                               handleZoneExpand(zone.name);
                             }}
                           >
-                            <Maximize2 size={14} />
+                            <FullscreenButton
+                              isFullscreen={false}
+                              onToggle={() => {}}
+                            />
                           </Button>
                         </div>
                       </div>
 
                       {/* Zone Preview Content */}
-                      <div className="text-sm text-gray-400 space-y-2">
+                      <div className={`text-gray-400 space-y-2 ${isFullscreen ? 'text-base' : 'text-sm'}`}>
                         <div className="flex justify-between">
                           <span>Delivery Quality:</span>
                           <span className="text-white font-medium">
@@ -146,7 +163,7 @@ const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({ data }) => {
 
                       {/* Hover Overlay */}
                       <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="text-white font-medium">Click to expand</span>
+                        <span className={`text-white font-medium ${isFullscreen ? 'text-lg' : ''}`}>Click to expand</span>
                       </div>
                     </GlassCard>
                   </motion.div>
