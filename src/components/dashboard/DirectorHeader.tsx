@@ -34,39 +34,6 @@ const DirectorHeader: React.FC = () => {
     >
       {/* Right: User Controls */}
       <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
-        {/* Theme Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          className="rounded-full hover:bg-white/5"
-        >
-          {resolvedTheme === 'dark' ? (
-            <Moon size={18} className="text-gray-300" />
-          ) : (
-            <Sun size={18} className="text-gray-600" />
-          )}
-        </Button>
-
-        {/* Notifications */}
-        <div className="relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full hover:bg-white/5"
-          >
-            <Bell size={18} className="text-gray-400" />
-          </Button>
-          {notifications > 0 && (
-            <Badge 
-              variant="secondary" 
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-blue-600 text-white border-0"
-            >
-              {notifications > 9 ? '9+' : notifications}
-            </Badge>
-          )}
-        </div>
-
         {/* User Avatar & Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
