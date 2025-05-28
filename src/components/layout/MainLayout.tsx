@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,8 +20,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
   const [isPageChanging, setIsPageChanging] = useState(false);
   const location = useLocation();
   
-  // Check if we're on the innovate page
+  // Check if we're on the innovate page or director dashboard
   const isInnovatePage = location.pathname === '/innovate';
+  const isDirectorDashboard = location.pathname === '/';
   
   // Handle welcome overlay
   useEffect(() => {
@@ -111,13 +111,23 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
       </AnimatePresence>
       
       {showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
-      <Navbar hidden={hideNav && !isInnovatePage} onLogout={onLogout} />
       
-      <main className={`flex-grow ${isInnovatePage ? 'pt-16' : 'container mx-auto px-4 py-6 pt-20'} ${isRTL ? 'font-noto-arabic' : ''}`}>
+      {/* Hide navbar on director dashboard since it has its own header */}
+      {!isDirectorDashboard && (
+        <Navbar hidden={hideNav && !isInnovatePage} onLogout={onLogout} />
+      )}
+      
+      <main className={`flex-grow ${
+        isInnovatePage 
+          ? 'pt-16' 
+          : isDirectorDashboard 
+            ? 'pt-0' 
+            : 'container mx-auto px-4 py-6 pt-20'
+      } ${isRTL ? 'font-noto-arabic' : ''}`}>
         <Outlet />
       </main>
       
-      {!isInnovatePage && <Footer />}
+      {!isInnovatePage && !isDirectorDashboard && <Footer />}
     </div>
   );
 };
