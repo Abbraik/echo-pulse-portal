@@ -60,11 +60,11 @@ const DirectorGeneralDashboard: React.FC = () => {
         {/* Director Header with Role Banner */}
         <DirectorHeader />
         
-        {/* Main Content Grid */}
-        <main className="flex-1 container mx-auto px-4 py-6 space-y-6">
-          {/* Strategic Overview - Top 25% */}
+        {/* Main Content Grid with proper spacing */}
+        <main className="flex-1 container mx-auto px-4 py-4 space-y-4 overflow-hidden">
+          {/* Strategic Overview - Top section with controlled height */}
           <motion.section 
-            className="h-[25vh] min-h-[300px]"
+            className="h-[280px]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -72,11 +72,11 @@ const DirectorGeneralDashboard: React.FC = () => {
             <StrategicOverview data={dashboardData?.strategic} />
           </motion.section>
           
-          {/* Zone Snapshots Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+          {/* Zone Snapshots Grid with proper spacing */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0 flex-1">
             {/* THINK and ACT - Top Row */}
             <motion.section 
-              className="lg:col-span-6"
+              className="lg:col-span-6 min-h-0"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
@@ -85,7 +85,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             </motion.section>
             
             <motion.section 
-              className="lg:col-span-6"
+              className="lg:col-span-6 min-h-0"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
@@ -95,7 +95,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             
             {/* MONITOR, LEARN, INNOVATE - Bottom Row */}
             <motion.section 
-              className="lg:col-span-4"
+              className="lg:col-span-4 min-h-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -104,7 +104,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             </motion.section>
             
             <motion.section 
-              className="lg:col-span-4"
+              className="lg:col-span-4 min-h-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -113,7 +113,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             </motion.section>
             
             <motion.section 
-              className="lg:col-span-4"
+              className="lg:col-span-4 min-h-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
