@@ -23,24 +23,28 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
   onViewModeChange,
   onToggleFullscreen
 }) => {
-  const [activePanel, setActivePanel] = useState<PanelType>(null);
+  const [hoveredPanel, setHoveredPanel] = useState<PanelType>(null);
 
-  const handlePanelClick = (panelType: PanelType) => {
-    setActivePanel(activePanel === panelType ? null : panelType);
+  const handlePanelHover = (panelType: PanelType) => {
+    setHoveredPanel(panelType);
+  };
+
+  const handlePanelLeave = () => {
+    setHoveredPanel(null);
   };
 
   const handleReset = () => {
-    setActivePanel(null);
+    setHoveredPanel(null);
   };
 
   const getPanelWidth = (panelType: PanelType) => {
-    if (!activePanel) return '33.333%';
-    return activePanel === panelType ? '60%' : '20%';
+    if (!hoveredPanel) return '33.333%';
+    return hoveredPanel === panelType ? '60%' : '20%';
   };
 
   const getPanelOpacity = (panelType: PanelType) => {
-    if (!activePanel) return 1;
-    return activePanel === panelType ? 1 : 0.7;
+    if (!hoveredPanel) return 0.8;
+    return hoveredPanel === panelType ? 1 : 0.8;
   };
 
   const panelVariants = {
@@ -50,11 +54,19 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
     },
     hover: {
       scale: 1.02,
-      boxShadow: '0 0 30px rgba(20, 184, 166, 0.2)'
-    },
-    active: {
-      boxShadow: '0 0 40px rgba(20, 184, 166, 0.4), inset 0 0 20px rgba(20, 184, 166, 0.1)'
+      boxShadow: '0 0 30px rgba(20, 184, 166, 0.3), 0 0 60px rgba(20, 184, 166, 0.1)'
     }
+  };
+
+  const getThemeBackground = (isHovered: boolean) => {
+    return {
+      background: 'rgba(10, 20, 40, 0.5)',
+      backdropFilter: 'blur(20px)',
+      border: isHovered 
+        ? '2px solid rgba(20, 184, 166, 0.8)' 
+        : '1px solid rgba(20, 184, 166, 0.3)',
+      borderRadius: '2rem'
+    };
   };
 
   return (
@@ -62,16 +74,16 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
       {/* Reset Controls */}
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          {activePanel && (
+          {hoveredPanel && (
             <Badge 
               variant="outline" 
               className="bg-teal-500/20 text-teal-400 border-teal-500/50"
             >
-              {activePanel.charAt(0).toUpperCase() + activePanel.slice(1)} Expanded
+              {hoveredPanel.charAt(0).toUpperCase() + hoveredPanel.slice(1)} Expanded
             </Badge>
           )}
         </div>
-        {activePanel && (
+        {hoveredPanel && (
           <Button
             size="sm"
             variant="outline"
@@ -84,18 +96,14 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
         )}
       </div>
 
-      {/* Dynamic Panels Container */}
+      {/* Dynamic Panels Container - Increased height to 45vh */}
       <div 
-        className="flex gap-6 min-h-[320px]"
+        className="flex gap-6 h-[45vh]"
         onDoubleClick={handleReset}
       >
         {/* Approvals Panel */}
         <motion.div
           className="relative"
-          style={{ 
-            width: getPanelWidth('approvals'),
-            opacity: getPanelOpacity('approvals')
-          }}
           animate={{
             width: getPanelWidth('approvals'),
             opacity: getPanelOpacity('approvals')
@@ -107,36 +115,34 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
           variants={panelVariants}
           initial="default"
           whileHover="hover"
-          animate={activePanel === 'approvals' ? 'active' : 'default'}
+          onMouseEnter={() => handlePanelHover('approvals')}
+          onMouseLeave={handlePanelLeave}
         >
           <div
             className="h-full cursor-pointer"
-            onClick={() => handlePanelClick('approvals')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                handlePanelClick('approvals');
+                handlePanelHover('approvals');
+              }
+              if (e.key === 'Escape') {
+                handleReset();
               }
             }}
+            onFocus={() => handlePanelHover('approvals')}
+            onBlur={handlePanelLeave}
             tabIndex={0}
             role="button"
-            aria-expanded={activePanel === 'approvals'}
+            aria-expanded={hoveredPanel === 'approvals'}
             aria-controls="approvals-content"
-            style={{
-              background: 'rgba(255, 255, 255, 0.5)',
-              backdropFilter: 'blur(20px)',
-              border: activePanel === 'approvals' 
-                ? '2px solid rgba(20, 184, 166, 0.8)' 
-                : '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '2rem'
-            }}
+            style={getThemeBackground(hoveredPanel === 'approvals')}
           >
             <EnhancedApprovalsPanel
               data={dashboardData?.approvals}
               onViewModeChange={onViewModeChange}
               currentMode={viewMode}
               onToggleFullscreen={() => onToggleFullscreen('approvals')}
-              isCompact={activePanel !== null && activePanel !== 'approvals'}
+              isCompact={hoveredPanel !== null && hoveredPanel !== 'approvals'}
             />
           </div>
         </motion.div>
@@ -144,10 +150,6 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
         {/* Health Panel */}
         <motion.div
           className="relative"
-          style={{ 
-            width: getPanelWidth('health'),
-            opacity: getPanelOpacity('health')
-          }}
           animate={{
             width: getPanelWidth('health'),
             opacity: getPanelOpacity('health')
@@ -159,36 +161,34 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
           variants={panelVariants}
           initial="default"
           whileHover="hover"
-          animate={activePanel === 'health' ? 'active' : 'default'}
+          onMouseEnter={() => handlePanelHover('health')}
+          onMouseLeave={handlePanelLeave}
         >
           <div
             className="h-full cursor-pointer"
-            onClick={() => handlePanelClick('health')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                handlePanelClick('health');
+                handlePanelHover('health');
+              }
+              if (e.key === 'Escape') {
+                handleReset();
               }
             }}
+            onFocus={() => handlePanelHover('health')}
+            onBlur={handlePanelLeave}
             tabIndex={0}
             role="button"
-            aria-expanded={activePanel === 'health'}
+            aria-expanded={hoveredPanel === 'health'}
             aria-controls="health-content"
-            style={{
-              background: 'rgba(255, 255, 255, 0.5)',
-              backdropFilter: 'blur(20px)',
-              border: activePanel === 'health' 
-                ? '2px solid rgba(20, 184, 166, 0.8)' 
-                : '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '2rem'
-            }}
+            style={getThemeBackground(hoveredPanel === 'health')}
           >
             <EnhancedSystemHealthPanel
               data={dashboardData?.systemHealth}
               onViewModeChange={onViewModeChange}
               currentMode={viewMode}
               onToggleFullscreen={() => onToggleFullscreen('health')}
-              isCompact={activePanel !== null && activePanel !== 'health'}
+              isCompact={hoveredPanel !== null && hoveredPanel !== 'health'}
             />
           </div>
         </motion.div>
@@ -196,10 +196,6 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
         {/* Coordination Panel */}
         <motion.div
           className="relative"
-          style={{ 
-            width: getPanelWidth('coordination'),
-            opacity: getPanelOpacity('coordination')
-          }}
           animate={{
             width: getPanelWidth('coordination'),
             opacity: getPanelOpacity('coordination')
@@ -211,34 +207,32 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
           variants={panelVariants}
           initial="default"
           whileHover="hover"
-          animate={activePanel === 'coordination' ? 'active' : 'default'}
+          onMouseEnter={() => handlePanelHover('coordination')}
+          onMouseLeave={handlePanelLeave}
         >
           <div
             className="h-full cursor-pointer"
-            onClick={() => handlePanelClick('coordination')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                handlePanelClick('coordination');
+                handlePanelHover('coordination');
+              }
+              if (e.key === 'Escape') {
+                handleReset();
               }
             }}
+            onFocus={() => handlePanelHover('coordination')}
+            onBlur={handlePanelLeave}
             tabIndex={0}
             role="button"
-            aria-expanded={activePanel === 'coordination'}
+            aria-expanded={hoveredPanel === 'coordination'}
             aria-controls="coordination-content"
-            style={{
-              background: 'rgba(255, 255, 255, 0.5)',
-              backdropFilter: 'blur(20px)',
-              border: activePanel === 'coordination' 
-                ? '2px solid rgba(20, 184, 166, 0.8)' 
-                : '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '2rem'
-            }}
+            style={getThemeBackground(hoveredPanel === 'coordination')}
           >
             <EnhancedCoordinationPanel
               data={dashboardData?.coordination}
               onToggleFullscreen={() => onToggleFullscreen('coordination')}
-              isCompact={activePanel !== null && activePanel !== 'coordination'}
+              isCompact={hoveredPanel !== null && hoveredPanel !== 'coordination'}
             />
           </div>
         </motion.div>
