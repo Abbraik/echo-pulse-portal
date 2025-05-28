@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Flask, Rocket, Archive, Users } from 'lucide-react';
+import { Zap, Beaker, Rocket, Archive, Users } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
@@ -83,7 +82,7 @@ const InnovateSnapshot: React.FC<InnovateSnapshotProps> = ({ data }) => {
             {displayData.decisionPoints.map((decision: any, index: number) => (
               <div key={index} className="flex items-center justify-between p-2 rounded bg-white/5">
                 <div className="flex items-center space-x-2">
-                  <Flask size={12} className="text-green-400" />
+                  <Beaker size={12} className="text-green-400" />
                   <span className="text-xs text-white">{decision.name}</span>
                 </div>
                 <div className="flex space-x-1">
