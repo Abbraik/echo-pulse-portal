@@ -27,11 +27,7 @@ const DirectorHeader: React.FC = () => {
   };
 
   return (
-    <motion.header 
-      className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-white/10"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+    <div>
       {/* User Avatar & Menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -53,7 +49,7 @@ const DirectorHeader: React.FC = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </motion.header>
+    </div>
   );
 };
 
