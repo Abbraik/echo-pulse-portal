@@ -37,10 +37,7 @@ export const exportExecutiveReportToPDF = (mockData: MockData) => {
     doc.setFont('helvetica', 'bold');
     const watermarkText = 'PDS';
     const textWidth = doc.getStringUnitWidth(watermarkText) * 60 / doc.internal.scaleFactor;
-    doc.text(watermarkText, pageWidth - textWidth - 20, pageHeight - 30, { 
-      align: 'left',
-      opacity: 0.1 
-    });
+    doc.text(watermarkText, pageWidth - textWidth - 20, pageHeight - 30, { align: 'left' });
   };
 
   // Helper function to add footer
@@ -80,13 +77,11 @@ export const exportExecutiveReportToPDF = (mockData: MockData) => {
 
   // Helper function to create glass panel effect
   const addGlassPanel = (x: number, y: number, width: number, height: number) => {
-    // Semi-transparent background
+    // Semi-transparent background (simulated with light fill)
     doc.setFillColor(colors.white[0], colors.white[1], colors.white[2]);
-    doc.setGState(new doc.GState({ opacity: 0.5 }));
     doc.roundedRect(x, y, width, height, 5, 5, 'F');
     
     // Border
-    doc.setGState(new doc.GState({ opacity: 1 }));
     doc.setDrawColor(colors.neonTeal[0], colors.neonTeal[1], colors.neonTeal[2]);
     doc.setLineWidth(0.3);
     doc.roundedRect(x, y, width, height, 5, 5, 'S');
@@ -108,20 +103,17 @@ export const exportExecutiveReportToPDF = (mockData: MockData) => {
   
   // Subtle pattern overlay (simulating blurred UAE map)
   doc.setFillColor(colors.electricBlue[0], colors.electricBlue[1], colors.electricBlue[2]);
-  doc.setGState(new doc.GState({ opacity: 0.3 }));
+  // Create a pattern effect with circles
   for (let i = 0; i < 20; i++) {
     const x = Math.random() * pageWidth;
     const y = Math.random() * pageHeight;
     const size = Math.random() * 10 + 5;
     doc.circle(x, y, size, 'F');
   }
-  doc.setGState(new doc.GState({ opacity: 1 }));
   
-  // Translucent black panel
+  // Translucent black panel (simulated with dark fill)
   doc.setFillColor(colors.black[0], colors.black[1], colors.black[2]);
-  doc.setGState(new doc.GState({ opacity: 0.5 }));
   doc.roundedRect(40, 60, pageWidth - 80, 120, 10, 10, 'F');
-  doc.setGState(new doc.GState({ opacity: 1 }));
   
   // Title text
   doc.setTextColor(colors.neonTeal[0], colors.neonTeal[1], colors.neonTeal[2]);
