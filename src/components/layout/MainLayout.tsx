@@ -21,9 +21,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
   const [isPageChanging, setIsPageChanging] = useState(false);
   const location = useLocation();
   
-  // Check if we're on the innovate page or director general dashboard
+  // Check if we're on the innovate page
   const isInnovatePage = location.pathname === '/innovate';
-  const isDirectorPage = location.pathname === '/';
   
   // Handle welcome overlay
   useEffect(() => {
@@ -112,21 +111,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
       </AnimatePresence>
       
       {showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
+      <Navbar hidden={hideNav && !isInnovatePage} onLogout={onLogout} />
       
-      {/* Only show Navbar if not on director page */}
-      {!isDirectorPage && <Navbar hidden={hideNav && !isInnovatePage} onLogout={onLogout} />}
-      
-      <main className={`flex-grow ${
-        isDirectorPage 
-          ? '' 
-          : isInnovatePage 
-            ? 'pt-16' 
-            : 'container mx-auto px-4 py-6 pt-20'
-      } ${isRTL ? 'font-noto-arabic' : ''}`}>
+      <main className={`flex-grow ${isInnovatePage ? 'pt-16' : 'container mx-auto px-4 py-6 pt-20'} ${isRTL ? 'font-noto-arabic' : ''}`}>
         <Outlet />
       </main>
       
-      {!isInnovatePage && !isDirectorPage && <Footer />}
+      {!isInnovatePage && <Footer />}
     </div>
   );
 };
