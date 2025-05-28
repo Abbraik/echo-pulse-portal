@@ -77,7 +77,6 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
                 value={displayData.deiScore}
                 max={100}
                 size="xl"
-                thickness={8}
                 className="mb-4"
               />
               <div className="absolute inset-0 flex items-center justify-center">
