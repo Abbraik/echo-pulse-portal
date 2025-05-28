@@ -190,3 +190,108 @@ export function getPulse(): Promise<PulseData> {
     }, 500);
   });
 }
+
+export const getDashboardData = async () => {
+  // Simulate API call for comprehensive dashboard data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        strategic: {
+          deiScore: 78.5,
+          deiTarget: 85,
+          deiTrend: [72, 74, 76, 78, 78.5],
+          populationStability: -2.1,
+          resourceEfficiency: 12.3,
+          socialCohesion: 82.7,
+          hasStrategicAlert: true,
+        },
+        think: {
+          targetAlignment: 78,
+          topLoops: [
+            { name: 'Population & Development', coverage: 75, status: 'attention' },
+            { name: 'Economic Migration', coverage: 89, status: 'good' },
+            { name: 'Environmental Quality', coverage: 61, status: 'critical' }
+          ],
+          scenarios: [
+            { name: 'Baseline', value: 78.5, color: 'gray' },
+            { name: 'Enhanced Migration', value: 82.3, color: 'teal' },
+            { name: 'Green Tech Focus', value: 79.1, color: 'blue' }
+          ]
+        },
+        act: {
+          pendingApprovals: [
+            {
+              id: 1,
+              title: 'Migration Enhancement Bundle',
+              owner: 'Policy Team A',
+              dueDate: '2024-01-15',
+              riskRating: 'medium'
+            },
+            {
+              id: 2,
+              title: 'Resource Optimization Strategy',
+              owner: 'Economic Team',
+              dueDate: '2024-01-12',
+              riskRating: 'low'
+            }
+          ],
+          performance: {
+            successRate: 82,
+            timeToDeployAvg: 45,
+            underperformers: 2
+          },
+          escalations: [
+            'Missed milestone: Social Cohesion Initiative',
+            'ROI shortfall: Green Tech Investment'
+          ]
+        },
+        monitor: {
+          topAlerts: [
+            { type: 'DEI Drift', severity: 'high', description: 'Population volatility increasing' },
+            { type: 'Loop Inconsistency', severity: 'medium', description: 'Marriage rate loop underperforming' },
+            { type: 'Operational Anomaly', severity: 'low', description: 'Resource extraction spike detected' }
+          ],
+          liveMetrics: {
+            dei: 78.5,
+            trust: 82.1,
+            migration: '+12.3%'
+          },
+          recentActivity: [
+            'DEI recalculation completed',
+            'New scenario analysis started',
+            'Alert threshold updated'
+          ]
+        },
+        learn: {
+          topLessons: [
+            { title: 'Migration Policy Optimization', successRate: 89, playbook: 'MP-2024-01' },
+            { title: 'Resource Allocation Strategy', successRate: 76, playbook: 'RA-2024-03' },
+            { title: 'Social Cohesion Enhancement', successRate: 82, playbook: 'SC-2024-02' }
+          ],
+          rootCauses: [
+            'Marriage-rate loop underperforming due to social barriers',
+            'Resource extraction exceeding sustainable thresholds'
+          ],
+          knowledgeGaps: [
+            'Youth employment correlation with migration patterns',
+            'Environmental impact on fertility rates'
+          ]
+        },
+        innovate: {
+          prototypes: [
+            { name: 'AI-Driven Migration Forecasting', phase: 'Testing', impact: '+5.2% DEI' },
+            { name: 'Dynamic Resource Allocation', phase: 'Development', impact: '+3.8% Efficiency' }
+          ],
+          decisionPoints: [
+            { name: 'Blockchain Governance Model', type: 'promote', readiness: 'ready' },
+            { name: 'Quantum Social Modeling', type: 'archive', readiness: 'incomplete' }
+          ],
+          resourceRequests: [
+            'Additional data scientists for ML models',
+            'Extended cloud computing resources'
+          ]
+        }
+      });
+    }, 1000);
+  });
+};
