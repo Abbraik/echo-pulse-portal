@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users, AlertCircle, ArrowRight, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
@@ -11,12 +10,14 @@ interface EnhancedCoordinationPanelProps {
   data?: any;
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
+  isCompact?: boolean;
 }
 
 const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ 
   data,
   isFullscreen = false,
-  onToggleFullscreen
+  onToggleFullscreen,
+  isCompact = false
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -71,6 +72,55 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({
     };
     return colors[zone] || 'text-gray-400';
   };
+
+  if (isCompact) {
+    return (
+      <div className="p-4 h-full flex flex-col">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-purple-400 text-lg">Coordination</h3>
+          <div className="flex items-center space-x-1">
+            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+            <span className="text-xs text-gray-400">Active</span>
+          </div>
+        </div>
+
+        {/* Top 2 Flags */}
+        <div className="space-y-2 mb-3">
+          {displayData.redesignFlags.slice(0, 2).map((flag: any) => (
+            <div key={flag.id} className="p-2 bg-white/5 rounded text-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Badge className={`${getSeverityColor(flag.severity)} text-xs`}>
+                    {flag.severity}
+                  </Badge>
+                  <span className="font-medium text-white text-xs">{flag.pattern}</span>
+                </div>
+                <span className="text-xs text-gray-400">{flag.occurrences}x</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Zone Status */}
+        <div className="flex-1 space-y-1">
+          {displayData.zoneLeads.slice(0, 3).map((lead: any) => (
+            <div key={lead.zone} className="flex items-center justify-between p-1 bg-white/5 rounded text-xs">
+              <span className={`font-medium ${getZoneColor(lead.zone)}`}>
+                {lead.zone}
+              </span>
+              <span className={getStatusColor(lead.status)}>
+                {lead.delivery}%
+              </span>
+            </div>
+          ))}
+          <Button size="sm" variant="ghost" className="w-full text-purple-400 text-xs">
+            View More ▶
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <GlassCard 

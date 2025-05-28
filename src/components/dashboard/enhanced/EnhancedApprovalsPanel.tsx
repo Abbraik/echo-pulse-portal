@@ -13,6 +13,7 @@ interface EnhancedApprovalsPanelProps {
   currentMode: string;
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
+  isCompact?: boolean;
 }
 
 const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({ 
@@ -20,7 +21,8 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
   onViewModeChange,
   currentMode,
   isFullscreen = false,
-  onToggleFullscreen
+  onToggleFullscreen,
+  isCompact = false
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [pinnedItems, setPinnedItems] = useState<string[]>(['1', '3']); // Mock pinned items
@@ -39,7 +41,7 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
   };
 
   const displayData = data || mockData;
-  const topItems = displayData.items.slice(0, 2);
+  const topItems = isCompact ? displayData.items.slice(0, 2) : displayData.items.slice(0, 2);
   const pinnedItemsData = displayData.items.filter((item: any) => pinnedItems.includes(item.id));
 
   const getPriorityColor = (priority: string) => {
@@ -59,6 +61,51 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
       default: return 'text-gray-400';
     }
   };
+
+  if (isCompact) {
+    return (
+      <div className="p-4 h-full flex flex-col">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-blue-400 text-lg">Approvals & Decisions</h3>
+          <div className="flex items-center space-x-1">
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+            <span className="text-xs text-gray-400">Live</span>
+          </div>
+        </div>
+
+        {/* Compact Summary */}
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="bg-yellow-500/20 rounded p-2 text-center">
+            <div className="font-bold text-yellow-400 text-lg">{displayData.pending}</div>
+            <div className="text-gray-400 text-xs">Pending</div>
+          </div>
+          <div className="bg-red-500/20 rounded p-2 text-center">
+            <div className="font-bold text-red-400 text-lg">{displayData.overdue}</div>
+            <div className="text-gray-400 text-xs">Overdue</div>
+          </div>
+        </div>
+
+        {/* Top 2 Items */}
+        <div className="flex-1 space-y-2">
+          {topItems.map((item: any) => (
+            <div key={item.id} className="p-2 bg-white/5 rounded text-sm">
+              <div className="font-medium text-white truncate">{item.title}</div>
+              <div className="flex items-center justify-between mt-1">
+                <Badge className={`${getPriorityColor(item.priority)} text-xs`}>
+                  {item.priority}
+                </Badge>
+                <span className="text-xs text-gray-400">{item.daysOut}d</span>
+              </div>
+            </div>
+          ))}
+          <Button size="sm" variant="ghost" className="w-full text-blue-400 text-xs">
+            View More ▶
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <GlassCard 

@@ -15,6 +15,7 @@ import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import { getDashboardData } from '@/api/dashboard';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import DynamicPanelContainer from '@/components/dashboard/enhanced/DynamicPanelContainer';
 
 const DirectorGeneralDashboard: React.FC = () => {
   const { t, isRTL } = useTranslation();
@@ -205,54 +206,20 @@ const DirectorGeneralDashboard: React.FC = () => {
                 </div>
               </motion.section>
               
-              {/* Main Panels Grid - Fixed spacing and heights */}
-              <div className="space-y-8">
-                {(viewMode === 'full' || viewMode === 'approvals') && (
-                  <motion.section 
-                    className="h-80"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <EnhancedApprovalsPanel 
-                      data={dashboardData?.approvals}
-                      onViewModeChange={setViewMode}
-                      currentMode={viewMode}
-                      onToggleFullscreen={() => toggleFullscreen('approvals')}
-                    />
-                  </motion.section>
-                )}
-
-                {(viewMode === 'full' || viewMode === 'health') && (
-                  <motion.section 
-                    className="h-80"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <EnhancedSystemHealthPanel 
-                      data={dashboardData?.systemHealth}
-                      onViewModeChange={setViewMode}
-                      currentMode={viewMode}
-                      onToggleFullscreen={() => toggleFullscreen('health')}
-                    />
-                  </motion.section>
-                )}
-
-                {viewMode === 'full' && (
-                  <motion.section 
-                    className="h-80"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    <EnhancedCoordinationPanel 
-                      data={dashboardData?.coordination}
-                      onToggleFullscreen={() => toggleFullscreen('coordination')}
-                    />
-                  </motion.section>
-                )}
-              </div>
+              {/* Dynamic Panels Container */}
+              <motion.section
+                className="mb-12"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <DynamicPanelContainer
+                  dashboardData={dashboardData}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                  onToggleFullscreen={toggleFullscreen}
+                />
+              </motion.section>
 
               {/* Zone Snapshots - Proper spacing from main panels */}
               {viewMode === 'full' && (

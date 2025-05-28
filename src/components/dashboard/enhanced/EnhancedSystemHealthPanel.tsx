@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, TrendingUp, TrendingDown, AlertTriangle, ChevronDown, ChevronUp, Eye } from 'lucide-react';
@@ -14,6 +13,7 @@ interface EnhancedSystemHealthPanelProps {
   currentMode: string;
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
+  isCompact?: boolean;
 }
 
 const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({ 
@@ -21,7 +21,8 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
   onViewModeChange,
   currentMode,
   isFullscreen = false,
-  onToggleFullscreen
+  onToggleFullscreen,
+  isCompact = false
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -65,6 +66,71 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
     };
     return colors[zone] || 'text-gray-400';
   };
+
+  if (isCompact) {
+    return (
+      <div className="p-4 h-full flex flex-col">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-teal-400 text-lg">System Health</h3>
+          <div className="flex items-center space-x-1">
+            <div className="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></div>
+            <span className="text-xs text-gray-400">Live</span>
+          </div>
+        </div>
+
+        {/* Compact Gauges */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div className="text-center">
+            <div className="relative h-12 w-12 mx-auto mb-1">
+              <div className="absolute inset-0 rounded-full border-2 border-gray-700/30"></div>
+              <div 
+                className="absolute inset-0 rounded-full border-2 border-t-teal-400 border-r-transparent border-b-transparent border-l-transparent"
+                style={{ transform: `rotate(${(displayData.deiScore / 100) * 360}deg)` }}
+              ></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="font-bold text-teal-400 text-xs">{displayData.deiScore}</span>
+              </div>
+            </div>
+            <div className="text-xs text-gray-400">DEI Score</div>
+          </div>
+          <div className="text-center">
+            <div className="grid grid-cols-2 gap-1 text-xs mb-1">
+              <div className="bg-teal-500/20 rounded p-1">
+                <div className="font-bold text-teal-400 text-xs">{displayData.psiu.producer}</div>
+                <div className="text-gray-400 text-xs">P</div>
+              </div>
+              <div className="bg-green-500/20 rounded p-1">
+                <div className="font-bold text-green-400 text-xs">{displayData.psiu.stabilizer}</div>
+                <div className="text-gray-400 text-xs">S</div>
+              </div>
+            </div>
+            <div className="text-xs text-gray-400">PSIU</div>
+          </div>
+        </div>
+
+        {/* Top 2 Alerts */}
+        <div className="flex-1 space-y-1">
+          {displayData.alerts.slice(0, 2).map((alert: any) => (
+            <div key={alert.id} className="p-2 bg-white/5 rounded text-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                  <AlertTriangle size={10} className="text-orange-400 flex-shrink-0" />
+                  <span className="text-white truncate text-xs">{alert.message}</span>
+                </div>
+                <Badge className={`${getSeverityColor(alert.severity)} text-xs`}>
+                  {alert.severity}
+                </Badge>
+              </div>
+            </div>
+          ))}
+          <Button size="sm" variant="ghost" className="w-full text-teal-400 text-xs">
+            View More ▶
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <GlassCard 
