@@ -389,7 +389,7 @@ const ExecutiveReportTemplate: React.FC<ExecutiveReportTemplateProps> = ({ onClo
             <div className="space-y-3">
               <div className="p-3 bg-white/5 rounded-lg flex justify-between items-center">
                 <div>
-                  <div className="font-medium text-white">Role dropouts >3 in last sprint</div>
+                  <div className="font-medium text-white">Role dropouts {'>'}3 in last sprint</div>
                   <div className="text-sm text-gray-300">THINK Zone • 2 hours ago</div>
                 </div>
                 <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
