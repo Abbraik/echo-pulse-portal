@@ -32,77 +32,75 @@ const DirectorHeader: React.FC = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-        {/* Right: User Controls */}
-        <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
-          {/* Language Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleLanguage}
-            className="rounded-full hover:bg-white/5 relative"
-          >
-            <Globe size={18} className="text-gray-400" />
-            <span className="absolute -top-1 -right-1 text-[10px] font-bold bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
-              {language === 'en' ? 'AR' : 'EN'}
-            </span>
-          </Button>
+      {/* Right: User Controls */}
+      <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
+        {/* Language Toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleLanguage}
+          className="rounded-full hover:bg-white/5 relative"
+        >
+          <Globe size={18} className="text-gray-400" />
+          <span className="absolute -top-1 -right-1 text-[10px] font-bold bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
+            {language === 'en' ? 'AR' : 'EN'}
+          </span>
+        </Button>
 
-          {/* Theme Toggle */}
+        {/* Theme Toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          className="rounded-full hover:bg-white/5"
+        >
+          {resolvedTheme === 'dark' ? (
+            <Moon size={18} className="text-gray-300" />
+          ) : (
+            <Sun size={18} className="text-gray-600" />
+          )}
+        </Button>
+
+        {/* Notifications */}
+        <div className="relative">
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleTheme}
             className="rounded-full hover:bg-white/5"
           >
-            {resolvedTheme === 'dark' ? (
-              <Moon size={18} className="text-gray-300" />
-            ) : (
-              <Sun size={18} className="text-gray-600" />
-            )}
+            <Bell size={18} className="text-gray-400" />
           </Button>
-
-          {/* Notifications */}
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full hover:bg-white/5"
+          {notifications > 0 && (
+            <Badge 
+              variant="secondary" 
+              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-blue-600 text-white border-0"
             >
-              <Bell size={18} className="text-gray-400" />
-            </Button>
-            {notifications > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-gradient-to-r from-teal-500 to-blue-600 text-white border-0"
-              >
-                {notifications > 9 ? '9+' : notifications}
-              </Badge>
-            )}
-          </div>
-
-          {/* User Avatar & Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="rounded-full hover:bg-white/5 p-2">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-teal-500/30 to-blue-500/30 flex items-center justify-center">
-                  <User size={16} className="text-gray-300" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="glass-panel-dark w-56 mt-2">
-              <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
-                {t('profile')}
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
-                {t('settings')}
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-400 cursor-pointer hover:bg-white/5">
-                {t('logout')}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              {notifications > 9 ? '9+' : notifications}
+            </Badge>
+          )}
         </div>
+
+        {/* User Avatar & Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="rounded-full hover:bg-white/5 p-2">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-teal-500/30 to-blue-500/30 flex items-center justify-center">
+                <User size={16} className="text-gray-300" />
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="glass-panel-dark w-56 mt-2">
+            <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
+              {t('profile')}
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
+              {t('settings')}
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-400 cursor-pointer hover:bg-white/5">
+              {t('logout')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </motion.header>
   );
