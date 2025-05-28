@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Pin, Eye, Filter, ChevronDown, ChevronUp, Maximize2 } from 'lucide-react';
-import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { FullscreenButton } from '@/components/ui/fullscreen-button';
 
 interface EnhancedApprovalsPanelProps {
@@ -13,7 +14,8 @@ interface EnhancedApprovalsPanelProps {
   currentMode: string;
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
-  isCompact?: boolean;
+  isExpanded?: boolean;
+  isContracted?: boolean;
 }
 
 const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({ 
@@ -22,10 +24,11 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
   currentMode,
   isFullscreen = false,
   onToggleFullscreen,
-  isCompact = false
+  isExpanded = false,
+  isContracted = false
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [pinnedItems, setPinnedItems] = useState<string[]>(['1', '3']); // Mock pinned items
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
+  const [pinnedItems, setPinnedItems] = useState<string[]>(['1', '3']);
 
   // Mock data
   const mockData = {
@@ -41,7 +44,7 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
   };
 
   const displayData = data || mockData;
-  const topItems = isCompact ? displayData.items.slice(0, 2) : displayData.items.slice(0, 2);
+  const topItems = isContracted ? displayData.items.slice(0, 2) : displayData.items;
   const pinnedItemsData = displayData.items.filter((item: any) => pinnedItems.includes(item.id));
 
   const getPriorityColor = (priority: string) => {
@@ -62,65 +65,74 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
     }
   };
 
-  if (isCompact) {
+  // Dynamic sizing classes
+  const getTextSize = () => {
+    if (isContracted) return { heading: 'text-sm', body: 'text-xs', icon: 'h-3 w-3' };
+    if (isExpanded) return { heading: 'text-lg', body: 'text-sm', icon: 'h-4 w-4' };
+    return { heading: 'text-base', body: 'text-sm', icon: 'h-4 w-4' };
+  };
+
+  const textSizes = getTextSize();
+
+  const getGridLayout = () => {
+    if (isContracted) return 'grid-cols-1';
+    if (isExpanded) return 'grid-cols-2 lg:grid-cols-4';
+    return 'grid-cols-4';
+  };
+
+  if (isContracted) {
     return (
-      <div className="p-4 h-full flex flex-col">
+      <div className="p-3 h-full flex flex-col">
         {/* Compact Header */}
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-blue-400 text-lg">Approvals & Decisions</h3>
+        <div className="flex items-center justify-between mb-3 flex-shrink-0">
+          <h3 className={`font-bold text-blue-400 ${textSizes.heading}`}>Approvals</h3>
           <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
             <span className="text-xs text-gray-400">Live</span>
           </div>
         </div>
 
         {/* Compact Summary */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="bg-yellow-500/20 rounded p-2 text-center">
-            <div className="font-bold text-yellow-400 text-lg">{displayData.pending}</div>
+        <div className="grid grid-cols-2 gap-2 mb-3 flex-shrink-0">
+          <div className="bg-yellow-500/20 rounded p-1 text-center">
+            <div className={`font-bold text-yellow-400 ${textSizes.body}`}>{displayData.pending}</div>
             <div className="text-gray-400 text-xs">Pending</div>
           </div>
-          <div className="bg-red-500/20 rounded p-2 text-center">
-            <div className="font-bold text-red-400 text-lg">{displayData.overdue}</div>
+          <div className="bg-red-500/20 rounded p-1 text-center">
+            <div className={`font-bold text-red-400 ${textSizes.body}`}>{displayData.overdue}</div>
             <div className="text-gray-400 text-xs">Overdue</div>
           </div>
         </div>
 
         {/* Top 2 Items */}
-        <div className="flex-1 space-y-2">
-          {topItems.map((item: any) => (
-            <div key={item.id} className="p-2 bg-white/5 rounded text-sm">
-              <div className="font-medium text-white truncate">{item.title}</div>
-              <div className="flex items-center justify-between mt-1">
-                <Badge className={`${getPriorityColor(item.priority)} text-xs`}>
-                  {item.priority}
-                </Badge>
-                <span className="text-xs text-gray-400">{item.daysOut}d</span>
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="space-y-1 h-full">
+            {topItems.map((item: any) => (
+              <div key={item.id} className="p-2 bg-white/5 rounded text-xs">
+                <div className="font-medium text-white truncate mb-1">{item.title}</div>
+                <div className="flex items-center justify-between">
+                  <Badge className={`${getPriorityColor(item.priority)} text-xs`}>
+                    {item.priority}
+                  </Badge>
+                  <span className="text-xs text-gray-400">{item.daysOut}d</span>
+                </div>
               </div>
-            </div>
-          ))}
-          <Button size="sm" variant="ghost" className="w-full text-blue-400 text-xs">
-            View More ▶
-          </Button>
+            ))}
+            <Button size="sm" variant="ghost" className="w-full text-blue-400 text-xs mt-2">
+              View More ▶
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <GlassCard 
-      className={`${isFullscreen ? 'h-full' : 'h-80'} p-4 relative overflow-hidden flex flex-col group`}
-      style={{ 
-        background: 'rgba(59, 130, 246, 0.1)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(59, 130, 246, 0.3)',
-        borderRadius: '2rem'
-      }}
-    >
+    <div className={`h-full p-4 relative overflow-hidden flex flex-col`}>
       {/* Header - Fixed */}
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <div className="flex items-center space-x-3">
-          <h3 className={`font-bold text-blue-400 ${isFullscreen ? 'text-2xl' : 'text-lg'}`}>
+          <h3 className={`font-bold text-blue-400 ${textSizes.heading}`}>
             Approvals & Decisions
           </h3>
           <div className="flex items-center space-x-1">
@@ -140,143 +152,159 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
             size="sm"
             variant={currentMode === 'approvals' ? 'default' : 'outline'}
             onClick={() => onViewModeChange(currentMode === 'approvals' ? 'full' : 'approvals')}
-            className="text-blue-400 text-xs h-7"
+            className={`text-blue-400 text-xs h-7 ${isExpanded ? 'text-sm h-8' : ''}`}
           >
-            <Eye size={12} className="mr-1" />
+            <Eye size={textSizes.icon === 'h-3 w-3' ? 10 : 12} className="mr-1" />
             Focus
           </Button>
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-blue-400 h-7"
+            onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
+            className={`text-blue-400 h-7 ${isExpanded ? 'h-8' : ''}`}
           >
-            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            {isDetailsExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </Button>
         </div>
       </div>
 
       {/* Decision Heatmap - Fixed */}
-      <div className={`grid grid-cols-4 gap-2 mb-4 flex-shrink-0 ${isFullscreen ? 'gap-4' : ''}`}>
-        <div className={`bg-yellow-500/20 rounded-lg text-center ${isFullscreen ? 'p-4' : 'p-2'}`}>
-          <div className={`font-bold text-yellow-400 ${isFullscreen ? 'text-3xl' : 'text-lg'}`}>
+      <div className={`grid gap-2 mb-4 flex-shrink-0 ${getGridLayout()}`}>
+        <div className={`bg-yellow-500/20 rounded-lg text-center ${isExpanded ? 'p-3' : 'p-2'}`}>
+          <div className={`font-bold text-yellow-400 ${isExpanded ? 'text-2xl' : 'text-lg'}`}>
             {displayData.pending}
           </div>
-          <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>Pending</div>
+          <div className={`text-gray-400 ${textSizes.body}`}>Pending</div>
         </div>
-        <div className={`bg-red-500/20 rounded-lg text-center ${isFullscreen ? 'p-4' : 'p-2'}`}>
-          <div className={`font-bold text-red-400 ${isFullscreen ? 'text-3xl' : 'text-lg'}`}>
+        <div className={`bg-red-500/20 rounded-lg text-center ${isExpanded ? 'p-3' : 'p-2'}`}>
+          <div className={`font-bold text-red-400 ${isExpanded ? 'text-2xl' : 'text-lg'}`}>
             {displayData.overdue}
           </div>
-          <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>Overdue</div>
+          <div className={`text-gray-400 ${textSizes.body}`}>Overdue</div>
         </div>
-        <div className={`bg-orange-500/20 rounded-lg text-center ${isFullscreen ? 'p-4' : 'p-2'}`}>
-          <div className={`font-bold text-orange-400 ${isFullscreen ? 'text-3xl' : 'text-lg'}`}>
+        <div className={`bg-orange-500/20 rounded-lg text-center ${isExpanded ? 'p-3' : 'p-2'}`}>
+          <div className={`font-bold text-orange-400 ${isExpanded ? 'text-2xl' : 'text-lg'}`}>
             {displayData.urgent}
           </div>
-          <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>Urgent</div>
+          <div className={`text-gray-400 ${textSizes.body}`}>Urgent</div>
         </div>
-        <div className={`bg-blue-500/20 rounded-lg text-center ${isFullscreen ? 'p-4' : 'p-2'}`}>
-          <div className={`font-bold text-blue-400 ${isFullscreen ? 'text-3xl' : 'text-lg'}`}>
+        <div className={`bg-blue-500/20 rounded-lg text-center ${isExpanded ? 'p-3' : 'p-2'}`}>
+          <div className={`font-bold text-blue-400 ${isExpanded ? 'text-2xl' : 'text-lg'}`}>
             {pinnedItems.length}
           </div>
-          <div className={`text-gray-400 ${isFullscreen ? 'text-sm' : 'text-xs'}`}>Pinned</div>
+          <div className={`text-gray-400 ${textSizes.body}`}>Pinned</div>
         </div>
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <Tabs defaultValue="all" className="h-full flex flex-col">
           <TabsList className="grid w-full grid-cols-4 bg-white/10 flex-shrink-0 mb-3">
-            <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
-            <TabsTrigger value="strategy" className="text-xs">Strategy</TabsTrigger>
-            <TabsTrigger value="redesign" className="text-xs">Redesign</TabsTrigger>
-            <TabsTrigger value="external" className="text-xs">External</TabsTrigger>
+            <TabsTrigger value="all" className={textSizes.body}>All</TabsTrigger>
+            <TabsTrigger value="strategy" className={textSizes.body}>Strategy</TabsTrigger>
+            <TabsTrigger value="redesign" className={textSizes.body}>Redesign</TabsTrigger>
+            <TabsTrigger value="external" className={textSizes.body}>External</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="flex-1 overflow-auto space-y-3 pr-2">
-            {/* Pinned Items */}
-            {pinnedItemsData.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-blue-400 flex items-center">
-                  <Pin size={12} className="mr-1" />
-                  Pinned
-                </h4>
-                {pinnedItemsData.map((item: any) => (
-                  <motion.div
-                    key={item.id}
-                    className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all group cursor-pointer"
-                    whileHover={{ scale: 1.01 }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <span className="font-medium text-white text-sm truncate">{item.title}</span>
-                          <Badge className={`${getPriorityColor(item.priority)} text-xs`}>
-                            {item.priority}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center space-x-3 text-xs text-gray-400">
-                          <span className={getTypeColor(item.type)}>{item.type}</span>
-                          <span className="truncate">{item.owner}</span>
-                        </div>
-                      </div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1 ml-2">
-                        <Button size="sm" className="bg-green-600 hover:bg-green-700 text-xs h-6 px-2">
-                          Approve
-                        </Button>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
+          <TabsContent value="all" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="space-y-3 pr-2">
+                {/* Pinned Items */}
+                <AnimatePresence>
+                  {pinnedItemsData.length > 0 && (
+                    <motion.div 
+                      className="space-y-2"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <h4 className={`font-medium text-blue-400 flex items-center ${textSizes.body}`}>
+                        <Pin size={12} className="mr-1" />
+                        Pinned
+                      </h4>
+                      {pinnedItemsData.map((item: any) => (
+                        <motion.div
+                          key={item.id}
+                          className={`rounded-lg hover:bg-white/20 transition-all group cursor-pointer ${isExpanded ? 'p-3 bg-white/10' : 'p-2 bg-white/10'}`}
+                          whileHover={{ scale: 1.01 }}
+                          layout
+                          transition={{ duration: 0.2 }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <span className={`font-medium text-white truncate ${textSizes.body}`}>{item.title}</span>
+                                <Badge className={`${getPriorityColor(item.priority)} text-xs`}>
+                                  {item.priority}
+                                </Badge>
+                              </div>
+                              <div className={`flex items-center space-x-3 text-xs text-gray-400`}>
+                                <span className={getTypeColor(item.type)}>{item.type}</span>
+                                <span className="truncate">{item.owner}</span>
+                              </div>
+                            </div>
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1 ml-2">
+                              <Button size="sm" className={`bg-green-600 hover:bg-green-700 text-xs ${isExpanded ? 'h-7 px-3' : 'h-6 px-2'}`}>
+                                Approve
+                              </Button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-            {/* Priority Items */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium text-blue-400">Priority Items</h4>
-                <Button size="sm" variant="ghost" className="text-xs text-blue-400 h-6">
-                  View All ({displayData.items.length}) ▶
-                </Button>
-              </div>
-              {(isExpanded ? displayData.items : topItems).map((item: any) => (
-                <motion.div
-                  key={item.id}
-                  className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-all group cursor-pointer"
-                  whileHover={{ scale: 1.01 }}
-                >
+                {/* Priority Items */}
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-medium text-white text-sm truncate">{item.title}</span>
-                        <Badge className={`${getPriorityColor(item.priority)} text-xs`}>
-                          {item.priority}
-                        </Badge>
-                        {item.daysOut < 0 && (
-                          <Badge className="bg-red-500/20 text-red-400 text-xs">
-                            {Math.abs(item.daysOut)}d overdue
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-3 text-xs text-gray-400">
-                        <span className={getTypeColor(item.type)}>{item.type}</span>
-                        <span className="truncate">{item.owner}</span>
-                      </div>
-                    </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1 ml-2">
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700 text-xs h-6 px-2">
-                        Approve
-                      </Button>
-                    </div>
+                    <h4 className={`font-medium text-blue-400 ${textSizes.body}`}>Priority Items</h4>
+                    <Button size="sm" variant="ghost" className={`text-xs text-blue-400 h-6 ${textSizes.body}`}>
+                      View All ({displayData.items.length}) ▶
+                    </Button>
                   </div>
-                </motion.div>
-              ))}
-            </div>
+                  {(isDetailsExpanded ? displayData.items : topItems).map((item: any) => (
+                    <motion.div
+                      key={item.id}
+                      className={`rounded-lg hover:bg-white/10 transition-all group cursor-pointer ${isExpanded ? 'p-3 bg-white/5' : 'p-2 bg-white/5'}`}
+                      whileHover={{ scale: 1.01 }}
+                      layout
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <span className={`font-medium text-white truncate ${textSizes.body}`}>{item.title}</span>
+                            <Badge className={`${getPriorityColor(item.priority)} text-xs`}>
+                              {item.priority}
+                            </Badge>
+                            {item.daysOut < 0 && (
+                              <Badge className="bg-red-500/20 text-red-400 text-xs">
+                                {Math.abs(item.daysOut)}d overdue
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-3 text-xs text-gray-400">
+                            <span className={getTypeColor(item.type)}>{item.type}</span>
+                            <span className="truncate">{item.owner}</span>
+                          </div>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1 ml-2">
+                          <Button size="sm" className={`bg-green-600 hover:bg-green-700 text-xs ${isExpanded ? 'h-7 px-3' : 'h-6 px-2'}`}>
+                            Approve
+                          </Button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </ScrollArea>
           </TabsContent>
         </Tabs>
       </div>
-    </GlassCard>
+    </div>
   );
 };
 

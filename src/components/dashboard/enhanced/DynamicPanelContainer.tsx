@@ -47,6 +47,9 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
     return hoveredPanel === panelType ? 1 : 0.8;
   };
 
+  const isExpanded = (panelType: PanelType) => hoveredPanel === panelType;
+  const isContracted = (panelType: PanelType) => hoveredPanel !== null && hoveredPanel !== panelType;
+
   const panelVariants = {
     default: {
       scale: 1,
@@ -96,9 +99,9 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
         )}
       </div>
 
-      {/* Dynamic Panels Container - Increased height and improved content fitting */}
+      {/* Dynamic Panels Container - Increased height */}
       <div 
-        className="flex gap-6 h-[55vh] min-h-[600px]"
+        className="flex gap-6 h-[65vh] min-h-[700px]"
         onDoubleClick={handleReset}
       >
         {/* Approvals Panel */}
@@ -143,7 +146,8 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
                 onViewModeChange={onViewModeChange}
                 currentMode={viewMode}
                 onToggleFullscreen={() => onToggleFullscreen('approvals')}
-                isCompact={hoveredPanel !== null && hoveredPanel !== 'approvals'}
+                isExpanded={isExpanded('approvals')}
+                isContracted={isContracted('approvals')}
               />
             </div>
           </div>
@@ -191,7 +195,8 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
                 onViewModeChange={onViewModeChange}
                 currentMode={viewMode}
                 onToggleFullscreen={() => onToggleFullscreen('health')}
-                isCompact={hoveredPanel !== null && hoveredPanel !== 'health'}
+                isExpanded={isExpanded('health')}
+                isContracted={isContracted('health')}
               />
             </div>
           </div>
@@ -237,7 +242,8 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
               <EnhancedCoordinationPanel
                 data={dashboardData?.coordination}
                 onToggleFullscreen={() => onToggleFullscreen('coordination')}
-                isCompact={hoveredPanel !== null && hoveredPanel !== 'coordination'}
+                isExpanded={isExpanded('coordination')}
+                isContracted={isContracted('coordination')}
               />
             </div>
           </div>
