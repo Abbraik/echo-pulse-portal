@@ -60,7 +60,7 @@ const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ data, lastUpdate }) => 
 
   return (
     <GlassCard 
-      className="h-full p-4 relative overflow-hidden"
+      className="h-24 p-4 relative overflow-hidden flex items-center"
       style={{ 
         background: 'rgba(255, 255, 255, 0.5)',
         backdropFilter: 'blur(20px)',
@@ -75,7 +75,7 @@ const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ data, lastUpdate }) => 
         <span className="text-xs text-gray-400">Live • {lastUpdate.toLocaleTimeString()}</span>
       </div>
 
-      <div className="flex items-center justify-between h-full">
+      <div className="flex items-center justify-between w-full">
         {/* Main Insight */}
         <div className="flex items-center space-x-4 flex-1 min-w-0">
           <div className={`p-2 rounded-xl ${config.bg} ${config.pulse} flex-shrink-0`}>

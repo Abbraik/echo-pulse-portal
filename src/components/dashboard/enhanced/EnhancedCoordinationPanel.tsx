@@ -67,7 +67,7 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
 
   return (
     <GlassCard 
-      className="h-full p-6 relative"
+      className="h-80 p-4 relative overflow-hidden flex flex-col"
       style={{ 
         background: 'rgba(139, 92, 246, 0.1)',
         backdropFilter: 'blur(20px)',
@@ -75,10 +75,10 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
         borderRadius: '2rem'
       }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <h3 className="text-xl font-bold text-purple-400">Coordination & Triggers</h3>
+      {/* Header - Fixed */}
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
+        <div className="flex items-center space-x-3">
+          <h3 className="text-lg font-bold text-purple-400">Coordination & Triggers</h3>
           <div className="flex items-center space-x-1">
             <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
             <span className="text-xs text-gray-400">Active</span>
@@ -86,135 +86,138 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({ d
         </div>
         
         <div className="flex items-center space-x-2">
-          <Button size="sm" variant="ghost" className="text-purple-400">
-            <RefreshCw size={14} className="mr-1" />
+          <Button size="sm" variant="ghost" className="text-purple-400 text-xs h-7">
+            <RefreshCw size={12} className="mr-1" />
             Refresh
           </Button>
           <Button
             size="sm"
             variant="ghost"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-purple-400"
+            className="text-purple-400 h-7"
           >
-            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column */}
-        <div className="space-y-4">
-          {/* Redesign Flags */}
-          <div className="space-y-3">
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+          {/* Left Column */}
+          <div className="space-y-3 overflow-auto pr-1">
+            {/* Redesign Flags */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-purple-400">Redesign Flags</h4>
+                <Button size="sm" variant="ghost" className="text-xs text-purple-400 h-6">
+                  View All ▶
+                </Button>
+              </div>
+              
+              <div className="space-y-1">
+                {(isExpanded ? displayData.redesignFlags : displayData.redesignFlags.slice(0, 2)).map((flag: any) => (
+                  <motion.div
+                    key={flag.id}
+                    className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-all group cursor-pointer"
+                    whileHover={{ scale: 1.01 }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <Badge className={`${getSeverityColor(flag.severity)} text-xs`}>
+                          {flag.severity}
+                        </Badge>
+                        <div className="min-w-0">
+                          <div className="font-medium text-white text-sm truncate">{flag.pattern}</div>
+                          <div className="text-xs text-gray-400">{flag.occurrences}x</div>
+                        </div>
+                      </div>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button size="sm" variant="ghost" className="text-xs h-6">
+                          Details
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Facilitator Escalations */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-purple-400">Live Escalations</h4>
+                <Button size="sm" variant="ghost" className="text-xs text-purple-400 h-6">
+                  View All ▶
+                </Button>
+              </div>
+              
+              <div className="space-y-1">
+                {(isExpanded ? displayData.escalations : displayData.escalations.slice(0, 2)).map((escalation: any) => (
+                  <motion.div
+                    key={escalation.id}
+                    className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-all group cursor-pointer"
+                    whileHover={{ scale: 1.01 }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <Badge variant="outline" className="text-xs">
+                            {escalation.type}
+                          </Badge>
+                          <span className={`text-xs font-medium ${getZoneColor(escalation.zone)}`}>
+                            {escalation.zone}
+                          </span>
+                        </div>
+                        <div className="text-sm text-white truncate">{escalation.message}</div>
+                        <div className="text-xs text-gray-400">{escalation.time}</div>
+                      </div>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button size="sm" variant="ghost" className="text-xs h-6">
+                          Reassign
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Zone Leads */}
+          <div className="space-y-2 overflow-auto pr-1">
             <div className="flex items-center justify-between">
-              <h4 className="text-lg font-semibold text-purple-400">Redesign Flags</h4>
-              <Button size="sm" variant="ghost" className="text-xs text-purple-400">
-                View All ▶
+              <h4 className="text-sm font-semibold text-purple-400">Zone Leads</h4>
+              <Button size="sm" variant="ghost" className="text-xs text-purple-400 h-6">
+                <Users size={10} className="mr-1" />
+                Council ▶
               </Button>
             </div>
             
-            <div className="space-y-2">
-              {(isExpanded ? displayData.redesignFlags : displayData.redesignFlags.slice(0, 2)).map((flag: any) => (
+            <div className="grid grid-cols-1 gap-1">
+              {displayData.zoneLeads.map((lead: any) => (
                 <motion.div
-                  key={flag.id}
-                  className="p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all group cursor-pointer"
+                  key={lead.zone}
+                  className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-all group cursor-pointer"
                   whileHover={{ scale: 1.01 }}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Badge className={getSeverityColor(flag.severity)}>
-                        {flag.severity}
-                      </Badge>
-                      <div>
-                        <div className="font-medium text-white text-sm">{flag.pattern}</div>
-                        <div className="text-xs text-gray-400">{flag.occurrences}x occurrences</div>
-                      </div>
-                    </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="sm" variant="ghost" className="text-xs">
-                        Details <ArrowRight size={12} className="ml-1" />
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Facilitator Escalations */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-lg font-semibold text-purple-400">Live Escalations</h4>
-              <Button size="sm" variant="ghost" className="text-xs text-purple-400">
-                View All ▶
-              </Button>
-            </div>
-            
-            <div className="space-y-2">
-              {(isExpanded ? displayData.escalations : displayData.escalations.slice(0, 2)).map((escalation: any) => (
-                <motion.div
-                  key={escalation.id}
-                  className="p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all group cursor-pointer"
-                  whileHover={{ scale: 1.01 }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Badge variant="outline" className="text-xs">
-                          {escalation.type}
-                        </Badge>
-                        <span className={`text-xs font-medium ${getZoneColor(escalation.zone)}`}>
-                          {escalation.zone}
-                        </span>
-                      </div>
-                      <div className="text-sm text-white">{escalation.message}</div>
-                      <div className="text-xs text-gray-400 mt-1">{escalation.time}</div>
-                    </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="sm" variant="ghost" className="text-xs">
-                        Reassign ▶
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column - Zone Leads */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="text-lg font-semibold text-purple-400">Zone Leads</h4>
-            <Button size="sm" variant="ghost" className="text-xs text-purple-400">
-              <Users size={12} className="mr-1" />
-              Council ▶
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 gap-2">
-            {displayData.zoneLeads.map((lead: any) => (
-              <motion.div
-                key={lead.zone}
-                className="p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all group cursor-pointer"
-                whileHover={{ scale: 1.01 }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <span className={`font-medium text-sm ${getZoneColor(lead.zone)}`}>
-                      {lead.zone}
-                    </span>
-                    <div className="flex space-x-2 text-xs">
-                      <span className={getStatusColor(lead.status)}>
-                        {lead.delivery}%
+                      <span className={`font-medium text-xs ${getZoneColor(lead.zone)}`}>
+                        {lead.zone}
                       </span>
-                      <span className="text-gray-400">E:{lead.entropy}</span>
+                      <div className="flex space-x-1 text-xs">
+                        <span className={getStatusColor(lead.status)}>
+                          {lead.delivery}%
+                        </span>
+                        <span className="text-gray-400">E:{lead.entropy}</span>
+                      </div>
                     </div>
+                    <div className="text-xs text-gray-400">{lead.lastClosure}</div>
                   </div>
-                  <div className="text-xs text-gray-400">{lead.lastClosure}</div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
