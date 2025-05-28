@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Pin, Eye, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, Pin, Eye, Filter, ChevronDown, ChevronUp, Maximize2 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -58,7 +58,7 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
 
   return (
     <GlassCard 
-      className="h-80 p-4 relative overflow-hidden flex flex-col"
+      className="h-80 p-4 relative overflow-hidden flex flex-col group"
       style={{ 
         background: 'rgba(59, 130, 246, 0.1)',
         backdropFilter: 'blur(20px)',
@@ -77,6 +77,14 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
         </div>
         
         <div className="flex items-center space-x-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 hover:bg-white/20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Maximize2 size={14} />
+          </Button>
           <Button
             size="sm"
             variant={currentMode === 'approvals' ? 'default' : 'outline'}

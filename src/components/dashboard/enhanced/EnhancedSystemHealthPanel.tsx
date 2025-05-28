@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, TrendingUp, TrendingDown, AlertTriangle, ChevronDown, ChevronUp, Eye } from 'lucide-react';
+import { Activity, TrendingUp, TrendingDown, AlertTriangle, ChevronDown, ChevronUp, Eye, Maximize2 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -63,7 +63,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
 
   return (
     <GlassCard 
-      className="h-80 p-4 relative overflow-hidden flex flex-col"
+      className="h-80 p-4 relative overflow-hidden flex flex-col group"
       style={{ 
         background: 'rgba(20, 184, 166, 0.1)',
         backdropFilter: 'blur(20px)',
@@ -82,6 +82,14 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
         </div>
         
         <div className="flex items-center space-x-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 hover:bg-white/20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Maximize2 size={14} />
+          </Button>
           <Button
             size="sm"
             variant={currentMode === 'health' ? 'default' : 'outline'}

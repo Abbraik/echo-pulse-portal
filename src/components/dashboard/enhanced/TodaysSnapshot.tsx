@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, TrendingUp, Activity } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Activity, Maximize2 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -60,7 +60,7 @@ const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ data, lastUpdate }) => 
 
   return (
     <GlassCard 
-      className="h-24 p-4 relative overflow-hidden flex items-center"
+      className="h-24 p-4 relative overflow-hidden flex items-center group"
       style={{ 
         background: 'rgba(255, 255, 255, 0.5)',
         backdropFilter: 'blur(20px)',
@@ -71,6 +71,14 @@ const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ data, lastUpdate }) => 
     >
       {/* Live Sync Indicator */}
       <div className="absolute top-3 right-4 flex items-center space-x-2 z-10">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 hover:bg-white/20"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Maximize2 size={14} />
+        </Button>
         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
         <span className="text-xs text-gray-400">Live • {lastUpdate.toLocaleTimeString()}</span>
       </div>
