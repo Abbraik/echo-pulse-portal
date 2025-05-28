@@ -33,23 +33,6 @@ const DirectorHeader: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
     >
       <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-        {/* Left: Loop Ribbon */}
-        <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
-          <div className="glass-panel px-4 py-2 rounded-full border border-white/20">
-            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-4 ${isRTL ? 'space-x-reverse' : ''} text-sm font-medium`}>
-              <span className="text-teal-400">THINK</span>
-              <span className="text-gray-400">▶</span>
-              <span className="text-blue-400">ACT</span>
-              <span className="text-gray-400">▶</span>
-              <span className="text-purple-400">MONITOR</span>
-              <span className="text-gray-400">▶</span>
-              <span className="text-orange-400">LEARN</span>
-              <span className="text-gray-400">▶</span>
-              <span className="text-green-400">INNOVATE</span>
-            </div>
-          </div>
-        </div>
-
         {/* Center: Role Banner */}
         <div className="flex items-center space-x-3">
           <div className="text-center">
