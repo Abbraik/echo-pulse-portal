@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Maximize2, Minimize2, AlertTriangle } from 'lucide-react';
@@ -9,6 +8,7 @@ import { ApprovalsDecisionsPanel } from './strategic/ApprovalsDecisionsPanel';
 import { SystemHealthAlertsPanel } from './strategic/SystemHealthAlertsPanel';
 import { CoordinationTriggersPanel } from './strategic/CoordinationTriggersPanel';
 import { DGNotesSidebar } from './strategic/DGNotesSidebar';
+import { ExecutiveReportButton } from './strategic/ExecutiveReportButton';
 
 interface StrategicOverviewProps {
   data?: {
@@ -58,6 +58,7 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
                   STRATEGIC OVERVIEW
                 </h2>
                 <div className="flex items-center space-x-4">
+                  <ExecutiveReportButton />
                   <Button
                     size="sm"
                     className={`${hasStrategicAlert ? 'animate-pulse bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'}`}
