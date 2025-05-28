@@ -34,19 +34,6 @@ const DirectorHeader: React.FC = () => {
     >
       {/* Right: User Controls */}
       <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
-        {/* Language Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleLanguage}
-          className="rounded-full hover:bg-white/5 relative"
-        >
-          <Globe size={18} className="text-gray-400" />
-          <span className="absolute -top-1 -right-1 text-[10px] font-bold bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
-            {language === 'en' ? 'AR' : 'EN'}
-          </span>
-        </Button>
-
         {/* Theme Toggle */}
         <Button
           variant="ghost"
