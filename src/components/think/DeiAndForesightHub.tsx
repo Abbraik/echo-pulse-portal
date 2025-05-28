@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -62,6 +63,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Population Deviation',
           value: -2.5,
+          target: undefined,
           unit: '%',
           description: 'Gap between current and target population',
           trend: [-3.2, -2.8, -2.5, -2.3, -2.5]
@@ -69,6 +71,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Structure Deviation',
           value: 15.2,
+          target: undefined,
           unit: 'index',
           description: 'Composite age/gender/nationality deviation',
           trend: [16.1, 15.8, 15.5, 15.2, 15.2]
@@ -76,6 +79,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Natural Growth Balance',
           value: 1.2,
+          target: undefined,
           unit: 'ratio',
           description: 'Births to deaths ratio (0-2 scale)',
           trend: [1.1, 1.15, 1.18, 1.2, 1.2]
@@ -83,6 +87,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Growth Volatility',
           value: 0.8,
+          target: undefined,
           unit: 'SD',
           description: 'Standard deviation of population change over 12 months',
           trend: [1.2, 1.0, 0.9, 0.8, 0.8]
@@ -96,6 +101,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Stock vs Target',
           value: 0.85,
+          target: undefined,
           unit: 'ratio',
           description: 'Current resource stock divided by target stock',
           trend: [0.82, 0.83, 0.84, 0.85, 0.85]
@@ -103,6 +109,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Renewal vs Consumption',
           value: 1.1,
+          target: undefined,
           unit: 'ratio',
           description: 'Renewal rate divided by consumption rate',
           trend: [1.05, 1.07, 1.08, 1.1, 1.1]
@@ -110,6 +117,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Extraction Pressure',
           value: 0.25,
+          target: undefined,
           unit: 'ratio',
           description: 'Extraction flow divided by total resource stock',
           trend: [0.28, 0.27, 0.26, 0.25, 0.25]
@@ -117,6 +125,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Smoothed Price',
           value: 245.6,
+          target: undefined,
           unit: 'AED',
           description: '12-month moving average of unit price',
           trend: [250.2, 248.1, 246.8, 245.6, 245.6]
@@ -130,6 +139,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Supply-Demand Gap',
           value: 0.05,
+          target: undefined,
           unit: 'normalized',
           description: 'Normalized gap between supply and demand',
           trend: [0.08, 0.07, 0.06, 0.05, 0.05]
@@ -137,6 +147,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Price Deviation',
           value: -0.03,
+          target: undefined,
           unit: '%',
           description: 'Deviation from target price as percentage',
           trend: [-0.05, -0.04, -0.03, -0.03, -0.03]
@@ -144,6 +155,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Capacity Utilization',
           value: 0.78,
+          target: undefined,
           unit: 'ratio',
           description: 'Weighted average of output to maximum capacity',
           trend: [0.75, 0.76, 0.77, 0.78, 0.78]
@@ -157,6 +169,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Employment Rate',
           value: 74.2,
+          target: undefined,
           unit: '%',
           description: 'Percentage of working-age population employed',
           trend: [72.8, 73.2, 73.8, 74.2, 74.2]
@@ -164,6 +177,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Education Completion',
           value: 88.5,
+          target: undefined,
           unit: '%',
           description: 'Percentage completing secondary education',
           trend: [87.1, 87.8, 88.2, 88.5, 88.5]
@@ -171,6 +185,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Health Index',
           value: 82.1,
+          target: undefined,
           unit: 'index',
           description: 'Composite health status indicator',
           trend: [80.5, 81.2, 81.8, 82.1, 82.1]
@@ -178,6 +193,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Living Conditions',
           value: 76.3,
+          target: undefined,
           unit: 'index',
           description: 'Household consumption and living standards',
           trend: [74.8, 75.5, 76.0, 76.3, 76.3]
@@ -185,6 +201,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Household Revenue',
           value: 12450,
+          target: undefined,
           unit: 'AED',
           description: 'Average monthly household income',
           trend: [12100, 12250, 12350, 12450, 12450]
@@ -192,6 +209,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         {
           name: 'Environmental Quality',
           value: 68.7,
+          target: undefined,
           unit: 'index',
           description: 'Environmental quality index',
           trend: [67.2, 67.8, 68.3, 68.7, 68.7]
