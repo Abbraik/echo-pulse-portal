@@ -1,390 +1,171 @@
-import React, { useState } from 'react';
-import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GlassCard } from '@/components/ui/glass-card';
-import { Button } from '@/components/ui/button';
+import { Sparkles } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { toast } from '@/hooks/use-toast';
-import OverallDeiIndicator from '@/components/think/OverallDeiIndicator';
-import PillarBreakouts from '@/components/think/PillarBreakouts';
-import DeiForesightTab from '@/components/think/DeiForesightTab';
-import SimulationLab from '@/components/think/SimulationLab';
-import EnhancedSimulationTab from '@/components/think/EnhancedSimulationTab';
-import { EnhancedPillarCard } from '@/components/think/components/EnhancedPillarCard';
-import { TargetSettingModal } from '@/components/think/components/TargetSettingModal';
-import LoopAnalysisTab from '@/components/think/LoopAnalysisTab';
+import { ScrollArea } from "@/components/ui/scroll-area"
+
+interface DeiAndForesightHubProps {
+  // Define any props here
+}
+
+interface MainIndicator {
+  name: string;
+  score: number;
+  target: number;
+  trend: number[];
+  subIndicators: SubIndicator[];
+}
 
 interface SubIndicator {
   name: string;
   value: number;
-  target?: number;
-  unit?: string;
+  unit: string;
   description: string;
-  trend?: number[];
+  trend: number[];
+  target?: number; // Add optional target property
 }
 
-interface DeiMetrics {
-  overall: number;
-  pillars: any;
-  equilibriumBands: any;
-}
-
-interface DeiAndForesightHubProps {
-  metrics: DeiMetrics;
-  scenarios: any[];
-  onSaveScenario: (scenario: any) => void;
-  onSelectScenario: (id: number) => void;
-}
-
-const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
-  metrics,
-  scenarios,
-  onSaveScenario,
-  onSelectScenario
-}) => {
+const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = () => {
   const { t, isRTL } = useTranslation();
-  const [activeView, setActiveView] = useState<'overview' | 'simulation' | 'loopAnalysis'>('overview');
-  const [selectedIndicator, setSelectedIndicator] = useState<{
-    pillar: string;
-    indicator: SubIndicator;
-  } | null>(null);
-  const [hasTargets, setHasTargets] = useState(false);
-  const [pillarsWithTargets, setPillarsWithTargets] = useState<string[]>([]);
 
-  // Enhanced sub-indicators for each pillar
-  const enhancedPillars = {
-    population: {
-      name: t('populationDynamics'),
-      value: metrics.pillars.population.value,
+  // Mock Data
+  const mainIndicators: MainIndicator[] = [
+    {
+      name: 'Equitable Access to Opportunities',
+      score: 75,
+      target: 85,
+      trend: [60, 65, 70, 72, 75],
       subIndicators: [
         {
-          name: 'Population Deviation',
-          value: -2.5,
+          name: 'Access to Education',
+          value: 80,
           unit: '%',
-          description: 'Gap between current and target population',
-          trend: [-3.2, -2.8, -2.5, -2.3, -2.5]
+          description: 'Percentage of population with access to quality education.',
+          trend: [75, 77, 78, 79, 80],
+          target: 90,
         },
-        {
-          name: 'Structure Deviation',
-          value: 15.2,
-          unit: 'index',
-          description: 'Composite age/gender/nationality deviation',
-          trend: [16.1, 15.8, 15.5, 15.2, 15.2]
-        },
-        {
-          name: 'Natural Growth Balance',
-          value: 1.2,
-          unit: 'ratio',
-          description: 'Births to deaths ratio (0-2 scale)',
-          trend: [1.1, 1.15, 1.18, 1.2, 1.2]
-        },
-        {
-          name: 'Growth Volatility',
-          value: 0.8,
-          unit: 'SD',
-          description: 'Standard deviation of population change over 12 months',
-          trend: [1.2, 1.0, 0.9, 0.8, 0.8]
-        }
-      ]
-    },
-    resources: {
-      name: t('resourceMarket'),
-      value: metrics.pillars.resources.value,
-      subIndicators: [
-        {
-          name: 'Stock vs Target',
-          value: 0.85,
-          unit: 'ratio',
-          description: 'Current resource stock divided by target stock',
-          trend: [0.82, 0.83, 0.84, 0.85, 0.85]
-        },
-        {
-          name: 'Renewal vs Consumption',
-          value: 1.1,
-          unit: 'ratio',
-          description: 'Renewal rate divided by consumption rate',
-          trend: [1.05, 1.07, 1.08, 1.1, 1.1]
-        },
-        {
-          name: 'Extraction Pressure',
-          value: 0.25,
-          unit: 'ratio',
-          description: 'Extraction flow divided by total resource stock',
-          trend: [0.28, 0.27, 0.26, 0.25, 0.25]
-        },
-        {
-          name: 'Smoothed Price',
-          value: 245.6,
-          unit: 'AED',
-          description: '12-month moving average of unit price',
-          trend: [250.2, 248.1, 246.8, 245.6, 245.6]
-        }
-      ]
-    },
-    goods: {
-      name: t('productsServicesMarket'),
-      value: metrics.pillars.goods.value,
-      subIndicators: [
-        {
-          name: 'Supply-Demand Gap',
-          value: 0.05,
-          unit: 'normalized',
-          description: 'Normalized gap between supply and demand',
-          trend: [0.08, 0.07, 0.06, 0.05, 0.05]
-        },
-        {
-          name: 'Price Deviation',
-          value: -0.03,
-          unit: '%',
-          description: 'Deviation from target price as percentage',
-          trend: [-0.05, -0.04, -0.03, -0.03, -0.03]
-        },
-        {
-          name: 'Capacity Utilization',
-          value: 0.78,
-          unit: 'ratio',
-          description: 'Weighted average of output to maximum capacity',
-          trend: [0.75, 0.76, 0.77, 0.78, 0.78]
-        }
-      ]
-    },
-    social: {
-      name: t('socialOutcomes'),
-      value: metrics.pillars.social.value,
-      subIndicators: [
         {
           name: 'Employment Rate',
-          value: 74.2,
+          value: 70,
           unit: '%',
-          description: 'Percentage of working-age population employed',
-          trend: [72.8, 73.2, 73.8, 74.2, 74.2]
+          description: 'Percentage of employable population currently employed.',
+          trend: [65, 67, 68, 69, 70],
+          target: 80,
+        },
+      ],
+    },
+    {
+      name: 'Inclusive Social Environment',
+      score: 68,
+      target: 75,
+      trend: [55, 60, 62, 65, 68],
+      subIndicators: [
+        {
+          name: 'Social Cohesion Index',
+          value: 72,
+          unit: '',
+          description: 'Index measuring the level of social cohesion within the community.',
+          trend: [68, 69, 70, 71, 72],
+          target: 80,
         },
         {
-          name: 'Education Completion',
-          value: 88.5,
+          name: 'Community Participation Rate',
+          value: 64,
           unit: '%',
-          description: 'Percentage completing secondary education',
-          trend: [87.1, 87.8, 88.2, 88.5, 88.5]
+          description: 'Percentage of residents actively participating in community activities.',
+          trend: [50, 55, 58, 60, 64],
+          target: 70,
+        },
+      ],
+    },
+    {
+      name: 'Fair Resource Distribution',
+      score: 82,
+      target: 90,
+      trend: [70, 75, 78, 80, 82],
+      subIndicators: [
+        {
+          name: 'Income Equality Ratio',
+          value: 85,
+          unit: '',
+          description: 'Ratio measuring the equality of income distribution.',
+          trend: [75, 80, 82, 84, 85],
+          target: 95,
         },
         {
-          name: 'Health Index',
-          value: 82.1,
-          unit: 'index',
-          description: 'Composite health status indicator',
-          trend: [80.5, 81.2, 81.8, 82.1, 82.1]
+          name: 'Access to Healthcare',
+          value: 80,
+          unit: '%',
+          description: 'Percentage of population with access to quality healthcare services.',
+          trend: [70, 72, 75, 78, 80],
+          target: 90,
         },
-        {
-          name: 'Living Conditions',
-          value: 76.3,
-          unit: 'index',
-          description: 'Household consumption and living standards',
-          trend: [74.8, 75.5, 76.0, 76.3, 76.3]
-        },
-        {
-          name: 'Household Revenue',
-          value: 12450,
-          unit: 'AED',
-          description: 'Average monthly household income',
-          trend: [12100, 12250, 12350, 12450, 12450]
-        },
-        {
-          name: 'Environmental Quality',
-          value: 68.7,
-          unit: 'index',
-          description: 'Environmental quality index',
-          trend: [67.2, 67.8, 68.3, 68.7, 68.7]
-        }
-      ]
-    }
-  };
-
-  const handleIndicatorClick = (pillar: string, indicator: SubIndicator) => {
-    setSelectedIndicator({ pillar, indicator });
-  };
-
-  const handleTargetSave = (target: number) => {
-    if (selectedIndicator) {
-      // Update the indicator with the new target
-      const pillarKey = selectedIndicator.pillar as keyof typeof enhancedPillars;
-      const indicator = enhancedPillars[pillarKey].subIndicators.find(
-        ind => ind.name === selectedIndicator.indicator.name
-      );
-      
-      if (indicator) {
-        indicator.target = target;
-        
-        // Track pillars with targets
-        if (!pillarsWithTargets.includes(selectedIndicator.pillar)) {
-          setPillarsWithTargets([...pillarsWithTargets, selectedIndicator.pillar]);
-        }
-        
-        setHasTargets(true);
-        
-        toast({
-          title: t('targetSet'),
-          description: `${t('newTargetFor')} ${indicator.name}: ${target}`,
-          duration: 3000,
-        });
-      }
-    }
-    setSelectedIndicator(null);
-  };
-
-  const handleApplyTargets = () => {
-    // In a real app, this would recalculate the DEI metrics
-    toast({
-      title: t('targetsApplied'),
-      description: t('deiMetricsRecalculated'),
-      duration: 3000,
-    });
-    
-    // Simulate triggering loop analysis
-    toast({
-      title: t('loopAnalysisTriggered'),
-      description: t('checkLoopAnalysisTab'),
-      duration: 5000,
-    });
-  };
-
-  const handlePromoteToAct = (objectives: string[]) => {
-    toast({
-      title: t('objectivesPromoted'),
-      description: t('checkStrategyBuilder'),
-      duration: 3000,
-    });
-  };
-
-  const handleAdjustLever = (lever: string) => {
-    // Switch to simulation tab and highlight the relevant slider
-    setActiveView('simulation');
-    toast({
-      title: t('navigatingToSimulation'),
-      description: `${t('adjusting')} ${lever}`,
-      duration: 2000,
-    });
-  };
+      ],
+    },
+  ];
 
   return (
-    <GlassCard className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center">
-          <div className="p-2 rounded-xl bg-teal-500/20 text-teal-400 mr-3">
-            <BarChart3 size={20} />
-          </div>
-          <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">
-            {t("deiAndForesightHub").toUpperCase()}
-          </h2>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          {hasTargets && (
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="bg-teal-500/20 text-teal-400">
-                {pillarsWithTargets.length} {t('targetsSet')}
-              </Badge>
-              <Button
-                onClick={handleApplyTargets}
-                className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700"
-                size="sm"
-              >
-                <Target size={16} className="mr-1" />
-                {t('applyTargets')}
-              </Button>
-            </div>
-          )}
-          
-          <div className="bg-white/5 backdrop-blur-sm rounded-full p-1">
-            <Tabs 
-              value={activeView} 
-              onValueChange={(v) => setActiveView(v as 'overview' | 'simulation' | 'loopAnalysis')}
-              className="w-full"
-            >
-              <TabsList className="bg-transparent">
-                <TabsTrigger 
-                  value="overview" 
-                  className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
-                >
-                  <Layout className="mr-2 h-4 w-4" />
-                  {t("overview").toUpperCase()}
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="simulation" 
-                  className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
-                >
-                  <Play className="mr-2 h-4 w-4" />
-                  {t("simulation").toUpperCase()}
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="loopAnalysis" 
-                  className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
-                >
-                  <Network className="mr-2 h-4 w-4" />
-                  {t("loopAnalysis").toUpperCase()}
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-        </div>
+    <section className="space-y-4">
+      {/* Section Header */}
+      <div className="flex items-center space-x-2">
+        <Sparkles size={20} className="text-teal-500 animate-pulse" />
+        <h2 className="text-lg font-bold">{t('deiAndForesightHub')}</h2>
+        <Badge variant="secondary">Beta</Badge>
       </div>
-      
-      {activeView === 'overview' ? (
-        <div>
-          {/* Overall DEI Indicator */}
-          <div className="flex justify-center mb-8">
-            <OverallDeiIndicator 
-              value={metrics.overall} 
-              minBand={metrics.equilibriumBands.overall.min} 
-              maxBand={metrics.equilibriumBands.overall.max}
-              pillars={metrics.pillars}
-              equilibriumBands={metrics.equilibriumBands}
-            />
-          </div>
-          
-          {/* Enhanced Pillar Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {Object.entries(enhancedPillars).map(([key, pillar]) => (
-              <EnhancedPillarCard
-                key={key}
-                pillarKey={key}
-                pillar={pillar}
-                onIndicatorClick={handleIndicatorClick}
-                hasTargets={pillarsWithTargets.includes(key)}
-              />
+
+      {/* Main Content */}
+      <GlassCard className="p-6" variant="deep">
+        <ScrollArea className="h-[65vh]">
+          <div className="space-y-6">
+            {mainIndicators.map((indicator, index) => (
+              <motion.div
+                key={index}
+                className="space-y-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                {/* Indicator Header */}
+                <div className="flex items-center justify-between">
+                  <h3 className="text-md font-semibold">{indicator.name}</h3>
+                  <div className="text-sm text-gray-400">
+                    Score: {indicator.score} / Target: {indicator.target}
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <Progress value={indicator.score} max={100} className="h-2" />
+
+                {/* Sub-indicators */}
+                <div className="space-y-2 pl-4">
+                  {indicator.subIndicators.map((sub, subIndex) => (
+                    <motion.div
+                      key={subIndex}
+                      className="glass-panel p-3 rounded-md border border-white/10"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 + subIndex * 0.05 }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-medium">{sub.name}</div>
+                        <div className="text-xs text-gray-400">
+                          {sub.value} {sub.unit} / Target: {sub.target}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-300 mt-1">{sub.description}</p>
+                      <Progress value={sub.value} max={100} className="h-1 mt-2" />
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
             ))}
           </div>
-          
-          {/* DEI Foresight Tab */}
-          <DeiForesightTab metrics={metrics} scenarios={scenarios} />
-        </div>
-      ) : activeView === 'simulation' ? (
-        <EnhancedSimulationTab 
-          metrics={metrics} 
-          scenarios={scenarios}
-          pillars={enhancedPillars}
-          onSaveScenario={onSaveScenario}
-          onSelectScenario={onSelectScenario}
-        />
-      ) : (
-        <LoopAnalysisTab 
-          hasTargets={hasTargets}
-          onPromoteToAct={handlePromoteToAct}
-          onAdjustLever={handleAdjustLever}
-        />
-      )}
-      
-      {/* Target Setting Modal */}
-      {selectedIndicator && (
-        <TargetSettingModal
-          open={!!selectedIndicator}
-          onOpenChange={() => setSelectedIndicator(null)}
-          indicator={selectedIndicator.indicator}
-          pillarName={selectedIndicator.pillar}
-          onSave={handleTargetSave}
-        />
-      )}
-    </GlassCard>
+        </ScrollArea>
+      </GlassCard>
+    </section>
   );
 };
 
