@@ -62,9 +62,9 @@ const DirectorGeneralDashboard: React.FC = () => {
         
         {/* Main Content Grid */}
         <main className="flex-1 container mx-auto px-4 py-6 space-y-6">
-          {/* Strategic Overview - Top 25% */}
+          {/* Strategic Overview - Top 40% of viewport */}
           <motion.section 
-            className="h-[25vh] min-h-[300px]"
+            className="h-[40vh] min-h-[400px]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -72,7 +72,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             <StrategicOverview data={dashboardData?.strategic} />
           </motion.section>
           
-          {/* Zone Snapshots Grid */}
+          {/* Zone Snapshots Grid - Remaining space */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
             {/* THINK and ACT - Top Row */}
             <motion.section 
