@@ -72,12 +72,11 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
               <p className="text-sm text-gray-400">Composite Score</p>
             </div>
             
-            <div className="relative">
+            <div className="relative mb-4">
               <Gauge
                 value={displayData.deiScore}
                 max={100}
                 size="xl"
-                className="mb-4"
               />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
