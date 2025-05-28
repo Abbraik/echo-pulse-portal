@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react';
@@ -77,7 +76,7 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
               <Gauge
                 value={displayData.deiScore}
                 max={100}
-                size={180}
+                size="xl"
                 thickness={8}
                 className="mb-4"
               />
