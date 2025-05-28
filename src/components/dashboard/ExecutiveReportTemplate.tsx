@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Download, FileText, ChevronLeft, ChevronRight, Maximize2, Eye } from 'lucide-react';
@@ -9,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LineChart, Line, ResponsiveContainer, RadialBarChart, RadialBar, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { exportExecutiveReportToPDF } from '@/utils/pdfExporter';
 
 interface ExecutiveReportTemplateProps {
   onClose?: () => void;
@@ -459,9 +459,7 @@ const ExecutiveReportTemplate: React.FC<ExecutiveReportTemplateProps> = ({ onClo
   };
 
   const handleExportPDF = () => {
-    // Mock PDF export
-    console.log('Exporting to PDF...');
-    alert('PDF export functionality would be implemented here');
+    exportExecutiveReportToPDF(mockData);
   };
 
   const handleExportPPTX = () => {
