@@ -33,18 +33,6 @@ const DirectorHeader: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
     >
       <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-        {/* Center: Role Banner */}
-        <div className="flex items-center space-x-3">
-          <div className="text-center">
-            <h1 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
-              {t('welcome')}, Director General
-            </h1>
-            <p className="text-xs text-gray-400 uppercase tracking-wide">
-              {t('populationDynamicsSystem')}
-            </p>
-          </div>
-        </div>
-
         {/* Right: User Controls */}
         <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
           {/* Language Toggle */}
