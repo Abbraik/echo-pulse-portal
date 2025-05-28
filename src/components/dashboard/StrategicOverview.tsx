@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -91,7 +90,19 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
     }
   };
 
-  const displayData = data || mockData;
+  // Ensure we have proper data structure with fallbacks
+  const displayData = {
+    deiScore: data?.deiScore ?? mockData.deiScore,
+    deiTarget: data?.deiTarget ?? mockData.deiTarget,
+    deiTrend: data?.deiTrend ?? mockData.deiTrend,
+    populationStability: data?.populationStability ?? mockData.populationStability,
+    resourceEfficiency: data?.resourceEfficiency ?? mockData.resourceEfficiency,
+    socialCohesion: data?.socialCohesion ?? mockData.socialCohesion,
+    hasStrategicAlert: data?.hasStrategicAlert ?? mockData.hasStrategicAlert,
+    psiu: data?.psiu ?? mockData.psiu,
+    entropyTrend: data?.entropyTrend ?? mockData.entropyTrend,
+    zones: data?.zones ?? mockData.zones
+  };
 
   const zones = [
     { 
@@ -232,8 +243,18 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
   };
 
   const renderZoneSnapshot = () => {
-    const zoneData = displayData.zones[activeZone as keyof typeof displayData.zones];
+    // Ensure zones exist and get the zone data safely
+    const zoneData = displayData.zones?.[activeZone as keyof typeof displayData.zones];
     const zone = zones.find(z => z.id === activeZone);
+    
+    // If no zone data is available, show a fallback
+    if (!zoneData) {
+      return (
+        <div className="space-y-4 text-center">
+          <div className="text-gray-400">No data available for this zone</div>
+        </div>
+      );
+    }
     
     switch (activeZone) {
       case 'monitor':
@@ -273,14 +294,14 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
               <div>
                 <h4 className="text-sm font-medium text-gray-300 mb-2">Loop Drift Highlights</h4>
                 <div className="space-y-1">
-                  {zoneData.loopDrifts.map((loop: any, index: number) => (
+                  {zoneData.loopDrifts?.map((loop: any, index: number) => (
                     <div key={index} className="flex justify-between text-xs">
                       <span className="text-gray-300 truncate">{loop.name}</span>
                       <span className={`${loop.drift > 0 ? 'text-orange-400' : 'text-teal-400'}`}>
                         {loop.drift > 0 ? '+' : ''}{loop.drift}%
                       </span>
                     </div>
-                  ))}
+                  )) || <div className="text-xs text-gray-400">No drift data</div>}
                 </div>
               </div>
             </div>
@@ -295,16 +316,16 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-400">{zoneData.pendingApprovals}</div>
+                <div className="text-2xl font-bold text-blue-400">{zoneData.pendingApprovals || 0}</div>
                 <div className="text-xs text-gray-400">Pending Approvals</div>
-                {zoneData.riskFlags > 0 && (
+                {(zoneData.riskFlags || 0) > 0 && (
                   <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 mt-1">
                     {zoneData.riskFlags} Risk Flags
                   </Badge>
                 )}
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-400">{zoneData.successRate}%</div>
+                <div className="text-2xl font-bold text-blue-400">{zoneData.successRate || 0}%</div>
                 <div className="text-xs text-gray-400">Bundle Success Rate</div>
               </div>
             </div>
@@ -319,11 +340,11 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-400">{zoneData.topLessons}</div>
+                <div className="text-2xl font-bold text-orange-400">{zoneData.topLessons || 0}</div>
                 <div className="text-xs text-gray-400">Top Lessons</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-400">{zoneData.patternFlags}</div>
+                <div className="text-2xl font-bold text-orange-400">{zoneData.patternFlags || 0}</div>
                 <div className="text-xs text-gray-400">Pattern Flags</div>
               </div>
             </div>
@@ -343,7 +364,7 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-400">{zoneData.activePrototypes}</div>
+                <div className="text-2xl font-bold text-green-400">{zoneData.activePrototypes || 0}</div>
                 <div className="text-xs text-gray-400">Active Prototypes</div>
                 <div className="flex justify-center space-x-1 mt-1">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
@@ -352,9 +373,9 @@ const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-400">{zoneData.redesignFlags}</div>
+                <div className="text-2xl font-bold text-green-400">{zoneData.redesignFlags || 0}</div>
                 <div className="text-xs text-gray-400">Redesign Flags</div>
-                {zoneData.readyForPromotion > 0 && (
+                {(zoneData.readyForPromotion || 0) > 0 && (
                   <Badge variant="secondary" className="bg-green-500/20 text-green-400 mt-1">
                     {zoneData.readyForPromotion} Ready
                   </Badge>
