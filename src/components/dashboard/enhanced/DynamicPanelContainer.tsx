@@ -96,14 +96,14 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
         )}
       </div>
 
-      {/* Dynamic Panels Container - Increased height to 45vh */}
+      {/* Dynamic Panels Container - Increased height and improved content fitting */}
       <div 
-        className="flex gap-6 h-[45vh]"
+        className="flex gap-6 h-[55vh] min-h-[600px]"
         onDoubleClick={handleReset}
       >
         {/* Approvals Panel */}
         <motion.div
-          className="relative"
+          className="relative overflow-hidden"
           animate={{
             width: getPanelWidth('approvals'),
             opacity: getPanelOpacity('approvals')
@@ -119,7 +119,7 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
           onMouseLeave={handlePanelLeave}
         >
           <div
-            className="h-full cursor-pointer"
+            className="h-full cursor-pointer flex flex-col"
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -137,19 +137,21 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
             aria-controls="approvals-content"
             style={getThemeBackground(hoveredPanel === 'approvals')}
           >
-            <EnhancedApprovalsPanel
-              data={dashboardData?.approvals}
-              onViewModeChange={onViewModeChange}
-              currentMode={viewMode}
-              onToggleFullscreen={() => onToggleFullscreen('approvals')}
-              isCompact={hoveredPanel !== null && hoveredPanel !== 'approvals'}
-            />
+            <div className="flex-1 min-h-0">
+              <EnhancedApprovalsPanel
+                data={dashboardData?.approvals}
+                onViewModeChange={onViewModeChange}
+                currentMode={viewMode}
+                onToggleFullscreen={() => onToggleFullscreen('approvals')}
+                isCompact={hoveredPanel !== null && hoveredPanel !== 'approvals'}
+              />
+            </div>
           </div>
         </motion.div>
 
         {/* Health Panel */}
         <motion.div
-          className="relative"
+          className="relative overflow-hidden"
           animate={{
             width: getPanelWidth('health'),
             opacity: getPanelOpacity('health')
@@ -165,7 +167,7 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
           onMouseLeave={handlePanelLeave}
         >
           <div
-            className="h-full cursor-pointer"
+            className="h-full cursor-pointer flex flex-col"
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -183,19 +185,21 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
             aria-controls="health-content"
             style={getThemeBackground(hoveredPanel === 'health')}
           >
-            <EnhancedSystemHealthPanel
-              data={dashboardData?.systemHealth}
-              onViewModeChange={onViewModeChange}
-              currentMode={viewMode}
-              onToggleFullscreen={() => onToggleFullscreen('health')}
-              isCompact={hoveredPanel !== null && hoveredPanel !== 'health'}
-            />
+            <div className="flex-1 min-h-0">
+              <EnhancedSystemHealthPanel
+                data={dashboardData?.systemHealth}
+                onViewModeChange={onViewModeChange}
+                currentMode={viewMode}
+                onToggleFullscreen={() => onToggleFullscreen('health')}
+                isCompact={hoveredPanel !== null && hoveredPanel !== 'health'}
+              />
+            </div>
           </div>
         </motion.div>
 
         {/* Coordination Panel */}
         <motion.div
-          className="relative"
+          className="relative overflow-hidden"
           animate={{
             width: getPanelWidth('coordination'),
             opacity: getPanelOpacity('coordination')
@@ -211,7 +215,7 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
           onMouseLeave={handlePanelLeave}
         >
           <div
-            className="h-full cursor-pointer"
+            className="h-full cursor-pointer flex flex-col"
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -229,11 +233,13 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
             aria-controls="coordination-content"
             style={getThemeBackground(hoveredPanel === 'coordination')}
           >
-            <EnhancedCoordinationPanel
-              data={dashboardData?.coordination}
-              onToggleFullscreen={() => onToggleFullscreen('coordination')}
-              isCompact={hoveredPanel !== null && hoveredPanel !== 'coordination'}
-            />
+            <div className="flex-1 min-h-0">
+              <EnhancedCoordinationPanel
+                data={dashboardData?.coordination}
+                onToggleFullscreen={() => onToggleFullscreen('coordination')}
+                isCompact={hoveredPanel !== null && hoveredPanel !== 'coordination'}
+              />
+            </div>
           </div>
         </motion.div>
       </div>
