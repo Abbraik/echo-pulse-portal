@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Calendar, AlertTriangle, CheckCircle, MessageCircle, Filter, Star, ChevronUp, ChevronDown, Plus, ExternalLink, X, Focus, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
 interface ApprovalItem {
@@ -28,17 +29,59 @@ interface ApprovalsDecisionsPanelProps {
   onFocusMode?: (isFocused: boolean) => void;
 }
 
-export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = ({ data, onFocusMode }) => {
+export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = ({ 
+  data, 
+  onFocusMode 
+}) => {
   const { toast } = useToast();
   
   // Mock data
   const initialItems: ApprovalItem[] = [
-    { id: '1', title: 'Infrastructure Dev Package', type: 'strategy', owner: 'Planning Ministry', dueDate: '2025-06-02', priority: 'high', isPinned: false },
-    { id: '2', title: 'Climate Resilience Framework', type: 'redesign', owner: 'Env Dept', dueDate: '2025-05-30', priority: 'medium', isPinned: true },
-    { id: '3', title: 'EU Partnership Directive', type: 'external', owner: 'Foreign Affairs', dueDate: '2025-06-05', priority: 'low', isPinned: false },
-    { id: '4', title: 'Education Reform Bundle', type: 'strategy', owner: 'Education Ministry', dueDate: '2025-06-10', priority: 'medium', isPinned: false },
-    { id: '5', title: 'Urban Housing Mandate', type: 'redesign', owner: 'Housing Authority', dueDate: '2025-05-28', priority: 'high', isPinned: false },
-    { id: '6', title: 'Digital ID Rollout', type: 'external', owner: 'Interior Ministry', dueDate: '2025-06-15', priority: 'low', isPinned: false },
+    { 
+      id: '1', 
+      title: 'Infrastructure Development Package', 
+      type: 'strategy', 
+      owner: 'Planning Ministry', 
+      dueDate: '2025-06-02', 
+      priority: 'high', 
+      isPinned: false 
+    },
+    { 
+      id: '2', 
+      title: 'Climate Resilience Framework', 
+      type: 'redesign', 
+      owner: 'Environment Department', 
+      dueDate: '2025-05-30', 
+      priority: 'medium', 
+      isPinned: true 
+    },
+    { 
+      id: '3', 
+      title: 'EU Partnership Directive', 
+      type: 'external', 
+      owner: 'Foreign Affairs', 
+      dueDate: '2025-06-05', 
+      priority: 'low', 
+      isPinned: false 
+    },
+    { 
+      id: '4', 
+      title: 'Education Reform Bundle', 
+      type: 'strategy', 
+      owner: 'Education Ministry', 
+      dueDate: '2025-06-10', 
+      priority: 'medium', 
+      isPinned: false 
+    },
+    { 
+      id: '5', 
+      title: 'Urban Housing Mandate', 
+      type: 'redesign', 
+      owner: 'Housing Authority', 
+      dueDate: '2025-05-28', 
+      priority: 'high', 
+      isPinned: false 
+    },
   ];
 
   // State
@@ -46,26 +89,24 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   const [activeFilter, setActiveFilter] = useState<'all' | 'strategy' | 'redesign' | 'external'>('all');
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [focusMode, setFocusMode] = useState(false);
-  
+  const [loading, setLoading] = useState<string | null>(null);
+
   // Modal states
-  const [approveModalOpen, setApproveModalOpen] = useState(false);
-  const [itemToApprove, setItemToApprove] = useState<ApprovalItem | null>(null);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  
-  // Revision state
-  const [expandedRevision, setExpandedRevision] = useState<string | null>(null);
-  const [revisionComment, setRevisionComment] = useState('');
-  
-  // Loading states
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [approveModal, setApproveModal] = useState<{ open: boolean; item: ApprovalItem | null }>({
+    open: false,
+    item: null
+  });
+  const [createModal, setCreateModal] = useState(false);
+  const [reviseRowId, setReviseRowId] = useState<string | null>(null);
+  const [reviseComment, setReviseComment] = useState('');
 
   // New item form
   const [newItem, setNewItem] = useState({
     title: '',
-    type: 'strategy' as const,
+    type: 'strategy' as ApprovalItem['type'],
     owner: '',
     dueDate: '',
-    priority: 'medium' as const
+    priority: 'medium' as ApprovalItem['priority']
   });
 
   // Keyboard shortcuts
@@ -94,14 +135,15 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         case 'r':
           if (selectedRowId) {
             e.preventDefault();
-            handleRevise(selectedRowId);
+            handleReviseClick(selectedRowId);
           }
           break;
         case 'escape':
           e.preventDefault();
-          setExpandedRevision(null);
-          setApproveModalOpen(false);
-          setCreateModalOpen(false);
+          setReviseRowId(null);
+          setReviseComment('');
+          setApproveModal({ open: false, item: null });
+          setCreateModal(false);
           setSelectedRowId(null);
           break;
       }
@@ -127,13 +169,13 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     external: items.filter(item => item.type === 'external').length,
   };
 
-  // Handlers
+  // Action handlers
   const handleFilterChange = (filter: typeof activeFilter) => {
     setActiveFilter(filter);
   };
 
-  const handlePin = useCallback(async (id: string) => {
-    setActionLoading(id);
+  const handlePin = async (id: string) => {
+    setLoading(id);
     
     // Mock delay
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -153,49 +195,47 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
       return updatedItems;
     });
     
-    setActionLoading(null);
-  }, [toast]);
+    setLoading(null);
+  };
 
   const handleApproveClick = (item: ApprovalItem) => {
-    setItemToApprove(item);
-    setApproveModalOpen(true);
+    setApproveModal({ open: true, item });
   };
 
   const handleApproveConfirm = async () => {
-    if (itemToApprove) {
-      setActionLoading(itemToApprove.id);
+    if (approveModal.item) {
+      setLoading(approveModal.item.id);
       
       // Mock delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      setItems(prevItems => prevItems.filter(item => item.id !== itemToApprove.id));
+      setItems(prevItems => prevItems.filter(item => item.id !== approveModal.item!.id));
       
       toast({
         title: "Approved!",
-        description: `${itemToApprove.title} has been approved successfully.`,
+        description: `${approveModal.item.title} has been approved successfully.`,
         duration: 3000,
       });
       
-      setApproveModalOpen(false);
-      setItemToApprove(null);
+      setApproveModal({ open: false, item: null });
       setSelectedRowId(null);
-      setActionLoading(null);
+      setLoading(null);
     }
   };
 
-  const handleRevise = (id: string) => {
-    if (expandedRevision === id) {
-      setExpandedRevision(null);
-      setRevisionComment('');
+  const handleReviseClick = (id: string) => {
+    if (reviseRowId === id) {
+      setReviseRowId(null);
+      setReviseComment('');
     } else {
-      setExpandedRevision(id);
-      setRevisionComment('');
+      setReviseRowId(id);
+      setReviseComment('');
     }
   };
 
-  const handleSubmitRevision = async (id: string) => {
-    if (revisionComment.trim()) {
-      setActionLoading(id);
+  const handleReviseSubmit = async (id: string) => {
+    if (reviseComment.trim()) {
+      setLoading(id);
       
       // Mock delay
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -207,16 +247,16 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         duration: 3000,
       });
       
-      setExpandedRevision(null);
-      setRevisionComment('');
+      setReviseRowId(null);
+      setReviseComment('');
       setSelectedRowId(null);
-      setActionLoading(null);
+      setLoading(null);
     }
   };
 
   const handleCreateNew = async () => {
     if (newItem.title && newItem.owner && newItem.dueDate) {
-      setActionLoading('create');
+      setLoading('create');
       
       // Mock delay
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -235,7 +275,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         duration: 3000,
       });
       
-      setCreateModalOpen(false);
+      setCreateModal(false);
       setNewItem({
         title: '',
         type: 'strategy',
@@ -243,7 +283,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         dueDate: '',
         priority: 'medium'
       });
-      setActionLoading(null);
+      setLoading(null);
     }
   };
 
@@ -290,6 +330,35 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     }
   };
 
+  const ActionButton = ({ 
+    children, 
+    onClick, 
+    disabled, 
+    variant = "default",
+    size = "sm",
+    className = ""
+  }: {
+    children: React.ReactNode;
+    onClick: () => void;
+    disabled?: boolean;
+    variant?: "default" | "outline" | "ghost";
+    size?: "sm" | "xs";
+    className?: string;
+  }) => (
+    <Button
+      size={size}
+      variant={variant}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      disabled={disabled}
+      className={className}
+    >
+      {children}
+    </Button>
+  );
+
   return (
     <>
       <div 
@@ -315,11 +384,6 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
             <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50 text-xs">
               Live
             </Badge>
-            {pinnedItems.length > 0 && (
-              <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50 text-xs">
-                Priority Items ({pinnedItems.length})
-              </Badge>
-            )}
           </div>
           <div className="flex items-center gap-2">
             <Button 
@@ -342,7 +406,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         </div>
 
         {/* Filter Row */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-6">
           {Object.entries(filterCounts).map(([filter, count]) => (
             <Button
               key={filter}
@@ -393,34 +457,31 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Button
-                      size="sm"
-                      variant="ghost"
+                    <ActionButton
                       onClick={() => handlePin(item.id)}
-                      disabled={actionLoading === item.id}
+                      disabled={loading === item.id}
+                      variant="ghost"
                       className="text-yellow-400 p-1 h-6 w-6"
                     >
                       <Star size={12} fill="currentColor" />
-                    </Button>
-                    <Button
-                      size="sm"
+                    </ActionButton>
+                    <ActionButton
                       onClick={() => handleApproveClick(item)}
-                      disabled={actionLoading === item.id}
+                      disabled={loading === item.id}
                       className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
                     >
                       <CheckCircle size={10} className="mr-1" />
                       Approve
-                    </Button>
-                    <Button
-                      size="sm"
+                    </ActionButton>
+                    <ActionButton
+                      onClick={() => handleReviseClick(item.id)}
+                      disabled={loading === item.id}
                       variant="outline"
-                      onClick={() => handleRevise(item.id)}
-                      disabled={actionLoading === item.id}
                       className="h-6 px-2 text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
                     >
                       <Edit size={10} className="mr-1" />
                       Revise
-                    </Button>
+                    </ActionButton>
                   </div>
                 </motion.div>
               ))}
@@ -474,48 +535,36 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Button
-                          size="sm"
+                        <ActionButton
+                          onClick={() => handlePin(item.id)}
+                          disabled={loading === item.id}
                           variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handlePin(item.id);
-                          }}
-                          disabled={actionLoading === item.id}
                           className="text-gray-400 hover:text-yellow-400 p-1 h-6 w-6"
                         >
                           <Star size={12} />
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleApproveClick(item);
-                          }}
-                          disabled={actionLoading === item.id}
+                        </ActionButton>
+                        <ActionButton
+                          onClick={() => handleApproveClick(item)}
+                          disabled={loading === item.id}
                           className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
                         >
                           <CheckCircle size={10} className="mr-1" />
                           Approve
-                        </Button>
-                        <Button
-                          size="sm"
+                        </ActionButton>
+                        <ActionButton
+                          onClick={() => handleReviseClick(item.id)}
+                          disabled={loading === item.id}
                           variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRevise(item.id);
-                          }}
-                          disabled={actionLoading === item.id}
                           className="h-6 px-2 text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
                         >
                           <Edit size={10} className="mr-1" />
                           Revise
-                        </Button>
+                        </ActionButton>
                       </div>
                     </TableCell>
                   </TableRow>
                   <AnimatePresence>
-                    {expandedRevision === item.id && (
+                    {reviseRowId === item.id && (
                       <motion.tr
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
@@ -525,9 +574,9 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                         <TableCell colSpan={6} className="p-4 bg-white/5">
                           <div className="space-y-3">
                             <label className="text-sm text-gray-300">Revision Comments:</label>
-                            <textarea
-                              value={revisionComment}
-                              onChange={(e) => setRevisionComment(e.target.value)}
+                            <Textarea
+                              value={reviseComment}
+                              onChange={(e) => setReviseComment(e.target.value)}
                               placeholder="Enter your revision comments..."
                               className="w-full h-16 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
                               rows={2}
@@ -535,16 +584,19 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
-                                onClick={() => handleSubmitRevision(item.id)}
-                                disabled={!revisionComment.trim() || actionLoading === item.id}
+                                onClick={() => handleReviseSubmit(item.id)}
+                                disabled={!reviseComment.trim() || loading === item.id}
                                 className="bg-orange-600 hover:bg-orange-700 text-white text-xs"
                               >
-                                {actionLoading === item.id ? 'Submitting...' : 'Submit'}
+                                {loading === item.id ? 'Submitting...' : 'Submit'}
                               </Button>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => setExpandedRevision(null)}
+                                onClick={() => {
+                                  setReviseRowId(null);
+                                  setReviseComment('');
+                                }}
                                 className="border-gray-500/50 text-gray-400 hover:bg-gray-500/10 text-xs"
                               >
                                 Cancel
@@ -572,8 +624,8 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           </Button>
           <Button
             size="sm"
-            onClick={() => setCreateModalOpen(true)}
-            className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold h-10"
+            onClick={() => setCreateModal(true)}
+            className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold h-8"
           >
             <Plus size={14} className="mr-1" />
             Create New Approval
@@ -582,35 +634,35 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
       </div>
 
       {/* Approve Confirmation Modal */}
-      <Dialog open={approveModalOpen} onOpenChange={setApproveModalOpen}>
+      <Dialog open={approveModal.open} onOpenChange={(open) => setApproveModal({ open, item: null })}>
         <DialogContent className="bg-gray-900 border-gray-700">
           <DialogHeader>
             <DialogTitle className="text-white">Confirm Approval</DialogTitle>
             <DialogDescription className="text-gray-300">
-              Confirm approval of "{itemToApprove?.title}"?
+              Are you sure you want to approve "{approveModal.item?.title}"?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button 
               variant="outline" 
-              onClick={() => setApproveModalOpen(false)}
-              disabled={actionLoading === itemToApprove?.id}
+              onClick={() => setApproveModal({ open: false, item: null })}
+              disabled={loading === approveModal.item?.id}
             >
               Cancel
             </Button>
             <Button 
               onClick={handleApproveConfirm} 
-              disabled={actionLoading === itemToApprove?.id}
+              disabled={loading === approveModal.item?.id}
               className="bg-green-600 hover:bg-green-700"
             >
-              {actionLoading === itemToApprove?.id ? 'Confirming...' : 'Confirm'}
+              {loading === approveModal.item?.id ? 'Confirming...' : 'Confirm'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Create New Approval Modal */}
-      <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+      <Dialog open={createModal} onOpenChange={setCreateModal}>
         <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
           <DialogHeader>
             <DialogTitle className="text-white">Create New Approval</DialogTitle>
@@ -631,7 +683,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
             </div>
             <div>
               <Label htmlFor="type" className="text-white">Type</Label>
-              <Select value={newItem.type} onValueChange={(value) => setNewItem({...newItem, type: value as any})}>
+              <Select value={newItem.type} onValueChange={(value) => setNewItem({...newItem, type: value as ApprovalItem['type']})}>
                 <SelectTrigger className="bg-white/10 border-white/20 text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -664,7 +716,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
             </div>
             <div>
               <Label htmlFor="priority" className="text-white">Priority</Label>
-              <Select value={newItem.priority} onValueChange={(value) => setNewItem({...newItem, priority: value as any})}>
+              <Select value={newItem.priority} onValueChange={(value) => setNewItem({...newItem, priority: value as ApprovalItem['priority']})}>
                 <SelectTrigger className="bg-white/10 border-white/20 text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -679,17 +731,17 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           <DialogFooter>
             <Button 
               variant="outline" 
-              onClick={() => setCreateModalOpen(false)}
-              disabled={actionLoading === 'create'}
+              onClick={() => setCreateModal(false)}
+              disabled={loading === 'create'}
             >
               Cancel
             </Button>
             <Button 
               onClick={handleCreateNew}
-              disabled={!newItem.title || !newItem.owner || !newItem.dueDate || actionLoading === 'create'}
+              disabled={!newItem.title || !newItem.owner || !newItem.dueDate || loading === 'create'}
               className="bg-teal-500 hover:bg-teal-600"
             >
-              {actionLoading === 'create' ? 'Saving...' : 'Save'}
+              {loading === 'create' ? 'Saving...' : 'Save'}
             </Button>
           </DialogFooter>
         </DialogContent>
