@@ -1,12 +1,11 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, AlertTriangle, Activity, Zap, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Activity, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/ui/glass-card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { FullscreenButton } from '@/components/ui/fullscreen-button';
 
 interface SystemHealthAlertsPanelProps {
   data?: {
@@ -17,16 +16,9 @@ interface SystemHealthAlertsPanelProps {
     risks: Array<{ id: string; name: string; likelihood: number; impact: number }>;
   };
   onAlertClick?: (alertType: string) => void;
-  isFullscreen?: boolean;
-  onToggleFullscreen?: () => void;
 }
 
-export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = ({ 
-  data, 
-  onAlertClick,
-  isFullscreen = false,
-  onToggleFullscreen
-}) => {
+export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = ({ data, onAlertClick }) => {
   // Mock data if not provided
   const mockData = {
     deiScore: 78.5,
@@ -76,137 +68,105 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
   };
 
   return (
-    <div className={`${
-      isFullscreen ? 'fixed inset-0 z-50 bg-black/60' : 'h-full'
-    }`}>
-      {isFullscreen && (
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onToggleFullscreen} />
-      )}
-      
-      <div className={`${
-        isFullscreen 
-          ? 'absolute inset-4 md:inset-8 bg-background/95 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden'
-          : 'h-full'
-      } glass-panel-deep p-6 flex flex-col`}>
-        
-        <div className="space-y-4 flex-1 overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-teal-400">System Health & Alerts</h3>
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-xs text-gray-400">Live</span>
-              </div>
-              {onToggleFullscreen && (
-                <FullscreenButton
-                  isFullscreen={isFullscreen}
-                  onToggle={onToggleFullscreen}
-                />
-              )}
-              {isFullscreen && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={onToggleFullscreen}
-                  className="text-gray-400 hover:text-white"
-                  aria-label="Close full-screen view"
-                >
-                  <X size={16} />
-                </Button>
-              )}
-            </div>
+    <div className="h-full p-6">
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-teal-400">System Health & Alerts</h3>
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-xs text-gray-400">Live</span>
           </div>
+        </div>
 
-          {/* Composite Gauge */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-teal-400">DEI Score</h4>
-              <div className="relative h-24 w-24 mx-auto">
-                <div className="absolute inset-0 rounded-full border-8 border-gray-700/30"></div>
-                <div 
-                  className="absolute inset-0 rounded-full border-8 border-t-teal-400 border-r-transparent border-b-transparent border-l-transparent"
-                  style={{ transform: `rotate(${(displayData.deiScore / 100) * 360}deg)` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-teal-400">{displayData.deiScore}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-teal-400">PSIU Balance</h4>
-              <div className="relative h-24 w-24 mx-auto">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={20}
-                      outerRadius={40}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+        {/* Composite Gauge */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-teal-400">DEI Score</h4>
+            <div className="relative h-24 w-24 mx-auto">
+              <div className="absolute inset-0 rounded-full border-8 border-gray-700/30"></div>
+              <div 
+                className="absolute inset-0 rounded-full border-8 border-t-teal-400 border-r-transparent border-b-transparent border-l-transparent"
+                style={{ transform: `rotate(${(displayData.deiScore / 100) * 360}deg)` }}
+              ></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-teal-400">{displayData.deiScore}</span>
               </div>
             </div>
           </div>
 
-          {/* Entropy Sparklines */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-teal-400">Entropy Trends</h4>
-            <div className="grid grid-cols-5 gap-1 text-xs">
-              {displayData.entropyTrend.map((zone) => (
-                <div key={zone.zone} className="text-center p-1 bg-white/5 rounded">
-                  <div className="font-medium text-white">{zone.zone}</div>
-                  <div className={`flex items-center justify-center ${zone.trend > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                    {zone.trend > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                    <span className="ml-1">{zone.current}</span>
-                  </div>
-                </div>
-              ))}
+            <h4 className="text-sm font-medium text-teal-400">PSIU Balance</h4>
+            <div className="relative h-24 w-24 mx-auto">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={20}
+                    outerRadius={40}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
+        </div>
 
-          {/* Alert Ticker */}
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-teal-400">Active Alerts</h4>
-            <div className="max-h-32 overflow-y-auto space-y-1">
-              {displayData.alerts.map((alert) => (
-                <div 
-                  key={alert.id} 
-                  className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => onAlertClick?.(alert.type)}
-                >
-                  <div className="flex items-center space-x-2">
-                    <AlertTriangle size={14} className="text-orange-400" />
-                    <span className="text-sm text-white">{alert.message}</span>
-                  </div>
-                  <Badge className={getSeverityColor(alert.severity)}>
-                    {alert.severity}
-                  </Badge>
+        {/* Entropy Sparklines */}
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-teal-400">Entropy Trends</h4>
+          <div className="grid grid-cols-5 gap-1 text-xs">
+            {displayData.entropyTrend.map((zone) => (
+              <div key={zone.zone} className="text-center p-1 bg-white/5 rounded">
+                <div className="font-medium text-white">{zone.zone}</div>
+                <div className={`flex items-center justify-center ${zone.trend > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                  {zone.trend > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                  <span className="ml-1">{zone.current}</span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
+        </div>
 
-          {/* Risk Overview */}
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-teal-400">Risk Matrix</h4>
-            <div className="grid grid-cols-3 gap-1 text-xs">
-              {displayData.risks.map((risk) => (
-                <div key={risk.id} className="p-2 bg-white/5 rounded text-center">
-                  <div className="font-medium text-white truncate">{risk.name}</div>
-                  <div className="text-gray-400">L:{Math.round(risk.likelihood*10)} I:{Math.round(risk.impact*10)}</div>
+        {/* Alert Ticker */}
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-teal-400">Active Alerts</h4>
+          <div className="max-h-32 overflow-y-auto space-y-1">
+            {displayData.alerts.map((alert) => (
+              <div 
+                key={alert.id} 
+                className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
+                onClick={() => onAlertClick?.(alert.type)}
+              >
+                <div className="flex items-center space-x-2">
+                  <AlertTriangle size={14} className="text-orange-400" />
+                  <span className="text-sm text-white">{alert.message}</span>
                 </div>
-              ))}
-            </div>
+                <Badge className={getSeverityColor(alert.severity)}>
+                  {alert.severity}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Risk Overview */}
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-teal-400">Risk Matrix</h4>
+          <div className="grid grid-cols-3 gap-1 text-xs">
+            {displayData.risks.map((risk) => (
+              <div key={risk.id} className="p-2 bg-white/5 rounded text-center">
+                <div className="font-medium text-white truncate">{risk.name}</div>
+                <div className="text-gray-400">L:{Math.round(risk.likelihood*10)} I:{Math.round(risk.impact*10)}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

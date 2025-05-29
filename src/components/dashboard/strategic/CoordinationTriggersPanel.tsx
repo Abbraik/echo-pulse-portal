@@ -1,9 +1,9 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Users, AlertCircle, ArrowRight, Filter, RefreshCw, X } from 'lucide-react';
+import { Users, AlertCircle, ArrowRight, Filter, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FullscreenButton } from '@/components/ui/fullscreen-button';
 
 interface CoordinationTriggersPanelProps {
   data?: {
@@ -32,17 +32,13 @@ interface CoordinationTriggersPanelProps {
   onRedesignFlag?: (flagType: string) => void;
   onEscalationAction?: (action: string, zone: string) => void;
   onZoneLeadClick?: (zone: string) => void;
-  isFullscreen?: boolean;
-  onToggleFullscreen?: () => void;
 }
 
 export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps> = ({ 
   data, 
   onRedesignFlag, 
   onEscalationAction, 
-  onZoneLeadClick,
-  isFullscreen = false,
-  onToggleFullscreen
+  onZoneLeadClick 
 }) => {
   const [escalationFilter, setEscalationFilter] = useState('all');
 
@@ -99,167 +95,135 @@ export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps>
   };
 
   return (
-    <div className={`${
-      isFullscreen ? 'fixed inset-0 z-50 bg-black/60' : 'h-full'
-    }`}>
-      {isFullscreen && (
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onToggleFullscreen} />
-      )}
-      
-      <div className={`${
-        isFullscreen 
-          ? 'absolute inset-4 md:inset-8 bg-background/95 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden'
-          : 'h-full'
-      } glass-panel-deep p-6 flex flex-col`}>
-        
-        <div className="space-y-4 flex-1 overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-purple-400">Coordination & Triggers</h3>
-            <div className="flex items-center space-x-2">
-              <Button size="sm" variant="ghost" className="text-purple-400">
-                <RefreshCw size={14} className="mr-1" />
-                Refresh
-              </Button>
-              {onToggleFullscreen && (
-                <FullscreenButton
-                  isFullscreen={isFullscreen}
-                  onToggle={onToggleFullscreen}
-                />
-              )}
-              {isFullscreen && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={onToggleFullscreen}
-                  className="text-gray-400 hover:text-white"
-                  aria-label="Close full-screen view"
-                >
-                  <X size={16} />
-                </Button>
-              )}
-            </div>
-          </div>
+    <div className="h-full p-6">
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-purple-400">Coordination & Triggers</h3>
+          <Button size="sm" variant="ghost" className="text-purple-400">
+            <RefreshCw size={14} className="mr-1" />
+            Refresh
+          </Button>
+        </div>
 
-          {/* Redesign Flags Council */}
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-purple-400">Redesign Flags</h4>
-            <div className="space-y-1 max-h-24 overflow-y-auto">
-              {displayData.redesignFlags.map((flag) => (
-                <div 
-                  key={flag.id} 
-                  className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => onRedesignFlag?.(flag.pattern)}
-                >
-                  <div className="flex items-center space-x-2">
-                    <Badge className={getSeverityColor(flag.severity)}>
-                      {flag.severity}
-                    </Badge>
-                    <div>
-                      <div className="text-sm font-medium text-white">{flag.pattern}</div>
-                      <div className="text-xs text-gray-400">{flag.occurrences}x occurrences</div>
-                    </div>
+        {/* Redesign Flags Council */}
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-purple-400">Redesign Flags</h4>
+          <div className="space-y-1 max-h-24 overflow-y-auto">
+            {displayData.redesignFlags.map((flag) => (
+              <div 
+                key={flag.id} 
+                className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
+                onClick={() => onRedesignFlag?.(flag.pattern)}
+              >
+                <div className="flex items-center space-x-2">
+                  <Badge className={getSeverityColor(flag.severity)}>
+                    {flag.severity}
+                  </Badge>
+                  <div>
+                    <div className="text-sm font-medium text-white">{flag.pattern}</div>
+                    <div className="text-xs text-gray-400">{flag.occurrences}x occurrences</div>
                   </div>
-                  <Button size="sm" variant="ghost" className="text-xs">
-                    Details <ArrowRight size={12} className="ml-1" />
-                  </Button>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Facilitator Escalations */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-purple-400">Live Escalations</h4>
-              <div className="flex space-x-1">
-                <Button
-                  size="sm"
-                  variant={escalationFilter === 'all' ? 'default' : 'ghost'}
-                  className="text-xs h-6"
-                  onClick={() => setEscalationFilter('all')}
-                >
-                  All
-                </Button>
-                <Button
-                  size="sm"
-                  variant={escalationFilter === 'role' ? 'default' : 'ghost'}
-                  className="text-xs h-6"
-                  onClick={() => setEscalationFilter('role')}
-                >
-                  Role
-                </Button>
-                <Button
-                  size="sm"
-                  variant={escalationFilter === 'blocker' ? 'default' : 'ghost'}
-                  className="text-xs h-6"
-                  onClick={() => setEscalationFilter('blocker')}
-                >
-                  Blocker
+                <Button size="sm" variant="ghost" className="text-xs">
+                  Details <ArrowRight size={12} className="ml-1" />
                 </Button>
               </div>
-            </div>
-            <div className="space-y-1 max-h-24 overflow-y-auto">
-              {displayData.facilitatorEscalations
-                .filter(esc => escalationFilter === 'all' || esc.type === escalationFilter)
-                .map((escalation) => (
-                <div key={escalation.id} className="flex items-center justify-between p-2 bg-white/5 rounded">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <Badge variant="outline" className="text-xs">
-                        {escalation.type}
-                      </Badge>
-                      <span className={`text-xs font-medium ${getZoneColor(escalation.zone)}`}>
-                        {escalation.zone}
-                      </span>
-                    </div>
-                    <div className="text-sm text-white mt-1">{escalation.message}</div>
-                    <div className="text-xs text-gray-400">{escalation.timestamp}</div>
-                  </div>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="text-xs"
-                    onClick={() => onEscalationAction?.('reassign', escalation.zone)}
-                  >
-                    Reassign
-                  </Button>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
+        </div>
 
-          {/* Zone Leads Snapshot */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-purple-400">Zone Leads</h4>
-              <Button size="sm" variant="ghost" className="text-xs text-purple-400">
-                <Users size={12} className="mr-1" />
-                Council
+        {/* Facilitator Escalations */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium text-purple-400">Live Escalations</h4>
+            <div className="flex space-x-1">
+              <Button
+                size="sm"
+                variant={escalationFilter === 'all' ? 'default' : 'ghost'}
+                className="text-xs h-6"
+                onClick={() => setEscalationFilter('all')}
+              >
+                All
+              </Button>
+              <Button
+                size="sm"
+                variant={escalationFilter === 'role' ? 'default' : 'ghost'}
+                className="text-xs h-6"
+                onClick={() => setEscalationFilter('role')}
+              >
+                Role
+              </Button>
+              <Button
+                size="sm"
+                variant={escalationFilter === 'blocker' ? 'default' : 'ghost'}
+                className="text-xs h-6"
+                onClick={() => setEscalationFilter('blocker')}
+              >
+                Blocker
               </Button>
             </div>
-            <div className="grid grid-cols-1 gap-1 max-h-32 overflow-y-auto">
-              {displayData.zoneLeads.map((lead) => (
-                <div 
-                  key={lead.zone} 
-                  className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => onZoneLeadClick?.(lead.zone)}
-                >
+          </div>
+          <div className="space-y-1 max-h-24 overflow-y-auto">
+            {displayData.facilitatorEscalations
+              .filter(esc => escalationFilter === 'all' || esc.type === escalationFilter)
+              .map((escalation) => (
+              <div key={escalation.id} className="flex items-center justify-between p-2 bg-white/5 rounded">
+                <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <span className={`font-medium text-sm ${getZoneColor(lead.zone)}`}>
-                      {lead.zone}
+                    <Badge variant="outline" className="text-xs">
+                      {escalation.type}
+                    </Badge>
+                    <span className={`text-xs font-medium ${getZoneColor(escalation.zone)}`}>
+                      {escalation.zone}
                     </span>
-                    <div className="flex space-x-1 text-xs">
-                      <span className={getStatusColor(lead.status)}>
-                        {lead.deliveryQuality}%
-                      </span>
-                      <span className="text-gray-400">E:{lead.entropy}</span>
-                    </div>
                   </div>
-                  <div className="text-xs text-gray-400">{lead.lastLoopClosure}</div>
+                  <div className="text-sm text-white mt-1">{escalation.message}</div>
+                  <div className="text-xs text-gray-400">{escalation.timestamp}</div>
                 </div>
-              ))}
-            </div>
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="text-xs"
+                  onClick={() => onEscalationAction?.('reassign', escalation.zone)}
+                >
+                  Reassign
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Zone Leads Snapshot */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium text-purple-400">Zone Leads</h4>
+            <Button size="sm" variant="ghost" className="text-xs text-purple-400">
+              <Users size={12} className="mr-1" />
+              Council
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 gap-1 max-h-32 overflow-y-auto">
+            {displayData.zoneLeads.map((lead) => (
+              <div 
+                key={lead.zone} 
+                className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
+                onClick={() => onZoneLeadClick?.(lead.zone)}
+              >
+                <div className="flex items-center space-x-2">
+                  <span className={`font-medium text-sm ${getZoneColor(lead.zone)}`}>
+                    {lead.zone}
+                  </span>
+                  <div className="flex space-x-1 text-xs">
+                    <span className={getStatusColor(lead.status)}>
+                      {lead.deliveryQuality}%
+                    </span>
+                    <span className="text-gray-400">E:{lead.entropy}</span>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-400">{lead.lastLoopClosure}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTheme } from '@/hooks/use-theme';
 import { useAsymmetricPanels } from '@/hooks/use-asymmetric-panels';
-import { useFullscreenPanel } from '@/hooks/use-fullscreen-panel';
 import ParticlesBackground from '@/components/ui/particles-background';
 import DirectorHeader from '@/components/dashboard/DirectorHeader';
 import { ApprovalsDecisionsPanel } from '@/components/dashboard/strategic/ApprovalsDecisionsPanel';
@@ -31,6 +31,7 @@ const DirectorGeneralDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
   const [contextualSnapshot, setContextualSnapshot] = useState<ContextualSnapshot | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -43,14 +44,6 @@ const DirectorGeneralDashboard: React.FC = () => {
     resetLayout,
     isTransitioning
   } = useAsymmetricPanels(dashboardData);
-
-  // Fullscreen panel management
-  const {
-    fullscreenPanel,
-    toggleFullscreen,
-    exitFullscreen,
-    isFullscreen
-  } = useFullscreenPanel();
 
   // Check for mobile viewport
   useEffect(() => {
@@ -123,7 +116,7 @@ const DirectorGeneralDashboard: React.FC = () => {
   }, [resetLayout]);
 
   const handleFullscreen = (panelId: string) => {
-    toggleFullscreen(panelId as any);
+    setFullscreenPanel(panelId);
   };
 
   const handleContextualAction = (zone: ZoneType, trigger: string, panelId: string) => {
@@ -161,42 +154,24 @@ const DirectorGeneralDashboard: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>
       </div>
       
-      {/* Fullscreen Panel Overlays */}
+      {/* Fullscreen Panel Overlay */}
       <FullscreenOverlay
-        isOpen={isFullscreen('approvals')}
-        onClose={exitFullscreen}
-        title="Approvals & Decisions Panel"
+        isOpen={!!fullscreenPanel}
+        onClose={() => setFullscreenPanel(null)}
+        title={`${fullscreenPanel} Panel`}
       >
-        <ApprovalsDecisionsPanel 
-          data={dashboardData?.approvals}
-          onFocusMode={() => {}}
-          isFullscreen={true}
-          onToggleFullscreen={exitFullscreen}
-        />
-      </FullscreenOverlay>
-
-      <FullscreenOverlay
-        isOpen={isFullscreen('health')}
-        onClose={exitFullscreen}
-        title="System Health & Alerts Panel"
-      >
-        <SystemHealthAlertsPanel 
-          data={dashboardData?.systemHealth} 
-          isFullscreen={true}
-          onToggleFullscreen={exitFullscreen}
-        />
-      </FullscreenOverlay>
-
-      <FullscreenOverlay
-        isOpen={isFullscreen('coordination')}
-        onClose={exitFullscreen}
-        title="Coordination & Triggers Panel"
-      >
-        <CoordinationTriggersPanel 
-          data={dashboardData?.coordination}
-          isFullscreen={true}
-          onToggleFullscreen={exitFullscreen}
-        />
+        {fullscreenPanel === 'approvals' && (
+          <ApprovalsDecisionsPanel 
+            data={dashboardData?.approvals}
+            onFocusMode={() => {}}
+          />
+        )}
+        {fullscreenPanel === 'health' && (
+          <SystemHealthAlertsPanel data={dashboardData?.systemHealth} />
+        )}
+        {fullscreenPanel === 'coordination' && (
+          <CoordinationTriggersPanel data={dashboardData?.coordination} />
+        )}
       </FullscreenOverlay>
       
       <motion.div 
@@ -315,8 +290,6 @@ const DirectorGeneralDashboard: React.FC = () => {
                     handleContextualAction('THINK', `Approved: ${itemTitle}`, 'approvals');
                   }
                 }}
-                isFullscreen={false}
-                onToggleFullscreen={() => handleFullscreen('approvals')}
               />
             </AsymmetricPanelWrapper>
 
@@ -345,8 +318,6 @@ const DirectorGeneralDashboard: React.FC = () => {
                 onAlertClick={(alertType) => {
                   handleContextualAction('MONITOR', `Alert: ${alertType}`, 'health');
                 }}
-                isFullscreen={false}
-                onToggleFullscreen={() => handleFullscreen('health')}
               />
             </AsymmetricPanelWrapper>
 
@@ -383,8 +354,6 @@ const DirectorGeneralDashboard: React.FC = () => {
                 onZoneLeadClick={(zone) => {
                   handleContextualAction('LEARN', `Zone Lead: ${zone}`, 'coordination');
                 }}
-                isFullscreen={false}
-                onToggleFullscreen={() => handleFullscreen('coordination')}
               />
             </AsymmetricPanelWrapper>
           </div>
