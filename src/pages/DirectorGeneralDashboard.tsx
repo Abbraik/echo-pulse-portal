@@ -185,7 +185,7 @@ const DirectorGeneralDashboard: React.FC = () => {
         </motion.div>
         
         {/* Role Banner with enhanced styling */}
-        <div className="max-w-[1440px] mx-auto px-6 mb-8">
+        <div className="max-w-[1440px] mx-auto px-6 mb-8 mt-6">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
