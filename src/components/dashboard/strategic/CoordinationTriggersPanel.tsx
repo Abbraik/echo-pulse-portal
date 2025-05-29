@@ -95,10 +95,10 @@ export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps>
   };
 
   return (
-    <div className="h-full p-6">
-      <div className="space-y-4">
+    <div className="h-full p-6 flex flex-col">
+      <div className="flex-1 space-y-6 overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-shrink-0">
           <h3 className="text-lg font-semibold text-purple-400">Coordination & Triggers</h3>
           <Button size="sm" variant="ghost" className="text-purple-400">
             <RefreshCw size={14} className="mr-1" />
@@ -107,16 +107,16 @@ export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps>
         </div>
 
         {/* Redesign Flags Council */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h4 className="text-sm font-medium text-purple-400">Redesign Flags</h4>
-          <div className="space-y-1 max-h-24 overflow-y-auto">
+          <div className="space-y-2 max-h-32 overflow-y-auto">
             {displayData.redesignFlags.map((flag) => (
               <div 
                 key={flag.id} 
-                className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
+                className="flex items-center justify-between p-3 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
                 onClick={() => onRedesignFlag?.(flag.pattern)}
               >
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   <Badge className={getSeverityColor(flag.severity)}>
                     {flag.severity}
                   </Badge>
@@ -134,7 +134,7 @@ export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps>
         </div>
 
         {/* Facilitator Escalations */}
-        <div className="space-y-2">
+        <div className="space-y-3 flex-1 min-h-0">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium text-purple-400">Live Escalations</h4>
             <div className="flex space-x-1">
@@ -164,11 +164,11 @@ export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps>
               </Button>
             </div>
           </div>
-          <div className="space-y-1 max-h-24 overflow-y-auto">
+          <div className="space-y-2 flex-1 overflow-y-auto min-h-[120px]">
             {displayData.facilitatorEscalations
               .filter(esc => escalationFilter === 'all' || esc.type === escalationFilter)
               .map((escalation) => (
-              <div key={escalation.id} className="flex items-center justify-between p-2 bg-white/5 rounded">
+              <div key={escalation.id} className="flex items-center justify-between p-3 bg-white/5 rounded">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
                     <Badge variant="outline" className="text-xs">
@@ -195,7 +195,7 @@ export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps>
         </div>
 
         {/* Zone Leads Snapshot */}
-        <div className="space-y-2">
+        <div className="space-y-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium text-purple-400">Zone Leads</h4>
             <Button size="sm" variant="ghost" className="text-xs text-purple-400">
@@ -203,18 +203,18 @@ export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps>
               Council
             </Button>
           </div>
-          <div className="grid grid-cols-1 gap-1 max-h-32 overflow-y-auto">
+          <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
             {displayData.zoneLeads.map((lead) => (
               <div 
                 key={lead.zone} 
-                className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
+                className="flex items-center justify-between p-3 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
                 onClick={() => onZoneLeadClick?.(lead.zone)}
               >
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   <span className={`font-medium text-sm ${getZoneColor(lead.zone)}`}>
                     {lead.zone}
                   </span>
-                  <div className="flex space-x-1 text-xs">
+                  <div className="flex space-x-2 text-xs">
                     <span className={getStatusColor(lead.status)}>
                       {lead.deliveryQuality}%
                     </span>

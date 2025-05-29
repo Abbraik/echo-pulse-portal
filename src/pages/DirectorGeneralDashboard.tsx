@@ -174,11 +174,11 @@ const DirectorGeneralDashboard: React.FC = () => {
         </div>
         
         {/* Role Banner with enhanced styling */}
-        <div className="max-w-[1440px] mx-auto px-6 mb-8 mt-6">
+        <div className="max-w-[1440px] mx-auto px-6 mb-6 mt-6">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-2xl p-8"
+            className="relative overflow-hidden rounded-2xl p-6"
             style={{ 
               background: 'rgba(20, 30, 50, 0.6)',
               backdropFilter: 'blur(24px)',
@@ -194,7 +194,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             <div className="relative flex items-center justify-between">
               <div>
                 <motion.h1 
-                  className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400"
+                  className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400"
                   style={{ letterSpacing: '0.05em' }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -203,7 +203,7 @@ const DirectorGeneralDashboard: React.FC = () => {
                   {greeting}, Director General
                 </motion.h1>
                 <motion.p 
-                  className="text-base text-gray-300 mt-3"
+                  className="text-sm text-gray-300 mt-2"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
@@ -213,18 +213,18 @@ const DirectorGeneralDashboard: React.FC = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <motion.div 
-                  className="w-4 h-4 bg-green-400 rounded-full"
+                  className="w-3 h-3 bg-green-400 rounded-full"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 ></motion.div>
-                <span className="text-sm text-gray-400">Last Update: {lastUpdate.toLocaleTimeString()}</span>
+                <span className="text-xs text-gray-400">Last Update: {lastUpdate.toLocaleTimeString()}</span>
               </div>
             </div>
           </motion.div>
         </div>
 
         {/* Global Search Bar */}
-        <div className="max-w-[1440px] mx-auto px-6 mb-6">
+        <div className="max-w-[1440px] mx-auto px-6 mb-4">
           <motion.div 
             className="relative max-w-md"
             initial={{ opacity: 0, y: 20 }}
@@ -237,19 +237,19 @@ const DirectorGeneralDashboard: React.FC = () => {
               id="global-search"
               type="text"
               placeholder="Global search..."
-              className="pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent backdrop-blur-md w-80"
+              className="pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent backdrop-blur-md w-80"
             />
           </motion.div>
         </div>
 
         {/* Today's Snapshot */}
-        <div className="max-w-[1440px] mx-auto px-6 mb-6">
+        <div className="max-w-[1440px] mx-auto px-6 mb-4">
           <TodaysSnapshot data={dashboardData?.todaysSnapshot} />
         </div>
 
-        {/* Main Cockpit Panels */}
-        <div className="max-w-[1440px] mx-auto px-6" ref={containerRef}>
-          <div className={`flex gap-8 h-[50vh] ${isMobile ? 'flex-col h-auto' : ''}`}>
+        {/* Main Cockpit Panels - Increased height */}
+        <div className="max-w-[1440px] mx-auto px-6 pb-6" ref={containerRef}>
+          <div className={`flex gap-8 h-[calc(100vh-280px)] min-h-[600px] ${isMobile ? 'flex-col h-auto' : ''}`}>
             {/* Approvals & Decisions Panel */}
             <CompactPanelWrapper
               panelId="approvals"

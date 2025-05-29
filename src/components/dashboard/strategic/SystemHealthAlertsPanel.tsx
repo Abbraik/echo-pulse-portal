@@ -68,10 +68,10 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
   };
 
   return (
-    <div className="h-full p-6">
-      <div className="space-y-4">
+    <div className="h-full p-6 flex flex-col">
+      <div className="flex-1 space-y-6 overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-shrink-0">
           <h3 className="text-lg font-semibold text-teal-400">System Health & Alerts</h3>
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -80,32 +80,32 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
         </div>
 
         {/* Composite Gauge */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-6 flex-shrink-0">
+          <div className="space-y-3">
             <h4 className="text-sm font-medium text-teal-400">DEI Score</h4>
-            <div className="relative h-24 w-24 mx-auto">
+            <div className="relative h-32 w-32 mx-auto">
               <div className="absolute inset-0 rounded-full border-8 border-gray-700/30"></div>
               <div 
                 className="absolute inset-0 rounded-full border-8 border-t-teal-400 border-r-transparent border-b-transparent border-l-transparent"
                 style={{ transform: `rotate(${(displayData.deiScore / 100) * 360}deg)` }}
               ></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-bold text-teal-400">{displayData.deiScore}</span>
+                <span className="text-xl font-bold text-teal-400">{displayData.deiScore}</span>
               </div>
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <h4 className="text-sm font-medium text-teal-400">PSIU Balance</h4>
-            <div className="relative h-24 w-24 mx-auto">
+            <div className="relative h-32 w-32 mx-auto">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={pieData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={20}
-                    outerRadius={40}
+                    innerRadius={25}
+                    outerRadius={50}
                     dataKey="value"
                     stroke="none"
                   >
@@ -120,11 +120,11 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
         </div>
 
         {/* Entropy Sparklines */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h4 className="text-sm font-medium text-teal-400">Entropy Trends</h4>
-          <div className="grid grid-cols-5 gap-1 text-xs">
+          <div className="grid grid-cols-5 gap-2 text-xs">
             {displayData.entropyTrend.map((zone) => (
-              <div key={zone.zone} className="text-center p-1 bg-white/5 rounded">
+              <div key={zone.zone} className="text-center p-2 bg-white/5 rounded">
                 <div className="font-medium text-white">{zone.zone}</div>
                 <div className={`flex items-center justify-center ${zone.trend > 0 ? 'text-red-400' : 'text-green-400'}`}>
                   {zone.trend > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
@@ -136,17 +136,17 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
         </div>
 
         {/* Alert Ticker */}
-        <div className="space-y-2">
+        <div className="space-y-3 flex-1 min-h-0">
           <h4 className="text-sm font-medium text-teal-400">Active Alerts</h4>
-          <div className="max-h-32 overflow-y-auto space-y-1">
+          <div className="flex-1 overflow-y-auto space-y-2 min-h-[120px]">
             {displayData.alerts.map((alert) => (
               <div 
                 key={alert.id} 
-                className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
+                className="flex items-center justify-between p-3 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
                 onClick={() => onAlertClick?.(alert.type)}
               >
-                <div className="flex items-center space-x-2">
-                  <AlertTriangle size={14} className="text-orange-400" />
+                <div className="flex items-center space-x-3">
+                  <AlertTriangle size={16} className="text-orange-400" />
                   <span className="text-sm text-white">{alert.message}</span>
                 </div>
                 <Badge className={getSeverityColor(alert.severity)}>
@@ -158,13 +158,13 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
         </div>
 
         {/* Risk Overview */}
-        <div className="space-y-2">
+        <div className="space-y-3 flex-shrink-0">
           <h4 className="text-sm font-medium text-teal-400">Risk Matrix</h4>
-          <div className="grid grid-cols-3 gap-1 text-xs">
+          <div className="grid grid-cols-3 gap-2 text-xs">
             {displayData.risks.map((risk) => (
-              <div key={risk.id} className="p-2 bg-white/5 rounded text-center">
+              <div key={risk.id} className="p-3 bg-white/5 rounded text-center">
                 <div className="font-medium text-white truncate">{risk.name}</div>
-                <div className="text-gray-400">L:{Math.round(risk.likelihood*10)} I:{Math.round(risk.impact*10)}</div>
+                <div className="text-gray-400 mt-1">L:{Math.round(risk.likelihood*10)} I:{Math.round(risk.impact*10)}</div>
               </div>
             ))}
           </div>
