@@ -174,16 +174,6 @@ const DirectorGeneralDashboard: React.FC = () => {
           <DirectorHeader />
         </div>
         
-        {/* Loop Ribbon with parallax effect */}
-        <motion.div 
-          className="sticky top-16 z-30 mb-6"
-          style={{ y: 0 }}
-          whileInView={{ y: -2 }}
-          transition={{ duration: 0.3 }}
-        >
-          <LoopRibbon />
-        </motion.div>
-        
         {/* Role Banner with enhanced styling */}
         <div className="max-w-[1440px] mx-auto px-6 mb-8 mt-6">
           <motion.div
