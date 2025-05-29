@@ -15,9 +15,10 @@ interface SystemHealthAlertsPanelProps {
     alerts: Array<{ id: string; type: 'health' | 'loop' | 'operational'; message: string; severity: 'high' | 'medium' | 'low' }>;
     risks: Array<{ id: string; name: string; likelihood: number; impact: number }>;
   };
+  onAlertClick?: (alertType: string) => void;
 }
 
-export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = ({ data }) => {
+export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = ({ data, onAlertClick }) => {
   // Mock data if not provided
   const mockData = {
     deiScore: 78.5,
@@ -67,7 +68,7 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
   };
 
   return (
-    <GlassCard className="h-full p-4 bg-teal-500/10 border-teal-500/30">
+    <div className="h-full p-6">
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -139,7 +140,11 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
           <h4 className="text-sm font-medium text-teal-400">Active Alerts</h4>
           <div className="max-h-32 overflow-y-auto space-y-1">
             {displayData.alerts.map((alert) => (
-              <div key={alert.id} className="flex items-center justify-between p-2 bg-white/5 rounded">
+              <div 
+                key={alert.id} 
+                className="flex items-center justify-between p-2 bg-white/5 rounded cursor-pointer hover:bg-white/10 transition-colors"
+                onClick={() => onAlertClick?.(alert.type)}
+              >
                 <div className="flex items-center space-x-2">
                   <AlertTriangle size={14} className="text-orange-400" />
                   <span className="text-sm text-white">{alert.message}</span>
@@ -165,6 +170,6 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
           </div>
         </div>
       </div>
-    </GlassCard>
+    </div>
   );
 };

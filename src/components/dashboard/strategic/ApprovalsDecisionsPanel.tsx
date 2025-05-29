@@ -27,11 +27,13 @@ interface ApprovalsDecisionsPanelProps {
     items: ApprovalItem[];
   };
   onFocusMode?: (isFocused: boolean) => void;
+  onContextualAction?: (action: string, itemTitle: string) => void;
 }
 
 export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = ({ 
   data, 
-  onFocusMode 
+  onFocusMode,
+  onContextualAction 
 }) => {
   const { toast } = useToast();
   
@@ -216,6 +218,9 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         description: `${approveModal.item.title} has been approved successfully.`,
         duration: 3000,
       });
+
+      // Trigger contextual action
+      onContextualAction?.('approve', approveModal.item.title);
       
       setApproveModal({ open: false, item: null });
       setSelectedRowId(null);
@@ -361,20 +366,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
 
   return (
     <>
-      <div 
-        className={`h-full flex flex-col transition-all duration-300 ${focusMode ? 'ring-2 ring-teal-500 ring-opacity-50' : ''}`}
-        style={{ 
-          background: 'rgba(10, 20, 40, 0.6)',
-          backdropFilter: 'blur(20px)',
-          border: focusMode ? '2px solid rgba(20, 184, 166, 0.5)' : '1px solid rgba(20, 184, 166, 0.3)',
-          borderRadius: '2rem',
-          padding: '24px',
-          margin: '0',
-          boxShadow: focusMode 
-            ? 'inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 40px rgba(20, 184, 166, 0.3)'
-            : 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
-        }}
-      >
+      <div className="h-full flex flex-col p-6">
         {/* Title Bar */}
         <div className="flex items-center justify-between h-12 mb-6 border-b border-teal-500/30 pb-4">
           <div className="flex items-center gap-3">
@@ -384,24 +376,6 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
             <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50 text-sm">
               Live
             </Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              onClick={toggleFocusMode}
-              className={`text-gray-400 hover:text-teal-400 transition-colors ${focusMode ? 'text-teal-400' : ''}`}
-              aria-pressed={focusMode}
-            >
-              <Focus size={16} />
-            </Button>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="text-gray-400 hover:text-teal-400"
-            >
-              <ExternalLink size={16} />
-            </Button>
           </div>
         </div>
 

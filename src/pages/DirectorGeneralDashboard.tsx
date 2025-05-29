@@ -1,32 +1,46 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTheme } from '@/hooks/use-theme';
-import { useFullscreenDashboard } from '@/hooks/use-fullscreen-dashboard';
 import ParticlesBackground from '@/components/ui/particles-background';
 import DirectorHeader from '@/components/dashboard/DirectorHeader';
-import TodaysSnapshot from '@/components/dashboard/enhanced/TodaysSnapshot';
-import EnhancedApprovalsPanel from '@/components/dashboard/enhanced/EnhancedApprovalsPanel';
-import EnhancedSystemHealthPanel from '@/components/dashboard/enhanced/EnhancedSystemHealthPanel';
-import EnhancedCoordinationPanel from '@/components/dashboard/enhanced/EnhancedCoordinationPanel';
-import PersonalizationSidebar from '@/components/dashboard/enhanced/PersonalizationSidebar';
-import ZoneSnapshotGrid from '@/components/dashboard/enhanced/ZoneSnapshotGrid';
+import { ApprovalsDecisionsPanel } from '@/components/dashboard/strategic/ApprovalsDecisionsPanel';
+import { SystemHealthAlertsPanel } from '@/components/dashboard/strategic/SystemHealthAlertsPanel';
+import { CoordinationTriggersPanel } from '@/components/dashboard/strategic/CoordinationTriggersPanel';
+import { LoopRibbon } from '@/components/dashboard/enhanced/LoopRibbon';
+import { ZoneSnapshot } from '@/components/dashboard/enhanced/ZoneSnapshot';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import { getDashboardData } from '@/api/dashboard';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
-import DynamicPanelContainer from '@/components/dashboard/enhanced/DynamicPanelContainer';
+import { X, Maximize2 } from 'lucide-react';
+
+type ZoneType = 'THINK' | 'ACT' | 'MONITOR' | 'LEARN' | 'INNOVATE';
+
+interface ContextualSnapshot {
+  zone: ZoneType;
+  trigger: string;
+  panelId: string;
+}
 
 const DirectorGeneralDashboard: React.FC = () => {
   const { t, isRTL } = useTranslation();
   const { resolvedTheme } = useTheme();
-  const { fullscreenPanel, toggleFullscreen, exitFullscreen, isFullscreen } = useFullscreenDashboard();
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'full' | 'approvals' | 'health'>('full');
   const [lastUpdate, setLastUpdate] = useState(new Date());
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [hoveredPanel, setHoveredPanel] = useState<string | null>(null);
+  const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
+  const [contextualSnapshot, setContextualSnapshot] = useState<ContextualSnapshot | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check for mobile viewport
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,13 +57,53 @@ const DirectorGeneralDashboard: React.FC = () => {
 
     fetchData();
     
-    // Set up real-time updates
     const interval = setInterval(() => {
       fetchData();
-    }, 30000); // Update every 30 seconds
+    }, 30000);
     
     return () => clearInterval(interval);
   }, []);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      switch (e.key.toLowerCase()) {
+        case 'escape':
+          e.preventDefault();
+          setFullscreenPanel(null);
+          setContextualSnapshot(null);
+          break;
+        case 'f':
+          e.preventDefault();
+          // Focus on filter functionality
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleFocusMode = (panelId: string) => {
+    setHoveredPanel(panelId);
+  };
+
+  const handleFullscreen = (panelId: string) => {
+    setFullscreenPanel(panelId);
+  };
+
+  const handleContextualAction = (zone: ZoneType, trigger: string, panelId: string) => {
+    setContextualSnapshot({ zone, trigger, panelId });
+  };
+
+  const getPanelWidth = (panelId: string) => {
+    if (isMobile) return 'w-full';
+    if (hoveredPanel === panelId) return 'w-[60%]';
+    if (hoveredPanel && hoveredPanel !== panelId) return 'w-[20%]';
+    return 'w-[33.333%]';
+  };
 
   if (loading) {
     return (
@@ -66,188 +120,243 @@ const DirectorGeneralDashboard: React.FC = () => {
   const hour = currentTime.getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
-  const renderFullscreenContent = () => {
-    switch (fullscreenPanel) {
-      case 'snapshot':
-        return (
-          <TodaysSnapshot 
-            data={dashboardData?.snapshot} 
-            lastUpdate={lastUpdate}
-            isFullscreen={true}
-            onToggleFullscreen={() => toggleFullscreen('snapshot')}
-          />
-        );
-      case 'approvals':
-        return (
-          <EnhancedApprovalsPanel 
-            data={dashboardData?.approvals}
-            onViewModeChange={setViewMode}
-            currentMode={viewMode}
-            isFullscreen={true}
-            onToggleFullscreen={() => toggleFullscreen('approvals')}
-          />
-        );
-      case 'health':
-        return (
-          <EnhancedSystemHealthPanel 
-            data={dashboardData?.systemHealth}
-            onViewModeChange={setViewMode}
-            currentMode={viewMode}
-            isFullscreen={true}
-            onToggleFullscreen={() => toggleFullscreen('health')}
-          />
-        );
-      case 'coordination':
-        return (
-          <EnhancedCoordinationPanel 
-            data={dashboardData?.coordination}
-            isFullscreen={true}
-            onToggleFullscreen={() => toggleFullscreen('coordination')}
-          />
-        );
-      case 'zones':
-        return (
-          <ZoneSnapshotGrid 
-            data={dashboardData?.zones}
-            isFullscreen={true}
-            onToggleFullscreen={() => toggleFullscreen('zones')}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className={`min-h-screen bg-background text-foreground relative ${isRTL ? 'rtl' : 'ltr'}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-foreground relative ${isRTL ? 'rtl' : 'ltr'}`}>
       {/* Animated background */}
       <div className="fixed inset-0 z-0">
-        <ParticlesBackground count={60} colorStart="#14B8A680" colorEnd="#2563EB80" />
+        <ParticlesBackground count={80} colorStart="#14B8A680" colorEnd="#2563EB80" />
       </div>
       
       {/* Fullscreen Panel Overlay */}
       <FullscreenOverlay
         isOpen={!!fullscreenPanel}
-        onClose={exitFullscreen}
+        onClose={() => setFullscreenPanel(null)}
         title={`${fullscreenPanel} Panel`}
       >
-        {renderFullscreenContent()}
+        {fullscreenPanel === 'approvals' && (
+          <ApprovalsDecisionsPanel 
+            data={dashboardData?.approvals}
+            onFocusMode={() => {}}
+          />
+        )}
+        {fullscreenPanel === 'health' && (
+          <SystemHealthAlertsPanel data={dashboardData?.systemHealth} />
+        )}
+        {fullscreenPanel === 'coordination' && (
+          <CoordinationTriggersPanel data={dashboardData?.coordination} />
+        )}
       </FullscreenOverlay>
       
-      {/* Main Dashboard Container */}
-      <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Director Header with Role Banner */}
+      <div className="relative z-10 min-h-screen">
+        {/* Director Header */}
         <div className="flex-shrink-0 z-20">
           <DirectorHeader />
         </div>
         
-        {/* Welcome Message */}
-        <AnimatePresence>
-          {showWelcome && (
+        {/* Loop Ribbon */}
+        <div className="sticky top-16 z-30 mb-6">
+          <LoopRibbon />
+        </div>
+        
+        {/* Role Banner */}
+        <div className="max-w-[1440px] mx-auto px-6 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-2xl p-6"
+            style={{ 
+              background: 'rgba(10, 20, 40, 0.6)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(20, 184, 166, 0.3)',
+              boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.1), 0 0 40px rgba(20, 184, 166, 0.2)'
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400">
+                  {greeting}, Director General
+                </h1>
+                <p className="text-sm text-gray-300 mt-2">
+                  Strategic Command Center • {dashboardData?.pending || 12} items require your attention • Live Sync Active
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-gray-400">Last Update: {lastUpdate.toLocaleTimeString()}</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Main Cockpit Panels */}
+        <div className="max-w-[1440px] mx-auto px-6">
+          <div className={`flex gap-6 h-[45vh] ${isMobile ? 'flex-col h-auto' : ''}`}>
+            {/* Approvals & Decisions Panel */}
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mx-4 mt-4 mb-6"
+              className={`${getPanelWidth('approvals')} transition-all duration-300 ${isMobile ? 'mb-4' : ''}`}
+              onMouseEnter={() => !isMobile && setHoveredPanel('approvals')}
+              onMouseLeave={() => !isMobile && setHoveredPanel(null)}
+              onFocus={() => handleFocusMode('approvals')}
+              style={{ 
+                background: 'rgba(10, 20, 40, 0.6)',
+                backdropFilter: 'blur(20px)',
+                border: hoveredPanel === 'approvals' ? '2px solid rgba(20, 184, 166, 0.5)' : '1px solid rgba(20, 184, 166, 0.3)',
+                borderRadius: '2rem',
+                boxShadow: hoveredPanel === 'approvals' 
+                  ? 'inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 40px rgba(20, 184, 166, 0.3)'
+                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
+              }}
             >
-              <div 
-                className="p-4 rounded-2xl relative overflow-hidden"
-                style={{ 
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(20, 184, 166, 0.3)',
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
-                      {greeting}, Director General
-                    </h1>
-                    <p className="text-sm text-gray-400 mt-1">
-                      Welcome to your strategic command center. {dashboardData?.pending || 12} items require your attention.
-                    </p>
-                  </div>
+              <div className="relative h-full">
+                <div className="absolute top-4 right-4 z-10">
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setShowWelcome(false)}
-                    className="text-gray-400 hover:text-white"
+                    onClick={() => handleFullscreen('approvals')}
+                    className="text-gray-400 hover:text-teal-400"
                   >
-                    <X size={16} />
+                    <Maximize2 size={16} />
                   </Button>
                 </div>
+                <ApprovalsDecisionsPanel 
+                  data={dashboardData?.approvals}
+                  onFocusMode={(isFocused) => handleFocusMode(isFocused ? 'approvals' : '')}
+                  onContextualAction={(action, itemTitle) => {
+                    if (action === 'approve') {
+                      // Inject relevant zone snapshot based on approval type
+                      handleContextualAction('THINK', `Approved: ${itemTitle}`, 'approvals');
+                    }
+                  }}
+                />
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-        
-        {/* Main Content */}
-        <div className="flex-1 flex relative">
-          {/* Primary Dashboard Content */}
-          <div 
-            className={`flex-1 transition-all duration-300 ease-in-out ${
-              sidebarCollapsed ? 'mr-0' : 'mr-80'
-            }`}
-          >
-            <div className="container mx-auto px-4 py-6">
-              {/* Today's Snapshot - Fixed height with proper spacing */}
-              <motion.section 
-                className="mb-8"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
+
+            {/* System Health & Alerts Panel */}
+            <motion.div
+              className={`${getPanelWidth('health')} transition-all duration-300 ${isMobile ? 'mb-4' : ''}`}
+              onMouseEnter={() => !isMobile && setHoveredPanel('health')}
+              onMouseLeave={() => !isMobile && setHoveredPanel(null)}
+              onFocus={() => handleFocusMode('health')}
+              style={{ 
+                background: 'rgba(10, 20, 40, 0.6)',
+                backdropFilter: 'blur(20px)',
+                border: hoveredPanel === 'health' ? '2px solid rgba(20, 184, 166, 0.5)' : '1px solid rgba(20, 184, 166, 0.3)',
+                borderRadius: '2rem',
+                boxShadow: hoveredPanel === 'health' 
+                  ? 'inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 40px rgba(20, 184, 166, 0.3)'
+                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
+              }}
+            >
+              <div className="relative h-full">
+                <div className="absolute top-4 right-4 z-10">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleFullscreen('health')}
+                    className="text-gray-400 hover:text-teal-400"
+                  >
+                    <Maximize2 size={16} />
+                  </Button>
+                </div>
+                <SystemHealthAlertsPanel 
+                  data={dashboardData?.systemHealth}
+                  onAlertClick={(alertType) => {
+                    handleContextualAction('MONITOR', `Alert: ${alertType}`, 'health');
+                  }}
+                />
+              </div>
+            </motion.div>
+
+            {/* Coordination & Triggers Panel */}
+            <motion.div
+              className={`${getPanelWidth('coordination')} transition-all duration-300`}
+              onMouseEnter={() => !isMobile && setHoveredPanel('coordination')}
+              onMouseLeave={() => !isMobile && setHoveredPanel(null)}
+              onFocus={() => handleFocusMode('coordination')}
+              style={{ 
+                background: 'rgba(10, 20, 40, 0.6)',
+                backdropFilter: 'blur(20px)',
+                border: hoveredPanel === 'coordination' ? '2px solid rgba(20, 184, 166, 0.5)' : '1px solid rgba(20, 184, 166, 0.3)',
+                borderRadius: '2rem',
+                boxShadow: hoveredPanel === 'coordination' 
+                  ? 'inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 40px rgba(20, 184, 166, 0.3)'
+                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
+              }}
+            >
+              <div className="relative h-full">
+                <div className="absolute top-4 right-4 z-10">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleFullscreen('coordination')}
+                    className="text-gray-400 hover:text-teal-400"
+                  >
+                    <Maximize2 size={16} />
+                  </Button>
+                </div>
+                <CoordinationTriggersPanel 
+                  data={dashboardData?.coordination}
+                  onRedesignFlag={(flagType) => {
+                    handleContextualAction('INNOVATE', `Redesign Flag: ${flagType}`, 'coordination');
+                  }}
+                  onEscalationAction={(action, zone) => {
+                    if (action === 'reassign') {
+                      handleContextualAction('ACT', `Reassignment in ${zone}`, 'coordination');
+                    }
+                  }}
+                  onZoneLeadClick={(zone) => {
+                    handleContextualAction('LEARN', `Zone Lead: ${zone}`, 'coordination');
+                  }}
+                />
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Contextual Zone Snapshots */}
+          <AnimatePresence>
+            {contextualSnapshot && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="mt-6"
               >
-                <div className="h-24 relative">
-                  <TodaysSnapshot 
-                    data={dashboardData?.snapshot} 
-                    lastUpdate={lastUpdate}
-                    onToggleFullscreen={() => toggleFullscreen('snapshot')}
+                <div 
+                  className="relative overflow-hidden rounded-2xl p-6"
+                  style={{ 
+                    background: 'rgba(10, 20, 40, 0.4)',
+                    backdropFilter: 'blur(15px)',
+                    border: '1px solid rgba(20, 184, 166, 0.2)',
+                    boxShadow: 'inset 0 0 20px rgba(20, 184, 166, 0.05)'
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <h3 className="text-lg font-semibold text-teal-400">
+                        {contextualSnapshot.zone} Zone Snapshot
+                      </h3>
+                      <span className="text-sm text-gray-400">
+                        Triggered by: {contextualSnapshot.trigger}
+                      </span>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setContextualSnapshot(null)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <X size={16} />
+                    </Button>
+                  </div>
+                  <ZoneSnapshot 
+                    zone={contextualSnapshot.zone}
+                    data={dashboardData?.zones?.[contextualSnapshot.zone.toLowerCase()]}
                   />
                 </div>
-              </motion.section>
-              
-              {/* Dynamic Panels Container */}
-              <motion.section
-                className="mb-12"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <DynamicPanelContainer
-                  dashboardData={dashboardData}
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
-                  onToggleFullscreen={toggleFullscreen}
-                />
-              </motion.section>
-
-              {/* Zone Snapshots - Proper spacing from main panels */}
-              {viewMode === 'full' && (
-                <motion.section
-                  className="mt-12"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <ZoneSnapshotGrid 
-                    data={dashboardData?.zones}
-                    onToggleFullscreen={() => toggleFullscreen('zones')}
-                  />
-                </motion.section>
-              )}
-            </div>
-          </div>
-
-          {/* Personalization Sidebar - Fixed positioning */}
-          <div className="fixed top-0 right-0 h-full z-30">
-            <PersonalizationSidebar 
-              isCollapsed={sidebarCollapsed}
-              onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-              data={dashboardData?.personalization}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-            />
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
