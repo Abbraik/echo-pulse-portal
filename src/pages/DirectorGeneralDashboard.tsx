@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -16,6 +15,22 @@ import { CompactPanelWrapper } from '@/components/dashboard/enhanced/CompactPane
 import { getDashboardData } from '@/api/dashboard';
 import { Button } from '@/components/ui/button';
 import { X, Maximize2, Search, Bell, Plus } from 'lucide-react';
+import { MasonryGrid } from '@/components/dashboard/masonry/MasonryGrid';
+import { 
+  LargeApprovalCard, 
+  MediumApprovalCard, 
+  SmallApprovalCard 
+} from '@/components/dashboard/masonry/ApprovalCards';
+import { 
+  LargeHealthCard, 
+  MediumHealthCard, 
+  SmallHealthCard 
+} from '@/components/dashboard/masonry/HealthCards';
+import { 
+  LargeCoordinationCard, 
+  MediumCoordinationCard, 
+  SmallCoordinationCard 
+} from '@/components/dashboard/masonry/CoordinationCards';
 
 type ZoneType = 'THINK' | 'ACT' | 'MONITOR' | 'LEARN' | 'INNOVATE';
 
@@ -72,6 +87,20 @@ const DirectorGeneralDashboard: React.FC = () => {
         setNotificationCount(prev => prev + 1);
       }
     }, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Auto-refresh for live updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Simulate live data updates with subtle pulse animation
+      const cards = document.querySelectorAll('.glass-masonry-card');
+      cards.forEach(card => {
+        card.classList.add('animate-pulse');
+        setTimeout(() => card.classList.remove('animate-pulse'), 200);
+      });
+    }, 10000);
     
     return () => clearInterval(interval);
   }, []);
@@ -202,7 +231,7 @@ const DirectorGeneralDashboard: React.FC = () => {
               <div>
                 <motion.h1 
                   className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400"
-                  style={{ letterSpacing: '0.05em' }}
+                  style={{ letterSpacing: '0.05em', fontFamily: 'Noto Sans' }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
@@ -211,6 +240,7 @@ const DirectorGeneralDashboard: React.FC = () => {
                 </motion.h1>
                 <motion.p 
                   className="text-base text-gray-300 mt-3"
+                  style={{ fontFamily: 'Noto Sans' }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
@@ -235,212 +265,166 @@ const DirectorGeneralDashboard: React.FC = () => {
           <TodaysSnapshot data={dashboardData?.todaysSnapshot} />
         </div>
 
-        {/* Main Cockpit Panels */}
-        <div className="max-w-[1440px] mx-auto px-6" ref={containerRef}>
-          <div className={`flex gap-8 h-[50vh] ${isMobile ? 'flex-col h-auto' : ''}`}>
-            {/* Approvals & Decisions Panel */}
-            <CompactPanelWrapper
-              panelId="approvals"
-              className={`${getPanelWidth('approvals')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
-              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'approvals' : null)}
-              onFullscreen={() => handleFullscreen('approvals')}
-              compactSummary={{
-                title: "Approvals",
-                items: [
-                  { id: '1', title: 'Infrastructure Development Package', priority: 'high' },
-                  { id: '3', title: 'THINK Zone Restructure', priority: 'high' }
-                ],
-                stats: { pending: dashboardData?.approvals?.pending || 12, overdue: 3 }
-              }}
-            >
-              <ApprovalsDecisionsPanel 
-                data={dashboardData?.approvals}
-                onFocusMode={(isFocused) => handleFocusMode(isFocused ? 'approvals' : '')}
-                onContextualAction={(action, itemTitle) => {
-                  if (action === 'approve') {
-                    handleContextualAction('THINK', `Approved: ${itemTitle}`, 'approvals');
-                  }
-                }}
-              />
-            </CompactPanelWrapper>
+        {/* Masonry Grid Dashboard Panels */}
+        <MasonryGrid columns={3} gap={16}>
+          {/* Approvals Cards */}
+          <LargeApprovalCard 
+            onClick={() => handleFullscreen('approvals')}
+            onHover={(isHovered: boolean) => !isMobile && setHoveredPanel(isHovered ? 'approvals' : null)}
+          />
+          <MediumApprovalCard 
+            onClick={() => handleFullscreen('approvals')}
+          />
+          <SmallApprovalCard 
+            onClick={() => handleFullscreen('approvals')}
+          />
+          
+          {/* Health Cards */}
+          <LargeHealthCard 
+            onClick={() => handleFullscreen('health')}
+            onHover={(isHovered: boolean) => !isMobile && setHoveredPanel(isHovered ? 'health' : null)}
+          />
+          <MediumHealthCard 
+            onClick={() => handleFullscreen('health')}
+          />
+          <SmallHealthCard 
+            onClick={() => handleFullscreen('health')}
+          />
+          
+          {/* Coordination Cards */}
+          <LargeCoordinationCard 
+            onClick={() => handleFullscreen('coordination')}
+            onHover={(isHovered: boolean) => !isMobile && setHoveredPanel(isHovered ? 'coordination' : null)}
+          />
+          <MediumCoordinationCard 
+            onClick={() => handleFullscreen('coordination')}
+          />
+          <SmallCoordinationCard 
+            onClick={() => handleFullscreen('coordination')}
+          />
+        </MasonryGrid>
 
-            {/* System Health & Alerts Panel */}
-            <CompactPanelWrapper
-              panelId="health"
-              className={`${getPanelWidth('health')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
-              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'health' : null)}
-              onFullscreen={() => handleFullscreen('health')}
-              compactSummary={{
-                title: "System Health",
-                items: [
-                  { id: '1', title: 'DEI score trending down', severity: 'medium' },
-                  { id: '2', title: 'THINK loop closure delayed', severity: 'high' }
-                ],
-                stats: { deiScore: 78.5, worstDrift: 'innovator' }
-              }}
+        {/* Contextual Zone Snapshots */}
+        <AnimatePresence>
+          {contextualSnapshot && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, y: 20 }}
+              animate={{ opacity: 1, height: 'auto', y: 0 }}
+              exit={{ opacity: 0, height: 0, y: 20 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="mt-8"
             >
-              <SystemHealthAlertsPanel 
-                data={dashboardData?.systemHealth}
-                onAlertClick={(alertType) => {
-                  handleContextualAction('MONITOR', `Alert: ${alertType}`, 'health');
+              <div 
+                className="relative overflow-hidden rounded-2xl p-8"
+                style={{ 
+                  background: 'rgba(20, 30, 50, 0.4)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(20, 184, 166, 0.25)',
+                  boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.1), 0 8px 24px rgba(0, 0, 0, 0.3)'
                 }}
-              />
-            </CompactPanelWrapper>
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-4">
+                    <motion.h3 
+                      className="text-xl font-semibold text-teal-400"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      {contextualSnapshot.zone} Zone Snapshot
+                    </motion.h3>
+                    <motion.span 
+                      className="text-sm text-gray-400"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      Triggered by: {contextualSnapshot.trigger}
+                    </motion.span>
+                  </div>
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setContextualSnapshot(null)}
+                      className="text-gray-400 hover:text-white hover:bg-white/10"
+                    >
+                      <X size={16} />
+                    </Button>
+                  </motion.div>
+                </div>
+                <ZoneSnapshot 
+                  zone={contextualSnapshot.zone}
+                  data={dashboardData?.zones?.[contextualSnapshot.zone.toLowerCase()]}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            {/* Coordination & Triggers Panel */}
-            <CompactPanelWrapper
-              panelId="coordination"
-              className={`${getPanelWidth('coordination')} transition-all duration-300`}
-              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'coordination' : null)}
-              onFullscreen={() => handleFullscreen('coordination')}
-              compactSummary={{
-                title: "Coordination",
-                items: [
-                  { id: '1', title: 'Role Dropouts', severity: 'high' },
-                  { id: '2', title: 'Rework Loops', severity: 'medium' }
-                ],
-                stats: { flags: 3, escalations: 2 }
-              }}
+        {/* Footer & Utilities */}
+        <motion.div 
+          className="mt-12 mb-8 flex items-center justify-between"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          {/* Global Search */}
+          <div className="flex items-center space-x-4">
+            <motion.div 
+              className="relative"
+              whileFocus={{ scale: 1.02 }}
             >
-              <CoordinationTriggersPanel 
-                data={dashboardData?.coordination}
-                onRedesignFlag={(flagType) => {
-                  handleContextualAction('INNOVATE', `Redesign Flag: ${flagType}`, 'coordination');
-                }}
-                onEscalationAction={(action, zone) => {
-                  if (action === 'reassign') {
-                    handleContextualAction('ACT', `Reassignment in ${zone}`, 'coordination');
-                  }
-                }}
-                onZoneLeadClick={(zone) => {
-                  handleContextualAction('LEARN', `Zone Lead: ${zone}`, 'coordination');
-                }}
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                id="global-search"
+                type="text"
+                placeholder="Global search..."
+                className="pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent backdrop-blur-md w-80"
               />
-            </CompactPanelWrapper>
+            </motion.div>
+            
+            {/* Notifications Center */}
+            <motion.div className="relative" whileHover={{ scale: 1.05 }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="relative text-gray-400 hover:text-white hover:bg-white/10"
+                onClick={() => {
+                  setHasNewNotifications(false);
+                  setNotificationCount(0);
+                }}
+              >
+                <Bell size={20} />
+                <AnimatePresence>
+                  {notificationCount > 0 && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                    >
+                      {notificationCount}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </Button>
+            </motion.div>
           </div>
 
-          {/* Contextual Zone Snapshots */}
-          <AnimatePresence>
-            {contextualSnapshot && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, y: 20 }}
-                animate={{ opacity: 1, height: 'auto', y: 0 }}
-                exit={{ opacity: 0, height: 0, y: 20 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="mt-8"
+          {/* Quick-Launch Floating Actions */}
+          <div className="flex items-center space-x-3">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="sm"
+                className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg"
               >
-                <div 
-                  className="relative overflow-hidden rounded-2xl p-8"
-                  style={{ 
-                    background: 'rgba(20, 30, 50, 0.4)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(20, 184, 166, 0.25)',
-                    boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.1), 0 8px 24px rgba(0, 0, 0, 0.3)'
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center space-x-4">
-                      <motion.h3 
-                        className="text-xl font-semibold text-teal-400"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 }}
-                      >
-                        {contextualSnapshot.zone} Zone Snapshot
-                      </motion.h3>
-                      <motion.span 
-                        className="text-sm text-gray-400"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        Triggered by: {contextualSnapshot.trigger}
-                      </motion.span>
-                    </div>
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setContextualSnapshot(null)}
-                        className="text-gray-400 hover:text-white hover:bg-white/10"
-                      >
-                        <X size={16} />
-                      </Button>
-                    </motion.div>
-                  </div>
-                  <ZoneSnapshot 
-                    zone={contextualSnapshot.zone}
-                    data={dashboardData?.zones?.[contextualSnapshot.zone.toLowerCase()]}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Footer & Utilities */}
-          <motion.div 
-            className="mt-12 mb-8 flex items-center justify-between"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            {/* Global Search */}
-            <div className="flex items-center space-x-4">
-              <motion.div 
-                className="relative"
-                whileFocus={{ scale: 1.02 }}
-              >
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  id="global-search"
-                  type="text"
-                  placeholder="Global search..."
-                  className="pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent backdrop-blur-md w-80"
-                />
-              </motion.div>
-              
-              {/* Notifications Center */}
-              <motion.div className="relative" whileHover={{ scale: 1.05 }}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="relative text-gray-400 hover:text-white hover:bg-white/10"
-                  onClick={() => {
-                    setHasNewNotifications(false);
-                    setNotificationCount(0);
-                  }}
-                >
-                  <Bell size={20} />
-                  <AnimatePresence>
-                    {notificationCount > 0 && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                      >
-                        {notificationCount}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Button>
-              </motion.div>
-            </div>
-
-            {/* Quick-Launch Floating Actions */}
-            <div className="flex items-center space-x-3">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  size="sm"
-                  className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg"
-                >
-                  <Plus size={16} className="mr-2" />
-                  Quick Action
-                </Button>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
+                <Plus size={16} className="mr-2" />
+                Quick Action
+              </Button>
+            </motion.div>
+          </div>
+        </motion.div>
       </motion.div>
     </div>
   );
