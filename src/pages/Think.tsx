@@ -114,7 +114,7 @@ const allMockPathways: ExecutionPathway[] = [
     actors: ['MOF', 'ADNOC', 'EAD'],
     coordinationTime: 8,
     impact: 4.2,
-    relatedObjectives: [2] // Connected to renewable energy objective
+    relatedObjectives: [2]
   },
   {
     id: 'path2',
@@ -123,7 +123,7 @@ const allMockPathways: ExecutionPathway[] = [
     actors: ['EAD', 'UAEU', 'MOE'],
     coordinationTime: 6,
     impact: 3.8,
-    relatedObjectives: [1] // Connected to water management
+    relatedObjectives: [1]
   },
   {
     id: 'path3',
@@ -141,7 +141,7 @@ const allMockPathways: ExecutionPathway[] = [
     actors: ['EAD', 'MOE', 'UAEU'],
     coordinationTime: 7,
     impact: 4.0,
-    relatedObjectives: [1] // Connected to water management
+    relatedObjectives: [1]
   },
   {
     id: 'path5',
@@ -150,7 +150,7 @@ const allMockPathways: ExecutionPathway[] = [
     actors: ['ADNOC', 'MOE', 'EDB'],
     coordinationTime: 10,
     impact: 4.5,
-    relatedObjectives: [2] // Connected to renewable energy
+    relatedObjectives: [2]
   },
   {
     id: 'path6',
@@ -159,7 +159,7 @@ const allMockPathways: ExecutionPathway[] = [
     actors: ['MOF', 'MOE', 'UAEU'],
     coordinationTime: 14,
     impact: 3.5,
-    relatedObjectives: [3] // Connected to birth rate stability
+    relatedObjectives: [3]
   }
 ];
 
@@ -384,7 +384,7 @@ const ThinkPage: React.FC = () => {
       <div className="fixed inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-radial from-teal-500/10 via-transparent to-transparent"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2314b8a6" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] animate-pulse"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%2314b8a6\" fill-opacity=\"0.05\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] animate-pulse"></div>
       </div>
 
       <AnimatedPage>
