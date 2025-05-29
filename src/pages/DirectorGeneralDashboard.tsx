@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -8,7 +7,6 @@ import DirectorHeader from '@/components/dashboard/DirectorHeader';
 import { ApprovalsDecisionsPanel } from '@/components/dashboard/strategic/ApprovalsDecisionsPanel';
 import { SystemHealthAlertsPanel } from '@/components/dashboard/strategic/SystemHealthAlertsPanel';
 import { CoordinationTriggersPanel } from '@/components/dashboard/strategic/CoordinationTriggersPanel';
-import { LoopRibbon } from '@/components/dashboard/enhanced/LoopRibbon';
 import { ZoneSnapshot } from '@/components/dashboard/enhanced/ZoneSnapshot';
 import { TodaysSnapshot } from '@/components/dashboard/enhanced/TodaysSnapshot';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
