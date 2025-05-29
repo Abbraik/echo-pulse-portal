@@ -43,16 +43,20 @@ export const HoverablePanelWrapper: React.FC<HoverablePanelWrapperProps> = ({
 
   return (
     <motion.div
-      className={`${width} transition-all duration-300 ease-in-out h-[75vh] min-h-[700px] relative`}
+      className={`${width} h-[75vh] min-h-[700px] relative`}
       onMouseEnter={() => onHover(panelId)}
       onMouseLeave={onLeave}
       onClick={() => onClick(panelId)}
       layout
       initial={false}
       animate={{
-        width: width.includes('[60px]') ? '60px' : width.includes('[80%]') ? '80%' : '33.333%',
+        width: width.includes('[80px]') ? '80px' : width.includes('[70%]') ? '70%' : '33.333%',
       }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      transition={{ 
+        duration: 0.25, 
+        ease: [0.25, 0.46, 0.45, 0.94],
+        layout: { duration: 0.25 }
+      }}
       role="button"
       tabIndex={0}
       aria-expanded={!isCollapsed}
@@ -65,7 +69,7 @@ export const HoverablePanelWrapper: React.FC<HoverablePanelWrapperProps> = ({
       }}
     >
       <div
-        className="h-full overflow-hidden rounded-2xl"
+        className="h-full overflow-hidden rounded-2xl transition-all duration-250 ease-out"
         style={{
           background: 'rgba(20, 30, 50, 0.6)',
           backdropFilter: 'blur(24px)',
@@ -80,9 +84,9 @@ export const HoverablePanelWrapper: React.FC<HoverablePanelWrapperProps> = ({
             <motion.div
               key="collapsed"
               className="h-full w-full flex items-center justify-center"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2 }}
             >
               <IconComponent className="w-6 h-6 text-teal-400" />
@@ -94,7 +98,7 @@ export const HoverablePanelWrapper: React.FC<HoverablePanelWrapperProps> = ({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.25 }}
             >
               <PanelHeader
                 title={panelTitles[panelId]}

@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 type PanelId = 'approvals' | 'health' | 'coordination';
 
@@ -13,35 +13,45 @@ export const usePanelHover = () => {
     expandedPanel: null,
     isAnimating: false,
   });
+  
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handlePanelHover = useCallback((panelId: PanelId | null) => {
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
     setState(prev => ({
-      ...prev,
       expandedPanel: panelId,
       isAnimating: true,
     }));
 
-    // Reset animation state after transition
-    setTimeout(() => {
+    // Reset animation state after a shorter, more responsive duration
+    timeoutRef.current = setTimeout(() => {
       setState(prev => ({ ...prev, isAnimating: false }));
-    }, 300);
+    }, 250);
   }, []);
 
   const handlePanelLeave = useCallback(() => {
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
     setState(prev => ({
-      ...prev,
       expandedPanel: null,
       isAnimating: true,
     }));
 
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       setState(prev => ({ ...prev, isAnimating: false }));
-    }, 300);
+    }, 250);
   }, []);
 
   const getPanelWidth = useCallback((panelId: PanelId) => {
-    if (state.expandedPanel === panelId) return 'w-[80%]';
-    if (state.expandedPanel && state.expandedPanel !== panelId) return 'w-[60px]';
+    if (state.expandedPanel === panelId) return 'w-[70%]';
+    if (state.expandedPanel && state.expandedPanel !== panelId) return 'w-[80px]';
     return 'w-[33.333%]';
   }, [state.expandedPanel]);
 
