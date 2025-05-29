@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTheme } from '@/hooks/use-theme';
 import { useAsymmetricPanels } from '@/hooks/use-asymmetric-panels';
+import { useFullscreenPanel } from '@/hooks/use-fullscreen-panel';
 import ParticlesBackground from '@/components/ui/particles-background';
 import DirectorHeader from '@/components/dashboard/DirectorHeader';
 import { ApprovalsDecisionsPanel } from '@/components/dashboard/strategic/ApprovalsDecisionsPanel';
@@ -31,7 +31,6 @@ const DirectorGeneralDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
-  const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
   const [contextualSnapshot, setContextualSnapshot] = useState<ContextualSnapshot | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -44,6 +43,13 @@ const DirectorGeneralDashboard: React.FC = () => {
     resetLayout,
     isTransitioning
   } = useAsymmetricPanels(dashboardData);
+
+  // Fullscreen panel state management
+  const {
+    fullscreenPanel,
+    toggleFullscreen,
+    exitFullscreen
+  } = useFullscreenPanel();
 
   // Check for mobile viewport
   useEffect(() => {
@@ -83,7 +89,7 @@ const DirectorGeneralDashboard: React.FC = () => {
       switch (e.key.toLowerCase()) {
         case 'escape':
           e.preventDefault();
-          setFullscreenPanel(null);
+          exitFullscreen();
           setContextualSnapshot(null);
           break;
         case 'r':
@@ -100,7 +106,7 @@ const DirectorGeneralDashboard: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [resetLayout]);
+  }, [resetLayout, exitFullscreen]);
 
   // Double click outside handler
   useEffect(() => {
@@ -114,10 +120,6 @@ const DirectorGeneralDashboard: React.FC = () => {
     document.addEventListener('dblclick', handleDoubleClick);
     return () => document.removeEventListener('dblclick', handleDoubleClick);
   }, [resetLayout]);
-
-  const handleFullscreen = (panelId: string) => {
-    setFullscreenPanel(panelId);
-  };
 
   const handleContextualAction = (zone: ZoneType, trigger: string, panelId: string) => {
     setContextualSnapshot({ zone, trigger, panelId });
@@ -157,7 +159,7 @@ const DirectorGeneralDashboard: React.FC = () => {
       {/* Fullscreen Panel Overlay */}
       <FullscreenOverlay
         isOpen={!!fullscreenPanel}
-        onClose={() => setFullscreenPanel(null)}
+        onClose={exitFullscreen}
         title={`${fullscreenPanel} Panel`}
       >
         {fullscreenPanel === 'approvals' && (
@@ -266,7 +268,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             <AsymmetricPanelWrapper
               panelId="approvals"
               title="Approvals & Decisions"
-              className={`${isMobile ? 'w-full' : getPanelWidth('approvals')} transition-all duration-300 ease-in-out`}
+              className={`${isMobile ? 'w-full' : getPanelWidth('approvals')} transition-all duration-300 ease-in-out group`}
               isHero={heroPanel === 'approvals' || hoveredPanel === 'approvals'}
               isHovered={hoveredPanel === 'approvals'}
               isTransitioning={isTransitioning}
@@ -290,6 +292,7 @@ const DirectorGeneralDashboard: React.FC = () => {
                     handleContextualAction('THINK', `Approved: ${itemTitle}`, 'approvals');
                   }
                 }}
+                onFullscreen={() => toggleFullscreen('approvals')}
               />
             </AsymmetricPanelWrapper>
 
@@ -297,7 +300,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             <AsymmetricPanelWrapper
               panelId="health"
               title="System Health & Alerts"
-              className={`${isMobile ? 'w-full' : getPanelWidth('health')} transition-all duration-300 ease-in-out`}
+              className={`${isMobile ? 'w-full' : getPanelWidth('health')} transition-all duration-300 ease-in-out group`}
               isHero={heroPanel === 'health' || hoveredPanel === 'health'}
               isHovered={hoveredPanel === 'health'}
               isTransitioning={isTransitioning}
@@ -318,6 +321,7 @@ const DirectorGeneralDashboard: React.FC = () => {
                 onAlertClick={(alertType) => {
                   handleContextualAction('MONITOR', `Alert: ${alertType}`, 'health');
                 }}
+                onFullscreen={() => toggleFullscreen('health')}
               />
             </AsymmetricPanelWrapper>
 
@@ -325,7 +329,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             <AsymmetricPanelWrapper
               panelId="coordination"
               title="Coordination & Triggers"
-              className={`${isMobile ? 'w-full' : getPanelWidth('coordination')} transition-all duration-300 ease-in-out`}
+              className={`${isMobile ? 'w-full' : getPanelWidth('coordination')} transition-all duration-300 ease-in-out group`}
               isHero={heroPanel === 'coordination' || hoveredPanel === 'coordination'}
               isHovered={hoveredPanel === 'coordination'}
               isTransitioning={isTransitioning}
@@ -354,6 +358,7 @@ const DirectorGeneralDashboard: React.FC = () => {
                 onZoneLeadClick={(zone) => {
                   handleContextualAction('LEARN', `Zone Lead: ${zone}`, 'coordination');
                 }}
+                onFullscreen={() => toggleFullscreen('coordination')}
               />
             </AsymmetricPanelWrapper>
           </div>

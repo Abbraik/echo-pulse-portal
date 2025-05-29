@@ -1,11 +1,11 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, AlertTriangle, Activity, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Activity, Zap, Maximize2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { GlassCard } from '@/components/ui/glass-card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Button } from '@/components/ui/button';
 
 interface SystemHealthAlertsPanelProps {
   data?: {
@@ -16,9 +16,10 @@ interface SystemHealthAlertsPanelProps {
     risks: Array<{ id: string; name: string; likelihood: number; impact: number }>;
   };
   onAlertClick?: (alertType: string) => void;
+  onFullscreen?: () => void;
 }
 
-export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = ({ data, onAlertClick }) => {
+export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = ({ data, onAlertClick, onFullscreen }) => {
   // Mock data if not provided
   const mockData = {
     deiScore: 78.5,
@@ -74,6 +75,14 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-teal-400">System Health & Alerts</h3>
           <div className="flex items-center space-x-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onFullscreen}
+              className="opacity-0 group-hover:opacity-100 transition-opacity duration-250 bg-white/10 hover:bg-white/20"
+            >
+              <Maximize2 size={14} />
+            </Button>
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <span className="text-xs text-gray-400">Live</span>
           </div>
