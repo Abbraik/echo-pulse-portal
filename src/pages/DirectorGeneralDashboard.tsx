@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTheme } from '@/hooks/use-theme';
 import { usePanelCompact } from '@/hooks/use-panel-compact';
+import { usePanelHover } from '@/hooks/use-panel-hover';
 import ParticlesBackground from '@/components/ui/particles-background';
 import DirectorHeader from '@/components/dashboard/DirectorHeader';
 import { ApprovalsDecisionsPanel } from '@/components/dashboard/strategic/ApprovalsDecisionsPanel';
@@ -13,6 +13,7 @@ import { ZoneSnapshot } from '@/components/dashboard/enhanced/ZoneSnapshot';
 import { TodaysSnapshot } from '@/components/dashboard/enhanced/TodaysSnapshot';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import { CompactPanelWrapper } from '@/components/dashboard/enhanced/CompactPanelWrapper';
+import { HoverablePanelWrapper } from '@/components/dashboard/strategic/HoverablePanelWrapper';
 import { getDashboardData } from '@/api/dashboard';
 import { Button } from '@/components/ui/button';
 import { X, Maximize2, Search } from 'lucide-react';
@@ -38,6 +39,16 @@ const DirectorGeneralDashboard: React.FC = () => {
 
   // Panel compact state management
   const { containerRef } = usePanelCompact();
+
+  // Add panel hover functionality
+  const {
+    expandedPanel,
+    isAnimating,
+    handlePanelHover,
+    handlePanelLeave,
+    getPanelWidth,
+    isPanelCollapsed,
+  } = usePanelHover();
 
   // Check for mobile viewport
   useEffect(() => {
@@ -79,18 +90,31 @@ const DirectorGeneralDashboard: React.FC = () => {
           e.preventDefault();
           setFullscreenPanel(null);
           setContextualSnapshot(null);
+          handlePanelLeave(); // Reset panel hover state
           break;
         case 'f':
           e.preventDefault();
           // Focus on global search
           document.getElementById('global-search')?.focus();
           break;
+        case '1':
+          e.preventDefault();
+          handlePanelHover('approvals');
+          break;
+        case '2':
+          e.preventDefault();
+          handlePanelHover('health');
+          break;
+        case '3':
+          e.preventDefault();
+          handlePanelHover('coordination');
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [handlePanelHover, handlePanelLeave]);
 
   const handleFocusMode = (panelId: string) => {
     setHoveredPanel(panelId);
@@ -102,13 +126,6 @@ const DirectorGeneralDashboard: React.FC = () => {
 
   const handleContextualAction = (zone: ZoneType, trigger: string, panelId: string) => {
     setContextualSnapshot({ zone, trigger, panelId });
-  };
-
-  const getPanelWidth = (panelId: string) => {
-    if (isMobile) return 'w-full';
-    if (hoveredPanel === panelId) return 'w-[60%]';
-    if (hoveredPanel && hoveredPanel !== panelId) return 'w-[20%]';
-    return 'w-[33.333%]';
   };
 
   if (loading) {
@@ -247,23 +264,17 @@ const DirectorGeneralDashboard: React.FC = () => {
           <TodaysSnapshot data={dashboardData?.todaysSnapshot} />
         </div>
 
-        {/* Main Cockpit Panels - Increased height */}
+        {/* Main Cockpit Panels - Updated with hover functionality */}
         <div className="max-w-[1440px] mx-auto px-6 pb-6" ref={containerRef}>
-          <div className={`flex gap-8 h-[calc(100vh-280px)] min-h-[600px] ${isMobile ? 'flex-col h-auto' : ''}`}>
+          <div className={`flex gap-4 h-[45vh] min-h-[500px] ${isMobile ? 'flex-col h-auto' : ''}`}>
             {/* Approvals & Decisions Panel */}
-            <CompactPanelWrapper
+            <HoverablePanelWrapper
               panelId="approvals"
-              className={`${getPanelWidth('approvals')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
-              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'approvals' : null)}
-              onFullscreen={() => handleFullscreen('approvals')}
-              compactSummary={{
-                title: "Approvals",
-                items: [
-                  { id: '1', title: 'Infrastructure Development Package', priority: 'high' },
-                  { id: '3', title: 'THINK Zone Restructure', priority: 'high' }
-                ],
-                stats: { pending: dashboardData?.approvals?.pending || 12, overdue: 3 }
-              }}
+              isCollapsed={isPanelCollapsed('approvals')}
+              width={getPanelWidth('approvals')}
+              onHover={handlePanelHover}
+              onLeave={handlePanelLeave}
+              onClick={handlePanelHover}
             >
               <ApprovalsDecisionsPanel 
                 data={dashboardData?.approvals}
@@ -274,22 +285,16 @@ const DirectorGeneralDashboard: React.FC = () => {
                   }
                 }}
               />
-            </CompactPanelWrapper>
+            </HoverablePanelWrapper>
 
             {/* System Health & Alerts Panel */}
-            <CompactPanelWrapper
+            <HoverablePanelWrapper
               panelId="health"
-              className={`${getPanelWidth('health')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
-              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'health' : null)}
-              onFullscreen={() => handleFullscreen('health')}
-              compactSummary={{
-                title: "System Health",
-                items: [
-                  { id: '1', title: 'DEI score trending down', severity: 'medium' },
-                  { id: '2', title: 'THINK loop closure delayed', severity: 'high' }
-                ],
-                stats: { deiScore: 78.5, worstDrift: 'innovator' }
-              }}
+              isCollapsed={isPanelCollapsed('health')}
+              width={getPanelWidth('health')}
+              onHover={handlePanelHover}
+              onLeave={handlePanelLeave}
+              onClick={handlePanelHover}
             >
               <SystemHealthAlertsPanel 
                 data={dashboardData?.systemHealth}
@@ -297,22 +302,16 @@ const DirectorGeneralDashboard: React.FC = () => {
                   handleContextualAction('MONITOR', `Alert: ${alertType}`, 'health');
                 }}
               />
-            </CompactPanelWrapper>
+            </HoverablePanelWrapper>
 
             {/* Coordination & Triggers Panel */}
-            <CompactPanelWrapper
+            <HoverablePanelWrapper
               panelId="coordination"
-              className={`${getPanelWidth('coordination')} transition-all duration-300`}
-              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'coordination' : null)}
-              onFullscreen={() => handleFullscreen('coordination')}
-              compactSummary={{
-                title: "Coordination",
-                items: [
-                  { id: '1', title: 'Role Dropouts', severity: 'high' },
-                  { id: '2', title: 'Rework Loops', severity: 'medium' }
-                ],
-                stats: { flags: 3, escalations: 2 }
-              }}
+              isCollapsed={isPanelCollapsed('coordination')}
+              width={getPanelWidth('coordination')}
+              onHover={handlePanelHover}
+              onLeave={handlePanelLeave}
+              onClick={handlePanelHover}
             >
               <CoordinationTriggersPanel 
                 data={dashboardData?.coordination}
@@ -328,7 +327,7 @@ const DirectorGeneralDashboard: React.FC = () => {
                   handleContextualAction('LEARN', `Zone Lead: ${zone}`, 'coordination');
                 }}
               />
-            </CompactPanelWrapper>
+            </HoverablePanelWrapper>
           </div>
 
           {/* Contextual Zone Snapshots */}
