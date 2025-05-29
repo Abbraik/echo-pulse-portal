@@ -264,7 +264,7 @@ const DirectorGeneralDashboard: React.FC = () => {
           <TodaysSnapshot data={dashboardData?.todaysSnapshot} />
         </div>
 
-        {/* Main Cockpit Panels - Updated with hover functionality */}
+        {/* Main Cockpit Panels - Updated with fullscreen functionality */}
         <div className="max-w-[1440px] mx-auto px-6 pb-6" ref={containerRef}>
           <div className={`flex gap-4 h-[45vh] min-h-[500px] ${isMobile ? 'flex-col h-auto' : ''}`}>
             {/* Approvals & Decisions Panel */}
@@ -275,6 +275,7 @@ const DirectorGeneralDashboard: React.FC = () => {
               onHover={handlePanelHover}
               onLeave={handlePanelLeave}
               onClick={handlePanelHover}
+              onFullscreen={() => handleFullscreen('approvals')}
             >
               <ApprovalsDecisionsPanel 
                 data={dashboardData?.approvals}
@@ -295,6 +296,7 @@ const DirectorGeneralDashboard: React.FC = () => {
               onHover={handlePanelHover}
               onLeave={handlePanelLeave}
               onClick={handlePanelHover}
+              onFullscreen={() => handleFullscreen('health')}
             >
               <SystemHealthAlertsPanel 
                 data={dashboardData?.systemHealth}
@@ -312,6 +314,7 @@ const DirectorGeneralDashboard: React.FC = () => {
               onHover={handlePanelHover}
               onLeave={handlePanelLeave}
               onClick={handlePanelHover}
+              onFullscreen={() => handleFullscreen('coordination')}
             >
               <CoordinationTriggersPanel 
                 data={dashboardData?.coordination}

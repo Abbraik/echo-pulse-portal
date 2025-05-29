@@ -2,6 +2,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ApprovalsIcon, HealthIcon, CoordinationIcon } from './PanelIcons';
+import { PanelHeader } from './PanelHeader';
 
 type PanelId = 'approvals' | 'health' | 'coordination';
 
@@ -13,6 +14,7 @@ interface HoverablePanelWrapperProps {
   onHover: (panelId: PanelId) => void;
   onLeave: () => void;
   onClick: (panelId: PanelId) => void;
+  onFullscreen: () => void;
 }
 
 const panelIcons = {
@@ -35,6 +37,7 @@ export const HoverablePanelWrapper: React.FC<HoverablePanelWrapperProps> = ({
   onHover,
   onLeave,
   onClick,
+  onFullscreen,
 }) => {
   const IconComponent = panelIcons[panelId];
 
@@ -87,13 +90,20 @@ export const HoverablePanelWrapper: React.FC<HoverablePanelWrapperProps> = ({
           ) : (
             <motion.div
               key="expanded"
-              className="h-full w-full"
+              className="h-full w-full flex flex-col"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
             >
-              {children}
+              <PanelHeader
+                title={panelTitles[panelId]}
+                icon={<IconComponent className="w-5 h-5" />}
+                onFullscreen={onFullscreen}
+              />
+              <div className="flex-1 overflow-hidden">
+                {children}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
