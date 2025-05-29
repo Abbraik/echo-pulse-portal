@@ -100,6 +100,173 @@ html {
       @apply px-6;
     }
   }
+
+  /* Approvals Panel Responsive Styles */
+  .approval-panel-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .approval-panel-container.compact-mode {
+    font-size: clamp(10px, 1vw, 14px);
+  }
+
+  .approval-panel-container.compact-mode .compact-hide {
+    display: none;
+  }
+
+  .approval-panel-container.compact-mode .compact-show {
+    display: block;
+  }
+
+  /* Custom scrollbar for approval lists */
+  .approval-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(20, 184, 166, 0.5) transparent;
+  }
+
+  .approval-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .approval-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .approval-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(20, 184, 166, 0.5);
+    border-radius: 2px;
+  }
+
+  .approval-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(20, 184, 166, 0.7);
+  }
+
+  /* Responsive table styles */
+  .approval-table {
+    table-layout: auto;
+    width: 100%;
+  }
+
+  .approval-table th,
+  .approval-table td {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /* Adaptive font sizing */
+  .approval-title {
+    font-size: clamp(14px, 1.5vw, 20px);
+    font-weight: 700;
+  }
+
+  .approval-text {
+    font-size: clamp(12px, 1.2vw, 16px);
+  }
+
+  .approval-small-text {
+    font-size: clamp(10px, 1vw, 14px);
+  }
+
+  /* Button and icon scaling */
+  .approval-button {
+    height: clamp(24px, 2vw, 32px);
+    font-size: clamp(10px, 1vw, 14px);
+  }
+
+  .approval-icon {
+    width: clamp(12px, 1.5vw, 16px);
+    height: clamp(12px, 1.5vw, 16px);
+  }
+
+  /* Content fit indicators */
+  .content-fit-perfect {
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.5);
+    animation: content-fit-flash 1s ease-out;
+  }
+
+  .content-fit-compacted {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5);
+    animation: content-fit-flash 1s ease-out;
+  }
+
+  @keyframes content-fit-flash {
+    0% { box-shadow: 0 0 0 0 transparent; }
+    50% { box-shadow: 0 0 0 2px currentColor; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+
+  /* Responsive breakpoints for approval panel */
+  @media (max-width: 400px) {
+    .approval-panel-container {
+      padding: 0.5rem;
+    }
+    
+    .approval-filters {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .approval-table th,
+    .approval-table td {
+      padding: 0.25rem;
+    }
+  }
+
+  @media (max-height: 500px) {
+    .approval-pinned-section {
+      max-height: 80px;
+      overflow-y: auto;
+    }
+    
+    .approval-main-list {
+      max-height: 200px;
+    }
+  }
+
+  /* Smooth transitions for responsive changes */
+  .approval-transition {
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Flex utilities for proportional sections */
+  .approval-header {
+    flex: 0 0 auto;
+  }
+
+  .approval-filters {
+    flex: 0 0 auto;
+  }
+
+  .approval-pinned {
+    flex: 0 0 15%;
+    min-height: 100px;
+  }
+
+  .approval-main {
+    flex: 1 1 65%;
+    min-height: 0;
+  }
+
+  .approval-footer {
+    flex: 0 0 auto;
+    min-height: 50px;
+  }
+
+  /* Wrap utilities for action buttons */
+  .approval-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .approval-actions.compact {
+    flex-direction: column;
+  }
 }
 
 /* Glass panel styles */

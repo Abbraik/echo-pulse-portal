@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Calendar, AlertTriangle, CheckCircle, MessageCircle, Filter, Star, ChevronUp, ChevronDown, Plus, ExternalLink, X, Focus, Edit, Users, Activity, TrendingUp, Brain, Zap, Eye, BookOpen, Lightbulb, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { ActChart } from './charts/ActChart';
 import { MonitorChart } from './charts/MonitorChart';
 import { LearnChart } from './charts/LearnChart';
 import { InnovateChart } from './charts/InnovateChart';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ApprovalItem {
   id: string;
@@ -43,6 +44,10 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
 }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [panelDimensions, setPanelDimensions] = useState({ width: 0, height: 0 });
+  const [isCompactMode, setIsCompactMode] = useState(false);
+  const [contentFitStatus, setContentFitStatus] = useState<'perfect' | 'compacted' | null>(null);
   
   // Extended mock data with 10 items
   const initialItems: ApprovalItem[] = [
@@ -145,6 +150,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   const [focusMode, setFocusMode] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
+  const [showAllFilters, setShowAllFilters] = useState(false);
 
   // Modal states
   const [approveModal, setApproveModal] = useState<{ open: boolean; item: ApprovalItem | null }>({
@@ -185,6 +191,33 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     dueDate: '',
     priority: 'medium' as ApprovalItem['priority']
   });
+
+  // ResizeObserver for container dimensions
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        const { width, height } = entries[0].contentRect;
+        setPanelDimensions({ width, height });
+        
+        // Determine compact mode based on size
+        const shouldBeCompact = width < 400 || height < 500;
+        
+        if (shouldBeCompact !== isCompactMode) {
+          setIsCompactMode(shouldBeCompact);
+          
+          // Visual feedback for content fit
+          setContentFitStatus(shouldBeCompact ? 'compacted' : 'perfect');
+          setTimeout(() => setContentFitStatus(null), 1000);
+        }
+      }
+    });
+
+    if (panelRef.current) {
+      resizeObserver.observe(panelRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, [isCompactMode]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -245,6 +278,11 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     redesign: items.filter(item => item.type === 'redesign').length,
     external: items.filter(item => item.type === 'external').length,
   };
+
+  // Adaptive display logic
+  const maxVisibleItems = isCompactMode ? 2 : Math.floor((panelDimensions.height - 200) / 50);
+  const visiblePinnedItems = pinnedItems.slice(0, isCompactMode ? 2 : 3);
+  const visibleUnpinnedItems = unpinnedItems.slice(0, maxVisibleItems);
 
   // Action handlers
   const handleFilterChange = (filter: typeof activeFilter) => {
@@ -375,10 +413,10 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   // Helper functions
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'strategy': return <FileText size={16} className="text-blue-400" />;
-      case 'redesign': return <AlertTriangle size={16} className="text-purple-400" />;
-      case 'external': return <MessageCircle size={16} className="text-orange-400" />;
-      default: return <FileText size={16} className="text-gray-400" />;
+      case 'strategy': return <FileText size={isCompactMode ? 12 : 16} className="text-blue-400" />;
+      case 'redesign': return <AlertTriangle size={isCompactMode ? 12 : 16} className="text-purple-400" />;
+      case 'external': return <MessageCircle size={isCompactMode ? 12 : 16} className="text-orange-400" />;
+      default: return <FileText size={isCompactMode ? 12 : 16} className="text-gray-400" />;
     }
   };
 
@@ -409,13 +447,33 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     }
   };
 
+  const TruncatedText = ({ text, maxLength = 30 }: { text: string; maxLength?: number }) => {
+    if (text.length <= maxLength) return <span>{text}</span>;
+    
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="cursor-help" aria-label={text}>
+              {text.substring(0, maxLength)}...
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-xs">
+            <p>{text}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
+
   const ActionButton = ({ 
     children, 
     onClick, 
     disabled, 
     variant = "default",
     size = "sm",
-    className = ""
+    className = "",
+    iconOnly = false
   }: {
     children: React.ReactNode;
     onClick: () => void;
@@ -423,6 +481,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     variant?: "default" | "outline" | "ghost";
     size?: "sm" | "default";
     className?: string;
+    iconOnly?: boolean;
   }) => (
     <Button
       size={size}
@@ -432,7 +491,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         onClick();
       }}
       disabled={disabled}
-      className={className}
+      className={`${className} ${iconOnly ? 'px-1 min-w-0' : ''} ${isCompactMode ? 'text-xs' : ''}`}
     >
       {children}
     </Button>
@@ -559,205 +618,272 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   };
 
   return (
-    <>
-      <div className="h-full flex flex-col p-6">
-        {/* Title Bar */}
-        <div className="flex items-center justify-between h-12 mb-6 border-b border-teal-500/30 pb-4">
+    <TooltipProvider>
+      <div 
+        ref={panelRef}
+        className={`approval-panel-container h-full w-full flex flex-col transition-all duration-200 ${
+          contentFitStatus === 'perfect' ? 'ring-2 ring-green-400/50' : 
+          contentFitStatus === 'compacted' ? 'ring-2 ring-red-400/50' : ''
+        } ${isCompactMode ? 'compact-mode' : ''}`}
+        style={{
+          fontSize: 'clamp(12px, 1.2vw, 16px)',
+          height: '45vh'
+        }}
+      >
+        {/* Title Bar - 10% */}
+        <div className="flex-shrink-0 h-[10%] min-h-[60px] flex items-center justify-between border-b border-teal-500/30 pb-2 px-4">
           <div className="flex items-center gap-3">
-            <h3 className="text-xl font-bold text-white">
+            <h3 className="font-bold text-white" style={{ fontSize: 'clamp(14px, 1.5vw, 20px)' }}>
               Approvals & Decisions
             </h3>
-            <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50 text-sm">
+            <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50">
               Live
             </Badge>
           </div>
         </div>
 
-        {/* Filter Row */}
-        <div className="flex gap-2 mb-6">
-          {Object.entries(filterCounts).map(([filter, count]) => (
-            <Button
-              key={filter}
-              id={filter === 'all' ? 'filter-all' : undefined}
-              size="sm"
-              variant={activeFilter === filter ? "default" : "outline"}
-              onClick={() => handleFilterChange(filter as typeof activeFilter)}
-              className={`text-sm transition-all duration-150 ${
-                activeFilter === filter 
-                  ? 'bg-teal-500 text-white border-teal-500' 
-                  : 'border-teal-500/50 text-teal-400 hover:bg-teal-500/20 hover:border-teal-500'
-              }`}
-              aria-pressed={activeFilter === filter}
-            >
-              {filter.charAt(0).toUpperCase() + filter.slice(1)} ({count})
-            </Button>
-          ))}
-        </div>
-
-        {/* Pinned Approvals Section */}
-        <div className="mb-6">
-          <h4 className="text-sm font-semibold text-teal-400 mb-3 flex items-center gap-2">
-            <Star size={16} className="text-yellow-400 fill-yellow-400" />
-            Pinned Approvals
-          </h4>
-          {pinnedItems.length > 0 ? (
-            <div className="space-y-2">
-              {pinnedItems.slice(0, 3).map(item => (
-                <motion.div 
-                  key={item.id} 
-                  className="bg-white/5 rounded-lg p-3 border border-white/10 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.15 }}
-                  onClick={() => handleApproveClick(item)}
-                >
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <span className="font-medium text-white text-sm truncate">{item.title}</span>
-                    <Badge className={`${getTypeColor(item.type)} text-sm shrink-0`}>
-                      <span className="flex items-center gap-1">
-                        {getTypeIcon(item.type)}
-                        {item.type}
-                      </span>
-                    </Badge>
-                    <span className="text-sm text-gray-400 shrink-0">{item.dueDate}</span>
-                    <span className={`text-sm ${getPriorityColor(item.priority)} shrink-0`}>
-                      {getPriorityDot(item.priority)} {item.priority}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <ActionButton
-                      onClick={() => handlePin(item.id)}
-                      disabled={loading === item.id}
-                      variant="ghost"
-                      className="text-yellow-400 p-1 h-6 w-6"
-                    >
-                      <Star size={12} fill="currentColor" />
-                    </ActionButton>
-                    <ActionButton
-                      onClick={() => handleApproveClick(item)}
-                      disabled={loading === item.id}
-                      className="h-6 px-2 text-sm bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      <CheckCircle size={10} className="mr-1" />
-                      Approve ▶
-                    </ActionButton>
-                    <ActionButton
-                      onClick={() => handleReviseClick(item)}
-                      disabled={loading === item.id}
-                      variant="outline"
-                      className="h-6 px-2 text-sm border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
-                    >
-                      <Edit size={10} className="mr-1" />
-                      Revise ✎
-                    </ActionButton>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+        {/* Filter Row - Adaptive */}
+        <div className="flex-shrink-0 h-[8%] min-h-[50px] flex items-center px-4">
+          {isCompactMode ? (
+            <Select value={activeFilter} onValueChange={(value) => handleFilterChange(value as typeof activeFilter)}>
+              <SelectTrigger className="w-full bg-white/10 border-white/20 text-white text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-700">
+                {Object.entries(filterCounts).map(([filter, count]) => (
+                  <SelectItem key={filter} value={filter}>
+                    {filter.charAt(0).toUpperCase() + filter.slice(1)} ({count})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           ) : (
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
-              <p className="text-gray-400 text-sm">No pinned approvals. Pin key items for quick access.</p>
+            <div className="flex gap-2 flex-wrap">
+              {Object.entries(filterCounts).map(([filter, count]) => (
+                <Button
+                  key={filter}
+                  id={filter === 'all' ? 'filter-all' : undefined}
+                  size="sm"
+                  variant={activeFilter === filter ? "default" : "outline"}
+                  onClick={() => handleFilterChange(filter as typeof activeFilter)}
+                  className={`transition-all duration-150 ${
+                    activeFilter === filter 
+                      ? 'bg-teal-500 text-white border-teal-500' 
+                      : 'border-teal-500/50 text-teal-400 hover:bg-teal-500/20 hover:border-teal-500'
+                  }`}
+                  style={{ fontSize: 'clamp(10px, 1vw, 14px)' }}
+                  aria-pressed={activeFilter === filter}
+                >
+                  {filter.charAt(0).toUpperCase() + filter.slice(1)} ({count})
+                </Button>
+              ))}
             </div>
           )}
         </div>
 
-        {/* Main Approval List */}
-        <div className="flex-1 min-h-0 overflow-y-auto mb-4">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-white/20 hover:bg-transparent">
-                <TableHead className="text-white w-[40%]">Title</TableHead>
-                <TableHead className="text-white w-[10%]">Type</TableHead>
-                <TableHead className="text-white w-[20%]">Owner</TableHead>
-                <TableHead className="text-white w-[15%]">Due Date</TableHead>
-                <TableHead className="text-white w-[10%]">Priority</TableHead>
-                <TableHead className="text-white w-[5%]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {unpinnedItems.map((item) => (
-                <TableRow 
-                  key={item.id}
-                  className="border-white/10 hover:bg-white/5 transition-all duration-150 cursor-pointer"
-                  onClick={() => {
-                    setSelectedRowId(item.id);
-                    handleApproveClick(item);
-                  }}
-                  onMouseEnter={() => setHoveredRowId(item.id)}
-                  onMouseLeave={() => setHoveredRowId(null)}
-                  style={{
-                    backgroundColor: selectedRowId === item.id ? 'rgba(20, 184, 166, 0.1)' : undefined,
-                    borderLeft: selectedRowId === item.id ? '3px solid rgb(20, 184, 166)' : undefined
-                  }}
-                >
-                  <TableCell className="font-medium text-white text-sm">{item.title}</TableCell>
-                  <TableCell>
-                    <Badge className={`${getTypeColor(item.type)} text-sm`}>
-                      <span className="flex items-center gap-1">
-                        {getTypeIcon(item.type)}
-                        {item.type}
+        {/* Pinned Approvals Section - 15% */}
+        <div className="flex-shrink-0 h-[15%] min-h-[100px] px-4 mb-2">
+          <h4 className="text-sm font-semibold text-teal-400 mb-2 flex items-center gap-2">
+            <Star size={isCompactMode ? 12 : 16} className="text-yellow-400 fill-yellow-400" />
+            Pinned Approvals
+          </h4>
+          <div className="h-full overflow-hidden">
+            {visiblePinnedItems.length > 0 ? (
+              <div className="space-y-1 h-full overflow-y-auto approval-scrollbar">
+                {visiblePinnedItems.map(item => (
+                  <motion.div 
+                    key={item.id} 
+                    className="bg-white/5 rounded-lg p-2 border border-white/10 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.15 }}
+                    onClick={() => handleApproveClick(item)}
+                  >
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <TruncatedText text={item.title} maxLength={isCompactMode ? 20 : 30} />
+                      <Badge className={`${getTypeColor(item.type)} text-xs shrink-0`}>
+                        <span className="flex items-center gap-1">
+                          {getTypeIcon(item.type)}
+                          {!isCompactMode && item.type}
+                        </span>
+                      </Badge>
+                      {!isCompactMode && <span className="text-xs text-gray-400 shrink-0">{item.dueDate}</span>}
+                      <span className={`text-xs ${getPriorityColor(item.priority)} shrink-0`}>
+                        {getPriorityDot(item.priority)} {!isCompactMode && item.priority}
                       </span>
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-gray-300 text-sm">{item.owner}</TableCell>
-                  <TableCell className="text-gray-300 text-sm">{item.dueDate}</TableCell>
-                  <TableCell className="text-sm">
-                    <span className={`flex items-center gap-1 ${getPriorityColor(item.priority)}`}>
-                      {getPriorityDot(item.priority)} {item.priority}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className={`flex items-center gap-1 transition-opacity duration-200 ${
-                      hoveredRowId === item.id ? 'opacity-100' : 'opacity-0'
-                    }`}>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
                       <ActionButton
                         onClick={() => handlePin(item.id)}
                         disabled={loading === item.id}
                         variant="ghost"
-                        className="text-gray-400 hover:text-yellow-400 p-1 h-6 w-6"
+                        className="text-yellow-400 p-1 h-6 w-6"
+                        iconOnly={isCompactMode}
                       >
-                        <Star size={12} />
+                        <Star size={isCompactMode ? 10 : 12} fill="currentColor" />
                       </ActionButton>
                       <ActionButton
                         onClick={() => handleApproveClick(item)}
                         disabled={loading === item.id}
-                        className="h-6 px-2 text-sm bg-green-600 hover:bg-green-700 text-white"
+                        className="h-6 px-2 bg-green-600 hover:bg-green-700 text-white"
+                        iconOnly={isCompactMode}
                       >
-                        Approve ▶
-                      </ActionButton>
-                      <ActionButton
-                        onClick={() => handleReviseClick(item)}
-                        disabled={loading === item.id}
-                        variant="outline"
-                        className="h-6 px-2 text-sm border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
-                      >
-                        Revise ✎
+                        <CheckCircle size={isCompactMode ? 10 : 12} className={!isCompactMode ? "mr-1" : ""} />
+                        {!isCompactMode && "Approve ▶"}
                       </ActionButton>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white/5 rounded-lg p-3 border border-white/10 text-center h-full flex items-center justify-center">
+                <p className="text-gray-400 text-xs">No pinned approvals. Pin key items for quick access.</p>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-white/10 h-10">
+        {/* Main Approval List - 65% */}
+        <div className="flex-1 min-h-0 px-4 mb-2">
+          <div className="h-full overflow-y-auto approval-scrollbar">
+            {isCompactMode ? (
+              // Compact card view for small containers
+              <div className="space-y-2">
+                {visibleUnpinnedItems.map((item) => (
+                  <motion.div 
+                    key={item.id}
+                    className="bg-white/5 rounded-lg p-3 border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
+                    onClick={() => {
+                      setSelectedRowId(item.id);
+                      handleApproveClick(item);
+                    }}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <TruncatedText text={item.title} maxLength={25} />
+                      <Badge className={`${getTypeColor(item.type)} text-xs shrink-0`}>
+                        {getTypeIcon(item.type)}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-400">{item.owner}</span>
+                      <span className={getPriorityColor(item.priority)}>
+                        {getPriorityDot(item.priority)}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+                {unpinnedItems.length > visibleUnpinnedItems.length && (
+                  <button 
+                    className="w-full text-sm text-teal-400 hover:text-teal-300 transition-colors duration-200 flex items-center justify-center space-x-2 py-2"
+                    aria-live="polite"
+                  >
+                    <span>View {unpinnedItems.length - visibleUnpinnedItems.length} More</span>
+                    <span>▶</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              // Full table view for larger containers
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow className="border-white/20 hover:bg-transparent">
+                    <TableHead className="text-white w-[40%]" style={{ fontSize: 'clamp(10px, 1vw, 14px)' }}>Title</TableHead>
+                    <TableHead className="text-white w-[10%]" style={{ fontSize: 'clamp(10px, 1vw, 14px)' }}>Type</TableHead>
+                    <TableHead className="text-white w-[20%]" style={{ fontSize: 'clamp(10px, 1vw, 14px)' }}>Owner</TableHead>
+                    <TableHead className="text-white w-[15%]" style={{ fontSize: 'clamp(10px, 1vw, 14px)' }}>Due Date</TableHead>
+                    <TableHead className="text-white w-[10%]" style={{ fontSize: 'clamp(10px, 1vw, 14px)' }}>Priority</TableHead>
+                    <TableHead className="text-white w-[5%]" style={{ fontSize: 'clamp(10px, 1vw, 14px)' }}>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {visibleUnpinnedItems.map((item) => (
+                    <TableRow 
+                      key={item.id}
+                      className="border-white/10 hover:bg-white/5 transition-all duration-150 cursor-pointer"
+                      onClick={() => {
+                        setSelectedRowId(item.id);
+                        handleApproveClick(item);
+                      }}
+                      onMouseEnter={() => setHoveredRowId(item.id)}
+                      onMouseLeave={() => setHoveredRowId(null)}
+                      style={{
+                        backgroundColor: selectedRowId === item.id ? 'rgba(20, 184, 166, 0.1)' : undefined,
+                        borderLeft: selectedRowId === item.id ? '3px solid rgb(20, 184, 166)' : undefined
+                      }}
+                    >
+                      <TableCell className="font-medium text-white">
+                        <TruncatedText text={item.title} maxLength={35} />
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={`${getTypeColor(item.type)} text-xs`}>
+                          <span className="flex items-center gap-1">
+                            {getTypeIcon(item.type)}
+                            {item.type}
+                          </span>
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-gray-300">
+                        <TruncatedText text={item.owner} maxLength={20} />
+                      </TableCell>
+                      <TableCell className="text-gray-300 text-sm">{item.dueDate}</TableCell>
+                      <TableCell>
+                        <span className={`flex items-center gap-1 ${getPriorityColor(item.priority)} text-sm`}>
+                          {getPriorityDot(item.priority)} {item.priority}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className={`flex items-center gap-1 transition-opacity duration-200 ${
+                          hoveredRowId === item.id ? 'opacity-100' : 'opacity-0'
+                        }`}>
+                          <ActionButton
+                            onClick={() => handlePin(item.id)}
+                            disabled={loading === item.id}
+                            variant="ghost"
+                            className="text-gray-400 hover:text-yellow-400 p-1 h-6 w-6"
+                            iconOnly
+                          >
+                            <Star size={12} />
+                          </ActionButton>
+                          <ActionButton
+                            onClick={() => handleApproveClick(item)}
+                            disabled={loading === item.id}
+                            className="h-6 px-2 bg-green-600 hover:bg-green-700 text-white text-xs"
+                          >
+                            Approve ▶
+                          </ActionButton>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+        </div>
+
+        {/* Footer - 10% */}
+        <div className="flex-shrink-0 h-[10%] min-h-[50px] flex items-center justify-between pt-2 border-t border-white/10 px-4">
           <Button
             variant="ghost"
             size="sm"
-            className="text-teal-400 hover:text-teal-300 text-sm"
+            className="text-teal-400 hover:text-teal-300"
+            style={{ fontSize: 'clamp(10px, 1vw, 14px)' }}
           >
             View All Approvals ▶ <ExternalLink size={12} className="ml-1" />
           </Button>
           <Button
             size="sm"
             onClick={() => setCreateModal(true)}
-            className="bg-teal-500 hover:bg-teal-600 text-white text-sm font-bold h-8"
+            className="bg-teal-500 hover:bg-teal-600 text-white font-bold"
+            style={{ 
+              fontSize: 'clamp(10px, 1vw, 14px)',
+              height: 'clamp(24px, 2vw, 32px)'
+            }}
           >
             <Plus size={14} className="mr-1" />
-            Create New Approval
+            {!isCompactMode && "Create New Approval"}
+            {isCompactMode && "New"}
           </Button>
         </div>
       </div>
@@ -1238,6 +1364,6 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </TooltipProvider>
   );
 };
