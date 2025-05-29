@@ -73,7 +73,7 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* Reset Controls */}
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
@@ -99,9 +99,9 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
         )}
       </div>
 
-      {/* Dynamic Panels Container - Increased height */}
+      {/* Dynamic Panels Container - Increased height and better spacing */}
       <div 
-        className="flex gap-6 h-[65vh] min-h-[700px]"
+        className="flex gap-4 h-[65vh] min-h-[700px] w-full"
         onDoubleClick={handleReset}
       >
         {/* Approvals Panel */}
@@ -140,7 +140,7 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
             aria-controls="approvals-content"
             style={getThemeBackground(hoveredPanel === 'approvals')}
           >
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 w-full">
               <EnhancedApprovalsPanel
                 data={dashboardData?.approvals}
                 onViewModeChange={onViewModeChange}
@@ -189,7 +189,7 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
             aria-controls="health-content"
             style={getThemeBackground(hoveredPanel === 'health')}
           >
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 w-full">
               <EnhancedSystemHealthPanel
                 data={dashboardData?.systemHealth}
                 onViewModeChange={onViewModeChange}
@@ -238,7 +238,7 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
             aria-controls="coordination-content"
             style={getThemeBackground(hoveredPanel === 'coordination')}
           >
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 w-full">
               <EnhancedCoordinationPanel
                 data={dashboardData?.coordination}
                 onToggleFullscreen={() => onToggleFullscreen('coordination')}

@@ -64,23 +64,62 @@ html {
   }
 }
 
+/* Container utilities for consistent max-width layout */
+@layer components {
+  .page-container {
+    @apply max-w-[1440px] mx-auto px-6;
+  }
+  
+  .page-container-wide {
+    @apply max-w-[1600px] mx-auto px-6;
+  }
+  
+  .page-container-full {
+    @apply w-full px-6;
+  }
+  
+  @media (min-width: 768px) {
+    .page-container {
+      @apply px-4;
+    }
+    .page-container-wide {
+      @apply px-4;
+    }
+    .page-container-full {
+      @apply px-4;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .page-container {
+      @apply px-6;
+    }
+    .page-container-wide {
+      @apply px-6;
+    }
+    .page-container-full {
+      @apply px-6;
+    }
+  }
+}
+
 /* Glass panel styles */
 .glass-panel {
-  @apply bg-white/5 backdrop-blur-[20px] border border-white/20 rounded-2xl;
+  @apply bg-white/5 backdrop-blur-[20px] border border-white/20 rounded-2xl w-full;
   box-shadow: 
     inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
     0 0 20px rgba(56, 178, 172, 0.1);
 }
 
 .glass-panel-deep {
-  @apply bg-white/10 backdrop-blur-[20px] border border-white/30 rounded-2xl;
+  @apply bg-white/10 backdrop-blur-[20px] border border-white/30 rounded-2xl w-full;
   box-shadow: 
     inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
     0 0 30px rgba(56, 178, 172, 0.15);
 }
 
 .glass-panel-dark {
-  @apply bg-black/20 backdrop-blur-[20px] border border-white/10 rounded-2xl;
+  @apply bg-black/20 backdrop-blur-[20px] border border-white/10 rounded-2xl w-full;
   box-shadow: 
     inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
     0 0 25px rgba(0, 0, 0, 0.3);
@@ -228,6 +267,11 @@ html {
   animation: slide-out-right 0.3s ease-out;
 }
 
+/* Responsive container animation */
+.animate-container-resize {
+  transition: max-width 200ms ease, padding 200ms ease;
+}
+
 /* Interactive elements */
 .story-link {
   @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
@@ -254,6 +298,18 @@ html {
   
   .slider-teal [data-slider-thumb] {
     @apply w-6 h-6;
+  }
+  
+  .page-container {
+    @apply px-4;
+  }
+  
+  .page-container-wide {
+    @apply px-4;
+  }
+  
+  .page-container-full {
+    @apply px-4;
   }
 }
 

@@ -91,7 +91,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
   };
 
   return (
-    <div className={`flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300 ${isRTL ? 'rtl' : ''}`}>
+    <div className={`flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300 w-full ${isRTL ? 'rtl' : ''}`}>
       {/* Page transition overlay */}
       <AnimatePresence mode="wait">
         {isPageChanging && (
@@ -113,8 +113,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
       {showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
       <Navbar hidden={hideNav && !isInnovatePage} onLogout={onLogout} />
       
-      <main className={`flex-grow ${isInnovatePage ? 'pt-16' : 'container mx-auto px-4 py-6 pt-20'} ${isRTL ? 'font-noto-arabic' : ''}`}>
-        <Outlet />
+      <main className={`flex-grow animate-container-resize ${isInnovatePage ? 'pt-16' : 'pt-20'} ${isRTL ? 'font-noto-arabic' : ''}`}>
+        <div className={isInnovatePage ? 'page-container-wide' : 'page-container'}>
+          <Outlet />
+        </div>
       </main>
       
       {!isInnovatePage && <Footer />}

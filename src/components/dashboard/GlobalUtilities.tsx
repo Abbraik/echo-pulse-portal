@@ -13,20 +13,20 @@ const GlobalUtilities: React.FC = () => {
 
   return (
     <motion.footer 
-      className="sticky bottom-0 bg-background/80 backdrop-blur-lg border-t border-white/10 p-4"
+      className="sticky bottom-0 bg-background/80 backdrop-blur-lg border-t border-white/10"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.7 }}
     >
-      <div className="container mx-auto">
-        <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div className="page-container py-4">
+        <div className={`flex items-center justify-between w-full ${isRTL ? 'flex-row-reverse' : ''}`}>
           {/* Search Bar */}
           <div className="flex items-center space-x-4 flex-1 max-w-md">
             <div className="relative flex-1">
               <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
                 placeholder="System-wide search..."
-                className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400"
+                className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
               />
             </div>
           </div>
