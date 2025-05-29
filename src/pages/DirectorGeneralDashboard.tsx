@@ -10,10 +10,11 @@ import { SystemHealthAlertsPanel } from '@/components/dashboard/strategic/System
 import { CoordinationTriggersPanel } from '@/components/dashboard/strategic/CoordinationTriggersPanel';
 import { LoopRibbon } from '@/components/dashboard/enhanced/LoopRibbon';
 import { ZoneSnapshot } from '@/components/dashboard/enhanced/ZoneSnapshot';
+import { TodaysSnapshot } from '@/components/dashboard/enhanced/TodaysSnapshot';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import { getDashboardData } from '@/api/dashboard';
 import { Button } from '@/components/ui/button';
-import { X, Maximize2 } from 'lucide-react';
+import { X, Maximize2, Search, Bell, Plus } from 'lucide-react';
 
 type ZoneType = 'THINK' | 'ACT' | 'MONITOR' | 'LEARN' | 'INNOVATE';
 
@@ -33,6 +34,8 @@ const DirectorGeneralDashboard: React.FC = () => {
   const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
   const [contextualSnapshot, setContextualSnapshot] = useState<ContextualSnapshot | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [hasNewNotifications, setHasNewNotifications] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(3);
 
   // Check for mobile viewport
   useEffect(() => {
@@ -59,6 +62,11 @@ const DirectorGeneralDashboard: React.FC = () => {
     
     const interval = setInterval(() => {
       fetchData();
+      // Simulate new notifications
+      if (Math.random() > 0.7) {
+        setHasNewNotifications(true);
+        setNotificationCount(prev => prev + 1);
+      }
     }, 30000);
     
     return () => clearInterval(interval);
@@ -77,7 +85,8 @@ const DirectorGeneralDashboard: React.FC = () => {
           break;
         case 'f':
           e.preventDefault();
-          // Focus on filter functionality
+          // Focus on global search
+          document.getElementById('global-search')?.focus();
           break;
       }
     };
@@ -107,11 +116,19 @@ const DirectorGeneralDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-background">
-        <div className="relative h-16 w-16">
-          <div className="absolute inset-0 bg-teal-500/20 rounded-full animate-pulse blur-xl"></div>
-          <div className="relative z-10 h-full w-full rounded-full border-4 border-t-teal-500 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
-        </div>
+      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        <motion.div 
+          className="relative h-20 w-20"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="absolute inset-0 bg-teal-500/30 rounded-full animate-pulse blur-xl"></div>
+          <div className="relative z-10 h-full w-full rounded-full border-4 border-t-teal-400 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-4 h-4 bg-teal-400 rounded-full animate-pulse"></div>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -121,10 +138,11 @@ const DirectorGeneralDashboard: React.FC = () => {
   const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-foreground relative ${isRTL ? 'rtl' : 'ltr'}`}>
-      {/* Animated background */}
+    <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-foreground relative overflow-hidden ${isRTL ? 'rtl' : 'ltr'}`}>
+      {/* Enhanced animated background */}
       <div className="fixed inset-0 z-0">
-        <ParticlesBackground count={80} colorStart="#14B8A680" colorEnd="#2563EB80" />
+        <ParticlesBackground count={120} colorStart="#14B8A680" colorEnd="#2563EB60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>
       </div>
       
       {/* Fullscreen Panel Overlay */}
@@ -147,83 +165,123 @@ const DirectorGeneralDashboard: React.FC = () => {
         )}
       </FullscreenOverlay>
       
-      <div className="relative z-10 min-h-screen">
+      <motion.div 
+        className="relative z-10 min-h-screen"
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
         {/* Director Header */}
         <div className="flex-shrink-0 z-20">
           <DirectorHeader />
         </div>
         
-        {/* Loop Ribbon */}
-        <div className="sticky top-16 z-30 mb-6">
+        {/* Loop Ribbon with parallax effect */}
+        <motion.div 
+          className="sticky top-16 z-30 mb-6"
+          style={{ y: 0 }}
+          whileInView={{ y: -2 }}
+          transition={{ duration: 0.3 }}
+        >
           <LoopRibbon />
-        </div>
+        </motion.div>
         
-        {/* Role Banner */}
+        {/* Role Banner with enhanced styling */}
         <div className="max-w-[1440px] mx-auto px-6 mb-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-2xl p-6"
+            className="relative overflow-hidden rounded-2xl p-8"
             style={{ 
-              background: 'rgba(10, 20, 40, 0.6)',
-              backdropFilter: 'blur(20px)',
+              background: 'rgba(20, 30, 50, 0.6)',
+              backdropFilter: 'blur(24px)',
               border: '1px solid rgba(20, 184, 166, 0.3)',
-              boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.1), 0 0 40px rgba(20, 184, 166, 0.2)'
+              boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
+            }}
+            whileHover={{ 
+              boxShadow: 'inset 0 0 40px rgba(20, 184, 166, 0.2), 0 20px 40px rgba(0, 0, 0, 0.5)',
+              transition: { duration: 0.3 }
             }}
           >
-            <div className="flex items-center justify-between">
+            <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-2xl"></div>
+            <div className="relative flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400">
+                <motion.h1 
+                  className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400"
+                  style={{ letterSpacing: '0.05em' }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
                   {greeting}, Director General
-                </h1>
-                <p className="text-sm text-gray-300 mt-2">
+                </motion.h1>
+                <motion.p 
+                  className="text-base text-gray-300 mt-3"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
                   Strategic Command Center • {dashboardData?.pending || 12} items require your attention • Live Sync Active
-                </p>
+                </motion.p>
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-xs text-gray-400">Last Update: {lastUpdate.toLocaleTimeString()}</span>
+              <div className="flex items-center space-x-3">
+                <motion.div 
+                  className="w-4 h-4 bg-green-400 rounded-full"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                ></motion.div>
+                <span className="text-sm text-gray-400">Last Update: {lastUpdate.toLocaleTimeString()}</span>
               </div>
             </div>
           </motion.div>
         </div>
 
+        {/* Today's Snapshot */}
+        <div className="max-w-[1440px] mx-auto px-6 mb-6">
+          <TodaysSnapshot data={dashboardData?.todaysSnapshot} />
+        </div>
+
         {/* Main Cockpit Panels */}
         <div className="max-w-[1440px] mx-auto px-6">
-          <div className={`flex gap-6 h-[45vh] ${isMobile ? 'flex-col h-auto' : ''}`}>
+          <div className={`flex gap-8 h-[50vh] ${isMobile ? 'flex-col h-auto' : ''}`}>
             {/* Approvals & Decisions Panel */}
             <motion.div
-              className={`${getPanelWidth('approvals')} transition-all duration-300 ${isMobile ? 'mb-4' : ''}`}
+              className={`${getPanelWidth('approvals')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
               onMouseEnter={() => !isMobile && setHoveredPanel('approvals')}
               onMouseLeave={() => !isMobile && setHoveredPanel(null)}
               onFocus={() => handleFocusMode('approvals')}
               style={{ 
-                background: 'rgba(10, 20, 40, 0.6)',
-                backdropFilter: 'blur(20px)',
-                border: hoveredPanel === 'approvals' ? '2px solid rgba(20, 184, 166, 0.5)' : '1px solid rgba(20, 184, 166, 0.3)',
-                borderRadius: '2rem',
+                background: 'rgba(20, 30, 50, 0.6)',
+                backdropFilter: 'blur(24px)',
+                border: hoveredPanel === 'approvals' ? '2px solid rgba(20, 184, 166, 0.6)' : '1px solid rgba(20, 184, 166, 0.3)',
+                borderRadius: '24px',
                 boxShadow: hoveredPanel === 'approvals' 
-                  ? 'inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 40px rgba(20, 184, 166, 0.3)'
-                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
+                  ? 'inset 0 0 40px rgba(20, 184, 166, 0.2), 0 16px 32px rgba(0, 0, 0, 0.4)'
+                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1), 0 8px 16px rgba(0, 0, 0, 0.2)'
+              }}
+              whileHover={{ 
+                y: -4,
+                transition: { duration: 0.2 }
               }}
             >
               <div className="relative h-full">
-                <div className="absolute top-4 right-4 z-10">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleFullscreen('approvals')}
-                    className="text-gray-400 hover:text-teal-400"
-                  >
-                    <Maximize2 size={16} />
-                  </Button>
+                <div className="absolute top-6 right-6 z-10">
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleFullscreen('approvals')}
+                      className="text-gray-400 hover:text-teal-400 hover:bg-teal-400/10"
+                    >
+                      <Maximize2 size={16} />
+                    </Button>
+                  </motion.div>
                 </div>
                 <ApprovalsDecisionsPanel 
                   data={dashboardData?.approvals}
                   onFocusMode={(isFocused) => handleFocusMode(isFocused ? 'approvals' : '')}
                   onContextualAction={(action, itemTitle) => {
                     if (action === 'approve') {
-                      // Inject relevant zone snapshot based on approval type
                       handleContextualAction('THINK', `Approved: ${itemTitle}`, 'approvals');
                     }
                   }}
@@ -233,30 +291,36 @@ const DirectorGeneralDashboard: React.FC = () => {
 
             {/* System Health & Alerts Panel */}
             <motion.div
-              className={`${getPanelWidth('health')} transition-all duration-300 ${isMobile ? 'mb-4' : ''}`}
+              className={`${getPanelWidth('health')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
               onMouseEnter={() => !isMobile && setHoveredPanel('health')}
               onMouseLeave={() => !isMobile && setHoveredPanel(null)}
               onFocus={() => handleFocusMode('health')}
               style={{ 
-                background: 'rgba(10, 20, 40, 0.6)',
-                backdropFilter: 'blur(20px)',
-                border: hoveredPanel === 'health' ? '2px solid rgba(20, 184, 166, 0.5)' : '1px solid rgba(20, 184, 166, 0.3)',
-                borderRadius: '2rem',
+                background: 'rgba(20, 30, 50, 0.6)',
+                backdropFilter: 'blur(24px)',
+                border: hoveredPanel === 'health' ? '2px solid rgba(20, 184, 166, 0.6)' : '1px solid rgba(20, 184, 166, 0.3)',
+                borderRadius: '24px',
                 boxShadow: hoveredPanel === 'health' 
-                  ? 'inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 40px rgba(20, 184, 166, 0.3)'
-                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
+                  ? 'inset 0 0 40px rgba(20, 184, 166, 0.2), 0 16px 32px rgba(0, 0, 0, 0.4)'
+                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1), 0 8px 16px rgba(0, 0, 0, 0.2)'
+              }}
+              whileHover={{ 
+                y: -4,
+                transition: { duration: 0.2 }
               }}
             >
               <div className="relative h-full">
-                <div className="absolute top-4 right-4 z-10">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleFullscreen('health')}
-                    className="text-gray-400 hover:text-teal-400"
-                  >
-                    <Maximize2 size={16} />
-                  </Button>
+                <div className="absolute top-6 right-6 z-10">
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleFullscreen('health')}
+                      className="text-gray-400 hover:text-teal-400 hover:bg-teal-400/10"
+                    >
+                      <Maximize2 size={16} />
+                    </Button>
+                  </motion.div>
                 </div>
                 <SystemHealthAlertsPanel 
                   data={dashboardData?.systemHealth}
@@ -274,25 +338,31 @@ const DirectorGeneralDashboard: React.FC = () => {
               onMouseLeave={() => !isMobile && setHoveredPanel(null)}
               onFocus={() => handleFocusMode('coordination')}
               style={{ 
-                background: 'rgba(10, 20, 40, 0.6)',
-                backdropFilter: 'blur(20px)',
-                border: hoveredPanel === 'coordination' ? '2px solid rgba(20, 184, 166, 0.5)' : '1px solid rgba(20, 184, 166, 0.3)',
-                borderRadius: '2rem',
+                background: 'rgba(20, 30, 50, 0.6)',
+                backdropFilter: 'blur(24px)',
+                border: hoveredPanel === 'coordination' ? '2px solid rgba(20, 184, 166, 0.6)' : '1px solid rgba(20, 184, 166, 0.3)',
+                borderRadius: '24px',
                 boxShadow: hoveredPanel === 'coordination' 
-                  ? 'inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 40px rgba(20, 184, 166, 0.3)'
-                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
+                  ? 'inset 0 0 40px rgba(20, 184, 166, 0.2), 0 16px 32px rgba(0, 0, 0, 0.4)'
+                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1), 0 8px 16px rgba(0, 0, 0, 0.2)'
+              }}
+              whileHover={{ 
+                y: -4,
+                transition: { duration: 0.2 }
               }}
             >
               <div className="relative h-full">
-                <div className="absolute top-4 right-4 z-10">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleFullscreen('coordination')}
-                    className="text-gray-400 hover:text-teal-400"
-                  >
-                    <Maximize2 size={16} />
-                  </Button>
+                <div className="absolute top-6 right-6 z-10">
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleFullscreen('coordination')}
+                      className="text-gray-400 hover:text-teal-400 hover:bg-teal-400/10"
+                    >
+                      <Maximize2 size={16} />
+                    </Button>
+                  </motion.div>
                 </div>
                 <CoordinationTriggersPanel 
                   data={dashboardData?.coordination}
@@ -316,38 +386,50 @@ const DirectorGeneralDashboard: React.FC = () => {
           <AnimatePresence>
             {contextualSnapshot && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                className="mt-6"
+                initial={{ opacity: 0, height: 0, y: 20 }}
+                animate={{ opacity: 1, height: 'auto', y: 0 }}
+                exit={{ opacity: 0, height: 0, y: 20 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="mt-8"
               >
                 <div 
-                  className="relative overflow-hidden rounded-2xl p-6"
+                  className="relative overflow-hidden rounded-2xl p-8"
                   style={{ 
-                    background: 'rgba(10, 20, 40, 0.4)',
-                    backdropFilter: 'blur(15px)',
-                    border: '1px solid rgba(20, 184, 166, 0.2)',
-                    boxShadow: 'inset 0 0 20px rgba(20, 184, 166, 0.05)'
+                    background: 'rgba(20, 30, 50, 0.4)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(20, 184, 166, 0.25)',
+                    boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.1), 0 8px 24px rgba(0, 0, 0, 0.3)'
                   }}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <h3 className="text-lg font-semibold text-teal-400">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-4">
+                      <motion.h3 
+                        className="text-xl font-semibold text-teal-400"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 }}
+                      >
                         {contextualSnapshot.zone} Zone Snapshot
-                      </h3>
-                      <span className="text-sm text-gray-400">
+                      </motion.h3>
+                      <motion.span 
+                        className="text-sm text-gray-400"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                      >
                         Triggered by: {contextualSnapshot.trigger}
-                      </span>
+                      </motion.span>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setContextualSnapshot(null)}
-                      className="text-gray-400 hover:text-white"
-                    >
-                      <X size={16} />
-                    </Button>
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setContextualSnapshot(null)}
+                        className="text-gray-400 hover:text-white hover:bg-white/10"
+                      >
+                        <X size={16} />
+                      </Button>
+                    </motion.div>
                   </div>
                   <ZoneSnapshot 
                     zone={contextualSnapshot.zone}
@@ -357,8 +439,72 @@ const DirectorGeneralDashboard: React.FC = () => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Footer & Utilities */}
+          <motion.div 
+            className="mt-12 mb-8 flex items-center justify-between"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            {/* Global Search */}
+            <div className="flex items-center space-x-4">
+              <motion.div 
+                className="relative"
+                whileFocus={{ scale: 1.02 }}
+              >
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <input
+                  id="global-search"
+                  type="text"
+                  placeholder="Global search..."
+                  className="pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent backdrop-blur-md w-80"
+                />
+              </motion.div>
+              
+              {/* Notifications Center */}
+              <motion.div className="relative" whileHover={{ scale: 1.05 }}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="relative text-gray-400 hover:text-white hover:bg-white/10"
+                  onClick={() => {
+                    setHasNewNotifications(false);
+                    setNotificationCount(0);
+                  }}
+                >
+                  <Bell size={20} />
+                  <AnimatePresence>
+                    {notificationCount > 0 && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                      >
+                        {notificationCount}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              </motion.div>
+            </div>
+
+            {/* Quick-Launch Floating Actions */}
+            <div className="flex items-center space-x-3">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  size="sm"
+                  className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg"
+                >
+                  <Plus size={16} className="mr-2" />
+                  Quick Action
+                </Button>
+              </motion.div>
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

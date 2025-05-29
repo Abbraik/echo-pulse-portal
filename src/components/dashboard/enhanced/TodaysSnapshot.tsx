@@ -1,139 +1,93 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, TrendingUp, Activity } from 'lucide-react';
-import { GlassCard } from '@/components/ui/glass-card';
+import { TrendingUp, AlertTriangle, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FullscreenButton } from '@/components/ui/fullscreen-button';
 
 interface TodaysSnapshotProps {
   data?: {
-    headline: string;
-    severity: 'critical' | 'warning' | 'info';
-    metric: string;
-    change: string;
-    hasStrategicAlert: boolean;
+    criticalAlert?: string;
+    volatility?: number;
+    activeItems?: number;
+    completionRate?: number;
   };
-  lastUpdate: Date;
-  isFullscreen?: boolean;
-  onToggleFullscreen?: () => void;
 }
 
-const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ 
-  data, 
-  lastUpdate, 
-  isFullscreen = false,
-  onToggleFullscreen 
-}) => {
+export const TodaysSnapshot: React.FC<TodaysSnapshotProps> = ({ data }) => {
   // Mock data if not provided
   const mockData = {
-    headline: "DEI out-of-band: Population Volatility",
-    severity: 'critical' as const,
-    metric: "↑15%",
-    change: "+0.25 in 12 cycles",
-    hasStrategicAlert: true
+    criticalAlert: 'DEI Volatility',
+    volatility: 15,
+    activeItems: 8,
+    completionRate: 87
   };
 
   const displayData = data || mockData;
 
-  const getSeverityConfig = (severity: string) => {
-    switch (severity) {
-      case 'critical':
-        return {
-          color: 'text-red-400',
-          bg: 'bg-red-500/20',
-          icon: AlertTriangle,
-          pulse: 'animate-pulse'
-        };
-      case 'warning':
-        return {
-          color: 'text-orange-400',
-          bg: 'bg-orange-500/20',
-          icon: TrendingUp,
-          pulse: ''
-        };
-      default:
-        return {
-          color: 'text-teal-400',
-          bg: 'bg-teal-500/20',
-          icon: Activity,
-          pulse: ''
-        };
-    }
-  };
-
-  const config = getSeverityConfig(displayData.severity);
-  const IconComponent = config.icon;
-
   return (
-    <GlassCard 
-      className={`${isFullscreen ? 'h-full p-8' : 'h-24 p-4'} relative overflow-hidden flex items-center group`}
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="relative overflow-hidden rounded-2xl p-6"
       style={{ 
-        background: 'rgba(255, 255, 255, 0.5)',
-        backdropFilter: 'blur(20px)',
+        background: 'rgba(20, 30, 50, 0.6)',
+        backdropFilter: 'blur(24px)',
         border: '1px solid rgba(20, 184, 166, 0.3)',
-        borderRadius: '2rem',
-        boxShadow: 'inset 0 1px 0 0 rgba(20, 184, 166, 0.1), 0 0 30px rgba(20, 184, 166, 0.15)'
+        boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.1), 0 8px 16px rgba(0, 0, 0, 0.2)'
       }}
     >
-      {/* Live Sync Indicator */}
-      <div className="absolute top-3 right-4 flex items-center space-x-2 z-10">
-        {onToggleFullscreen && (
-          <FullscreenButton
-            isFullscreen={isFullscreen}
-            onToggle={onToggleFullscreen}
-          />
-        )}
-        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-        <span className="text-xs text-gray-400">Live • {lastUpdate.toLocaleTimeString()}</span>
-      </div>
-
-      <div className={`flex items-center justify-between w-full ${isFullscreen ? 'flex-col space-y-8' : ''}`}>
-        {/* Main Insight */}
-        <div className={`flex items-center space-x-4 flex-1 min-w-0 ${isFullscreen ? 'w-full justify-center' : ''}`}>
-          <div className={`p-2 rounded-xl ${config.bg} ${config.pulse} flex-shrink-0 ${isFullscreen ? 'p-4' : ''}`}>
-            <IconComponent size={isFullscreen ? 32 : 20} className={config.color} />
+      <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 rounded-2xl"></div>
+      <div className="relative flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-3">
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            >
+              <AlertTriangle className="text-orange-400" size={24} />
+            </motion.div>
+            <div>
+              <motion.h3 
+                className="text-lg font-semibold text-orange-400"
+                animate={{ opacity: [1, 0.7, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                {displayData.criticalAlert} ↑{displayData.volatility}%
+              </motion.h3>
+              <p className="text-sm text-gray-300">Requires immediate attention</p>
+            </div>
           </div>
           
-          <div className={`space-y-1 flex-1 min-w-0 ${isFullscreen ? 'text-center' : ''}`}>
-            <h2 className={`font-semibold text-white ${isFullscreen ? 'text-2xl' : 'text-sm'}`}>
-              Today's Critical Insight
-            </h2>
-            <div className={`flex items-center space-x-2 ${isFullscreen ? 'justify-center flex-wrap text-center' : 'flex-wrap'}`}>
-              <span className={`font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500 ${isFullscreen ? 'text-3xl' : 'text-lg'} ${isFullscreen ? '' : 'truncate'}`}>
-                {displayData.headline}
-              </span>
-              <Badge className={`${config.color} ${config.bg} font-bold ${isFullscreen ? 'text-lg px-4 py-2' : 'text-sm px-2 py-1'} flex-shrink-0`}>
-                {displayData.metric}
-              </Badge>
+          <div className="h-8 w-px bg-gray-600"></div>
+          
+          <div className="flex items-center space-x-4">
+            <div className="text-center">
+              <div className="text-xl font-bold text-teal-400">{displayData.activeItems}</div>
+              <div className="text-xs text-gray-400">Active Items</div>
             </div>
-            <p className={`text-gray-400 ${isFullscreen ? 'text-lg' : 'text-xs'}`}>
-              {displayData.change}
-            </p>
+            <div className="text-center">
+              <div className="text-xl font-bold text-green-400">{displayData.completionRate}%</div>
+              <div className="text-xs text-gray-400">Completion Rate</div>
+            </div>
           </div>
         </div>
 
-        {/* Strategic Alert CTA */}
-        <div className={`flex items-center space-x-4 flex-shrink-0 ${isFullscreen ? 'w-full justify-center' : 'ml-4'}`}>
-          {displayData.hasStrategicAlert && (
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button 
+            className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white shadow-lg relative overflow-hidden"
+          >
             <motion.div
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Button
-                size={isFullscreen ? "lg" : "sm"}
-                className={`${config.pulse} ${config.color === 'text-red-400' ? 'bg-red-600 hover:bg-red-700' : 'bg-teal-600 hover:bg-teal-700'} text-white font-semibold ${isFullscreen ? 'px-8 py-4 text-lg' : 'px-4 py-2'}`}
-              >
-                <AlertTriangle size={isFullscreen ? 20 : 16} className="mr-2" />
-                Review Alert ▶
-              </Button>
-            </motion.div>
-          )}
-        </div>
+              className="absolute inset-0 bg-white/20"
+              initial={{ x: '-100%' }}
+              whileHover={{ x: '100%' }}
+              transition={{ duration: 0.6 }}
+            ></motion.div>
+            <span className="relative">Review Alert</span>
+          </Button>
+        </motion.div>
       </div>
-    </GlassCard>
+    </motion.div>
   );
 };
-
-export default TodaysSnapshot;
