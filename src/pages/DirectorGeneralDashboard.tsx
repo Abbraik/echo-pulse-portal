@@ -33,21 +33,24 @@ const DirectorGeneralDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [hoveredPanel, setHoveredPanel] = useState<string | null>(null);
-  const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
   const [contextualSnapshot, setContextualSnapshot] = useState<ContextualSnapshot | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   // Panel compact state management
   const { containerRef } = usePanelCompact();
 
-  // Add panel hover functionality
+  // Enhanced panel hover functionality with fullscreen
   const {
     expandedPanel,
     isAnimating,
+    fullscreenPanel,
     handlePanelHover,
     handlePanelLeave,
+    handleFullscreen,
+    getPanelTransform,
     getPanelWidth,
     isPanelCollapsed,
+    isFullscreen,
   } = usePanelHover();
 
   // Check for mobile viewport
@@ -80,7 +83,7 @@ const DirectorGeneralDashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Keyboard shortcuts
+  // Enhanced keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -88,13 +91,12 @@ const DirectorGeneralDashboard: React.FC = () => {
       switch (e.key.toLowerCase()) {
         case 'escape':
           e.preventDefault();
-          setFullscreenPanel(null);
+          handleFullscreen(null);
           setContextualSnapshot(null);
-          handlePanelLeave(); // Reset panel hover state
+          handlePanelLeave();
           break;
         case 'f':
           e.preventDefault();
-          // Focus on global search
           document.getElementById('global-search')?.focus();
           break;
         case '1':
@@ -114,14 +116,10 @@ const DirectorGeneralDashboard: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePanelHover, handlePanelLeave]);
+  }, [handlePanelHover, handlePanelLeave, handleFullscreen]);
 
   const handleFocusMode = (panelId: string) => {
     setHoveredPanel(panelId);
-  };
-
-  const handleFullscreen = (panelId: string) => {
-    setFullscreenPanel(panelId);
   };
 
   const handleContextualAction = (zone: ZoneType, trigger: string, panelId: string) => {
@@ -264,17 +262,20 @@ const DirectorGeneralDashboard: React.FC = () => {
           <TodaysSnapshot data={dashboardData?.todaysSnapshot} />
         </div>
 
-        {/* Main Cockpit Panels - Updated with hover functionality */}
+        {/* Enhanced Main Cockpit Panels with hardware-accelerated hover functionality */}
         <div className="max-w-[1440px] mx-auto px-6 pb-6" ref={containerRef}>
           <div className={`flex gap-4 h-[45vh] min-h-[500px] ${isMobile ? 'flex-col h-auto' : ''}`}>
             {/* Approvals & Decisions Panel */}
             <HoverablePanelWrapper
               panelId="approvals"
               isCollapsed={isPanelCollapsed('approvals')}
+              isFullscreen={isFullscreen('approvals')}
               width={getPanelWidth('approvals')}
+              transform={getPanelTransform('approvals')}
               onHover={handlePanelHover}
               onLeave={handlePanelLeave}
               onClick={handlePanelHover}
+              onFullscreen={handleFullscreen}
             >
               <ApprovalsDecisionsPanel 
                 data={dashboardData?.approvals}
@@ -291,10 +292,13 @@ const DirectorGeneralDashboard: React.FC = () => {
             <HoverablePanelWrapper
               panelId="health"
               isCollapsed={isPanelCollapsed('health')}
+              isFullscreen={isFullscreen('health')}
               width={getPanelWidth('health')}
+              transform={getPanelTransform('health')}
               onHover={handlePanelHover}
               onLeave={handlePanelLeave}
               onClick={handlePanelHover}
+              onFullscreen={handleFullscreen}
             >
               <SystemHealthAlertsPanel 
                 data={dashboardData?.systemHealth}
@@ -308,10 +312,13 @@ const DirectorGeneralDashboard: React.FC = () => {
             <HoverablePanelWrapper
               panelId="coordination"
               isCollapsed={isPanelCollapsed('coordination')}
+              isFullscreen={isFullscreen('coordination')}
               width={getPanelWidth('coordination')}
+              transform={getPanelTransform('coordination')}
               onHover={handlePanelHover}
               onLeave={handlePanelLeave}
               onClick={handlePanelHover}
+              onFullscreen={handleFullscreen}
             >
               <CoordinationTriggersPanel 
                 data={dashboardData?.coordination}
