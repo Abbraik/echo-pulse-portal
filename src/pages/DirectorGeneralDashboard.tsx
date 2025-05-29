@@ -15,7 +15,7 @@ import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import { CompactPanelWrapper } from '@/components/dashboard/enhanced/CompactPanelWrapper';
 import { getDashboardData } from '@/api/dashboard';
 import { Button } from '@/components/ui/button';
-import { X, Maximize2, Search, Bell, Plus } from 'lucide-react';
+import { X, Maximize2, Search } from 'lucide-react';
 
 type ZoneType = 'THINK' | 'ACT' | 'MONITOR' | 'LEARN' | 'INNOVATE';
 
@@ -35,8 +35,6 @@ const DirectorGeneralDashboard: React.FC = () => {
   const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
   const [contextualSnapshot, setContextualSnapshot] = useState<ContextualSnapshot | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [hasNewNotifications, setHasNewNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(3);
 
   // Panel compact state management
   const { containerRef } = usePanelCompact();
@@ -66,11 +64,6 @@ const DirectorGeneralDashboard: React.FC = () => {
     
     const interval = setInterval(() => {
       fetchData();
-      // Simulate new notifications
-      if (Math.random() > 0.7) {
-        setHasNewNotifications(true);
-        setNotificationCount(prev => prev + 1);
-      }
     }, 30000);
     
     return () => clearInterval(interval);
@@ -230,6 +223,25 @@ const DirectorGeneralDashboard: React.FC = () => {
           </motion.div>
         </div>
 
+        {/* Global Search Bar */}
+        <div className="max-w-[1440px] mx-auto px-6 mb-6">
+          <motion.div 
+            className="relative max-w-md"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            whileFocus={{ scale: 1.02 }}
+          >
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              id="global-search"
+              type="text"
+              placeholder="Global search..."
+              className="pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent backdrop-blur-md w-80"
+            />
+          </motion.div>
+        </div>
+
         {/* Today's Snapshot */}
         <div className="max-w-[1440px] mx-auto px-6 mb-6">
           <TodaysSnapshot data={dashboardData?.todaysSnapshot} />
@@ -376,70 +388,6 @@ const DirectorGeneralDashboard: React.FC = () => {
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* Footer & Utilities */}
-          <motion.div 
-            className="mt-12 mb-8 flex items-center justify-between"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            {/* Global Search */}
-            <div className="flex items-center space-x-4">
-              <motion.div 
-                className="relative"
-                whileFocus={{ scale: 1.02 }}
-              >
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  id="global-search"
-                  type="text"
-                  placeholder="Global search..."
-                  className="pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent backdrop-blur-md w-80"
-                />
-              </motion.div>
-              
-              {/* Notifications Center */}
-              <motion.div className="relative" whileHover={{ scale: 1.05 }}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="relative text-gray-400 hover:text-white hover:bg-white/10"
-                  onClick={() => {
-                    setHasNewNotifications(false);
-                    setNotificationCount(0);
-                  }}
-                >
-                  <Bell size={20} />
-                  <AnimatePresence>
-                    {notificationCount > 0 && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                      >
-                        {notificationCount}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Button>
-              </motion.div>
-            </div>
-
-            {/* Quick-Launch Floating Actions */}
-            <div className="flex items-center space-x-3">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  size="sm"
-                  className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg"
-                >
-                  <Plus size={16} className="mr-2" />
-                  Quick Action
-                </Button>
-              </motion.div>
-            </div>
-          </motion.div>
         </div>
       </motion.div>
     </div>
