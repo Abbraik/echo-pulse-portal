@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Users, AlertCircle, ArrowRight, Filter, RefreshCw, Maximize2 } from 'lucide-react';
+import { Users, AlertCircle, ArrowRight, Filter, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -31,15 +32,13 @@ interface CoordinationTriggersPanelProps {
   onRedesignFlag?: (flagType: string) => void;
   onEscalationAction?: (action: string, zone: string) => void;
   onZoneLeadClick?: (zone: string) => void;
-  onFullscreen?: () => void;
 }
 
 export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps> = ({ 
   data, 
   onRedesignFlag, 
   onEscalationAction, 
-  onZoneLeadClick,
-  onFullscreen
+  onZoneLeadClick 
 }) => {
   const [escalationFilter, setEscalationFilter] = useState('all');
 
@@ -101,20 +100,10 @@ export const CoordinationTriggersPanel: React.FC<CoordinationTriggersPanelProps>
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-purple-400">Coordination & Triggers</h3>
-          <div className="flex items-center space-x-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={onFullscreen}
-              className="opacity-0 group-hover:opacity-100 transition-opacity duration-250 bg-white/10 hover:bg-white/20"
-            >
-              <Maximize2 size={14} />
-            </Button>
-            <Button size="sm" variant="ghost" className="text-purple-400">
-              <RefreshCw size={14} className="mr-1" />
-              Refresh
-            </Button>
-          </div>
+          <Button size="sm" variant="ghost" className="text-purple-400">
+            <RefreshCw size={14} className="mr-1" />
+            Refresh
+          </Button>
         </div>
 
         {/* Redesign Flags Council */}

@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-type PanelType = 'approvals' | 'health' | 'coordination' | null;
+type PanelType = 'toolbox' | 'canvas' | 'simulation' | 'results' | null;
 
 export const useFullscreenPanel = () => {
   const [fullscreenPanel, setFullscreenPanel] = useState<PanelType>(null);
