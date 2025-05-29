@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Check, Info, ThumbsUp } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
@@ -33,7 +34,16 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
 
   // If a bundle is selected and the view is 'default', show the bundle view
   if (selectedBundle && view === 'default') {
-    return <BundleView bundleId={selectedBundle} onClose={handleCloseBundleView} />;
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="p-6"
+      >
+        <BundleView bundleId={selectedBundle} onClose={handleCloseBundleView} />
+      </motion.div>
+    );
   }
   
   // Otherwise, show the appropriate action view based on the selected action
@@ -41,40 +51,64 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
     switch (view) {
       case 'assign-leverage':
         return (
-          <div className="h-full flex flex-col">
-            {/* Stepper header */}
+          <div className="h-full flex flex-col p-6">
+            {/* Cinematic Stepper header */}
             <div className="flex justify-between mb-8 px-4">
               {steps.map((step, index) => (
                 <React.Fragment key={step.id}>
-                  <div 
+                  <motion.div 
                     className={`flex flex-col items-center ${index <= currentStepIndex ? 'cursor-pointer' : ''}`}
                     onClick={() => index <= currentStepIndex && setCurrentStepIndex(index)}
+                    whileHover={index <= currentStepIndex ? { scale: 1.05 } : {}}
+                    whileTap={index <= currentStepIndex ? { scale: 0.95 } : {}}
                   >
-                    <div 
-                      className={`w-10 h-10 rounded-full flex items-center justify-center
-                        ${index < currentStepIndex ? 'bg-teal-500 text-white' : 
-                          index === currentStepIndex ? 'bg-teal-500 text-white' : 
-                          'bg-white/10 text-gray-400'}`}
+                    <motion.div 
+                      className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm border transition-all duration-300
+                        ${index < currentStepIndex ? 'bg-teal-500/80 text-white border-teal-400/50 shadow-lg shadow-teal-500/25' : 
+                          index === currentStepIndex ? 'bg-teal-500/80 text-white border-teal-400/50 shadow-lg shadow-teal-500/25' : 
+                          'bg-white/10 text-gray-400 border-white/20'}`}
+                      animate={index === currentStepIndex ? { 
+                        boxShadow: [
+                          '0 0 20px rgba(20, 184, 166, 0.3)',
+                          '0 0 30px rgba(20, 184, 166, 0.5)',
+                          '0 0 20px rgba(20, 184, 166, 0.3)'
+                        ]
+                      } : {}}
+                      transition={{ duration: 2, repeat: Infinity }}
                     >
                       {index < currentStepIndex ? (
-                        <Check className="h-6 w-6" />
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: "spring", stiffness: 200 }}
+                        >
+                          <Check className="h-6 w-6" />
+                        </motion.div>
                       ) : (
-                        <span>{index + 1}</span>
+                        <span className="font-noto-bold">{index + 1}</span>
                       )}
-                    </div>
-                    <span 
-                      className={`mt-2 text-sm ${index === currentStepIndex ? 'text-teal-400' : 'text-gray-400'}`}
+                    </motion.div>
+                    <motion.span 
+                      className={`mt-3 text-sm font-noto-medium transition-colors duration-300 ${
+                        index === currentStepIndex ? 'text-teal-400' : 'text-gray-400'
+                      }`}
+                      animate={index === currentStepIndex ? { 
+                        textShadow: '0 0 10px rgba(20, 184, 166, 0.5)' 
+                      } : {}}
                     >
                       {step.title}
-                    </span>
-                  </div>
+                    </motion.span>
+                  </motion.div>
                   
                   {index < steps.length - 1 && (
-                    <div className="flex-1 flex items-center">
-                      <div 
-                        className={`h-1 w-full ${
-                          index < currentStepIndex ? 'bg-teal-500' : 'bg-white/10'
+                    <div className="flex-1 flex items-center px-4">
+                      <motion.div 
+                        className={`h-1 w-full rounded-full transition-all duration-500 ${
+                          index < currentStepIndex ? 'bg-gradient-to-r from-teal-500 to-teal-400' : 'bg-white/10'
                         }`}
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: index < currentStepIndex ? 1 : 0.3 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
                       />
                     </div>
                   )}
@@ -82,88 +116,173 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
               ))}
             </div>
             
-            {/* Step content */}
-            <div className="flex-1 bg-white/5 backdrop-blur-sm rounded-lg p-6">
+            {/* Step content with glassmorphic container */}
+            <div className="flex-1 rounded-xl backdrop-blur-sm border border-white/10 p-6 relative overflow-hidden"
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                boxShadow: 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-blue-500/5 rounded-xl"></div>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={`step-${currentStepIndex}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="h-full"
+                  initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="h-full relative z-10"
                 >
-                  {/* ... keep existing code for the various step views */}
+                  <div className="flex flex-col items-center justify-center h-full text-center">
+                    <h3 className="text-xl font-noto-bold text-teal-300 mb-4">
+                      {steps[currentStepIndex].title}
+                    </h3>
+                    <p className="text-gray-300 font-noto-regular mb-6 max-w-md">
+                      {t('stepContent', { defaultValue: `Complete the ${steps[currentStepIndex].title.toLowerCase()} phase of your strategy.` })}
+                    </p>
+                    <div className="w-full max-w-sm bg-white/5 rounded-lg p-4 border border-white/10">
+                      <div className="text-sm text-gray-400 mb-2">Progress</div>
+                      <div className="w-full bg-white/10 rounded-full h-2">
+                        <motion.div 
+                          className="bg-gradient-to-r from-teal-500 to-blue-500 h-2 rounded-full"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>
             
-            {/* Navigation buttons */}
+            {/* Navigation buttons with enhanced styling */}
             <div className="mt-6 flex justify-between">
               <Button
                 variant="outline"
-                className="bg-white/5"
+                className="backdrop-blur-sm bg-white/5 border-white/20 hover:bg-white/10 transition-all duration-300 font-noto-medium"
                 onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
                 disabled={currentStepIndex === 0}
               >
                 {t('previous')}
               </Button>
-              <Button
-                onClick={() => {
-                  if (currentStepIndex < steps.length - 1) {
-                    setCurrentStepIndex(currentStepIndex + 1);
-                  } else {
-                    // Handle completion
-                  }
-                }}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {currentStepIndex < steps.length - 1 ? 
-                  t('next') : 
-                  t('complete')
-                }
-              </Button>
+                <Button
+                  className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 transition-all duration-300 font-noto-medium shadow-lg shadow-teal-500/25"
+                  onClick={() => {
+                    if (currentStepIndex < steps.length - 1) {
+                      setCurrentStepIndex(currentStepIndex + 1);
+                    } else {
+                      // Handle completion
+                    }
+                  }}
+                >
+                  {currentStepIndex < steps.length - 1 ? 
+                    t('next') : 
+                    t('complete')
+                  }
+                </Button>
+              </motion.div>
             </div>
           </div>
         );
         
       case 're-optimize':
         return (
-          <div className="h-full">
-            <h2 className="text-xl font-medium mb-6">{t('optimizeBands')}</h2>
+          <div className="h-full p-6">
+            <motion.h2 
+              className="text-2xl font-noto-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-400"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {t('optimizeBands')}
+            </motion.h2>
             
-            {/* Sliders for optimization parameters */}
+            {/* Sliders for optimization parameters with enhanced styling */}
             <div className="space-y-8">
-              {['economic', 'social', 'environmental', 'governance'].map((band) => (
-                <div key={band} className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="capitalize">{t(band as 'economic' | 'social' | 'environmental' | 'governance')}</span>
-                    <span className="text-sm text-gray-400">65%</span>
+              {['economic', 'social', 'environmental', 'governance'].map((band, index) => (
+                <motion.div 
+                  key={band} 
+                  className="space-y-3"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="capitalize font-noto-medium text-gray-200">
+                      {t(band as 'economic' | 'social' | 'environmental' | 'governance')}
+                    </span>
+                    <motion.span 
+                      className="text-sm text-teal-400 font-noto-bold"
+                      animate={{ textShadow: '0 0 10px rgba(20, 184, 166, 0.5)' }}
+                    >
+                      65%
+                    </motion.span>
                   </div>
-                  <Slider
-                    defaultValue={[65]}
-                    max={100}
-                    step={1}
-                  />
-                </div>
+                  <div className="slider-teal">
+                    <Slider
+                      defaultValue={[65]}
+                      max={100}
+                      step={1}
+                      className="transition-all duration-300"
+                    />
+                  </div>
+                </motion.div>
               ))}
               
-              <div className="pt-4 border-t border-white/10">
-                <div className="flex justify-between mb-2">
-                  <span>{t('weightDistribution')}</span>
-                  <span className="text-sm text-gray-400">{t('balanced')}</span>
+              <motion.div 
+                className="pt-6 border-t border-white/10"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <div className="flex justify-between mb-3">
+                  <span className="font-noto-medium text-gray-200">{t('weightDistribution')}</span>
+                  <span className="text-sm text-gray-400 font-noto-regular">{t('balanced')}</span>
                 </div>
-                <div className="grid grid-cols-4 gap-1 h-6">
-                  <div className="bg-teal-500/80 rounded-l-full" />
-                  <div className="bg-blue-500/80" />
-                  <div className="bg-purple-500/80" />
-                  <div className="bg-amber-500/80 rounded-r-full" />
+                <div className="grid grid-cols-4 gap-1 h-8 rounded-lg overflow-hidden">
+                  <motion.div 
+                    className="bg-teal-500/80 rounded-l-lg"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.6, duration: 0.3 }}
+                  />
+                  <motion.div 
+                    className="bg-blue-500/80"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.7, duration: 0.3 }}
+                  />
+                  <motion.div 
+                    className="bg-purple-500/80"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.8, duration: 0.3 }}
+                  />
+                  <motion.div 
+                    className="bg-amber-500/80 rounded-r-lg"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.9, duration: 0.3 }}
+                  />
                 </div>
-              </div>
+              </motion.div>
               
-              <div className="flex justify-center">
-                <Button size="lg" className="px-8">
-                  {t('compute')}
-                </Button>
+              <div className="flex justify-center pt-4">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button 
+                    size="lg" 
+                    className="px-12 py-3 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 font-noto-bold text-lg shadow-lg shadow-teal-500/25 transition-all duration-300"
+                  >
+                    {t('compute')}
+                  </Button>
+                </motion.div>
               </div>
             </div>
           </div>
@@ -171,54 +290,82 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
         
       case 'launch-delivery':
         return (
-          <div className="h-full flex flex-col items-center justify-center text-center py-12">
+          <div className="h-full flex flex-col items-center justify-center text-center py-12 p-6">
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="relative"
             >
-              <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">
-                {t('launchingDeliveryPlan')}
-              </h2>
-              <p className="text-gray-400 mb-8">
-                {t('scrollingToDelivery')}
-              </p>
-              <motion.div 
-                className="text-teal-400 text-6xl"
-                animate={{ 
-                  y: [0, 10, 0],
-                  opacity: [1, 0.6, 1] 
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatType: "reverse"
-                }}
-              >
-                ↓
-              </motion.div>
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-blue-500/20 rounded-3xl blur-xl"></div>
+              <div className="relative backdrop-blur-sm bg-white/5 rounded-2xl p-8 border border-white/20">
+                <motion.h2 
+                  className="text-3xl font-noto-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500"
+                  animate={{ 
+                    textShadow: [
+                      '0 0 20px rgba(20, 184, 166, 0.5)',
+                      '0 0 30px rgba(20, 184, 166, 0.7)',
+                      '0 0 20px rgba(20, 184, 166, 0.5)'
+                    ]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  {t('launchingDeliveryPlan')}
+                </motion.h2>
+                <p className="text-gray-300 mb-8 font-noto-medium">
+                  {t('scrollingToDelivery')}
+                </p>
+                <motion.div 
+                  className="text-teal-400 text-6xl font-bold"
+                  animate={{ 
+                    y: [0, 15, 0],
+                    opacity: [1, 0.6, 1],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: "easeInOut"
+                  }}
+                >
+                  ↓
+                </motion.div>
+              </div>
             </motion.div>
           </div>
         );
         
       default:
         return (
-          <div className="h-full flex flex-col items-center justify-center text-center py-12">
+          <div className="h-full flex flex-col items-center justify-center text-center py-12 p-6">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+              className="relative"
             >
-              <Info className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h2 className="text-xl font-medium mb-4">
-                {selectedBundle ? 
-                  t('selectAction') : 
-                  t('selectBundle')
-                }
-              </h2>
-              <p className="text-gray-400 max-w-md mx-auto">
-                {t('detailInstructions')}
-              </p>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl blur-xl"></div>
+              <div className="relative backdrop-blur-sm bg-white/5 rounded-xl p-8 border border-white/20">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.05, 1],
+                    opacity: [0.7, 1, 0.7]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  <Info className="h-16 w-16 text-blue-400 mx-auto mb-6" />
+                </motion.div>
+                <h2 className="text-xl font-noto-bold mb-4 text-gray-200">
+                  {selectedBundle ? 
+                    t('selectAction') : 
+                    t('selectBundle')
+                  }
+                </h2>
+                <p className="text-gray-400 max-w-md mx-auto font-noto-regular">
+                  {t('detailInstructions')}
+                </p>
+              </div>
             </motion.div>
           </div>
         );
@@ -226,23 +373,25 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
   };
   
   return (
-    <GlassCard className="min-h-[500px] p-6 relative overflow-hidden">
+    <div className="min-h-[500px] relative overflow-hidden">
       {view !== 'default' && (
         <motion.div
           className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-gradient-to-br from-teal-500/10 to-blue-500/5 blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.1, 0.2, 0.1],
+            rotate: [0, 180, 360]
           }}
           transition={{
             duration: 8,
             repeat: Infinity,
             repeatType: "reverse",
+            ease: "easeInOut"
           }}
         />
       )}
       {getContent()}
-    </GlassCard>
+    </div>
   );
 };
 
