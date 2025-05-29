@@ -3,7 +3,7 @@ import { AnimatedPage } from '@/components/ui/motion';
 import { 
   Monitor, BarChart2, AlertTriangle, Map, Info, 
   TrendingUp, TrendingDown, Search, Settings, Zap, 
-  ArrowRight, Bell, Clock, Activity, FileText 
+  ArrowRight, Bell, Clock, Activity, FileText, ArrowUp
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { GlassCard } from '@/components/ui/glass-card';
@@ -1078,7 +1078,7 @@ const MonitorPage: React.FC = () => {
               }}
               onClick={scrollToTop}
             >
-              <ArrowUpCircle className="h-6 w-6 text-white" />
+              <ArrowUp className="h-6 w-6 text-white" />
             </Button>
           </motion.div>
         )}
