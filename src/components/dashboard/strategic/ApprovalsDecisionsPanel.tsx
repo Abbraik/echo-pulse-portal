@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Calendar, AlertTriangle, CheckCircle, MessageCircle, Filter, Star, ChevronUp, ChevronDown, Plus, ExternalLink, X, Focus, Edit, Users, Activity, TrendingUp } from 'lucide-react';
+import { FileText, Calendar, AlertTriangle, CheckCircle, MessageCircle, Filter, Star, ChevronUp, ChevronDown, Plus, ExternalLink, X, Focus, Edit, Users, Activity, TrendingUp, Brain, Zap, Eye, BookOpen, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface ApprovalItem {
   id: string;
@@ -36,6 +36,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   onContextualAction 
 }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   // Extended mock data with 10 items
   const initialItems: ApprovalItem[] = [
@@ -270,7 +271,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
       
       toast({
         title: "Approved!",
-        description: `${approveModal.item.title} has been approved successfully.`,
+        description: `${approveModal.item.title} approved and pipeline updated.`,
         duration: 3000,
       });
 
@@ -409,6 +410,13 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
       {children}
     </Button>
   );
+
+  const handleZoneNavigation = (zone: string) => {
+    if (approveModal.item) {
+      setApproveModal({ open: false, item: null });
+      navigate(`/${zone.toLowerCase()}`);
+    }
+  };
 
   return (
     <>
@@ -614,113 +622,324 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         </div>
       </div>
 
-      {/* Approve Details Modal */}
+      {/* Enhanced Approve Details Modal */}
       <Dialog open={approveModal.open} onOpenChange={(open) => setApproveModal({ open, item: null })}>
-        <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl max-h-[80vh] overflow-y-auto" aria-modal="true">
-          <DialogHeader>
-            <DialogTitle className="text-white text-xl">Approval Details</DialogTitle>
-            <DialogDescription className="text-gray-300">
-              Review contextual information before approving
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent 
+          className="max-w-none w-[80vw] h-[80vh] p-0 bg-transparent border-0 shadow-none overflow-hidden"
+          aria-modal="true"
+        >
+          {/* Modal Backdrop */}
+          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" />
           
-          {approveModal.item && (
-            <div className="space-y-6">
-              {/* Header Info */}
-              <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                <div>
-                  <h3 className="text-lg font-semibold text-white">{approveModal.item.title}</h3>
-                  <p className="text-sm text-gray-400">{approveModal.item.owner} • Due: {approveModal.item.dueDate}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className={getTypeColor(approveModal.item.type)}>
-                    {getTypeIcon(approveModal.item.type)}
-                    <span className="ml-1">{approveModal.item.type}</span>
-                  </Badge>
-                  <span className={`text-sm ${getPriorityColor(approveModal.item.priority)}`}>
-                    {getPriorityDot(approveModal.item.priority)} {approveModal.item.priority}
-                  </span>
-                </div>
+          {/* Glass Panel */}
+          <div className="relative w-full h-full bg-white/20 backdrop-blur-xl border border-teal-500/30 rounded-2xl shadow-2xl shadow-teal-500/20 flex flex-col">
+            
+            {/* Header (10% height) */}
+            <div className="h-[10%] flex items-center justify-between p-6 border-b border-white/10">
+              <div className="flex items-center gap-4">
+                <h2 className="text-2xl font-bold text-white">
+                  {approveModal.item?.title}
+                </h2>
               </div>
+              <div className="flex items-center gap-3">
+                {approveModal.item && (
+                  <>
+                    <Badge className={getTypeColor(approveModal.item.type)}>
+                      {getTypeIcon(approveModal.item.type)}
+                      <span className="ml-1">{approveModal.item.type}</span>
+                    </Badge>
+                    <span className={`text-sm ${getPriorityColor(approveModal.item.priority)}`}>
+                      {getPriorityDot(approveModal.item.priority)} {approveModal.item.priority}
+                    </span>
+                  </>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setApproveModal({ open: false, item: null })}
+                  className="text-white hover:bg-white/10 p-2"
+                >
+                  <X size={20} />
+                </Button>
+              </div>
+            </div>
 
-              {/* Context Sections */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Scenario Summary (THINK) */}
-                <div className="p-4 bg-white/5 rounded-lg border border-teal-500/30">
-                  <h4 className="text-sm font-semibold text-teal-400 mb-3 flex items-center gap-2">
-                    <Activity size={16} />
-                    Scenario Summary
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Selected Scenario:</span>
-                      <span className="text-white">Sustainable Growth</span>
+            {/* Body (75% height) - Two Column Grid */}
+            <div className="h-[75%] overflow-y-auto p-6">
+              <div className="grid grid-cols-2 gap-6 h-full">
+                
+                {/* Left Column */}
+                <div className="space-y-6">
+                  
+                  {/* Think Context */}
+                  <motion.div 
+                    className="p-4 bg-white/10 rounded-xl border border-blue-500/30 hover:border-blue-500/60 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-blue-400 flex items-center gap-2">
+                        <Brain size={20} />
+                        Think Context
+                      </h3>
+                      <Button
+                        size="sm"
+                        onClick={() => handleZoneNavigation('think')}
+                        className="bg-teal-500 hover:bg-teal-600 text-white"
+                      >
+                        Go to Think
+                      </Button>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Target DEI:</span>
-                      <span className="text-green-400">85.2</span>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-2">Scenario Overview</h4>
+                        <div className="text-sm text-gray-300 space-y-1">
+                          <div>Selected: Sustainable Growth</div>
+                          <div>Created: 2025-05-15</div>
+                          <div className="flex items-center gap-2">
+                            <span>Target DEI:</span>
+                            <span className="text-green-400">85.2</span>
+                            <span>vs Current:</span>
+                            <span className="text-orange-400">78.5</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-2">Loop Analysis</h4>
+                        <div className="space-y-1 text-sm text-gray-300">
+                          <div className="flex justify-between">
+                            <span>Infrastructure Loop:</span>
+                            <span className="text-green-400">92%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Resource Loop:</span>
+                            <span className="text-orange-400">78%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Policy Loop:</span>
+                            <span className="text-red-400">65%</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Simulated DEI:</span>
-                      <span className="text-orange-400">78.5</span>
+                  </motion.div>
+
+                  {/* Act Context */}
+                  <motion.div 
+                    className="p-4 bg-white/10 rounded-xl border border-blue-400/30 hover:border-blue-400/60 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-blue-400 flex items-center gap-2">
+                        <Zap size={20} />
+                        Act Context
+                      </h3>
+                      <Button
+                        size="sm"
+                        onClick={() => handleZoneNavigation('act')}
+                        className="bg-blue-500 hover:bg-blue-600 text-white"
+                      >
+                        Go to Act
+                      </Button>
                     </div>
-                  </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-2">Bundle Details</h4>
+                        <div className="text-sm text-gray-300 space-y-1">
+                          <div>Bundle: Strategic Infrastructure 2025</div>
+                          <div>Objectives: 8 active, 3 completed</div>
+                          <div className="flex items-center gap-2">
+                            <span>Success Rate:</span>
+                            <span className="text-green-400">85%</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-2">KPIs</h4>
+                        <div className="space-y-1 text-sm text-gray-300">
+                          <div className="flex justify-between">
+                            <span>ROI:</span>
+                            <span className="text-green-400">245%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Time to Deploy:</span>
+                            <span className="text-orange-400">3.2 months</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
 
-                {/* Bundle KPIs (ACT) */}
-                <div className="p-4 bg-white/5 rounded-lg border border-blue-500/30">
-                  <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
-                    <TrendingUp size={16} />
-                    Bundle KPIs
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">ROI:</span>
-                      <span className="text-green-400">245%</span>
+                {/* Right Column */}
+                <div className="space-y-6">
+                  
+                  {/* Monitor Context */}
+                  <motion.div 
+                    className="p-4 bg-white/10 rounded-xl border border-teal-500/30 hover:border-teal-500/60 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-teal-400 flex items-center gap-2">
+                        <Eye size={20} />
+                        Monitor Context
+                      </h3>
+                      <Button
+                        size="sm"
+                        onClick={() => handleZoneNavigation('monitor')}
+                        className="bg-teal-500 hover:bg-teal-600 text-white"
+                      >
+                        Go to Monitor
+                      </Button>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Success Rate:</span>
-                      <span className="text-green-400">92%</span>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-2">Recent Alerts</h4>
+                        <div className="space-y-2 text-sm text-gray-300">
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle size={12} className="text-red-400" />
+                            <span>Resource constraint detected</span>
+                            <span className="text-xs text-gray-400">2h ago</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle size={12} className="text-orange-400" />
+                            <span>Stakeholder feedback pending</span>
+                            <span className="text-xs text-gray-400">4h ago</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle size={12} className="text-yellow-400" />
+                            <span>Timeline variance +5 days</span>
+                            <span className="text-xs text-gray-400">1d ago</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-2">Live Metrics</h4>
+                        <div className="space-y-1 text-sm text-gray-300">
+                          <div className="flex justify-between">
+                            <span>DEI Score:</span>
+                            <span className="text-green-400">78.5</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Trust Index:</span>
+                            <span className="text-orange-400">82.1</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Migration Flow:</span>
+                            <span className="text-blue-400">+2.3%</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Time to Deploy:</span>
-                      <span className="text-orange-400">3.2 months</span>
-                    </div>
-                  </div>
-                </div>
+                  </motion.div>
 
-                {/* Recent Alerts (MONITOR) */}
-                <div className="p-4 bg-white/5 rounded-lg border border-purple-500/30">
-                  <h4 className="text-sm font-semibold text-purple-400 mb-3 flex items-center gap-2">
-                    <AlertTriangle size={16} />
-                    Recent Alerts
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="text-red-400">Resource constraint detected</div>
-                    <div className="text-orange-400">Stakeholder feedback pending</div>
-                    <div className="text-yellow-400">Timeline variance +5 days</div>
-                  </div>
+                  {/* Learn Context */}
+                  <motion.div 
+                    className="p-4 bg-white/10 rounded-xl border border-purple-500/30 hover:border-purple-500/60 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-purple-400 flex items-center gap-2">
+                        <BookOpen size={20} />
+                        Learn Context
+                      </h3>
+                      <Button
+                        size="sm"
+                        onClick={() => handleZoneNavigation('learn')}
+                        className="bg-purple-500 hover:bg-purple-600 text-white"
+                      >
+                        Go to Learn
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-2">Relevant Lessons</h4>
+                        <div className="space-y-2 text-sm text-gray-300">
+                          <div>
+                            <div className="flex justify-between">
+                              <span>Infrastructure Planning Playbook</span>
+                              <span className="text-green-400">94%</span>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between">
+                              <span>Multi-Stakeholder Coordination</span>
+                              <span className="text-orange-400">78%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Innovate Context */}
+                  <motion.div 
+                    className="p-4 bg-white/10 rounded-xl border border-yellow-500/30 hover:border-yellow-500/60 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-yellow-400 flex items-center gap-2">
+                        <Lightbulb size={20} />
+                        Innovate Context
+                      </h3>
+                      <Button
+                        size="sm"
+                        onClick={() => handleZoneNavigation('innovate')}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                      >
+                        Go to Innovate
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-2">Active Experiments</h4>
+                        <div className="space-y-2 text-sm text-gray-300">
+                          <div>
+                            <div className="flex justify-between items-center">
+                              <span>Smart City Infrastructure</span>
+                              <Badge className="bg-green-500/20 text-green-400 text-xs">Prototype</Badge>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between items-center">
+                              <span>Adaptive Policy Framework</span>
+                              <Badge className="bg-orange-500/20 text-orange-400 text-xs">Testing</Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
-          )}
 
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setApproveModal({ open: false, item: null })}
-              disabled={loading === approveModal.item?.id}
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleApproveConfirm} 
-              disabled={loading === approveModal.item?.id}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {loading === approveModal.item?.id ? 'Confirming...' : 'Confirm Approval'}
-            </Button>
-          </DialogFooter>
+            {/* Footer (15% height) */}
+            <div className="h-[15%] flex items-center justify-end gap-4 p-6 border-t border-white/10">
+              <Button 
+                variant="ghost" 
+                onClick={() => setApproveModal({ open: false, item: null })}
+                disabled={loading === approveModal.item?.id}
+                className="text-white hover:bg-white/10"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleApproveConfirm} 
+                disabled={loading === approveModal.item?.id}
+                className="bg-teal-500 hover:bg-teal-600 text-white h-12 px-8 text-lg font-bold"
+              >
+                {loading === approveModal.item?.id ? 'Confirming...' : 'Confirm Approval'}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
