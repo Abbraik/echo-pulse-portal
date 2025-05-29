@@ -9,8 +9,14 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { ThinkChart } from './charts/ThinkChart';
+import { ActChart } from './charts/ActChart';
+import { MonitorChart } from './charts/MonitorChart';
+import { LearnChart } from './charts/LearnChart';
+import { InnovateChart } from './charts/InnovateChart';
 
 interface ApprovalItem {
   id: string;
@@ -150,6 +156,15 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     item: null
   });
   const [createModal, setCreateModal] = useState(false);
+
+  // Visualization toggles for the approve modal
+  const [visualToggles, setVisualToggles] = useState({
+    think: false,
+    act: false,
+    monitor: false,
+    learn: false,
+    innovate: false
+  });
 
   // Revision form state
   const [revisionForm, setRevisionForm] = useState({
@@ -411,6 +426,84 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     </Button>
   );
 
+  const toggleVisual = (zone: keyof typeof visualToggles) => {
+    setVisualToggles(prev => ({
+      ...prev,
+      [zone]: !prev[zone]
+    }));
+  };
+
+  const ZoneContextCard = ({ 
+    zone, 
+    icon: Icon, 
+    title, 
+    color, 
+    summary, 
+    chart: ChartComponent 
+  }: {
+    zone: keyof typeof visualToggles;
+    icon: React.ComponentType<any>;
+    title: string;
+    color: string;
+    summary: React.ReactNode;
+    chart: React.ComponentType;
+  }) => (
+    <motion.div 
+      className={`p-4 bg-white/10 rounded-xl border border-${color}-500/30 hover:border-${color}-500/60 transition-all`}
+      whileHover={{ scale: 1.02 }}
+      role="region"
+      aria-label={`${title} context`}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className={`text-lg font-semibold text-${color}-400 flex items-center gap-2`}>
+          <Icon size={20} />
+          {title}
+        </h3>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Label htmlFor={`${zone}-toggle`} className="text-sm text-white">Show Visuals</Label>
+            <Switch
+              id={`${zone}-toggle`}
+              checked={visualToggles[zone]}
+              onCheckedChange={() => toggleVisual(zone)}
+              aria-checked={visualToggles[zone]}
+              className="data-[state=checked]:bg-teal-500"
+            />
+          </div>
+          <Button
+            size="sm"
+            onClick={() => handleZoneNavigation(zone)}
+            className={`bg-${color}-500 hover:bg-${color}-600 text-white`}
+            aria-label={`Go to ${title} zone`}
+          >
+            Go to {title}
+          </Button>
+        </div>
+      </div>
+      
+      <div className="space-y-3">
+        {summary}
+        
+        <AnimatePresence>
+          {visualToggles[zone] && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+              aria-expanded={visualToggles[zone]}
+            >
+              <div className="p-3 bg-white/5 rounded-lg border border-white/10">
+                <ChartComponent />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+
   const handleZoneNavigation = (zone: string) => {
     if (approveModal.item) {
       setApproveModal({ open: false, item: null });
@@ -637,7 +730,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
             {/* Header (10% height) */}
             <div className="h-[10%] flex items-center justify-between p-6 border-b border-white/10">
               <div className="flex items-center gap-4">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-white" id="approval-modal-title">
                   {approveModal.item?.title}
                 </h2>
               </div>
@@ -658,271 +751,152 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                   size="sm"
                   onClick={() => setApproveModal({ open: false, item: null })}
                   className="text-white hover:bg-white/10 p-2"
+                  aria-label="Close modal"
                 >
                   <X size={20} />
                 </Button>
               </div>
             </div>
 
-            {/* Body (75% height) - Two Column Grid */}
-            <div className="h-[75%] overflow-y-auto p-6">
-              <div className="grid grid-cols-2 gap-6 h-full">
-                
-                {/* Left Column */}
-                <div className="space-y-6">
-                  
-                  {/* Think Context */}
-                  <motion.div 
-                    className="p-4 bg-white/10 rounded-xl border border-blue-500/30 hover:border-blue-500/60 transition-all"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-blue-400 flex items-center gap-2">
-                        <Brain size={20} />
-                        Think Context
-                      </h3>
-                      <Button
-                        size="sm"
-                        onClick={() => handleZoneNavigation('think')}
-                        className="bg-teal-500 hover:bg-teal-600 text-white"
-                      >
-                        Go to Think
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="text-sm font-medium text-white mb-2">Scenario Overview</h4>
-                        <div className="text-sm text-gray-300 space-y-1">
-                          <div>Selected: Sustainable Growth</div>
-                          <div>Created: 2025-05-15</div>
-                          <div className="flex items-center gap-2">
-                            <span>Target DEI:</span>
-                            <span className="text-green-400">85.2</span>
-                            <span>vs Current:</span>
-                            <span className="text-orange-400">78.5</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-white mb-2">Loop Analysis</h4>
-                        <div className="space-y-1 text-sm text-gray-300">
-                          <div className="flex justify-between">
-                            <span>Infrastructure Loop:</span>
-                            <span className="text-green-400">92%</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Resource Loop:</span>
-                            <span className="text-orange-400">78%</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Policy Loop:</span>
-                            <span className="text-red-400">65%</span>
-                          </div>
-                        </div>
+            {/* Body (70% height) - Vertical Stack */}
+            <div className="h-[70%] overflow-y-auto p-6 space-y-4">
+              
+              {/* Think Context */}
+              <ZoneContextCard
+                zone="think"
+                icon={Brain}
+                title="Think"
+                color="teal"
+                chart={ThinkChart}
+                summary={
+                  <div>
+                    <h4 className="text-sm font-medium text-white mb-2">Scenario Overview</h4>
+                    <div className="text-sm text-gray-300 space-y-1">
+                      <div>Selected: Sustainable Growth</div>
+                      <div>Created: 2025-05-15</div>
+                      <div className="flex items-center gap-2">
+                        <span>Target DEI:</span>
+                        <span className="text-green-400">85.2</span>
+                        <span>vs Current:</span>
+                        <span className="text-orange-400">78.5</span>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
+                }
+              />
 
-                  {/* Act Context */}
-                  <motion.div 
-                    className="p-4 bg-white/10 rounded-xl border border-blue-400/30 hover:border-blue-400/60 transition-all"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-blue-400 flex items-center gap-2">
-                        <Zap size={20} />
-                        Act Context
-                      </h3>
-                      <Button
-                        size="sm"
-                        onClick={() => handleZoneNavigation('act')}
-                        className="bg-blue-500 hover:bg-blue-600 text-white"
-                      >
-                        Go to Act
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="text-sm font-medium text-white mb-2">Bundle Details</h4>
-                        <div className="text-sm text-gray-300 space-y-1">
-                          <div>Bundle: Strategic Infrastructure 2025</div>
-                          <div>Objectives: 8 active, 3 completed</div>
-                          <div className="flex items-center gap-2">
-                            <span>Success Rate:</span>
-                            <span className="text-green-400">85%</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-white mb-2">KPIs</h4>
-                        <div className="space-y-1 text-sm text-gray-300">
-                          <div className="flex justify-between">
-                            <span>ROI:</span>
-                            <span className="text-green-400">245%</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Time to Deploy:</span>
-                            <span className="text-orange-400">3.2 months</span>
-                          </div>
-                        </div>
+              {/* Act Context */}
+              <ZoneContextCard
+                zone="act"
+                icon={Zap}
+                title="Act"
+                color="blue"
+                chart={ActChart}
+                summary={
+                  <div>
+                    <h4 className="text-sm font-medium text-white mb-2">Bundle Details</h4>
+                    <div className="text-sm text-gray-300 space-y-1">
+                      <div>Bundle: Strategic Infrastructure 2025</div>
+                      <div>Objectives: 8 active, 3 completed</div>
+                      <div className="flex items-center gap-2">
+                        <span>Success Rate:</span>
+                        <span className="text-green-400">85%</span>
                       </div>
                     </div>
-                  </motion.div>
-                </div>
+                  </div>
+                }
+              />
 
-                {/* Right Column */}
-                <div className="space-y-6">
-                  
-                  {/* Monitor Context */}
-                  <motion.div 
-                    className="p-4 bg-white/10 rounded-xl border border-teal-500/30 hover:border-teal-500/60 transition-all"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-teal-400 flex items-center gap-2">
-                        <Eye size={20} />
-                        Monitor Context
-                      </h3>
-                      <Button
-                        size="sm"
-                        onClick={() => handleZoneNavigation('monitor')}
-                        className="bg-teal-500 hover:bg-teal-600 text-white"
-                      >
-                        Go to Monitor
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="text-sm font-medium text-white mb-2">Recent Alerts</h4>
-                        <div className="space-y-2 text-sm text-gray-300">
-                          <div className="flex items-center gap-2">
-                            <AlertTriangle size={12} className="text-red-400" />
-                            <span>Resource constraint detected</span>
-                            <span className="text-xs text-gray-400">2h ago</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <AlertTriangle size={12} className="text-orange-400" />
-                            <span>Stakeholder feedback pending</span>
-                            <span className="text-xs text-gray-400">4h ago</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <AlertTriangle size={12} className="text-yellow-400" />
-                            <span>Timeline variance +5 days</span>
-                            <span className="text-xs text-gray-400">1d ago</span>
-                          </div>
-                        </div>
+              {/* Monitor Context */}
+              <ZoneContextCard
+                zone="monitor"
+                icon={Eye}
+                title="Monitor"
+                color="green"
+                chart={MonitorChart}
+                summary={
+                  <div>
+                    <h4 className="text-sm font-medium text-white mb-2">Recent Alerts</h4>
+                    <div className="space-y-2 text-sm text-gray-300">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle size={12} className="text-red-400" />
+                        <span>Resource constraint detected</span>
+                        <span className="text-xs text-gray-400">2h ago</span>
                       </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-white mb-2">Live Metrics</h4>
-                        <div className="space-y-1 text-sm text-gray-300">
-                          <div className="flex justify-between">
-                            <span>DEI Score:</span>
-                            <span className="text-green-400">78.5</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Trust Index:</span>
-                            <span className="text-orange-400">82.1</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Migration Flow:</span>
-                            <span className="text-blue-400">+2.3%</span>
-                          </div>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle size={12} className="text-orange-400" />
+                        <span>Stakeholder feedback pending</span>
+                        <span className="text-xs text-gray-400">4h ago</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle size={12} className="text-yellow-400" />
+                        <span>Timeline variance +5 days</span>
+                        <span className="text-xs text-gray-400">1d ago</span>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
+                }
+              />
 
-                  {/* Learn Context */}
-                  <motion.div 
-                    className="p-4 bg-white/10 rounded-xl border border-purple-500/30 hover:border-purple-500/60 transition-all"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-purple-400 flex items-center gap-2">
-                        <BookOpen size={20} />
-                        Learn Context
-                      </h3>
-                      <Button
-                        size="sm"
-                        onClick={() => handleZoneNavigation('learn')}
-                        className="bg-purple-500 hover:bg-purple-600 text-white"
-                      >
-                        Go to Learn
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-3">
+              {/* Learn Context */}
+              <ZoneContextCard
+                zone="learn"
+                icon={BookOpen}
+                title="Learn"
+                color="purple"
+                chart={LearnChart}
+                summary={
+                  <div>
+                    <h4 className="text-sm font-medium text-white mb-2">Relevant Lessons</h4>
+                    <div className="space-y-2 text-sm text-gray-300">
                       <div>
-                        <h4 className="text-sm font-medium text-white mb-2">Relevant Lessons</h4>
-                        <div className="space-y-2 text-sm text-gray-300">
-                          <div>
-                            <div className="flex justify-between">
-                              <span>Infrastructure Planning Playbook</span>
-                              <span className="text-green-400">94%</span>
-                            </div>
-                          </div>
-                          <div>
-                            <div className="flex justify-between">
-                              <span>Multi-Stakeholder Coordination</span>
-                              <span className="text-orange-400">78%</span>
-                            </div>
-                          </div>
+                        <div className="flex justify-between">
+                          <span>Infrastructure Planning Playbook</span>
+                          <span className="text-green-400">94%</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between">
+                          <span>Multi-Stakeholder Coordination</span>
+                          <span className="text-orange-400">78%</span>
                         </div>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
+                }
+              />
 
-                  {/* Innovate Context */}
-                  <motion.div 
-                    className="p-4 bg-white/10 rounded-xl border border-yellow-500/30 hover:border-yellow-500/60 transition-all"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-yellow-400 flex items-center gap-2">
-                        <Lightbulb size={20} />
-                        Innovate Context
-                      </h3>
-                      <Button
-                        size="sm"
-                        onClick={() => handleZoneNavigation('innovate')}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white"
-                      >
-                        Go to Innovate
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-3">
+              {/* Innovate Context */}
+              <ZoneContextCard
+                zone="innovate"
+                icon={Lightbulb}
+                title="Innovate"
+                color="amber"
+                chart={InnovateChart}
+                summary={
+                  <div>
+                    <h4 className="text-sm font-medium text-white mb-2">Active Experiments</h4>
+                    <div className="space-y-2 text-sm text-gray-300">
                       <div>
-                        <h4 className="text-sm font-medium text-white mb-2">Active Experiments</h4>
-                        <div className="space-y-2 text-sm text-gray-300">
-                          <div>
-                            <div className="flex justify-between items-center">
-                              <span>Smart City Infrastructure</span>
-                              <Badge className="bg-green-500/20 text-green-400 text-xs">Prototype</Badge>
-                            </div>
-                          </div>
-                          <div>
-                            <div className="flex justify-between items-center">
-                              <span>Adaptive Policy Framework</span>
-                              <Badge className="bg-orange-500/20 text-orange-400 text-xs">Testing</Badge>
-                            </div>
-                          </div>
+                        <div className="flex justify-between items-center">
+                          <span>Smart City Infrastructure</span>
+                          <Badge className="bg-green-500/20 text-green-400 text-xs">Prototype</Badge>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between items-center">
+                          <span>Adaptive Policy Framework</span>
+                          <Badge className="bg-orange-500/20 text-orange-400 text-xs">Testing</Badge>
                         </div>
                       </div>
                     </div>
-                  </motion.div>
-                </div>
-              </div>
+                  </div>
+                }
+              />
             </div>
 
-            {/* Footer (15% height) */}
-            <div className="h-[15%] flex items-center justify-end gap-4 p-6 border-t border-white/10">
+            {/* Footer (20% height) */}
+            <div className="h-[20%] flex items-center justify-end gap-4 p-6 border-t border-white/10">
               <Button 
                 variant="ghost" 
                 onClick={() => setApproveModal({ open: false, item: null })}
