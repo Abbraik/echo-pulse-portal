@@ -1004,10 +1004,13 @@ const MonitorPage: React.FC = () => {
                     <div>
                       <h4 className="text-lg font-medium mb-4 text-left text-gray-200 font-noto-medium">{t('quickActions')}</h4>
                       
-                      <div className="space-y-4" style={{
-                        background: 'rgba(20, 30, 50, 0.8)',
-                        boxShadow: 'inset 0 0 20px rgba(59, 130, 246, 0.1)'
-                      }} className="p-4 rounded-xl border border-white/10">
+                      <div 
+                        className="space-y-4 p-4 rounded-xl border border-white/10"
+                        style={{
+                          background: 'rgba(20, 30, 50, 0.8)',
+                          boxShadow: 'inset 0 0 20px rgba(59, 130, 246, 0.1)'
+                        }}
+                      >
                         {[
                           {
                             action: 'reassign',
