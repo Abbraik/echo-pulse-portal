@@ -342,7 +342,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     onClick: () => void;
     disabled?: boolean;
     variant?: "default" | "outline" | "ghost";
-    size?: "sm" | "xs";
+    size?: "sm" | "default";
     className?: string;
   }) => (
     <Button
@@ -381,7 +381,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
             <h3 className="text-xl font-bold text-white">
               Approvals & Decisions
             </h3>
-            <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50 text-xs">
+            <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50 text-sm">
               Live
             </Badge>
           </div>
@@ -414,7 +414,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
               size="sm"
               variant={activeFilter === filter ? "default" : "outline"}
               onClick={() => handleFilterChange(filter as typeof activeFilter)}
-              className={`text-xs transition-all duration-150 ${
+              className={`text-sm transition-all duration-150 ${
                 activeFilter === filter 
                   ? 'bg-teal-500 text-white border-teal-500' 
                   : 'border-teal-500/50 text-teal-400 hover:bg-teal-500/20 hover:border-teal-500'
@@ -445,14 +445,14 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                 >
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <span className="font-medium text-white text-sm truncate">{item.title}</span>
-                    <Badge className={`${getTypeColor(item.type)} text-xs shrink-0`}>
+                    <Badge className={`${getTypeColor(item.type)} text-sm shrink-0`}>
                       <span className="flex items-center gap-1">
                         {getTypeIcon(item.type)}
                         {item.type}
                       </span>
                     </Badge>
-                    <span className="text-xs text-gray-400 shrink-0">{item.dueDate}</span>
-                    <span className={`text-xs ${getPriorityColor(item.priority)} shrink-0`}>
+                    <span className="text-sm text-gray-400 shrink-0">{item.dueDate}</span>
+                    <span className={`text-sm ${getPriorityColor(item.priority)} shrink-0`}>
                       {getPriorityDot(item.priority)} {item.priority}
                     </span>
                   </div>
@@ -468,19 +468,19 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                     <ActionButton
                       onClick={() => handleApproveClick(item)}
                       disabled={loading === item.id}
-                      className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
+                      className="h-6 px-2 text-sm bg-green-600 hover:bg-green-700 text-white"
                     >
                       <CheckCircle size={10} className="mr-1" />
-                      Approve
+                      Approve ▶
                     </ActionButton>
                     <ActionButton
                       onClick={() => handleReviseClick(item.id)}
                       disabled={loading === item.id}
                       variant="outline"
-                      className="h-6 px-2 text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
+                      className="h-6 px-2 text-sm border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
                     >
                       <Edit size={10} className="mr-1" />
-                      Revise
+                      Revise ▶
                     </ActionButton>
                   </div>
                 </motion.div>
@@ -519,16 +519,16 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                   >
                     <TableCell className="font-medium text-white text-sm">{item.title}</TableCell>
                     <TableCell>
-                      <Badge className={`${getTypeColor(item.type)} text-xs`}>
+                      <Badge className={`${getTypeColor(item.type)} text-sm`}>
                         <span className="flex items-center gap-1">
                           {getTypeIcon(item.type)}
                           {item.type}
                         </span>
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-gray-300 text-xs">{item.owner}</TableCell>
-                    <TableCell className="text-gray-300 text-xs">{item.dueDate}</TableCell>
-                    <TableCell className="text-xs">
+                    <TableCell className="text-gray-300 text-sm">{item.owner}</TableCell>
+                    <TableCell className="text-gray-300 text-sm">{item.dueDate}</TableCell>
+                    <TableCell className="text-sm">
                       <span className={`flex items-center gap-1 ${getPriorityColor(item.priority)}`}>
                         {getPriorityDot(item.priority)} {item.priority}
                       </span>
@@ -546,19 +546,19 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                         <ActionButton
                           onClick={() => handleApproveClick(item)}
                           disabled={loading === item.id}
-                          className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
+                          className="h-6 px-2 text-sm bg-green-600 hover:bg-green-700 text-white"
                         >
                           <CheckCircle size={10} className="mr-1" />
-                          Approve
+                          Approve ▶
                         </ActionButton>
                         <ActionButton
                           onClick={() => handleReviseClick(item.id)}
                           disabled={loading === item.id}
                           variant="outline"
-                          className="h-6 px-2 text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
+                          className="h-6 px-2 text-sm border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
                         >
                           <Edit size={10} className="mr-1" />
-                          Revise
+                          Revise ✎
                         </ActionButton>
                       </div>
                     </TableCell>
@@ -586,7 +586,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                                 size="sm"
                                 onClick={() => handleReviseSubmit(item.id)}
                                 disabled={!reviseComment.trim() || loading === item.id}
-                                className="bg-orange-600 hover:bg-orange-700 text-white text-xs"
+                                className="bg-orange-600 hover:bg-orange-700 text-white text-sm"
                               >
                                 {loading === item.id ? 'Submitting...' : 'Submit'}
                               </Button>
@@ -597,7 +597,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                                   setReviseRowId(null);
                                   setReviseComment('');
                                 }}
-                                className="border-gray-500/50 text-gray-400 hover:bg-gray-500/10 text-xs"
+                                className="border-gray-500/50 text-gray-400 hover:bg-gray-500/10 text-sm"
                               >
                                 Cancel
                               </Button>
@@ -618,14 +618,14 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           <Button
             variant="ghost"
             size="sm"
-            className="text-teal-400 hover:text-teal-300 text-xs"
+            className="text-teal-400 hover:text-teal-300 text-sm"
           >
-            View All Approvals <ExternalLink size={12} className="ml-1" />
+            View All Approvals ▶ <ExternalLink size={12} className="ml-1" />
           </Button>
           <Button
             size="sm"
             onClick={() => setCreateModal(true)}
-            className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold h-8"
+            className="bg-teal-500 hover:bg-teal-600 text-white text-sm font-bold h-8"
           >
             <Plus size={14} className="mr-1" />
             Create New Approval
