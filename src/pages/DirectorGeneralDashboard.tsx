@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTheme } from '@/hooks/use-theme';
+import { usePanelCompact } from '@/hooks/use-panel-compact';
 import ParticlesBackground from '@/components/ui/particles-background';
 import DirectorHeader from '@/components/dashboard/DirectorHeader';
 import { ApprovalsDecisionsPanel } from '@/components/dashboard/strategic/ApprovalsDecisionsPanel';
@@ -10,6 +12,7 @@ import { CoordinationTriggersPanel } from '@/components/dashboard/strategic/Coor
 import { ZoneSnapshot } from '@/components/dashboard/enhanced/ZoneSnapshot';
 import { TodaysSnapshot } from '@/components/dashboard/enhanced/TodaysSnapshot';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
+import { CompactPanelWrapper } from '@/components/dashboard/enhanced/CompactPanelWrapper';
 import { getDashboardData } from '@/api/dashboard';
 import { Button } from '@/components/ui/button';
 import { X, Maximize2, Search, Bell, Plus } from 'lucide-react';
@@ -34,6 +37,9 @@ const DirectorGeneralDashboard: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
+
+  // Panel compact state management
+  const { containerRef } = usePanelCompact();
 
   // Check for mobile viewport
   useEffect(() => {
@@ -230,144 +236,87 @@ const DirectorGeneralDashboard: React.FC = () => {
         </div>
 
         {/* Main Cockpit Panels */}
-        <div className="max-w-[1440px] mx-auto px-6">
+        <div className="max-w-[1440px] mx-auto px-6" ref={containerRef}>
           <div className={`flex gap-8 h-[50vh] ${isMobile ? 'flex-col h-auto' : ''}`}>
             {/* Approvals & Decisions Panel */}
-            <motion.div
+            <CompactPanelWrapper
+              panelId="approvals"
               className={`${getPanelWidth('approvals')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
-              onMouseEnter={() => !isMobile && setHoveredPanel('approvals')}
-              onMouseLeave={() => !isMobile && setHoveredPanel(null)}
-              onFocus={() => handleFocusMode('approvals')}
-              style={{ 
-                background: 'rgba(20, 30, 50, 0.6)',
-                backdropFilter: 'blur(24px)',
-                border: hoveredPanel === 'approvals' ? '2px solid rgba(20, 184, 166, 0.6)' : '1px solid rgba(20, 184, 166, 0.3)',
-                borderRadius: '24px',
-                boxShadow: hoveredPanel === 'approvals' 
-                  ? 'inset 0 0 40px rgba(20, 184, 166, 0.2), 0 16px 32px rgba(0, 0, 0, 0.4)'
-                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1), 0 8px 16px rgba(0, 0, 0, 0.2)'
-              }}
-              whileHover={{ 
-                y: -4,
-                transition: { duration: 0.2 }
+              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'approvals' : null)}
+              onFullscreen={() => handleFullscreen('approvals')}
+              compactSummary={{
+                title: "Approvals",
+                items: [
+                  { id: '1', title: 'Infrastructure Development Package', priority: 'high' },
+                  { id: '3', title: 'THINK Zone Restructure', priority: 'high' }
+                ],
+                stats: { pending: dashboardData?.approvals?.pending || 12, overdue: 3 }
               }}
             >
-              <div className="relative h-full">
-                <div className="absolute top-6 right-6 z-10">
-                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleFullscreen('approvals')}
-                      className="text-gray-400 hover:text-teal-400 hover:bg-teal-400/10"
-                    >
-                      <Maximize2 size={16} />
-                    </Button>
-                  </motion.div>
-                </div>
-                <ApprovalsDecisionsPanel 
-                  data={dashboardData?.approvals}
-                  onFocusMode={(isFocused) => handleFocusMode(isFocused ? 'approvals' : '')}
-                  onContextualAction={(action, itemTitle) => {
-                    if (action === 'approve') {
-                      handleContextualAction('THINK', `Approved: ${itemTitle}`, 'approvals');
-                    }
-                  }}
-                />
-              </div>
-            </motion.div>
+              <ApprovalsDecisionsPanel 
+                data={dashboardData?.approvals}
+                onFocusMode={(isFocused) => handleFocusMode(isFocused ? 'approvals' : '')}
+                onContextualAction={(action, itemTitle) => {
+                  if (action === 'approve') {
+                    handleContextualAction('THINK', `Approved: ${itemTitle}`, 'approvals');
+                  }
+                }}
+              />
+            </CompactPanelWrapper>
 
             {/* System Health & Alerts Panel */}
-            <motion.div
+            <CompactPanelWrapper
+              panelId="health"
               className={`${getPanelWidth('health')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
-              onMouseEnter={() => !isMobile && setHoveredPanel('health')}
-              onMouseLeave={() => !isMobile && setHoveredPanel(null)}
-              onFocus={() => handleFocusMode('health')}
-              style={{ 
-                background: 'rgba(20, 30, 50, 0.6)',
-                backdropFilter: 'blur(24px)',
-                border: hoveredPanel === 'health' ? '2px solid rgba(20, 184, 166, 0.6)' : '1px solid rgba(20, 184, 166, 0.3)',
-                borderRadius: '24px',
-                boxShadow: hoveredPanel === 'health' 
-                  ? 'inset 0 0 40px rgba(20, 184, 166, 0.2), 0 16px 32px rgba(0, 0, 0, 0.4)'
-                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1), 0 8px 16px rgba(0, 0, 0, 0.2)'
-              }}
-              whileHover={{ 
-                y: -4,
-                transition: { duration: 0.2 }
+              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'health' : null)}
+              onFullscreen={() => handleFullscreen('health')}
+              compactSummary={{
+                title: "System Health",
+                items: [
+                  { id: '1', title: 'DEI score trending down', severity: 'medium' },
+                  { id: '2', title: 'THINK loop closure delayed', severity: 'high' }
+                ],
+                stats: { deiScore: 78.5, worstDrift: 'innovator' }
               }}
             >
-              <div className="relative h-full">
-                <div className="absolute top-6 right-6 z-10">
-                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleFullscreen('health')}
-                      className="text-gray-400 hover:text-teal-400 hover:bg-teal-400/10"
-                    >
-                      <Maximize2 size={16} />
-                    </Button>
-                  </motion.div>
-                </div>
-                <SystemHealthAlertsPanel 
-                  data={dashboardData?.systemHealth}
-                  onAlertClick={(alertType) => {
-                    handleContextualAction('MONITOR', `Alert: ${alertType}`, 'health');
-                  }}
-                />
-              </div>
-            </motion.div>
+              <SystemHealthAlertsPanel 
+                data={dashboardData?.systemHealth}
+                onAlertClick={(alertType) => {
+                  handleContextualAction('MONITOR', `Alert: ${alertType}`, 'health');
+                }}
+              />
+            </CompactPanelWrapper>
 
             {/* Coordination & Triggers Panel */}
-            <motion.div
+            <CompactPanelWrapper
+              panelId="coordination"
               className={`${getPanelWidth('coordination')} transition-all duration-300`}
-              onMouseEnter={() => !isMobile && setHoveredPanel('coordination')}
-              onMouseLeave={() => !isMobile && setHoveredPanel(null)}
-              onFocus={() => handleFocusMode('coordination')}
-              style={{ 
-                background: 'rgba(20, 30, 50, 0.6)',
-                backdropFilter: 'blur(24px)',
-                border: hoveredPanel === 'coordination' ? '2px solid rgba(20, 184, 166, 0.6)' : '1px solid rgba(20, 184, 166, 0.3)',
-                borderRadius: '24px',
-                boxShadow: hoveredPanel === 'coordination' 
-                  ? 'inset 0 0 40px rgba(20, 184, 166, 0.2), 0 16px 32px rgba(0, 0, 0, 0.4)'
-                  : 'inset 0 0 20px rgba(20, 184, 166, 0.1), 0 8px 16px rgba(0, 0, 0, 0.2)'
-              }}
-              whileHover={{ 
-                y: -4,
-                transition: { duration: 0.2 }
+              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'coordination' : null)}
+              onFullscreen={() => handleFullscreen('coordination')}
+              compactSummary={{
+                title: "Coordination",
+                items: [
+                  { id: '1', title: 'Role Dropouts', severity: 'high' },
+                  { id: '2', title: 'Rework Loops', severity: 'medium' }
+                ],
+                stats: { flags: 3, escalations: 2 }
               }}
             >
-              <div className="relative h-full">
-                <div className="absolute top-6 right-6 z-10">
-                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleFullscreen('coordination')}
-                      className="text-gray-400 hover:text-teal-400 hover:bg-teal-400/10"
-                    >
-                      <Maximize2 size={16} />
-                    </Button>
-                  </motion.div>
-                </div>
-                <CoordinationTriggersPanel 
-                  data={dashboardData?.coordination}
-                  onRedesignFlag={(flagType) => {
-                    handleContextualAction('INNOVATE', `Redesign Flag: ${flagType}`, 'coordination');
-                  }}
-                  onEscalationAction={(action, zone) => {
-                    if (action === 'reassign') {
-                      handleContextualAction('ACT', `Reassignment in ${zone}`, 'coordination');
-                    }
-                  }}
-                  onZoneLeadClick={(zone) => {
-                    handleContextualAction('LEARN', `Zone Lead: ${zone}`, 'coordination');
-                  }}
-                />
-              </div>
-            </motion.div>
+              <CoordinationTriggersPanel 
+                data={dashboardData?.coordination}
+                onRedesignFlag={(flagType) => {
+                  handleContextualAction('INNOVATE', `Redesign Flag: ${flagType}`, 'coordination');
+                }}
+                onEscalationAction={(action, zone) => {
+                  if (action === 'reassign') {
+                    handleContextualAction('ACT', `Reassignment in ${zone}`, 'coordination');
+                  }
+                }}
+                onZoneLeadClick={(zone) => {
+                  handleContextualAction('LEARN', `Zone Lead: ${zone}`, 'coordination');
+                }}
+              />
+            </CompactPanelWrapper>
           </div>
 
           {/* Contextual Zone Snapshots */}
