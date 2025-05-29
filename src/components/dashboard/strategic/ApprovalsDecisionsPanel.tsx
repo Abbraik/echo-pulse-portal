@@ -48,7 +48,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     priority: 'medium' as const
   });
 
-  // Mock data
+  // Mock data with exactly the specified items
   const mockItems: ApprovalItem[] = [
     { id: '1', title: 'Infrastructure Dev Package', type: 'strategy', owner: 'Planning Ministry', dueDate: '2025-06-02', priority: 'high', isPinned: true },
     { id: '2', title: 'Climate Resilience Framework', type: 'redesign', owner: 'Env Dept', dueDate: '2025-05-30', priority: 'medium', isPinned: true },
@@ -60,9 +60,10 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
 
   const [items, setItems] = useState<ApprovalItem[]>(data?.items || mockItems);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts implementation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in inputs
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       
       switch (e.key.toLowerCase()) {
@@ -90,9 +91,11 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           }
           break;
         case 'escape':
+          e.preventDefault();
           setExpandedRevision(null);
           setApproveModalOpen(false);
           setCreateModalOpen(false);
+          setSelectedRowId(null);
           break;
       }
     };
@@ -101,6 +104,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedRowId, items]);
 
+  // Real-time filter counts
   const filterCounts = {
     all: items.length,
     strategy: items.filter(item => item.type === 'strategy').length,
@@ -108,6 +112,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     external: items.filter(item => item.type === 'external').length,
   };
 
+  // Filter and sort logic
   const filteredItems = items.filter(item => 
     activeFilter === 'all' || item.type === activeFilter
   );
@@ -122,6 +127,12 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   const pinnedItems = sortedItems.filter(item => item.isPinned);
   const unpinnedItems = sortedItems.filter(item => !item.isPinned);
 
+  // Core functionality handlers
+  const handleFilterChange = (filter: string) => {
+    setActiveFilter(filter);
+    // Sort persists when filters change
+  };
+
   const handleSort = (field: keyof ApprovalItem) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -132,15 +143,21 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   };
 
   const handlePin = useCallback((id: string) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, isPinned: !item.isPinned } : item
-    ));
-    toast({
-      title: "Pin Updated",
-      description: "Item pinning status changed.",
-      duration: 2000,
+    setItems(prevItems => {
+      const updatedItems = prevItems.map(item => 
+        item.id === id ? { ...item, isPinned: !item.isPinned } : item
+      );
+      
+      const item = prevItems.find(i => i.id === id);
+      toast({
+        title: item?.isPinned ? "Item Unpinned" : "Item Pinned",
+        description: `${item?.title} ${item?.isPinned ? 'removed from' : 'added to'} pinned items.`,
+        duration: 2000,
+      });
+      
+      return updatedItems;
     });
-  }, [items, toast]);
+  }, [toast]);
 
   const handleApproveClick = (item: ApprovalItem) => {
     setItemToApprove(item);
@@ -149,20 +166,28 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
 
   const handleApproveConfirm = () => {
     if (itemToApprove) {
-      setItems(items.filter(item => item.id !== itemToApprove.id));
+      // Remove approved item from list
+      setItems(prevItems => prevItems.filter(item => item.id !== itemToApprove.id));
+      
       toast({
         title: "Approved!",
         description: `${itemToApprove.title} has been approved successfully.`,
         duration: 3000,
       });
+      
       setApproveModalOpen(false);
       setItemToApprove(null);
+      setSelectedRowId(null);
     }
   };
 
   const handleRevise = (id: string) => {
-    setExpandedRevision(expandedRevision === id ? null : id);
-    setRevisionComment('');
+    if (expandedRevision === id) {
+      setExpandedRevision(null);
+    } else {
+      setExpandedRevision(id);
+      setRevisionComment('');
+    }
   };
 
   const handleSubmitRevision = (id: string, title: string) => {
@@ -174,6 +199,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
       });
       setExpandedRevision(null);
       setRevisionComment('');
+      setSelectedRowId(null);
     }
   };
 
@@ -184,12 +210,14 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         ...newItem,
         isPinned: false
       };
-      setItems([...items, item]);
+      setItems(prevItems => [...prevItems, item]);
+      
       toast({
         title: "Approval Created",
         description: `${newItem.title} has been added to the approval list.`,
         duration: 3000,
       });
+      
       setCreateModalOpen(false);
       setNewItem({
         title: '',
@@ -207,6 +235,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     onFocusMode?.(newFocusMode);
   };
 
+  // Helper functions for styling
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'strategy': return <FileText size={16} className="text-blue-400" />;
@@ -243,6 +272,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     }
   };
 
+  // Sortable header component
   const SortableHeader = ({ field, children }: { field: keyof ApprovalItem; children: React.ReactNode }) => (
     <TableHead 
       className="text-white cursor-pointer hover:text-teal-400 transition-colors group"
@@ -262,10 +292,11 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     </TableHead>
   );
 
-  const ItemRow = ({ item, showActions = true }: { item: ApprovalItem; showActions?: boolean }) => (
+  // Row component with proper interactions
+  const ItemRow = ({ item }: { item: ApprovalItem }) => (
     <TableRow 
       key={item.id} 
-      className="border-white/10 hover:bg-white/5 transition-colors group cursor-pointer"
+      className="border-white/10 hover:bg-white/5 transition-all duration-150 group cursor-pointer"
       onClick={() => setSelectedRowId(item.id)}
       tabIndex={0}
       onKeyDown={(e) => {
@@ -278,8 +309,8 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         borderLeft: selectedRowId === item.id ? '3px solid rgb(20, 184, 166)' : undefined
       }}
     >
-      <TableCell className="font-medium text-white text-sm">{item.title}</TableCell>
-      <TableCell>
+      <TableCell className="font-medium text-white text-sm w-2/5">{item.title}</TableCell>
+      <TableCell className="w-1/10">
         <Badge className={`${getTypeColor(item.type)} text-xs`}>
           <span className="flex items-center gap-1">
             {getTypeIcon(item.type)}
@@ -287,14 +318,14 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           </span>
         </Badge>
       </TableCell>
-      <TableCell className="text-gray-300 text-xs">{item.owner}</TableCell>
-      <TableCell className="text-gray-300 text-xs">{item.dueDate}</TableCell>
-      <TableCell className="text-xs">
+      <TableCell className="text-gray-300 text-xs w-1/5">{item.owner}</TableCell>
+      <TableCell className="text-gray-300 text-xs w-3/20">{item.dueDate}</TableCell>
+      <TableCell className="text-xs w-1/10">
         <span className={`flex items-center gap-1 ${getPriorityColor(item.priority)}`}>
           {getPriorityDot(item.priority)} {item.priority}
         </span>
       </TableCell>
-      <TableCell>
+      <TableCell className="w-1/20">
         <div className="flex items-center gap-1">
           <Button
             size="sm"
@@ -309,34 +340,32 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           >
             <Star size={12} fill={item.isPinned ? 'currentColor' : 'none'} />
           </Button>
-          {showActions && (
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-              <Button
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleApproveClick(item);
-                }}
-                className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
-                aria-label={`Approve ${item.title}`}
-              >
-                <CheckCircle size={10} className="mr-1" />
-                Approve
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRevise(item.id);
-                }}
-                className="h-6 px-2 text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
-                aria-label={`Request revision for ${item.title}`}
-              >
-                Revise
-              </Button>
-            </div>
-          )}
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleApproveClick(item);
+              }}
+              className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
+              aria-label={`Approve ${item.title}`}
+            >
+              <CheckCircle size={10} className="mr-1" />
+              Approve
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRevise(item.id);
+              }}
+              className="h-6 px-2 text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
+              aria-label={`Request revision for ${item.title}`}
+            >
+              Revise
+            </Button>
+          </div>
         </div>
       </TableCell>
     </TableRow>
@@ -352,21 +381,24 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           border: focusMode ? '2px solid rgba(20, 184, 166, 0.5)' : '1px solid rgba(20, 184, 166, 0.3)',
           borderRadius: '2rem',
           padding: '24px',
+          margin: '0',
           boxShadow: focusMode 
             ? 'inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 40px rgba(20, 184, 166, 0.3)'
             : 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
         }}
       >
-        {/* Title Bar */}
+        {/* Title Bar - 48px height */}
         <div className="flex items-center justify-between h-12 mb-6 border-b border-teal-500/30 pb-4">
           <div className="flex items-center gap-3">
-            <h3 className="text-xl font-bold text-white">Approvals & Decisions</h3>
+            <h3 className="text-xl font-bold text-white hover:text-teal-400 transition-colors cursor-pointer border-b-2 border-transparent hover:border-teal-400">
+              Approvals & Decisions
+            </h3>
             <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50 text-xs">
               Live
             </Badge>
             {pinnedItems.length > 0 && (
               <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50 text-xs">
-                {pinnedItems.length} Pinned
+                Priority Items ({pinnedItems.length})
               </Badge>
             )}
           </div>
@@ -375,19 +407,24 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
               size="sm" 
               variant="ghost" 
               onClick={toggleFocusMode}
-              className={`text-gray-400 hover:text-teal-400 ${focusMode ? 'text-teal-400' : ''}`}
+              className={`text-gray-400 hover:text-teal-400 transition-colors ${focusMode ? 'text-teal-400' : ''}`}
               aria-pressed={focusMode}
               aria-label="Toggle focus mode"
             >
               <Focus size={16} />
             </Button>
-            <Button size="sm" variant="ghost" className="text-gray-400 hover:text-teal-400">
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="text-gray-400 hover:text-teal-400"
+              aria-label="Expand to full screen"
+            >
               <ExternalLink size={16} />
             </Button>
           </div>
         </div>
 
-        {/* Filter Section */}
+        {/* Filter Section - 10% */}
         <div className="flex gap-2 mb-4">
           {Object.entries(filterCounts).map(([filter, count]) => (
             <Button
@@ -395,11 +432,11 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
               id={filter === 'all' ? 'filter-all' : undefined}
               size="sm"
               variant={activeFilter === filter ? "default" : "outline"}
-              onClick={() => setActiveFilter(filter)}
+              onClick={() => handleFilterChange(filter)}
               className={`text-xs transition-all duration-150 ${
                 activeFilter === filter 
                   ? 'bg-teal-500 text-white border-teal-500' 
-                  : 'border-teal-500/50 text-teal-400 hover:bg-teal-500/10'
+                  : 'border-teal-500/50 text-teal-400 hover:bg-blue-500/20 hover:border-blue-500'
               }`}
               aria-pressed={activeFilter === filter}
             >
@@ -408,7 +445,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           ))}
         </div>
 
-        {/* Pinned Items */}
+        {/* Pinned Items Section - 15% */}
         <div className="mb-4">
           <h4 className="text-sm font-semibold text-teal-400 mb-2 flex items-center gap-1">
             📌 Pinned
@@ -418,27 +455,23 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
               {pinnedItems.slice(0, 3).map(item => (
                 <motion.div 
                   key={item.id} 
-                  className="bg-white/5 rounded-lg p-3 border border-white/10"
+                  className="bg-white/5 rounded-lg p-3 border border-white/10 h-12 flex items-center"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.15 }}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-white text-sm truncate">{item.title}</span>
-                        <Badge className={`${getTypeColor(item.type)} text-xs`}>
-                          {item.type}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-gray-400">
-                        <span>{item.owner}</span>
-                        <span>{item.dueDate}</span>
-                        <span className={getPriorityColor(item.priority)}>
-                          {getPriorityDot(item.priority)} {item.priority}
-                        </span>
-                      </div>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex-1 min-w-0 flex items-center gap-4">
+                      <span className="font-medium text-white text-sm truncate">{item.title}</span>
+                      <Badge className={`${getTypeColor(item.type)} text-xs`}>
+                        {item.type}
+                      </Badge>
+                      <span className="text-xs text-gray-400">{item.owner}</span>
+                      <span className="text-xs text-gray-400">{item.dueDate}</span>
+                      <span className={`text-xs ${getPriorityColor(item.priority)}`}>
+                        {getPriorityDot(item.priority)} {item.priority}
+                      </span>
                     </div>
                     <Button
                       size="sm"
@@ -453,83 +486,91 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                   </div>
                 </motion.div>
               ))}
+              {/* Fill empty slots */}
+              {Array.from({ length: 3 - pinnedItems.length }).map((_, index) => (
+                <div key={`empty-${index}`} className="bg-white/5 rounded-lg p-3 border border-white/10 h-12 flex items-center">
+                  <p className="text-gray-400 text-sm">Pin important items for quick access</p>
+                </div>
+              ))}
             </div>
           ) : (
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
-              <p className="text-gray-400 text-sm">Pin important items for quick access</p>
+            <div className="space-y-2">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={`empty-${index}`} className="bg-white/5 rounded-lg p-3 border border-white/10 h-12 flex items-center">
+                  <p className="text-gray-400 text-sm">Pin important items for quick access</p>
+                </div>
+              ))}
             </div>
           )}
         </div>
 
-        {/* Priority Items List */}
-        <div className="flex-1 min-h-0 mb-4">
-          <div className="h-full overflow-y-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-white/20 hover:bg-transparent">
-                  <SortableHeader field="title">Title</SortableHeader>
-                  <SortableHeader field="type">Type</SortableHeader>
-                  <SortableHeader field="owner">Owner</SortableHeader>
-                  <SortableHeader field="dueDate">Due Date</SortableHeader>
-                  <SortableHeader field="priority">Priority</SortableHeader>
-                  <TableHead className="text-white">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {unpinnedItems.map((item) => (
-                  <React.Fragment key={item.id}>
-                    <ItemRow item={item} />
-                    <AnimatePresence>
-                      {expandedRevision === item.id && (
-                        <motion.tr
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.15 }}
-                        >
-                          <TableCell colSpan={6} className="p-4 bg-white/5">
-                            <div className="space-y-3" aria-expanded={true}>
-                              <label className="text-sm text-gray-300">Revision Comments:</label>
-                              <textarea
-                                value={revisionComment}
-                                onChange={(e) => setRevisionComment(e.target.value)}
-                                placeholder="Enter your revision comments..."
-                                className="w-full h-16 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                rows={2}
-                                aria-label="Revision comments"
-                              />
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleSubmitRevision(item.id, item.title)}
-                                  disabled={!revisionComment.trim()}
-                                  className="bg-orange-600 hover:bg-orange-700 text-white text-xs"
-                                >
-                                  Submit
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => setExpandedRevision(null)}
-                                  className="border-gray-500/50 text-gray-400 hover:bg-gray-500/10 text-xs"
-                                >
-                                  Cancel
-                                </Button>
-                              </div>
+        {/* Priority Items List - 55% */}
+        <div className="flex-1 min-h-0 mb-4 overflow-y-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-white/20 hover:bg-transparent">
+                <SortableHeader field="title">Title</SortableHeader>
+                <SortableHeader field="type">Type</SortableHeader>
+                <SortableHeader field="owner">Owner</SortableHeader>
+                <SortableHeader field="dueDate">Due Date</SortableHeader>
+                <SortableHeader field="priority">Priority</SortableHeader>
+                <TableHead className="text-white">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {unpinnedItems.map((item) => (
+                <React.Fragment key={item.id}>
+                  <ItemRow item={item} />
+                  <AnimatePresence>
+                    {expandedRevision === item.id && (
+                      <motion.tr
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.15 }}
+                      >
+                        <TableCell colSpan={6} className="p-4 bg-white/5">
+                          <div className="space-y-3" aria-expanded={true}>
+                            <label className="text-sm text-gray-300">Revision Comments:</label>
+                            <textarea
+                              value={revisionComment}
+                              onChange={(e) => setRevisionComment(e.target.value)}
+                              placeholder="Enter your revision comments..."
+                              className="w-full h-16 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
+                              rows={2}
+                              aria-label="Revision comments"
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => handleSubmitRevision(item.id, item.title)}
+                                disabled={!revisionComment.trim()}
+                                className="bg-orange-600 hover:bg-orange-700 text-white text-xs"
+                              >
+                                Submit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setExpandedRevision(null)}
+                                className="border-gray-500/50 text-gray-400 hover:bg-gray-500/10 text-xs"
+                              >
+                                Cancel
+                              </Button>
                             </div>
-                          </TableCell>
-                        </motion.tr>
-                      )}
-                    </AnimatePresence>
-                  </React.Fragment>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                          </div>
+                        </TableCell>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
+                </React.Fragment>
+              ))}
+            </TableBody>
+          </Table>
         </div>
 
-        {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-white/10">
+        {/* Footer Actions - 10% */}
+        <div className="flex items-center justify-between pt-4 border-t border-white/10 h-10">
           <Button
             variant="ghost"
             size="sm"
