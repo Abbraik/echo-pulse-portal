@@ -1,10 +1,12 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 html {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', 'Noto Sans', system-ui, sans-serif;
 }
 
 @layer base {
@@ -102,7 +104,7 @@ html {
   }
 }
 
-/* Glass panel styles */
+/* Enhanced Cinematic Glass panel styles */
 .glass-panel {
   @apply bg-white/5 backdrop-blur-[20px] border border-white/20 rounded-2xl w-full;
   box-shadow: 
@@ -111,10 +113,20 @@ html {
 }
 
 .glass-panel-deep {
-  @apply bg-white/10 backdrop-blur-[20px] border border-white/30 rounded-2xl w-full;
+  @apply bg-white/10 backdrop-blur-[24px] border border-white/30 rounded-2xl w-full;
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
-    0 0 30px rgba(56, 178, 172, 0.15);
+    inset 0 0 30px rgba(20, 184, 166, 0.15),
+    0 16px 32px rgba(0, 0, 0, 0.4);
+}
+
+.glass-panel-cinematic {
+  background: rgba(20, 30, 50, 0.6);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  border-radius: 1rem;
+  box-shadow: 
+    inset 0 0 30px rgba(20, 184, 166, 0.15),
+    0 16px 32px rgba(0, 0, 0, 0.4);
 }
 
 .glass-panel-dark {
@@ -148,7 +160,7 @@ html {
   box-shadow: 0 0 20px rgba(56, 178, 172, 0.8);
 }
 
-/* Animation keyframes */
+/* Enhanced Animation keyframes */
 @keyframes accordion-down {
   from {
     height: 0;
@@ -233,6 +245,47 @@ html {
   }
 }
 
+@keyframes cinematic-entrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.98) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes neon-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(20, 184, 166, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.8);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes spring-bounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 /* Utility animations */
 .animate-accordion-down {
   animation: accordion-down 0.2s ease-out;
@@ -266,6 +319,22 @@ html {
   animation: slide-out-right 0.3s ease-out;
 }
 
+.animate-cinematic-entrance {
+  animation: cinematic-entrance 0.6s ease-out;
+}
+
+.animate-neon-glow {
+  animation: neon-glow 2s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+.animate-spring-bounce {
+  animation: spring-bounce 0.3s ease-out;
+}
+
 /* Responsive container animation */
 .animate-container-resize {
   transition: max-width 200ms ease, padding 200ms ease;
@@ -278,6 +347,20 @@ html {
 
 .hover-scale {
   @apply transition-transform duration-200 hover:scale-105;
+}
+
+.cinematic-hover {
+  @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl;
+}
+
+.neon-border {
+  @apply border border-teal-500/30 shadow-lg;
+  box-shadow: inset 0 0 20px rgba(20, 184, 166, 0.1), 0 0 20px rgba(20, 184, 166, 0.1);
+}
+
+.neon-border:hover {
+  @apply border-teal-400/50;
+  box-shadow: inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 30px rgba(20, 184, 166, 0.2);
 }
 
 /* Enhanced hover panel animations */
@@ -317,6 +400,32 @@ html {
   transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
 }
 
+/* Gradient utilities */
+.bg-gradient-radial {
+  background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+}
+
+/* Typography enhancements */
+.text-noto-bold {
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: 0.05em;
+}
+
+.text-noto-medium {
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 500;
+  font-size: 1.125rem;
+  letter-spacing: 0.025em;
+}
+
+.text-noto-regular {
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+}
+
 /* RTL support */
 [dir="rtl"] .glass-panel {
   direction: rtl;
@@ -330,6 +439,10 @@ html {
 @media (max-width: 600px) {
   .glass-panel {
     @apply rounded-xl;
+  }
+  
+  .glass-panel-cinematic {
+    border-radius: 0.75rem;
   }
   
   .slider-teal [data-slider-thumb] {
@@ -364,6 +477,40 @@ html {
     0 0 30px rgba(0, 0, 0, 0.15);
 }
 
+.light .glass-panel-cinematic {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  box-shadow: 
+    inset 0 0 30px rgba(20, 184, 166, 0.1),
+    0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
 .light .slider-teal [data-slider-track] {
   @apply bg-gray-200;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .animate-cinematic-entrance,
+  .animate-neon-glow,
+  .animate-pulse-subtle,
+  .animate-spring-bounce {
+    animation: none;
+  }
+  
+  .cinematic-hover {
+    @apply hover:scale-100;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass-panel-cinematic {
+    border: 2px solid rgba(20, 184, 166, 0.8);
+  }
+  
+  .neon-border {
+    border: 2px solid rgba(20, 184, 166, 0.8);
+  }
 }

@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { Layout, Layers, Network, BarChart3, ArrowRight, GitBranch, MessageSquare } from 'lucide-react';
+import { Layout, Layers, Network, BarChart3, ArrowRight, GitBranch, MessageSquare, Brain } from 'lucide-react';
 import SystemFramingStudio from '@/components/think/SystemFramingStudio';
 import FooterCTA from '@/components/think/FooterCTA';
 import DeiAndForesightHub from '@/components/think/DeiAndForesightHub';
@@ -378,125 +379,253 @@ const ThinkPage: React.FC = () => {
   };
 
   return (
-    <AnimatedPage>
-      {/* Top Navigation Bar */}
-      <motion.header 
-        className="sticky top-0 z-50 w-full glass-panel py-3 px-6 mb-8 border-b border-white/20"
-        initial={{ y: 0 }}
-        animate={{ y: hideHeader ? -100 : 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-2 rounded-xl bg-teal-500/20 text-teal-400">
-              <Layers size={24} />
-            </div>
-            <div className="text-left">
-              <h1 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">THINK 🔍: {t("strategyZone").toUpperCase()}</h1>
-              <p className="text-sm md:text-base text-gray-400">
-                {t("thinkCoreDesc")}
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      {/* Enhanced cinematic background */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-radial from-teal-500/10 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2314b8a6" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] animate-pulse"></div>
+      </div>
+
+      <AnimatedPage>
+        {/* Cinematic Header Bar */}
+        <motion.header 
+          className="sticky top-0 z-50 w-full backdrop-blur-[24px] py-4 px-6 mb-8"
+          style={{
+            background: 'rgba(20, 30, 50, 0.6)',
+            borderBottom: '1px solid rgba(20, 184, 166, 0.3)',
+            boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
+          }}
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: hideHeader ? -100 : 0, opacity: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          <div className="max-w-[1440px] mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <motion.div 
+                className="p-3 rounded-2xl bg-teal-500/20 text-teal-400"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Brain size={28} />
+              </motion.div>
+              <div className="text-left">
+                <motion.h1 
+                  className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500"
+                  style={{ letterSpacing: '0.05em' }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                >
+                  THINK 🔍: {t("strategyZone").toUpperCase()}
+                </motion.h1>
+                <motion.p 
+                  className="text-base text-gray-300"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                >
+                  {t("thinkCoreDesc")}
+                </motion.p>
+              </div>
             </div>
           </div>
+        </motion.header>
+        
+        {/* Main Content Container */}
+        <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
+          {/* Section 1: System Framing Studio */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+            className="mb-8"
+          >
+            <div 
+              className="rounded-2xl p-8 backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
+              style={{
+                background: 'rgba(20, 30, 50, 0.6)',
+                boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-2xl"></div>
+              <div className="relative">
+                <motion.h2 
+                  className="text-2xl font-bold mb-6 text-left flex items-center text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500"
+                  style={{ letterSpacing: '0.05em' }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Layout className="mr-3 text-teal-400" size={24} />
+                  {t("systemFramingStudio").toUpperCase()}
+                </motion.h2>
+                <SystemFramingStudio 
+                  cldData={mockCldData} 
+                  snaData={adaptSNADataToSystemFraming(mockSnaData)} 
+                />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Section 2: Main Tabbed Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+          >
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+              >
+                <TabsList className="w-full backdrop-blur-[24px] rounded-2xl p-2 mb-8 flex justify-center border border-white/20"
+                  style={{
+                    background: 'rgba(20, 30, 50, 0.4)',
+                    boxShadow: 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
+                  }}
+                >
+                  <TabsTrigger 
+                    value="dei" 
+                    className="rounded-xl px-6 py-3 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400 transition-all duration-300 hover:bg-teal-500/10"
+                  >
+                    <BarChart3 className="mr-2 h-5 w-5" />
+                    {t("deiAndForesight").toUpperCase()}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="sna" 
+                    className="rounded-xl px-6 py-3 data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400 transition-all duration-300 hover:bg-purple-500/10"
+                  >
+                    <Network className="mr-2 h-5 w-5" />
+                    {t("snaAnalysis").toUpperCase()}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="strategy" 
+                    className="rounded-xl px-6 py-3 data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-400 transition-all duration-300 hover:bg-blue-500/10"
+                  >
+                    <GitBranch className="mr-2 h-5 w-5" />
+                    {t("strategyBuilder").toUpperCase()}
+                  </TabsTrigger>
+                </TabsList>
+              </motion.div>
+
+              {/* DEI & Foresight Hub */}
+              <TabsContent value="dei" className="mt-0">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden"
+                  style={{
+                    background: 'rgba(20, 30, 50, 0.6)',
+                    boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
+                  }}
+                >
+                  <DeiAndForesightHub 
+                    metrics={currentMetrics}
+                    scenarios={scenarios}
+                    onSaveScenario={handleSaveScenario}
+                    onSelectScenario={handleScenarioSelect}
+                  />
+                </motion.div>
+              </TabsContent>
+              
+              {/* SNA Analysis Panel */}
+              <TabsContent value="sna" className="mt-0">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden"
+                  style={{
+                    background: 'rgba(20, 30, 50, 0.6)',
+                    boxShadow: 'inset 0 0 30px rgba(139, 69, 199, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
+                  }}
+                >
+                  <SnaAnalysisPanel 
+                    snaData={mockSnaData}
+                    onHighlightActors={handleHighlightActors}
+                  />
+                </motion.div>
+              </TabsContent>
+              
+              {/* Strategy Builder */}
+              <TabsContent value="strategy" className="mt-0">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden p-8"
+                  style={{
+                    background: 'rgba(20, 30, 50, 0.6)',
+                    boxShadow: 'inset 0 0 30px rgba(59, 130, 246, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
+                  }}
+                >
+                  <motion.h2 
+                    className="text-2xl font-bold mb-6 text-left flex items-center text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-500"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <GitBranch className="mr-3 text-blue-400" size={24} />
+                    {t("strategyBuilder").toUpperCase()}
+                  </motion.h2>
+                  <StrategyBuilder 
+                    sensitivityParameters={mockSensitivity} 
+                    executionImpact={mockExecutionImpact}
+                    onCompute={handleStrategyBuilderCompute}
+                  />
+                  
+                  {/* SNA-Driven Execution Pathways */}
+                  <ExecutionPathwayPanel 
+                    pathways={pathways} 
+                    onHighlightPathway={handleHighlightActors}
+                    onAdoptPathway={handleAdoptPathway}
+                  />
+                </motion.div>
+              </TabsContent>
+            </Tabs>
+          </motion.div>
+
+          {/* Footer CTA */}
+          <motion.div 
+            className="mt-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <FooterCTA />
+          </motion.div>
         </div>
-      </motion.header>
-      
-      {/* System Framing Studio (Always visible at the top) */}
-      <GlassCard className="p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4 text-left flex items-center text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">
-          <Layout className="mr-2 text-teal-400" size={20} />
-          {t("systemFramingStudio").toUpperCase()}
-        </h2>
-        <SystemFramingStudio 
-          cldData={mockCldData} 
-          snaData={adaptSNADataToSystemFraming(mockSnaData)} 
-        />
-      </GlassCard>
-      
-      {/* Main Tabbed Content */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
-        <TabsList className="w-full bg-white/5 backdrop-blur-sm rounded-full p-1 mb-6 flex justify-center">
-          <TabsTrigger 
-            value="dei" 
-            className="rounded-full px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
-          >
-            <BarChart3 className="mr-2 h-4 w-4" />
-            {t("deiAndForesight").toUpperCase()}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="sna" 
-            className="rounded-full px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
-          >
-            <Network className="mr-2 h-4 w-4" />
-            {t("snaAnalysis").toUpperCase()}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="strategy" 
-            className="rounded-full px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
-          >
-            <GitBranch className="mr-2 h-4 w-4" />
-            {t("strategyBuilder").toUpperCase()}
-          </TabsTrigger>
-        </TabsList>
-
-        {/* DEI & Foresight Hub */}
-        <TabsContent value="dei" className="mt-0">
-          <DeiAndForesightHub 
-            metrics={currentMetrics}
-            scenarios={scenarios}
-            onSaveScenario={handleSaveScenario}
-            onSelectScenario={handleScenarioSelect}
-          />
-        </TabsContent>
         
-        {/* SNA Analysis Panel */}
-        <TabsContent value="sna" className="mt-0">
-          <SnaAnalysisPanel 
-            snaData={mockSnaData}
-            onHighlightActors={handleHighlightActors}
-          />
-        </TabsContent>
-        
-        {/* Strategy Builder with SNA-driven Execution Pathways */}
-        <TabsContent value="strategy" className="mt-0">
-          <GlassCard className="p-6">
-            <h2 className="text-xl font-bold mb-4 text-left flex items-center text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500">
-              <GitBranch className="mr-2 text-teal-400" size={20} />
-              {t("strategyBuilder").toUpperCase()}
-            </h2>
-            <StrategyBuilder 
-              sensitivityParameters={mockSensitivity} 
-              executionImpact={mockExecutionImpact}
-              onCompute={handleStrategyBuilderCompute}
-            />
-            
-            {/* SNA-Driven Execution Pathways */}
-            <ExecutionPathwayPanel 
-              pathways={pathways} 
-              onHighlightPathway={handleHighlightActors}
-              onAdoptPathway={handleAdoptPathway}
-            />
-          </GlassCard>
-        </TabsContent>
-      </Tabs>
-
-      {/* Footer CTA */}
-      <div className="mt-8">
-        <FooterCTA />
-      </div>
-      
-      {/* AI Advisor Chat Button and Panel */}
-      <div className="fixed left-4 bottom-4 z-50">
-        <Button 
-          onClick={() => setShowAiAdvisor(!showAiAdvisor)} 
-          className={`rounded-full p-3 ${showAiAdvisor ? 'bg-red-500/80 hover:bg-red-600/80' : 'bg-teal-500/80 hover:bg-teal-600/80'}`}
+        {/* AI Advisor Chat Button and Panel */}
+        <motion.div 
+          className="fixed left-6 bottom-6 z-50"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 1, duration: 0.4, type: "spring" }}
         >
-          <MessageSquare size={24} />
-        </Button>
-      </div>
-      
-      {showAiAdvisor && <AiAdvisorChat onClose={() => setShowAiAdvisor(false)} />}
-    </AnimatedPage>
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button 
+              onClick={() => setShowAiAdvisor(!showAiAdvisor)} 
+              className={`rounded-full p-4 backdrop-blur-[24px] border border-white/20 transition-all duration-300 ${
+                showAiAdvisor 
+                  ? 'bg-red-500/80 hover:bg-red-600/80 shadow-lg shadow-red-500/25' 
+                  : 'bg-teal-500/80 hover:bg-teal-600/80 shadow-lg shadow-teal-500/25'
+              }`}
+            >
+              <MessageSquare size={24} />
+            </Button>
+          </motion.div>
+        </motion.div>
+        
+        {showAiAdvisor && <AiAdvisorChat onClose={() => setShowAiAdvisor(false)} />}
+      </AnimatedPage>
+    </div>
   );
 };
 
