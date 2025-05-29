@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
@@ -330,4 +329,69 @@ html {
 
 .light .slider-teal [data-slider-track] {
   @apply bg-gray-200;
+}
+
+/* Asymmetric panel responsive styles */
+@media (max-width: 1024px) and (min-width: 600px) {
+  .asymmetric-panel-hero {
+    width: 60% !important;
+  }
+  .asymmetric-panel-secondary {
+    width: 25% !important;
+  }
+  .asymmetric-panel-tertiary {
+    width: 15% !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .asymmetric-panels-container {
+    flex-direction: column;
+  }
+  .asymmetric-panel {
+    width: 100% !important;
+    height: auto;
+  }
+  .asymmetric-panel-collapsed {
+    height: 60px; /* Header only */
+  }
+  .asymmetric-panel-expanded {
+    height: 50vh;
+  }
+}
+
+/* Enhanced glass effect for hero panels */
+.asymmetric-panel-hero {
+  box-shadow: 
+    inset 0 0 30px rgba(20, 184, 166, 0.15), 
+    0 20px 40px rgba(0, 0, 0, 0.5), 
+    0 0 20px rgba(20, 184, 166, 0.3) !important;
+  border: 1px solid rgba(20, 184, 166, 0.4) !important;
+}
+
+/* Panel transition improvements */
+.panel-transition {
+  transition: 
+    width 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    height 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.panel-transition-data-driven {
+  transition: 
+    width 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    height 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Focus indicators for accessibility */
+.asymmetric-panel:focus {
+  outline: 2px solid rgba(20, 184, 166, 0.6);
+  outline-offset: 2px;
+}
+
+.asymmetric-panel:focus:not(:focus-visible) {
+  outline: none;
 }
