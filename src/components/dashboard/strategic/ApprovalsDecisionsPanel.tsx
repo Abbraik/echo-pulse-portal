@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Calendar, AlertTriangle, CheckCircle, MessageCircle, Filter, Star, ChevronUp, ChevronDown, Plus, ExternalLink, X, Focus, Edit } from 'lucide-react';
+import { FileText, Calendar, AlertTriangle, CheckCircle, MessageCircle, Filter, Star, ChevronUp, ChevronDown, Plus, ExternalLink, X, Focus, Edit, Users, Activity, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -37,7 +37,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
 }) => {
   const { toast } = useToast();
   
-  // Mock data
+  // Extended mock data with 10 items
   const initialItems: ApprovalItem[] = [
     { 
       id: '1', 
@@ -84,6 +84,51 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
       priority: 'high', 
       isPinned: false 
     },
+    { 
+      id: '6', 
+      title: 'Digital ID Rollout', 
+      type: 'external', 
+      owner: 'Interior Ministry', 
+      dueDate: '2025-06-15', 
+      priority: 'low', 
+      isPinned: false 
+    },
+    { 
+      id: '7', 
+      title: 'Health Data Integration', 
+      type: 'strategy', 
+      owner: 'Health Ministry', 
+      dueDate: '2025-06-08', 
+      priority: 'high', 
+      isPinned: false 
+    },
+    { 
+      id: '8', 
+      title: 'Water Sustainability Act', 
+      type: 'redesign', 
+      owner: 'Water Authority', 
+      dueDate: '2025-06-12', 
+      priority: 'medium', 
+      isPinned: false 
+    },
+    { 
+      id: '9', 
+      title: 'Smart Mobility Plan', 
+      type: 'strategy', 
+      owner: 'Transport Department', 
+      dueDate: '2025-06-20', 
+      priority: 'medium', 
+      isPinned: false 
+    },
+    { 
+      id: '10', 
+      title: 'Cybersecurity Protocol', 
+      type: 'external', 
+      owner: 'Tech Authority', 
+      dueDate: '2025-06-18', 
+      priority: 'low', 
+      isPinned: false 
+    }
   ];
 
   // State
@@ -92,15 +137,25 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [focusMode, setFocusMode] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+  const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
 
   // Modal states
   const [approveModal, setApproveModal] = useState<{ open: boolean; item: ApprovalItem | null }>({
     open: false,
     item: null
   });
+  const [reviseModal, setReviseModal] = useState<{ open: boolean; item: ApprovalItem | null }>({
+    open: false,
+    item: null
+  });
   const [createModal, setCreateModal] = useState(false);
-  const [reviseRowId, setReviseRowId] = useState<string | null>(null);
-  const [reviseComment, setReviseComment] = useState('');
+
+  // Revision form state
+  const [revisionForm, setRevisionForm] = useState({
+    comment: '',
+    to: '',
+    urgency: 'normal' as 'immediate' | 'high' | 'normal'
+  });
 
   // New item form
   const [newItem, setNewItem] = useState({
@@ -137,14 +192,14 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         case 'r':
           if (selectedRowId) {
             e.preventDefault();
-            handleReviseClick(selectedRowId);
+            const item = items.find(i => i.id === selectedRowId);
+            if (item) handleReviseClick(item);
           }
           break;
         case 'escape':
           e.preventDefault();
-          setReviseRowId(null);
-          setReviseComment('');
           setApproveModal({ open: false, item: null });
+          setReviseModal({ open: false, item: null });
           setCreateModal(false);
           setSelectedRowId(null);
           break;
@@ -228,32 +283,29 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     }
   };
 
-  const handleReviseClick = (id: string) => {
-    if (reviseRowId === id) {
-      setReviseRowId(null);
-      setReviseComment('');
-    } else {
-      setReviseRowId(id);
-      setReviseComment('');
-    }
+  const handleReviseClick = (item: ApprovalItem) => {
+    setRevisionForm({
+      comment: '',
+      to: item.owner,
+      urgency: 'normal'
+    });
+    setReviseModal({ open: true, item });
   };
 
-  const handleReviseSubmit = async (id: string) => {
-    if (reviseComment.trim()) {
-      setLoading(id);
+  const handleReviseSubmit = async () => {
+    if (reviseModal.item && revisionForm.comment.trim()) {
+      setLoading(reviseModal.item.id);
       
       // Mock delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const item = items.find(i => i.id === id);
       toast({
-        title: "Feedback Submitted",
-        description: `Feedback submitted for ${item?.title}.`,
+        title: "Revision Sent",
+        description: `Revision request sent to ${revisionForm.to}.`,
         duration: 3000,
       });
       
-      setReviseRowId(null);
-      setReviseComment('');
+      setReviseModal({ open: false, item: null });
       setSelectedRowId(null);
       setLoading(null);
     }
@@ -290,12 +342,6 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
       });
       setLoading(null);
     }
-  };
-
-  const toggleFocusMode = () => {
-    const newFocusMode = !focusMode;
-    setFocusMode(newFocusMode);
-    onFocusMode?.(newFocusMode);
   };
 
   // Helper functions
@@ -411,11 +457,12 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
               {pinnedItems.slice(0, 3).map(item => (
                 <motion.div 
                   key={item.id} 
-                  className="bg-white/5 rounded-lg p-3 border border-white/10 flex items-center justify-between"
+                  className="bg-white/5 rounded-lg p-3 border border-white/10 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.15 }}
+                  onClick={() => handleApproveClick(item)}
                 >
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <span className="font-medium text-white text-sm truncate">{item.title}</span>
@@ -448,13 +495,13 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
                       Approve ▶
                     </ActionButton>
                     <ActionButton
-                      onClick={() => handleReviseClick(item.id)}
+                      onClick={() => handleReviseClick(item)}
                       disabled={loading === item.id}
                       variant="outline"
                       className="h-6 px-2 text-sm border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
                     >
                       <Edit size={10} className="mr-1" />
-                      Revise ▶
+                      Revise ✎
                     </ActionButton>
                   </div>
                 </motion.div>
@@ -482,106 +529,66 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
             </TableHeader>
             <TableBody>
               {unpinnedItems.map((item) => (
-                <React.Fragment key={item.id}>
-                  <TableRow 
-                    className="border-white/10 hover:bg-white/5 transition-all duration-150 cursor-pointer"
-                    onClick={() => setSelectedRowId(item.id)}
-                    style={{
-                      backgroundColor: selectedRowId === item.id ? 'rgba(20, 184, 166, 0.1)' : undefined,
-                      borderLeft: selectedRowId === item.id ? '3px solid rgb(20, 184, 166)' : undefined
-                    }}
-                  >
-                    <TableCell className="font-medium text-white text-sm">{item.title}</TableCell>
-                    <TableCell>
-                      <Badge className={`${getTypeColor(item.type)} text-sm`}>
-                        <span className="flex items-center gap-1">
-                          {getTypeIcon(item.type)}
-                          {item.type}
-                        </span>
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-gray-300 text-sm">{item.owner}</TableCell>
-                    <TableCell className="text-gray-300 text-sm">{item.dueDate}</TableCell>
-                    <TableCell className="text-sm">
-                      <span className={`flex items-center gap-1 ${getPriorityColor(item.priority)}`}>
-                        {getPriorityDot(item.priority)} {item.priority}
+                <TableRow 
+                  key={item.id}
+                  className="border-white/10 hover:bg-white/5 transition-all duration-150 cursor-pointer"
+                  onClick={() => {
+                    setSelectedRowId(item.id);
+                    handleApproveClick(item);
+                  }}
+                  onMouseEnter={() => setHoveredRowId(item.id)}
+                  onMouseLeave={() => setHoveredRowId(null)}
+                  style={{
+                    backgroundColor: selectedRowId === item.id ? 'rgba(20, 184, 166, 0.1)' : undefined,
+                    borderLeft: selectedRowId === item.id ? '3px solid rgb(20, 184, 166)' : undefined
+                  }}
+                >
+                  <TableCell className="font-medium text-white text-sm">{item.title}</TableCell>
+                  <TableCell>
+                    <Badge className={`${getTypeColor(item.type)} text-sm`}>
+                      <span className="flex items-center gap-1">
+                        {getTypeIcon(item.type)}
+                        {item.type}
                       </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <ActionButton
-                          onClick={() => handlePin(item.id)}
-                          disabled={loading === item.id}
-                          variant="ghost"
-                          className="text-gray-400 hover:text-yellow-400 p-1 h-6 w-6"
-                        >
-                          <Star size={12} />
-                        </ActionButton>
-                        <ActionButton
-                          onClick={() => handleApproveClick(item)}
-                          disabled={loading === item.id}
-                          className="h-6 px-2 text-sm bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          <CheckCircle size={10} className="mr-1" />
-                          Approve ▶
-                        </ActionButton>
-                        <ActionButton
-                          onClick={() => handleReviseClick(item.id)}
-                          disabled={loading === item.id}
-                          variant="outline"
-                          className="h-6 px-2 text-sm border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
-                        >
-                          <Edit size={10} className="mr-1" />
-                          Revise ✎
-                        </ActionButton>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                  <AnimatePresence>
-                    {reviseRowId === item.id && (
-                      <motion.tr
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.15 }}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-gray-300 text-sm">{item.owner}</TableCell>
+                  <TableCell className="text-gray-300 text-sm">{item.dueDate}</TableCell>
+                  <TableCell className="text-sm">
+                    <span className={`flex items-center gap-1 ${getPriorityColor(item.priority)}`}>
+                      {getPriorityDot(item.priority)} {item.priority}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className={`flex items-center gap-1 transition-opacity duration-200 ${
+                      hoveredRowId === item.id ? 'opacity-100' : 'opacity-0'
+                    }`}>
+                      <ActionButton
+                        onClick={() => handlePin(item.id)}
+                        disabled={loading === item.id}
+                        variant="ghost"
+                        className="text-gray-400 hover:text-yellow-400 p-1 h-6 w-6"
                       >
-                        <TableCell colSpan={6} className="p-4 bg-white/5">
-                          <div className="space-y-3">
-                            <label className="text-sm text-gray-300">Revision Comments:</label>
-                            <Textarea
-                              value={reviseComment}
-                              onChange={(e) => setReviseComment(e.target.value)}
-                              placeholder="Enter your revision comments..."
-                              className="w-full h-16 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
-                              rows={2}
-                            />
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                onClick={() => handleReviseSubmit(item.id)}
-                                disabled={!reviseComment.trim() || loading === item.id}
-                                className="bg-orange-600 hover:bg-orange-700 text-white text-sm"
-                              >
-                                {loading === item.id ? 'Submitting...' : 'Submit'}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setReviseRowId(null);
-                                  setReviseComment('');
-                                }}
-                                className="border-gray-500/50 text-gray-400 hover:bg-gray-500/10 text-sm"
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </div>
-                        </TableCell>
-                      </motion.tr>
-                    )}
-                  </AnimatePresence>
-                </React.Fragment>
+                        <Star size={12} />
+                      </ActionButton>
+                      <ActionButton
+                        onClick={() => handleApproveClick(item)}
+                        disabled={loading === item.id}
+                        className="h-6 px-2 text-sm bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        Approve ▶
+                      </ActionButton>
+                      <ActionButton
+                        onClick={() => handleReviseClick(item)}
+                        disabled={loading === item.id}
+                        variant="outline"
+                        className="h-6 px-2 text-sm border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
+                      >
+                        Revise ✎
+                      </ActionButton>
+                    </div>
+                  </TableCell>
+                </TableRow>
               ))}
             </TableBody>
           </Table>
@@ -607,15 +614,97 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
         </div>
       </div>
 
-      {/* Approve Confirmation Modal */}
+      {/* Approve Details Modal */}
       <Dialog open={approveModal.open} onOpenChange={(open) => setApproveModal({ open, item: null })}>
-        <DialogContent className="bg-gray-900 border-gray-700">
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl max-h-[80vh] overflow-y-auto" aria-modal="true">
           <DialogHeader>
-            <DialogTitle className="text-white">Confirm Approval</DialogTitle>
+            <DialogTitle className="text-white text-xl">Approval Details</DialogTitle>
             <DialogDescription className="text-gray-300">
-              Are you sure you want to approve "{approveModal.item?.title}"?
+              Review contextual information before approving
             </DialogDescription>
           </DialogHeader>
+          
+          {approveModal.item && (
+            <div className="space-y-6">
+              {/* Header Info */}
+              <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{approveModal.item.title}</h3>
+                  <p className="text-sm text-gray-400">{approveModal.item.owner} • Due: {approveModal.item.dueDate}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className={getTypeColor(approveModal.item.type)}>
+                    {getTypeIcon(approveModal.item.type)}
+                    <span className="ml-1">{approveModal.item.type}</span>
+                  </Badge>
+                  <span className={`text-sm ${getPriorityColor(approveModal.item.priority)}`}>
+                    {getPriorityDot(approveModal.item.priority)} {approveModal.item.priority}
+                  </span>
+                </div>
+              </div>
+
+              {/* Context Sections */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Scenario Summary (THINK) */}
+                <div className="p-4 bg-white/5 rounded-lg border border-teal-500/30">
+                  <h4 className="text-sm font-semibold text-teal-400 mb-3 flex items-center gap-2">
+                    <Activity size={16} />
+                    Scenario Summary
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Selected Scenario:</span>
+                      <span className="text-white">Sustainable Growth</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Target DEI:</span>
+                      <span className="text-green-400">85.2</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Simulated DEI:</span>
+                      <span className="text-orange-400">78.5</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bundle KPIs (ACT) */}
+                <div className="p-4 bg-white/5 rounded-lg border border-blue-500/30">
+                  <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                    <TrendingUp size={16} />
+                    Bundle KPIs
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">ROI:</span>
+                      <span className="text-green-400">245%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Success Rate:</span>
+                      <span className="text-green-400">92%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Time to Deploy:</span>
+                      <span className="text-orange-400">3.2 months</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Alerts (MONITOR) */}
+                <div className="p-4 bg-white/5 rounded-lg border border-purple-500/30">
+                  <h4 className="text-sm font-semibold text-purple-400 mb-3 flex items-center gap-2">
+                    <AlertTriangle size={16} />
+                    Recent Alerts
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="text-red-400">Resource constraint detected</div>
+                    <div className="text-orange-400">Stakeholder feedback pending</div>
+                    <div className="text-yellow-400">Timeline variance +5 days</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <DialogFooter>
             <Button 
               variant="outline" 
@@ -629,7 +718,72 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
               disabled={loading === approveModal.item?.id}
               className="bg-green-600 hover:bg-green-700"
             >
-              {loading === approveModal.item?.id ? 'Confirming...' : 'Confirm'}
+              {loading === approveModal.item?.id ? 'Confirming...' : 'Confirm Approval'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Revise Modal */}
+      <Dialog open={reviseModal.open} onOpenChange={(open) => setReviseModal({ open, item: null })}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl" aria-modal="true">
+          <DialogHeader>
+            <DialogTitle className="text-white text-xl">Request Revision</DialogTitle>
+            <DialogDescription className="text-gray-300">
+              Provide feedback for "{reviseModal.item?.title}"
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="comment" className="text-white">Comment *</Label>
+              <Textarea
+                id="comment"
+                value={revisionForm.comment}
+                onChange={(e) => setRevisionForm({...revisionForm, comment: e.target.value})}
+                className="bg-white/10 border-white/20 text-white mt-1"
+                placeholder="Provide feedback for sender..."
+                rows={3}
+              />
+            </div>
+            <div>
+              <Label htmlFor="to" className="text-white">To</Label>
+              <Input
+                id="to"
+                value={revisionForm.to}
+                onChange={(e) => setRevisionForm({...revisionForm, to: e.target.value})}
+                className="bg-white/10 border-white/20 text-white mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="urgency" className="text-white">Urgency</Label>
+              <Select value={revisionForm.urgency} onValueChange={(value) => setRevisionForm({...revisionForm, urgency: value as typeof revisionForm.urgency})}>
+                <SelectTrigger className="bg-white/10 border-white/20 text-white mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectItem value="immediate">Immediate</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="normal">Normal</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setReviseModal({ open: false, item: null })}
+              disabled={loading === reviseModal.item?.id}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleReviseSubmit}
+              disabled={!revisionForm.comment.trim() || loading === reviseModal.item?.id}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              {loading === reviseModal.item?.id ? 'Sending...' : 'Send Revision Request'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -637,7 +791,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
 
       {/* Create New Approval Modal */}
       <Dialog open={createModal} onOpenChange={setCreateModal}>
-        <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-md" aria-modal="true">
           <DialogHeader>
             <DialogTitle className="text-white">Create New Approval</DialogTitle>
             <DialogDescription className="text-gray-300">
