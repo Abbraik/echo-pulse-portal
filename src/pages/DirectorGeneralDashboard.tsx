@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTheme } from '@/hooks/use-theme';
-import { usePanelCompact } from '@/hooks/use-panel-compact';
+import { useFocalPanels } from '@/hooks/use-focal-panels';
 import ParticlesBackground from '@/components/ui/particles-background';
 import DirectorHeader from '@/components/dashboard/DirectorHeader';
 import { ApprovalsDecisionsPanel } from '@/components/dashboard/strategic/ApprovalsDecisionsPanel';
@@ -12,10 +12,10 @@ import { CoordinationTriggersPanel } from '@/components/dashboard/strategic/Coor
 import { ZoneSnapshot } from '@/components/dashboard/enhanced/ZoneSnapshot';
 import { TodaysSnapshot } from '@/components/dashboard/enhanced/TodaysSnapshot';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
-import { CompactPanelWrapper } from '@/components/dashboard/enhanced/CompactPanelWrapper';
+import { FocalPanelWrapper } from '@/components/dashboard/enhanced/FocalPanelWrapper';
 import { getDashboardData } from '@/api/dashboard';
 import { Button } from '@/components/ui/button';
-import { X, Maximize2, Search, Bell, Plus } from 'lucide-react';
+import { X, Search, Bell, Plus } from 'lucide-react';
 
 type ZoneType = 'THINK' | 'ACT' | 'MONITOR' | 'LEARN' | 'INNOVATE';
 
@@ -31,23 +31,23 @@ const DirectorGeneralDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
-  const [hoveredPanel, setHoveredPanel] = useState<string | null>(null);
   const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
   const [contextualSnapshot, setContextualSnapshot] = useState<ContextualSnapshot | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
 
-  // Panel compact state management
-  const { containerRef } = usePanelCompact();
-
-  // Check for mobile viewport
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  // Focal panels system
+  const {
+    panelConfigs,
+    heroPanelId,
+    isMobile,
+    isTablet,
+    animationDuration,
+    handlePanelHover,
+    handlePanelFocus,
+    resetPanels,
+    setAutoFocus,
+  } = useFocalPanels();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +55,9 @@ const DirectorGeneralDashboard: React.FC = () => {
         const data = await getDashboardData();
         setDashboardData(data);
         setLastUpdate(new Date());
+        
+        // Set auto-focus based on priority data
+        setAutoFocus(data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -71,10 +74,10 @@ const DirectorGeneralDashboard: React.FC = () => {
         setHasNewNotifications(true);
         setNotificationCount(prev => prev + 1);
       }
-    }, 30000);
+    }, 10000); // Auto-focus recomputation every 10s
     
     return () => clearInterval(interval);
-  }, []);
+  }, [setAutoFocus]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -89,7 +92,6 @@ const DirectorGeneralDashboard: React.FC = () => {
           break;
         case 'f':
           e.preventDefault();
-          // Focus on global search
           document.getElementById('global-search')?.focus();
           break;
       }
@@ -99,10 +101,6 @@ const DirectorGeneralDashboard: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleFocusMode = (panelId: string) => {
-    setHoveredPanel(panelId);
-  };
-
   const handleFullscreen = (panelId: string) => {
     setFullscreenPanel(panelId);
   };
@@ -111,11 +109,9 @@ const DirectorGeneralDashboard: React.FC = () => {
     setContextualSnapshot({ zone, trigger, panelId });
   };
 
-  const getPanelWidth = (panelId: string) => {
-    if (isMobile) return 'w-full';
-    if (hoveredPanel === panelId) return 'w-[60%]';
-    if (hoveredPanel && hoveredPanel !== panelId) return 'w-[20%]';
-    return 'w-[33.333%]';
+  // Get panel config by ID
+  const getPanelConfig = (panelId: string) => {
+    return panelConfigs.find(config => config.id === panelId);
   };
 
   if (loading) {
@@ -235,49 +231,59 @@ const DirectorGeneralDashboard: React.FC = () => {
           <TodaysSnapshot data={dashboardData?.todaysSnapshot} />
         </div>
 
-        {/* Main Cockpit Panels */}
-        <div className="max-w-[1440px] mx-auto px-6" ref={containerRef}>
-          <div className={`flex gap-8 h-[50vh] ${isMobile ? 'flex-col h-auto' : ''}`}>
+        {/* Focal Panel System */}
+        <div className="max-w-[1440px] mx-auto px-6">
+          <div className={`flex gap-6 h-[50vh] ${isMobile ? 'flex-col h-auto' : ''}`}>
             {/* Approvals & Decisions Panel */}
-            <CompactPanelWrapper
+            <FocalPanelWrapper
               panelId="approvals"
-              className={`${getPanelWidth('approvals')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
-              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'approvals' : null)}
-              onFullscreen={() => handleFullscreen('approvals')}
+              panelState={getPanelConfig('approvals')?.state || 'normal'}
+              width={getPanelConfig('approvals')?.width || '33.333%'}
+              animationDuration={animationDuration}
+              title="Approvals & Decisions"
+              accentColor="blue"
+              onHover={handlePanelHover}
+              onFocus={handlePanelFocus}
+              onReset={resetPanels}
               compactSummary={{
-                title: "Approvals",
                 items: [
                   { id: '1', title: 'Infrastructure Development Package', priority: 'high' },
                   { id: '3', title: 'THINK Zone Restructure', priority: 'high' }
                 ],
                 stats: { pending: dashboardData?.approvals?.pending || 12, overdue: 3 }
               }}
+              className={isMobile ? 'mb-6' : ''}
             >
               <ApprovalsDecisionsPanel 
                 data={dashboardData?.approvals}
-                onFocusMode={(isFocused) => handleFocusMode(isFocused ? 'approvals' : '')}
+                onFocusMode={() => {}}
                 onContextualAction={(action, itemTitle) => {
                   if (action === 'approve') {
                     handleContextualAction('THINK', `Approved: ${itemTitle}`, 'approvals');
                   }
                 }}
               />
-            </CompactPanelWrapper>
+            </FocalPanelWrapper>
 
             {/* System Health & Alerts Panel */}
-            <CompactPanelWrapper
+            <FocalPanelWrapper
               panelId="health"
-              className={`${getPanelWidth('health')} transition-all duration-300 ${isMobile ? 'mb-6' : ''}`}
-              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'health' : null)}
-              onFullscreen={() => handleFullscreen('health')}
+              panelState={getPanelConfig('health')?.state || 'normal'}
+              width={getPanelConfig('health')?.width || '33.333%'}
+              animationDuration={animationDuration}
+              title="System Health & Alerts"
+              accentColor="teal"
+              onHover={handlePanelHover}
+              onFocus={handlePanelFocus}
+              onReset={resetPanels}
               compactSummary={{
-                title: "System Health",
                 items: [
                   { id: '1', title: 'DEI score trending down', severity: 'medium' },
                   { id: '2', title: 'THINK loop closure delayed', severity: 'high' }
                 ],
                 stats: { deiScore: 78.5, worstDrift: 'innovator' }
               }}
+              className={isMobile ? 'mb-6' : ''}
             >
               <SystemHealthAlertsPanel 
                 data={dashboardData?.systemHealth}
@@ -285,16 +291,20 @@ const DirectorGeneralDashboard: React.FC = () => {
                   handleContextualAction('MONITOR', `Alert: ${alertType}`, 'health');
                 }}
               />
-            </CompactPanelWrapper>
+            </FocalPanelWrapper>
 
             {/* Coordination & Triggers Panel */}
-            <CompactPanelWrapper
+            <FocalPanelWrapper
               panelId="coordination"
-              className={`${getPanelWidth('coordination')} transition-all duration-300`}
-              onHover={(isHovered) => !isMobile && setHoveredPanel(isHovered ? 'coordination' : null)}
-              onFullscreen={() => handleFullscreen('coordination')}
+              panelState={getPanelConfig('coordination')?.state || 'normal'}
+              width={getPanelConfig('coordination')?.width || '33.333%'}
+              animationDuration={animationDuration}
+              title="Coordination & Triggers"
+              accentColor="purple"
+              onHover={handlePanelHover}
+              onFocus={handlePanelFocus}
+              onReset={resetPanels}
               compactSummary={{
-                title: "Coordination",
                 items: [
                   { id: '1', title: 'Role Dropouts', severity: 'high' },
                   { id: '2', title: 'Rework Loops', severity: 'medium' }
@@ -316,7 +326,7 @@ const DirectorGeneralDashboard: React.FC = () => {
                   handleContextualAction('LEARN', `Zone Lead: ${zone}`, 'coordination');
                 }}
               />
-            </CompactPanelWrapper>
+            </FocalPanelWrapper>
           </div>
 
           {/* Contextual Zone Snapshots */}
