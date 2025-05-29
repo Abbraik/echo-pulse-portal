@@ -94,7 +94,6 @@ export const usePanelHover = () => {
     handlePanelHover,
     handlePanelLeave,
     handleFullscreen,
-    setFullscreenPanel: handleFullscreen, // Add this alias for backward compatibility
     getPanelTransform,
     getPanelWidth,
     isPanelCollapsed,
