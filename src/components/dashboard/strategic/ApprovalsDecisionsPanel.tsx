@@ -1,11 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Calendar, AlertTriangle, CheckCircle, MessageCircle, Filter, Star, ChevronUp, ChevronDown, Plus, ExternalLink } from 'lucide-react';
+import { FileText, Calendar, AlertTriangle, CheckCircle, MessageCircle, Filter, Star, ChevronUp, ChevronDown, Plus, ExternalLink, X, Focus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { GlassCard } from '@/components/ui/glass-card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
 interface ApprovalItem {
@@ -22,15 +25,28 @@ interface ApprovalsDecisionsPanelProps {
   data?: {
     items: ApprovalItem[];
   };
+  onFocusMode?: (isFocused: boolean) => void;
 }
 
-export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = ({ data }) => {
+export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = ({ data, onFocusMode }) => {
   const { toast } = useToast();
   const [activeFilter, setActiveFilter] = useState('all');
   const [sortField, setSortField] = useState<keyof ApprovalItem | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [expandedRevision, setExpandedRevision] = useState<string | null>(null);
   const [revisionComment, setRevisionComment] = useState('');
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [focusMode, setFocusMode] = useState(false);
+  const [approveModalOpen, setApproveModalOpen] = useState(false);
+  const [itemToApprove, setItemToApprove] = useState<ApprovalItem | null>(null);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [newItem, setNewItem] = useState({
+    title: '',
+    type: 'strategy' as const,
+    owner: '',
+    dueDate: '',
+    priority: 'medium' as const
+  });
 
   // Mock data
   const mockItems: ApprovalItem[] = [
@@ -43,6 +59,47 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   ];
 
   const [items, setItems] = useState<ApprovalItem[]>(data?.items || mockItems);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      switch (e.key.toLowerCase()) {
+        case 'f':
+          e.preventDefault();
+          document.getElementById('filter-all')?.focus();
+          break;
+        case 'p':
+          if (selectedRowId) {
+            e.preventDefault();
+            handlePin(selectedRowId);
+          }
+          break;
+        case 'a':
+          if (selectedRowId) {
+            e.preventDefault();
+            const item = items.find(i => i.id === selectedRowId);
+            if (item) handleApproveClick(item);
+          }
+          break;
+        case 'r':
+          if (selectedRowId) {
+            e.preventDefault();
+            handleRevise(selectedRowId);
+          }
+          break;
+        case 'escape':
+          setExpandedRevision(null);
+          setApproveModalOpen(false);
+          setCreateModalOpen(false);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedRowId, items]);
 
   const filterCounts = {
     all: items.length,
@@ -74,18 +131,33 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     }
   };
 
-  const handlePin = (id: string) => {
+  const handlePin = useCallback((id: string) => {
     setItems(items.map(item => 
       item.id === id ? { ...item, isPinned: !item.isPinned } : item
     ));
+    toast({
+      title: "Pin Updated",
+      description: "Item pinning status changed.",
+      duration: 2000,
+    });
+  }, [items, toast]);
+
+  const handleApproveClick = (item: ApprovalItem) => {
+    setItemToApprove(item);
+    setApproveModalOpen(true);
   };
 
-  const handleApprove = (id: string, title: string) => {
-    toast({
-      title: "Approved!",
-      description: `${title} has been approved successfully.`,
-      duration: 3000,
-    });
+  const handleApproveConfirm = () => {
+    if (itemToApprove) {
+      setItems(items.filter(item => item.id !== itemToApprove.id));
+      toast({
+        title: "Approved!",
+        description: `${itemToApprove.title} has been approved successfully.`,
+        duration: 3000,
+      });
+      setApproveModalOpen(false);
+      setItemToApprove(null);
+    }
   };
 
   const handleRevise = (id: string) => {
@@ -103,6 +175,36 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
       setExpandedRevision(null);
       setRevisionComment('');
     }
+  };
+
+  const handleCreateNew = () => {
+    if (newItem.title && newItem.owner && newItem.dueDate) {
+      const item: ApprovalItem = {
+        id: Date.now().toString(),
+        ...newItem,
+        isPinned: false
+      };
+      setItems([...items, item]);
+      toast({
+        title: "Approval Created",
+        description: `${newItem.title} has been added to the approval list.`,
+        duration: 3000,
+      });
+      setCreateModalOpen(false);
+      setNewItem({
+        title: '',
+        type: 'strategy',
+        owner: '',
+        dueDate: '',
+        priority: 'medium'
+      });
+    }
+  };
+
+  const toggleFocusMode = () => {
+    const newFocusMode = !focusMode;
+    setFocusMode(newFocusMode);
+    onFocusMode?.(newFocusMode);
   };
 
   const getTypeIcon = (type: string) => {
@@ -145,6 +247,7 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
     <TableHead 
       className="text-white cursor-pointer hover:text-teal-400 transition-colors group"
       onClick={() => handleSort(field)}
+      aria-sort={sortField === field ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
     >
       <div className="flex items-center justify-between">
         {children}
@@ -160,7 +263,21 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   );
 
   const ItemRow = ({ item, showActions = true }: { item: ApprovalItem; showActions?: boolean }) => (
-    <TableRow key={item.id} className="border-white/10 hover:bg-white/5 transition-colors group">
+    <TableRow 
+      key={item.id} 
+      className="border-white/10 hover:bg-white/5 transition-colors group cursor-pointer"
+      onClick={() => setSelectedRowId(item.id)}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          setSelectedRowId(item.id);
+        }
+      }}
+      style={{
+        backgroundColor: selectedRowId === item.id ? 'rgba(20, 184, 166, 0.1)' : undefined,
+        borderLeft: selectedRowId === item.id ? '3px solid rgb(20, 184, 166)' : undefined
+      }}
+    >
       <TableCell className="font-medium text-white text-sm">{item.title}</TableCell>
       <TableCell>
         <Badge className={`${getTypeColor(item.type)} text-xs`}>
@@ -182,8 +299,13 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => handlePin(item.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePin(item.id);
+            }}
             className={`p-1 h-6 w-6 ${item.isPinned ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'}`}
+            aria-pressed={item.isPinned}
+            aria-label={item.isPinned ? 'Unpin item' : 'Pin item'}
           >
             <Star size={12} fill={item.isPinned ? 'currentColor' : 'none'} />
           </Button>
@@ -191,8 +313,12 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
               <Button
                 size="sm"
-                onClick={() => handleApprove(item.id, item.title)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleApproveClick(item);
+                }}
                 className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
+                aria-label={`Approve ${item.title}`}
               >
                 <CheckCircle size={10} className="mr-1" />
                 Approve
@@ -200,8 +326,12 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => handleRevise(item.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRevise(item.id);
+                }}
                 className="h-6 px-2 text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
+                aria-label={`Request revision for ${item.title}`}
               >
                 Revise
               </Button>
@@ -213,176 +343,312 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
   );
 
   return (
-    <div 
-      className="h-full flex flex-col"
-      style={{ 
-        background: 'rgba(10, 20, 40, 0.6)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(20, 184, 166, 0.3)',
-        borderRadius: '2rem',
-        padding: '24px',
-        boxShadow: 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
-      }}
-    >
-      {/* Title Bar */}
-      <div className="flex items-center justify-between h-12 mb-6 border-b border-teal-500/30 pb-4">
-        <div className="flex items-center gap-3">
-          <h3 className="text-xl font-bold text-white">Approvals & Decisions</h3>
-          <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50 text-xs">
-            Live
-          </Badge>
+    <>
+      <div 
+        className={`h-full flex flex-col transition-all duration-300 ${focusMode ? 'ring-2 ring-teal-500 ring-opacity-50' : ''}`}
+        style={{ 
+          background: 'rgba(10, 20, 40, 0.6)',
+          backdropFilter: 'blur(20px)',
+          border: focusMode ? '2px solid rgba(20, 184, 166, 0.5)' : '1px solid rgba(20, 184, 166, 0.3)',
+          borderRadius: '2rem',
+          padding: '24px',
+          boxShadow: focusMode 
+            ? 'inset 0 0 30px rgba(20, 184, 166, 0.2), 0 0 40px rgba(20, 184, 166, 0.3)'
+            : 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
+        }}
+      >
+        {/* Title Bar */}
+        <div className="flex items-center justify-between h-12 mb-6 border-b border-teal-500/30 pb-4">
+          <div className="flex items-center gap-3">
+            <h3 className="text-xl font-bold text-white">Approvals & Decisions</h3>
+            <Badge className="bg-teal-500/20 text-teal-400 border-teal-500/50 text-xs">
+              Live
+            </Badge>
+            {pinnedItems.length > 0 && (
+              <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50 text-xs">
+                {pinnedItems.length} Pinned
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              onClick={toggleFocusMode}
+              className={`text-gray-400 hover:text-teal-400 ${focusMode ? 'text-teal-400' : ''}`}
+              aria-pressed={focusMode}
+              aria-label="Toggle focus mode"
+            >
+              <Focus size={16} />
+            </Button>
+            <Button size="sm" variant="ghost" className="text-gray-400 hover:text-teal-400">
+              <ExternalLink size={16} />
+            </Button>
+          </div>
         </div>
-        <Button size="sm" variant="ghost" className="text-gray-400 hover:text-teal-400">
-          <ExternalLink size={16} />
-        </Button>
-      </div>
 
-      {/* Filter Section */}
-      <div className="flex gap-2 mb-4">
-        {Object.entries(filterCounts).map(([filter, count]) => (
-          <Button
-            key={filter}
-            size="sm"
-            variant={activeFilter === filter ? "default" : "outline"}
-            onClick={() => setActiveFilter(filter)}
-            className={`text-xs ${
-              activeFilter === filter 
-                ? 'bg-teal-500 text-white border-teal-500' 
-                : 'border-teal-500/50 text-teal-400 hover:bg-teal-500/10'
-            }`}
-          >
-            {filter.charAt(0).toUpperCase() + filter.slice(1)} ({count})
-          </Button>
-        ))}
-      </div>
+        {/* Filter Section */}
+        <div className="flex gap-2 mb-4">
+          {Object.entries(filterCounts).map(([filter, count]) => (
+            <Button
+              key={filter}
+              id={filter === 'all' ? 'filter-all' : undefined}
+              size="sm"
+              variant={activeFilter === filter ? "default" : "outline"}
+              onClick={() => setActiveFilter(filter)}
+              className={`text-xs transition-all duration-150 ${
+                activeFilter === filter 
+                  ? 'bg-teal-500 text-white border-teal-500' 
+                  : 'border-teal-500/50 text-teal-400 hover:bg-teal-500/10'
+              }`}
+              aria-pressed={activeFilter === filter}
+            >
+              {filter.charAt(0).toUpperCase() + filter.slice(1)} ({count})
+            </Button>
+          ))}
+        </div>
 
-      {/* Pinned Items */}
-      <div className="mb-4">
-        <h4 className="text-sm font-semibold text-teal-400 mb-2 flex items-center gap-1">
-          📌 Pinned
-        </h4>
-        {pinnedItems.length > 0 ? (
-          <div className="space-y-2">
-            {pinnedItems.slice(0, 3).map(item => (
-              <div key={item.id} className="bg-white/5 rounded-lg p-3 border border-white/10">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-white text-sm truncate">{item.title}</span>
-                      <Badge className={`${getTypeColor(item.type)} text-xs`}>
-                        {item.type}
-                      </Badge>
+        {/* Pinned Items */}
+        <div className="mb-4">
+          <h4 className="text-sm font-semibold text-teal-400 mb-2 flex items-center gap-1">
+            📌 Pinned
+          </h4>
+          {pinnedItems.length > 0 ? (
+            <div className="space-y-2">
+              {pinnedItems.slice(0, 3).map(item => (
+                <motion.div 
+                  key={item.id} 
+                  className="bg-white/5 rounded-lg p-3 border border-white/10"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-white text-sm truncate">{item.title}</span>
+                        <Badge className={`${getTypeColor(item.type)} text-xs`}>
+                          {item.type}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-gray-400">
+                        <span>{item.owner}</span>
+                        <span>{item.dueDate}</span>
+                        <span className={getPriorityColor(item.priority)}>
+                          {getPriorityDot(item.priority)} {item.priority}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-gray-400">
-                      <span>{item.owner}</span>
-                      <span>{item.dueDate}</span>
-                      <span className={getPriorityColor(item.priority)}>
-                        {getPriorityDot(item.priority)} {item.priority}
-                      </span>
-                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handlePin(item.id)}
+                      className="text-yellow-400 p-1 h-6 w-6"
+                      aria-pressed={true}
+                      aria-label="Unpin item"
+                    >
+                      <Star size={12} fill="currentColor" />
+                    </Button>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handlePin(item.id)}
-                    className="text-yellow-400 p-1 h-6 w-6"
-                  >
-                    <Star size={12} fill="currentColor" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
-            <p className="text-gray-400 text-sm">Pin important items for quick access</p>
-          </div>
-        )}
-      </div>
-
-      {/* Priority Items List */}
-      <div className="flex-1 min-h-0 mb-4">
-        <div className="h-full overflow-y-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-white/20 hover:bg-transparent">
-                <SortableHeader field="title">Title</SortableHeader>
-                <SortableHeader field="type">Type</SortableHeader>
-                <SortableHeader field="owner">Owner</SortableHeader>
-                <SortableHeader field="dueDate">Due Date</SortableHeader>
-                <SortableHeader field="priority">Priority</SortableHeader>
-                <TableHead className="text-white">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {unpinnedItems.map((item) => (
-                <React.Fragment key={item.id}>
-                  <ItemRow item={item} />
-                  <AnimatePresence>
-                    {expandedRevision === item.id && (
-                      <motion.tr
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        <TableCell colSpan={6} className="p-4 bg-white/5">
-                          <div className="space-y-3">
-                            <label className="text-sm text-gray-300">Revision Comments:</label>
-                            <textarea
-                              value={revisionComment}
-                              onChange={(e) => setRevisionComment(e.target.value)}
-                              placeholder="Enter your revision comments..."
-                              className="w-full h-16 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
-                              rows={2}
-                            />
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                onClick={() => handleSubmitRevision(item.id, item.title)}
-                                disabled={!revisionComment.trim()}
-                                className="bg-orange-600 hover:bg-orange-700 text-white text-xs"
-                              >
-                                Submit
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setExpandedRevision(null)}
-                                className="border-gray-500/50 text-gray-400 hover:bg-gray-500/10 text-xs"
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </div>
-                        </TableCell>
-                      </motion.tr>
-                    )}
-                  </AnimatePresence>
-                </React.Fragment>
+                </motion.div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+          ) : (
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
+              <p className="text-gray-400 text-sm">Pin important items for quick access</p>
+            </div>
+          )}
+        </div>
+
+        {/* Priority Items List */}
+        <div className="flex-1 min-h-0 mb-4">
+          <div className="h-full overflow-y-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-white/20 hover:bg-transparent">
+                  <SortableHeader field="title">Title</SortableHeader>
+                  <SortableHeader field="type">Type</SortableHeader>
+                  <SortableHeader field="owner">Owner</SortableHeader>
+                  <SortableHeader field="dueDate">Due Date</SortableHeader>
+                  <SortableHeader field="priority">Priority</SortableHeader>
+                  <TableHead className="text-white">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {unpinnedItems.map((item) => (
+                  <React.Fragment key={item.id}>
+                    <ItemRow item={item} />
+                    <AnimatePresence>
+                      {expandedRevision === item.id && (
+                        <motion.tr
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.15 }}
+                        >
+                          <TableCell colSpan={6} className="p-4 bg-white/5">
+                            <div className="space-y-3" aria-expanded={true}>
+                              <label className="text-sm text-gray-300">Revision Comments:</label>
+                              <textarea
+                                value={revisionComment}
+                                onChange={(e) => setRevisionComment(e.target.value)}
+                                placeholder="Enter your revision comments..."
+                                className="w-full h-16 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                rows={2}
+                                aria-label="Revision comments"
+                              />
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleSubmitRevision(item.id, item.title)}
+                                  disabled={!revisionComment.trim()}
+                                  className="bg-orange-600 hover:bg-orange-700 text-white text-xs"
+                                >
+                                  Submit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setExpandedRevision(null)}
+                                  className="border-gray-500/50 text-gray-400 hover:bg-gray-500/10 text-xs"
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </motion.tr>
+                      )}
+                    </AnimatePresence>
+                  </React.Fragment>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="flex items-center justify-between pt-4 border-t border-white/10">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-teal-400 hover:text-teal-300 text-xs"
+          >
+            View All Approvals <ExternalLink size={12} className="ml-1" />
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => setCreateModalOpen(true)}
+            className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold h-10"
+          >
+            <Plus size={14} className="mr-1" />
+            Create New Approval
+          </Button>
         </div>
       </div>
 
-      {/* Footer Actions */}
-      <div className="flex items-center justify-between pt-4 border-t border-white/10">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-teal-400 hover:text-teal-300 text-xs"
-        >
-          View All Approvals <ExternalLink size={12} className="ml-1" />
-        </Button>
-        <Button
-          size="sm"
-          className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold h-10"
-        >
-          <Plus size={14} className="mr-1" />
-          Create New Approval
-        </Button>
-      </div>
-    </div>
+      {/* Approve Confirmation Modal */}
+      <Dialog open={approveModalOpen} onOpenChange={setApproveModalOpen}>
+        <DialogContent className="bg-gray-900 border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-white">Confirm Approval</DialogTitle>
+            <DialogDescription className="text-gray-300">
+              Are you sure you want to approve "{itemToApprove?.title}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setApproveModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleApproveConfirm} className="bg-green-600 hover:bg-green-700">
+              Confirm Approval
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create New Approval Modal */}
+      <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">Create New Approval</DialogTitle>
+            <DialogDescription className="text-gray-300">
+              Add a new item to the approval queue.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="title" className="text-white">Title</Label>
+              <Input
+                id="title"
+                value={newItem.title}
+                onChange={(e) => setNewItem({...newItem, title: e.target.value})}
+                className="bg-white/10 border-white/20 text-white"
+                placeholder="Enter approval title..."
+              />
+            </div>
+            <div>
+              <Label htmlFor="type" className="text-white">Type</Label>
+              <Select value={newItem.type} onValueChange={(value) => setNewItem({...newItem, type: value as any})}>
+                <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectItem value="strategy">Strategy</SelectItem>
+                  <SelectItem value="redesign">Redesign</SelectItem>
+                  <SelectItem value="external">External</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="owner" className="text-white">Owner</Label>
+              <Input
+                id="owner"
+                value={newItem.owner}
+                onChange={(e) => setNewItem({...newItem, owner: e.target.value})}
+                className="bg-white/10 border-white/20 text-white"
+                placeholder="Enter responsible owner..."
+              />
+            </div>
+            <div>
+              <Label htmlFor="dueDate" className="text-white">Due Date</Label>
+              <Input
+                id="dueDate"
+                type="date"
+                value={newItem.dueDate}
+                onChange={(e) => setNewItem({...newItem, dueDate: e.target.value})}
+                className="bg-white/10 border-white/20 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="priority" className="text-white">Priority</Label>
+              <Select value={newItem.priority} onValueChange={(value) => setNewItem({...newItem, priority: value as any})}>
+                <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleCreateNew}
+              disabled={!newItem.title || !newItem.owner || !newItem.dueDate}
+              className="bg-teal-500 hover:bg-teal-600"
+            >
+              Save Approval
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
