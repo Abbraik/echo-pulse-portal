@@ -160,7 +160,7 @@ const DirectorGeneralDashboard: React.FC = () => {
       {/* Fullscreen Panel Overlay */}
       <FullscreenOverlay
         isOpen={!!fullscreenPanel}
-        onClose={() => setFullscreenPanel(null)}
+        onClose={() => handleFullscreen(null)}
         title={`${fullscreenPanel} Panel`}
       >
         {fullscreenPanel === 'approvals' && (
