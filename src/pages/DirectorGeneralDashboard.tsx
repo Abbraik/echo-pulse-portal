@@ -264,9 +264,9 @@ const DirectorGeneralDashboard: React.FC = () => {
           <TodaysSnapshot data={dashboardData?.todaysSnapshot} />
         </div>
 
-        {/* Main Cockpit Panels - Updated with fullscreen functionality */}
+        {/* Main Cockpit Panels - Updated with fullscreen functionality and increased height */}
         <div className="max-w-[1440px] mx-auto px-6 pb-6" ref={containerRef}>
-          <div className={`flex gap-4 h-[45vh] min-h-[500px] ${isMobile ? 'flex-col h-auto' : ''}`}>
+          <div className={`flex gap-4 h-[75vh] min-h-[700px] ${isMobile ? 'flex-col h-auto' : ''}`}>
             {/* Approvals & Decisions Panel */}
             <HoverablePanelWrapper
               panelId="approvals"

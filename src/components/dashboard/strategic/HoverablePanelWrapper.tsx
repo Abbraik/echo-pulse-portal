@@ -43,7 +43,7 @@ export const HoverablePanelWrapper: React.FC<HoverablePanelWrapperProps> = ({
 
   return (
     <motion.div
-      className={`${width} transition-all duration-300 ease-in-out h-[45vh] min-h-[500px] relative`}
+      className={`${width} transition-all duration-300 ease-in-out h-[75vh] min-h-[700px] relative`}
       onMouseEnter={() => onHover(panelId)}
       onMouseLeave={onLeave}
       onClick={() => onClick(panelId)}
