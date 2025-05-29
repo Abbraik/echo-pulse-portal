@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
@@ -280,71 +281,13 @@ html {
   @apply transition-transform duration-200 hover:scale-105;
 }
 
-/* Masonry Grid Styles */
-.masonry-grid {
-  @apply w-full;
-}
-
-.glass-masonry-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform, box-shadow;
-}
-
-.glass-masonry-card:hover {
-  transform: translateY(-8px) scale(1.02);
-}
-
-.glass-masonry-card:focus {
-  outline: 2px solid rgba(20, 184, 166, 0.6);
-  outline-offset: 2px;
-}
-
-/* Typography for Noto Sans */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Sans+Arabic:wght@400;500;700&display=swap');
-
-.font-noto {
-  font-family: 'Noto Sans', 'Noto Sans Arabic', system-ui, sans-serif;
-}
-
-/* Electric blue color for approvals */
-.text-electric-blue-500 {
-  color: #0080ff;
-}
-
-.bg-electric-blue-500\/20 {
-  background-color: rgba(0, 128, 255, 0.2);
-}
-
-/* Responsive masonry adjustments */
-@media (max-width: 600px) {
-  .masonry-grid {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
-  
-  .glass-masonry-card {
-    grid-column: span 1 !important;
-    grid-row: span 1 !important;
-  }
-  
-  .glass-masonry-card:hover {
-    transform: none;
-  }
-}
-
-@media (min-width: 600px) and (max-width: 1024px) {
-  .masonry-grid {
-    grid-template-columns: 1fr 1.2fr !important;
-  }
-}
-
-/* RTL support for masonry */
-[dir="rtl"] .masonry-grid {
+/* RTL support */
+[dir="rtl"] .glass-panel {
   direction: rtl;
 }
 
-[dir="rtl"] .glass-masonry-card {
-  direction: rtl;
+[dir="rtl"] .slider-teal [data-slider-thumb] {
+  transform: translateX(50%);
 }
 
 /* Mobile responsiveness */
