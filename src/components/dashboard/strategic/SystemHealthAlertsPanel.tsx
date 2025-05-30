@@ -22,22 +22,48 @@ interface SystemHealthAlertsPanelProps {
   onAlertClick?: (alertType: string) => void;
 }
 
+interface KpiData {
+  value: number;
+  trend: number[];
+  unit: string;
+}
+
+interface AlertData {
+  id: string;
+  type: 'health' | 'loop' | 'operational';
+  message: string;
+  severity: 'high' | 'medium' | 'low';
+  timestamp: string;
+  cause: string;
+  metrics: number[];
+  recommendations: string[];
+}
+
+interface RiskData {
+  id: string;
+  name: string;
+  likelihood: number;
+  impact: number;
+  description: string;
+  lastUpdate: string;
+}
+
 export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = ({ data, onAlertClick }) => {
-  const [selectedAlert, setSelectedAlert] = useState<any>(null);
-  const [selectedRisk, setSelectedRisk] = useState<any>(null);
+  const [selectedAlert, setSelectedAlert] = useState<AlertData | null>(null);
+  const [selectedRisk, setSelectedRisk] = useState<RiskData | null>(null);
   const [hoveredKpi, setHoveredKpi] = useState<string | null>(null);
   const [selectedPsiuSlice, setSelectedPsiuSlice] = useState<string | null>(null);
   const [deiTarget, setDeiTarget] = useState(83);
 
-  // Enhanced mock data
+  // Enhanced mock data with proper types
   const mockData = {
     deiScore: 78.5,
     psiu: { producer: 82, stabilizer: 76, innovator: 68, unifier: 85 },
     kpis: {
-      volatility: { value: 0.27, trend: [0.31, 0.29, 0.25, 0.27], unit: 'σ' },
-      resourceRatio: { value: 0.92, trend: [0.89, 0.91, 0.93, 0.92], unit: '' },
-      marketStability: { value: 68, trend: [65, 67, 69, 68], unit: '/100' },
-      socialCohesion: { value: 71, trend: [69, 70, 72, 71], unit: '/100' }
+      volatility: { value: 0.27, trend: [0.31, 0.29, 0.25, 0.27], unit: 'σ' } as KpiData,
+      resourceRatio: { value: 0.92, trend: [0.89, 0.91, 0.93, 0.92], unit: '' } as KpiData,
+      marketStability: { value: 68, trend: [65, 67, 69, 68], unit: '/100' } as KpiData,
+      socialCohesion: { value: 71, trend: [69, 70, 72, 71], unit: '/100' } as KpiData
     },
     entropyTrend: [
       { zone: 'MONITOR', current: 0.27, trend: -0.02 },
@@ -86,7 +112,7 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
           'Initiate resource replenishment protocols'
         ]
       }
-    ],
+    ] as AlertData[],
     risks: [
       { 
         id: '1', 
@@ -112,7 +138,7 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
         description: 'Systematic deviation from optimal feedback patterns',
         lastUpdate: '1 hour ago'
       }
-    ]
+    ] as RiskData[]
   };
 
   const displayData = data || mockData;
@@ -130,6 +156,13 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
     { name: 'Innovator', value: displayData.psiu.innovator, color: psiuColors.innovator },
     { name: 'Unifier', value: displayData.psiu.unifier, color: psiuColors.unifier }
   ];
+
+  const chartConfig = {
+    value: {
+      label: "Value",
+      color: "hsl(var(--chart-1))",
+    },
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -167,11 +200,11 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
     setSelectedPsiuSlice(slice);
   };
 
-  const handleAlertInvestigate = (alert: any) => {
+  const handleAlertInvestigate = (alert: AlertData) => {
     setSelectedAlert(alert);
   };
 
-  const handleRiskClick = (risk: any) => {
+  const handleRiskClick = (risk: RiskData) => {
     setSelectedRisk(risk);
   };
 
@@ -188,7 +221,7 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
 
       {/* KPI Grid */}
       <div className="grid grid-cols-2 gap-3">
-        {Object.entries(displayData.kpis || mockData.kpis).map(([key, kpi]) => (
+        {Object.entries(mockData.kpis).map(([key, kpi]) => (
           <motion.div
             key={key}
             className="p-3 bg-white/5 rounded-lg border border-white/10 cursor-pointer"
@@ -260,7 +293,7 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
         <div className="space-y-3">
           <h4 className="text-sm font-medium text-teal-400">PSIU Balance</h4>
           <div className="relative h-32 w-32 mx-auto cursor-pointer">
-            <ResponsiveContainer width="100%" height="100%">
+            <ChartContainer config={chartConfig}>
               <PieChart>
                 <Pie
                   data={pieData}
@@ -282,7 +315,7 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
                 </Pie>
                 <ChartTooltip content={<ChartTooltipContent />} />
               </PieChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           </div>
         </div>
       </div>
@@ -310,7 +343,7 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
       <div className="space-y-3 flex-1 min-h-0">
         <h4 className="text-sm font-medium text-teal-400">Critical Alerts</h4>
         <div className="space-y-2 overflow-y-auto max-h-48">
-          {displayData.alerts.map((alert) => (
+          {mockData.alerts.map((alert) => (
             <motion.div 
               key={alert.id} 
               className="p-3 bg-white/5 rounded border border-white/10 hover:bg-white/10 transition-colors"
@@ -364,7 +397,7 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
           </div>
           
           {/* Risk pins */}
-          {displayData.risks.map((risk) => {
+          {mockData.risks.map((risk) => {
             const position = getRiskMatrixPosition(risk.likelihood, risk.impact);
             return (
               <motion.div
@@ -400,7 +433,7 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
           <DialogHeader>
             <DialogTitle className="text-teal-400">{selectedAlert?.message}</DialogTitle>
             <div className="flex items-center space-x-2">
-              <Badge className={getSeverityColor(selectedAlert?.severity)}>
+              <Badge className={getSeverityColor(selectedAlert?.severity || '')}>
                 {selectedAlert?.severity}
               </Badge>
               <span className="text-sm text-gray-400">{selectedAlert?.timestamp}</span>
@@ -416,12 +449,12 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
             
             <TabsContent value="metrics" className="space-y-4">
               <div className="h-32">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer config={chartConfig}>
                   <LineChart data={selectedAlert?.metrics?.map((value: number, index: number) => ({ month: index + 1, value }))}>
                     <Line type="monotone" dataKey="value" stroke="#14B8A6" strokeWidth={2} />
-                    <ChartTooltip />
+                    <ChartTooltip content={<ChartTooltipContent />} />
                   </LineChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
             </TabsContent>
             
@@ -469,12 +502,12 @@ export const SystemHealthAlertsPanel: React.FC<SystemHealthAlertsPanelProps> = (
           
           <div className="space-y-4">
             <div className="h-32">
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer config={chartConfig}>
                 <LineChart data={[65, 68, 72, 74, 76, 78, 82].map((value, index) => ({ quarter: `Q${index + 1}`, value }))}>
                   <Line type="monotone" dataKey="value" stroke={psiuColors[selectedPsiuSlice as keyof typeof psiuColors]} strokeWidth={2} />
-                  <ChartTooltip />
+                  <ChartTooltip content={<ChartTooltipContent />} />
                 </LineChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
             
             <div className="space-y-2">
