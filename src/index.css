@@ -139,6 +139,44 @@ html {
     0 0 25px rgba(0, 0, 0, 0.3);
 }
 
+/* Working Canvas Grid System */
+.working-canvas-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.working-canvas-content {
+  grid-column: 1 / -1;
+}
+
+/* Section dividers */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.5), transparent);
+  margin: 24px 0;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 1024px) {
+  .working-canvas-grid {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .working-canvas-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px;
+  }
+}
+
 /* Custom slider styling for teal theme */
 .slider-teal [data-slider-track] {
   @apply bg-white/20;

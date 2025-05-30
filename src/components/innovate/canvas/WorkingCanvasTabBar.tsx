@@ -14,6 +14,7 @@ import {
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { motion } from 'framer-motion';
 
 interface WorkingCanvasTabBarProps {
   activeTab: string;
@@ -39,24 +40,35 @@ export const WorkingCanvasTabBar: React.FC<WorkingCanvasTabBarProps> = ({
   ];
 
   return (
-    <div className="h-12 px-6 border-b border-white/10">
-      <ScrollArea className="w-full">
-        <div className="flex items-center gap-1 min-w-max">
-          {tabs.map((tab) => (
-            <Button
+    <div className="h-16 px-6 border-b border-teal-400/20 bg-black/10">
+      <ScrollArea className="w-full h-full">
+        <div className="flex items-center gap-2 min-w-max h-full">
+          {tabs.map((tab, index) => (
+            <motion.div
               key={tab.id}
-              size="sm"
-              variant="ghost"
-              onClick={() => onTabChange(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
-                activeTab === tab.id 
-                  ? 'bg-teal-500/20 text-teal-300 shadow-lg shadow-teal-500/10 border-b-2 border-teal-400' 
-                  : 'hover:bg-white/10 hover:text-white'
-              }`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
             >
-              {tab.icon}
-              <span className="hidden sm:inline text-sm">{tab.label}</span>
-            </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => onTabChange(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 h-10 rounded-xl transition-all duration-300 font-noto-medium ${
+                  activeTab === tab.id 
+                    ? 'bg-gradient-to-r from-teal-500/30 to-blue-500/30 text-teal-200 shadow-lg border border-teal-400/40 neon-border' 
+                    : 'hover:bg-white/10 hover:text-white text-gray-300 border border-transparent hover:border-white/20'
+                }`}
+              >
+                <motion.div
+                  animate={activeTab === tab.id ? { scale: [1, 1.1, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {tab.icon}
+                </motion.div>
+                <span className="hidden sm:inline text-sm">{tab.label}</span>
+              </Button>
+            </motion.div>
           ))}
         </div>
       </ScrollArea>

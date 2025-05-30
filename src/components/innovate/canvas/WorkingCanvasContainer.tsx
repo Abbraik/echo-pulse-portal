@@ -54,14 +54,14 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
     <AnimatePresence>
       {selectedItem && (
         <motion.div
-          className={`fixed top-0 ${isRTL ? 'left-0' : 'right-0'} w-[70vw] h-screen z-50`}
+          className={`fixed top-0 ${isRTL ? 'left-0' : 'right-0'} w-[75vw] max-w-[960px] h-screen z-50`}
           initial={{ x: isRTL ? '-100%' : '100%', opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: isRTL ? '-100%' : '100%', opacity: 0 }}
           transition={{ duration: 0.4, ease: 'easeInOut' }}
         >
-          <div className="w-full h-full glass-panel-deep rounded-l-2xl flex flex-col relative overflow-hidden">
-            {/* Header */}
+          <div className="w-full h-full glass-panel-cinematic rounded-l-2xl flex flex-col relative overflow-hidden">
+            {/* Enhanced Header */}
             <WorkingCanvasHeader
               itemName={getItemName(selectedItem)}
               itemType={getItemType(selectedItem)}
@@ -69,35 +69,61 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
               onClose={onClose}
             />
 
-            {/* Tab Bar */}
+            {/* Enhanced Tab Bar */}
             <WorkingCanvasTabBar
               activeTab={activeTab}
               onTabChange={setActiveTab}
             />
 
-            {/* Content Area */}
-            <div className="flex-1 relative overflow-hidden">
-              <WorkingCanvasContent
-                activeTab={activeTab}
-                selectedItem={selectedItem}
-                onLeverageSidebarToggle={() => setLeverageSidebarOpen(!leverageSidebarOpen)}
-              />
+            {/* Main Content Area with Grid Layout */}
+            <div className="flex-1 relative overflow-hidden p-6">
+              <div className="working-canvas-grid h-full">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="h-full"
+                >
+                  <WorkingCanvasContent
+                    activeTab={activeTab}
+                    selectedItem={selectedItem}
+                    onLeverageSidebarToggle={() => setLeverageSidebarOpen(!leverageSidebarOpen)}
+                  />
+                </motion.div>
+              </div>
 
-              {/* Leverage Point Sidebar */}
+              {/* Enhanced Leverage Point Sidebar */}
               <AnimatePresence>
                 {leverageSidebarOpen && (
-                  <motion.div
-                    className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} h-full z-10`}
-                    initial={{ x: isRTL ? '-100%' : '100%' }}
-                    animate={{ x: 0 }}
-                    exit={{ x: isRTL ? '-100%' : '100%' }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <LeveragePointSidebar
-                      onClose={() => setLeverageSidebarOpen(false)}
-                      viewMode={viewMode}
+                  <>
+                    {/* Backdrop overlay */}
+                    <motion.div
+                      className="absolute inset-0 bg-black/20 backdrop-blur-sm z-10"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      onClick={() => setLeverageSidebarOpen(false)}
                     />
-                  </motion.div>
+                    
+                    {/* Sidebar */}
+                    <motion.div
+                      className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} h-full z-20 w-80`}
+                      initial={{ x: isRTL ? '-100%' : '100%' }}
+                      animate={{ x: 0 }}
+                      exit={{ x: isRTL ? '-100%' : '100%' }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                    >
+                      <div className="glass-panel-deep h-full rounded-l-xl border-l border-teal-400/30">
+                        <LeveragePointSidebar
+                          onClose={() => setLeverageSidebarOpen(false)}
+                          viewMode={viewMode}
+                        />
+                      </div>
+                    </motion.div>
+                  </>
                 )}
               </AnimatePresence>
             </div>
