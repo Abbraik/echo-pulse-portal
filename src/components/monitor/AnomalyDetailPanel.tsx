@@ -17,10 +17,11 @@ interface AnomalyDetailPanelProps {
   anomaly: {
     id: number;
     title: string;
-    change: string;
+    change?: string;
     date: string;
     description: string;
     rootCause?: string;
+    severity?: string;
   } | null;
   isOpen: boolean;
   onClose: () => void;
@@ -55,6 +56,16 @@ export const AnomalyDetailPanel: React.FC<AnomalyDetailPanelProps> = ({
     onClose();
   };
 
+  // Safe access to change property with fallback
+  const getChangeDisplay = () => {
+    if (!anomaly.change) return null;
+    return (
+      <span className={`text-${anomaly.change.startsWith('-') ? 'red' : 'green'}-400 ml-2`}>
+        {anomaly.change}
+      </span>
+    );
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent 
@@ -65,9 +76,7 @@ export const AnomalyDetailPanel: React.FC<AnomalyDetailPanelProps> = ({
           <div className="flex flex-col items-start">
             <SheetTitle className="text-xl flex items-center">
               {anomaly.title}
-              <span className={`text-${anomaly.change.startsWith('-') ? 'red' : 'green'}-400 ml-2`}>
-                {anomaly.change}
-              </span>
+              {getChangeDisplay()}
             </SheetTitle>
             <p className="text-xs text-gray-400">{anomaly.date}</p>
           </div>
@@ -84,7 +93,7 @@ export const AnomalyDetailPanel: React.FC<AnomalyDetailPanelProps> = ({
             
             <div className="flex items-center justify-between mt-2 glass-panel p-3">
               <span className="text-sm">{t('severity')}</span>
-              <Badge className="bg-amber-500">{t('medium')}</Badge>
+              <Badge className="bg-amber-500">{anomaly.severity || t('medium')}</Badge>
             </div>
           </div>
           
