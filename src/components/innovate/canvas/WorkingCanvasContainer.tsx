@@ -54,13 +54,13 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
     <AnimatePresence>
       {selectedItem && (
         <motion.div
-          className={`fixed top-0 ${isRTL ? 'left-0' : 'right-0'} w-[75vw] max-w-[960px] h-screen z-50`}
-          initial={{ x: isRTL ? '-100%' : '100%', opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: isRTL ? '-100%' : '100%', opacity: 0 }}
+          className="absolute inset-0 w-full h-full z-50"
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.4, ease: 'easeInOut' }}
         >
-          <div className="w-full h-full glass-panel-cinematic rounded-l-2xl flex flex-col relative overflow-hidden">
+          <div className="w-full h-full glass-panel-cinematic rounded-2xl flex flex-col relative overflow-hidden">
             {/* Enhanced Header */}
             <WorkingCanvasHeader
               itemName={getItemName(selectedItem)}
@@ -76,7 +76,7 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
             />
 
             {/* Main Content Area with Grid Layout */}
-            <div className="flex-1 relative overflow-hidden p-6">
+            <div className="flex-1 relative overflow-hidden">
               <div className="working-canvas-grid h-full">
                 <motion.div
                   key={activeTab}
