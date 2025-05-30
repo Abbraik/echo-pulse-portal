@@ -125,8 +125,8 @@ export const CompareTab: React.FC = () => {
 
     // Spine configuration: 30% down from top, 150px height area
     const spineY = height * 0.3;
-    const spineStartX = width * 0.08; // 8% from left edge
-    const spineEndX = width * 0.92;   // 8% from right edge
+    const spineStartX = width * 0.1; // 10% from left edge for baseline
+    const spineEndX = width * 0.9;   // 10% from right edge
     const spineLength = spineEndX - spineStartX;
     
     const baseline = scenarios[0]; // Current Baseline
@@ -134,7 +134,7 @@ export const CompareTab: React.FC = () => {
     const isSmallScreen = width < 600;
     const maxBranchLength = isSmallScreen ? 80 : 120;
 
-    // Position baseline at spine start
+    // Position baseline at spine start - this is the anchor
     const baselinePosition = {
       ...baseline,
       spineX: spineStartX,
@@ -148,9 +148,9 @@ export const CompareTab: React.FC = () => {
 
     // Calculate redesign scenario positions along spine
     const redesignPositions = redesignScenarios.map((scenario, index) => {
-      // Equally space along spine
-      const segmentWidth = spineLength / (redesignScenarios.length + 1);
-      const spineX = spineStartX + segmentWidth * (index + 1);
+      // Position along spine after baseline
+      const segmentWidth = spineLength / redesignScenarios.length;
+      const spineX = spineStartX + segmentWidth * (index + 0.5);
 
       // Calculate branch length based on DEI improvement
       const deiImprovement = Math.abs(scenario.dei - baseline.dei);
@@ -218,8 +218,8 @@ export const CompareTab: React.FC = () => {
     if (width === 0 || height === 0 || positionedScenarios.length === 0) return null;
 
     const spineY = height * 0.3;
-    const spineStartX = width * 0.08;
-    const spineEndX = width * 0.92;
+    const spineStartX = width * 0.1;
+    const spineEndX = width * 0.9;
 
     return (
       <svg className="absolute inset-0 w-full h-full" role="img" aria-label="Fishbone diagram comparing scenarios to current baseline">
@@ -261,10 +261,8 @@ export const CompareTab: React.FC = () => {
           onMouseLeave={() => setHoveredNode(null)}
         />
         
-        {/* Scenario Branches */}
-        {positionedScenarios.map((scenario, index) => {
-          if (scenario.isBaseline || scenario.branchLength === 0) return null;
-          
+        {/* Scenario Branches - only for redesign scenarios */}
+        {positionedScenarios.slice(1).map((scenario, index) => {
           // Create smooth Bézier curve for branch
           const controlX = scenario.spineX + (scenario.branchX - scenario.spineX) * 0.6;
           const controlY = scenario.spineY + (scenario.branchY - scenario.spineY) * 0.8;
@@ -285,7 +283,7 @@ export const CompareTab: React.FC = () => {
               initial={{ pathLength: 0 }}
               animate={{ pathLength: spineAnimated ? 1 : 0 }}
               transition={{ 
-                delay: 0.5 + (index - 1) * 0.1, 
+                delay: 0.5 + index * 0.1, 
                 duration: 0.3, 
                 ease: "easeOut" 
               }}
@@ -339,15 +337,17 @@ export const CompareTab: React.FC = () => {
           <div 
             className={`${
               isBaseline 
-                ? 'w-20 h-20 rounded-full' 
-                : 'w-25 h-12 rounded-lg'
-            } border-2 flex flex-col items-center justify-center glass-panel-deep transition-all duration-300 ${
+                ? 'w-20 h-20 rounded-full border-4 border-teal-400' 
+                : 'w-25 h-12 rounded-lg border-2'
+            } flex flex-col items-center justify-center glass-panel-deep transition-all duration-300 ${
               isSelected || isHovered
                 ? 'border-white shadow-2xl shadow-white/30 backdrop-blur-[32px]' 
+                : isBaseline 
+                ? 'border-teal-400/60 backdrop-blur-[20px]'
                 : 'border-white/40 backdrop-blur-[20px]'
             }`}
             style={{ 
-              backgroundColor: `${scenario.color}40`,
+              backgroundColor: isBaseline ? 'rgba(20, 184, 166, 0.2)' : `${scenario.color}40`,
               borderColor: isHovered ? scenario.color : undefined,
               minWidth: isBaseline ? '80px' : '100px',
               minHeight: isBaseline ? '80px' : '50px'
@@ -357,8 +357,13 @@ export const CompareTab: React.FC = () => {
               {isBaseline ? 'Current' : scenario.name.split(' ')[0]}
             </span>
             <span className="text-xs text-white/80">
-              {isBaseline ? '(+0)' : `+${scenario.dei - scenarios[0].dei}`}
+              {isBaseline ? 'Baseline' : `+${scenario.dei - scenarios[0].dei}`}
             </span>
+            {isBaseline && (
+              <span className="text-xs text-teal-300 font-medium">
+                ({scenario.dei}%)
+              </span>
+            )}
           </div>
         </motion.div>
       );
