@@ -90,10 +90,7 @@ const DirectorGeneralDashboard: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <Card className="h-full glass-panel-deep border-white/10">
-              <StrategicOverview 
-                viewMode={viewMode} 
-                onViewModeChange={handleViewModeChange}
-              />
+              <StrategicOverview />
             </Card>
           </motion.div>
 
@@ -118,7 +115,12 @@ const DirectorGeneralDashboard: React.FC = () => {
 
       {/* Sidebars */}
       {showPersonalization && (
-        <PersonalizationSidebar onClose={() => setShowPersonalization(false)} />
+        <PersonalizationSidebar 
+          isCollapsed={false}
+          onToggle={() => setShowPersonalization(false)}
+          viewMode={viewMode}
+          onViewModeChange={handleViewModeChange}
+        />
       )}
       
       {showNotes && (
