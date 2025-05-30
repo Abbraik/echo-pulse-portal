@@ -10,6 +10,38 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Slider } from '@/components/ui/slider';
 import SparklineChart from '@/components/think/components/SparklineChart';
 
+interface KPI {
+  name: string;
+  value: number;
+  trend: number[];
+  unit: string;
+}
+
+interface Alert {
+  id: string;
+  type: string;
+  message: string;
+  severity: 'critical' | 'warning' | 'info';
+  timestamp: string;
+  cause: string;
+}
+
+interface Risk {
+  id: string;
+  name: string;
+  likelihood: number;
+  impact: number;
+  bundles: number;
+  description: string;
+}
+
+interface PSIU {
+  producer: number;
+  stabilizer: number;
+  innovator: number;
+  unifier: number;
+}
+
 interface EnhancedSystemHealthPanelProps {
   data?: any;
   onViewModeChange: (mode: 'full' | 'approvals' | 'health') => void;
@@ -34,26 +66,26 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
   const [pinnedMetric, setPinnedMetric] = useState<string | null>(null);
   const [draggedRisk, setDraggedRisk] = useState<string | null>(null);
 
-  // Mock data
+  // Mock data with proper typing
   const mockData = {
     kpis: [
       { name: 'Population Volatility', value: 12.3, trend: [10, 12, 11, 13, 12.3], unit: '%' },
       { name: 'Resource Stock Ratio', value: 78.5, trend: [75, 77, 76, 79, 78.5], unit: '%' },
       { name: 'Market Stability', value: 89.2, trend: [87, 88, 90, 89, 89.2], unit: '%' },
       { name: 'Social Cohesion', value: 72.1, trend: [70, 71, 73, 72, 72.1], unit: '%' }
-    ],
+    ] as KPI[],
     deiScore: 78.5,
-    psiu: { producer: 82, stabilizer: 76, innovator: 68, unifier: 85 },
+    psiu: { producer: 82, stabilizer: 76, innovator: 68, unifier: 85 } as PSIU,
     alerts: [
-      { id: '1', type: 'critical', message: 'DEI score trending down rapidly', severity: 'critical', timestamp: '2 min ago', cause: 'Population surge in Zone 3' },
-      { id: '2', type: 'warning', message: 'THINK loop closure delayed', severity: 'warning', timestamp: '5 min ago', cause: 'Resource allocation bottleneck' },
-      { id: '3', type: 'info', message: 'Resource allocation variance detected', severity: 'info', timestamp: '8 min ago', cause: 'Seasonal adjustment needed' }
-    ],
+      { id: '1', type: 'critical', message: 'DEI score trending down rapidly', severity: 'critical' as const, timestamp: '2 min ago', cause: 'Population surge in Zone 3' },
+      { id: '2', type: 'warning', message: 'THINK loop closure delayed', severity: 'warning' as const, timestamp: '5 min ago', cause: 'Resource allocation bottleneck' },
+      { id: '3', type: 'info', message: 'Resource allocation variance detected', severity: 'info' as const, timestamp: '8 min ago', cause: 'Seasonal adjustment needed' }
+    ] as Alert[],
     risks: [
       { id: 'risk1', name: 'Population Surge', likelihood: 0.7, impact: 0.8, bundles: 12, description: 'Sudden population increase in urban zones' },
       { id: 'risk2', name: 'Extraction Over-Quota', likelihood: 0.4, impact: 0.9, bundles: 8, description: 'Resource extraction exceeding sustainable limits' },
       { id: 'risk3', name: 'Loop Inconsistency', likelihood: 0.6, impact: 0.6, bundles: 15, description: 'Feedback loops showing irregular patterns' }
-    ]
+    ] as Risk[]
   };
 
   const displayData = data || mockData;
@@ -104,7 +136,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
         
         {/* Compact KPIs */}
         <div className="grid grid-cols-2 gap-2 mb-3">
-          {displayData.kpis.slice(0, 4).map((kpi: any) => (
+          {displayData.kpis.slice(0, 4).map((kpi: KPI) => (
             <div key={kpi.name} className="p-2 bg-white/5 rounded text-center">
               <div className="text-xs font-bold text-teal-400">{kpi.value}</div>
               <div className="text-xs text-gray-400 truncate">{kpi.name}</div>
@@ -167,7 +199,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            {displayData.kpis.map((kpi: any, index: number) => (
+            {displayData.kpis.map((kpi: KPI, index: number) => (
               <motion.div
                 key={kpi.name}
                 className="glass-panel p-3 rounded-xl hover:scale-105 hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300 cursor-pointer"
@@ -223,7 +255,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
             <div className="glass-panel p-4 rounded-xl">
               <h4 className="text-sm font-medium text-teal-400 mb-2">PSIU Balance</h4>
               <div className="grid grid-cols-2 gap-2">
-                {Object.entries(displayData.psiu).map(([key, value]) => (
+                {Object.entries(displayData.psiu).map(([key, value]: [string, number]) => (
                   <motion.div
                     key={key}
                     className="p-2 bg-white/10 rounded cursor-pointer hover:bg-white/20 transition-colors"
@@ -245,7 +277,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            {displayData.kpis.map((kpi: any) => (
+            {displayData.kpis.map((kpi: KPI) => (
               <div key={kpi.name} className="flex items-center space-x-2">
                 <span className="text-xs text-gray-400">{kpi.name.split(' ')[0]}</span>
                 <SparklineChart data={kpi.trend} width={40} height={16} color="#14B8A6" />
@@ -263,7 +295,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
             <h4 className="text-sm font-medium text-teal-400 mb-3">Critical Alerts</h4>
             <ScrollArea className="h-full">
               <div className="space-y-2">
-                {displayData.alerts.map((alert: any) => (
+                {displayData.alerts.map((alert: Alert) => (
                   <motion.div
                     key={alert.id}
                     className={`p-3 rounded-lg border ${getSeverityColor(alert.severity)} hover:scale-[1.02] hover:shadow-lg transition-all duration-300`}
@@ -315,7 +347,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
               </div>
 
               {/* Risk Pins */}
-              {displayData.risks.map((risk: any) => (
+              {displayData.risks.map((risk: Risk) => (
                 <motion.div
                   key={risk.id}
                   className={`absolute w-4 h-4 rounded-full border-2 cursor-pointer hover:scale-125 transition-transform ${getRiskMatrixColor(risk.likelihood, risk.impact)}`}
