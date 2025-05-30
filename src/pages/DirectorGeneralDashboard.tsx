@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { Settings, FileText, Target, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { StrategicOverview } from '@/components/dashboard/StrategicOverview';
-import { EnhancedSystemHealthPanel } from '@/components/dashboard/enhanced/EnhancedSystemHealthPanel';
+import StrategicOverview from '@/components/dashboard/StrategicOverview';
+import EnhancedSystemHealthPanel from '@/components/dashboard/enhanced/EnhancedSystemHealthPanel';
 import { SystemHealthAlertsPanel } from '@/components/dashboard/strategic/SystemHealthAlertsPanel';
-import { DynamicPanelContainer } from '@/components/dashboard/enhanced/DynamicPanelContainer';
-import { PersonalizationSidebar } from '@/components/dashboard/enhanced/PersonalizationSidebar';
+import DynamicPanelContainer from '@/components/dashboard/enhanced/DynamicPanelContainer';
+import PersonalizationSidebar from '@/components/dashboard/enhanced/PersonalizationSidebar';
 import { DGNotesSidebar } from '@/components/dashboard/strategic/DGNotesSidebar';
 import { ExecutiveReportButton } from '@/components/dashboard/strategic/ExecutiveReportButton';
 
@@ -122,7 +122,10 @@ const DirectorGeneralDashboard: React.FC = () => {
       )}
       
       {showNotes && (
-        <DGNotesSidebar onClose={() => setShowNotes(false)} />
+        <DGNotesSidebar 
+          isCollapsed={false}
+          onToggle={() => setShowNotes(false)}
+        />
       )}
     </div>
   );
