@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe } from 'lucide-react';
+import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -21,6 +21,8 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const [scrolled, setScrolled] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const { t, language, setLanguage, isRTL } = useTranslation();
@@ -42,6 +44,26 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
     };
   }, [scrolled]);
 
+  // Handle keyboard shortcuts for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      if (e.key.toLowerCase() === 'f' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        setShowSearch(true);
+      }
+      
+      if (e.key === 'Escape' && showSearch) {
+        setShowSearch(false);
+        setSearchQuery('');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showSearch]);
+
   const navLinks = [
     { name: 'HOME', path: '/' },
     { name: 'THINK', path: '/think' },
@@ -53,6 +75,12 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'ar' : 'en');
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Searching for:', searchQuery);
+    // Handle search logic here
   };
 
   return (
@@ -129,6 +157,17 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
 
             {/* Utility Icons */}
             <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-4 ${isRTL ? 'space-x-reverse' : ''}`}>
+              {/* Search Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowSearch(true)}
+                className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5"
+                aria-label="Search"
+              >
+                <Search size={18} className="text-gray-600 dark:text-gray-300" />
+              </Button>
+
               {/* Language Toggle */}
               <Button
                 variant="ghost"
@@ -247,6 +286,53 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
             </div>
           </div>
         </div>
+
+        {/* Search Popup Overlay */}
+        <AnimatePresence>
+          {showSearch && (
+            <motion.div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-32"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSearch(false)}
+            >
+              <motion.div
+                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 w-full max-w-2xl mx-4"
+                initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-white">Global Search</h3>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowSearch(false)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <X size={20} />
+                  </Button>
+                </div>
+                <form onSubmit={handleSearch} className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search across all zones..."
+                    className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent"
+                    autoFocus
+                  />
+                </form>
+                <div className="mt-4 text-sm text-gray-400">
+                  Press <kbd className="bg-white/10 px-2 py-1 rounded">Ctrl</kbd> + <kbd className="bg-white/10 px-2 py-1 rounded">F</kbd> to search, <kbd className="bg-white/10 px-2 py-1 rounded">Esc</kbd> to close
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
     </AnimatePresence>
   );

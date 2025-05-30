@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -16,7 +17,7 @@ import { CompactPanelWrapper } from '@/components/dashboard/enhanced/CompactPane
 import { HoverablePanelWrapper } from '@/components/dashboard/strategic/HoverablePanelWrapper';
 import { getDashboardData } from '@/api/dashboard';
 import { Button } from '@/components/ui/button';
-import { X, Maximize2, Search } from 'lucide-react';
+import { X, Maximize2 } from 'lucide-react';
 
 type ZoneType = 'THINK' | 'ACT' | 'MONITOR' | 'LEARN' | 'INNOVATE';
 
@@ -91,11 +92,6 @@ const DirectorGeneralDashboard: React.FC = () => {
           setFullscreenPanel(null);
           setContextualSnapshot(null);
           handlePanelLeave(); // Reset panel hover state
-          break;
-        case 'f':
-          e.preventDefault();
-          // Focus on global search
-          document.getElementById('global-search')?.focus();
           break;
         case '1':
           e.preventDefault();
@@ -256,25 +252,6 @@ const DirectorGeneralDashboard: React.FC = () => {
                 <span className="text-xs text-gray-400">Last Update: {lastUpdate.toLocaleTimeString()}</span>
               </div>
             </div>
-          </motion.div>
-        </div>
-
-        {/* Global Search Bar */}
-        <div className="max-w-[1440px] mx-auto px-6 mb-4">
-          <motion.div 
-            className="relative max-w-md"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            whileFocus={{ scale: 1.02 }}
-          >
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              id="global-search"
-              type="text"
-              placeholder="Global search..."
-              className="pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent backdrop-blur-md w-80"
-            />
           </motion.div>
         </div>
 
