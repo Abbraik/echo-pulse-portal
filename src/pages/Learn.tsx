@@ -18,7 +18,7 @@ const Learn: React.FC = () => {
   return (
     <AnimatedPage>
       <motion.div 
-        className="flex flex-col h-[calc(100vh-5rem)] overflow-hidden"
+        className="flex flex-col h-[calc(100vh-5rem)] overflow-hidden relative z-10"
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}

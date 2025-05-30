@@ -4,7 +4,6 @@ import { useTranslation } from '@/hooks/use-translation';
 import { useTheme } from '@/hooks/use-theme';
 import { usePanelCompact } from '@/hooks/use-panel-compact';
 import { usePanelHover } from '@/hooks/use-panel-hover';
-import ParticlesBackground from '@/components/ui/particles-background';
 import DirectorHeader from '@/components/dashboard/DirectorHeader';
 import { ApprovalsDecisionsPanel } from '@/components/dashboard/strategic/ApprovalsDecisionsPanel';
 import { SystemHealthAlertsPanel } from '@/components/dashboard/strategic/SystemHealthAlertsPanel';
@@ -130,7 +129,7 @@ const DirectorGeneralDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <div className="h-screen flex items-center justify-center">
         <motion.div 
           className="relative h-20 w-20"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -152,31 +151,14 @@ const DirectorGeneralDashboard: React.FC = () => {
   const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-foreground relative overflow-hidden ${isRTL ? 'rtl' : 'ltr'}`}>
-      {/* Enhanced animated background */}
-      <div className="fixed inset-0 z-0">
-        <ParticlesBackground count={120} colorStart="#14B8A680" colorEnd="#2563EB60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>
-      </div>
-      
+    <div className={`min-h-screen text-foreground relative ${isRTL ? 'rtl' : 'ltr'}`}>
       {/* Fullscreen Panel Overlay */}
       <FullscreenOverlay
         isOpen={!!fullscreenPanel}
         onClose={() => setFullscreenPanel(null)}
         title={`${fullscreenPanel} Panel`}
       >
-        {fullscreenPanel === 'approvals' && (
-          <ApprovalsDecisionsPanel 
-            data={dashboardData?.approvals}
-            onFocusMode={() => {}}
-          />
-        )}
-        {fullscreenPanel === 'health' && (
-          <SystemHealthAlertsPanel data={dashboardData?.systemHealth} />
-        )}
-        {fullscreenPanel === 'coordination' && (
-          <CoordinationTriggersPanel data={dashboardData?.coordination} />
-        )}
+        {/* ... keep existing code (fullscreen panel content) */}
       </FullscreenOverlay>
       
       <motion.div 

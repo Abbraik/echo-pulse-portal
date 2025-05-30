@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import WelcomeOverlay from '../home/WelcomeOverlay';
+import ParticlesBackground from '@/components/ui/particles-background';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -91,7 +92,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
   };
 
   return (
-    <div className={`flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300 w-full ${isRTL ? 'rtl' : ''}`}>
+    <div className={`flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300 w-full relative overflow-hidden ${isRTL ? 'rtl' : ''}`}>
+      {/* Dynamic Particles Background */}
+      <div className="fixed inset-0 z-0">
+        <ParticlesBackground count={120} colorStart="#14B8A680" colorEnd="#2563EB60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/40 via-blue-900/30 to-indigo-900/40"></div>
+      </div>
+
       {/* Page transition overlay */}
       <AnimatePresence mode="wait">
         {isPageChanging && (
@@ -113,7 +121,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
       {showWelcome && <WelcomeOverlay onDismiss={handleDismissWelcome} />}
       <Navbar hidden={hideNav && !isInnovatePage} onLogout={onLogout} />
       
-      <main className={`flex-grow animate-container-resize ${isInnovatePage ? 'pt-16' : 'pt-20'} ${isRTL ? 'font-noto-arabic' : ''}`}>
+      <main className={`flex-grow animate-container-resize relative z-10 ${isInnovatePage ? 'pt-16' : 'pt-20'} ${isRTL ? 'font-noto-arabic' : ''}`}>
         <div className={isInnovatePage ? 'page-container-wide' : 'page-container'}>
           <Outlet />
         </div>
