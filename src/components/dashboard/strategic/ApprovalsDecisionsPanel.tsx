@@ -751,14 +751,6 @@ export const ApprovalsDecisionsPanel: React.FC<ApprovalsDecisionsPanelProps> = (
           >
             View All Approvals ▶ <ExternalLink size={12} className="ml-1" />
           </Button>
-          <Button
-            size="sm"
-            onClick={() => setCreateModal(true)}
-            className="bg-teal-500 hover:bg-teal-600 text-white text-sm font-bold h-8"
-          >
-            <Plus size={14} className="mr-1" />
-            Create New Approval
-          </Button>
         </div>
       </div>
 
