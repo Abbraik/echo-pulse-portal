@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Tag, Calendar, ArrowRight, Star, Maximize2, Minimize2, ChevronUp, ChevronDown, TrendingUp } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
@@ -16,7 +15,7 @@ export const SmartLibraryPanel: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [selectedTag, setSelectedTag] = useState<string>('');
+  const [selectedTag, setSelectedTag] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'archive' | 'reuse' | 'tags'>('archive');
   
   // Sample data for the library with enhanced metadata
@@ -101,7 +100,7 @@ export const SmartLibraryPanel: React.FC = () => {
   const filteredItems = libraryItems.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          item.summary.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTag = !selectedTag || item.tags.includes(selectedTag);
+    const matchesTag = selectedTag === 'all' || item.tags.includes(selectedTag);
     const matchesTab = activeTab === 'tags' || item.category === activeTab;
     return matchesSearch && matchesTag && matchesTab;
   });
@@ -281,7 +280,7 @@ export const SmartLibraryPanel: React.FC = () => {
                         </div>
                       </SelectTrigger>
                       <SelectContent className="bg-slate-900/95 border-white/20 backdrop-blur-xl z-50">
-                        <SelectItem value="" className="text-gray-200 focus:bg-teal-500/20 focus:text-teal-300">
+                        <SelectItem value="all" className="text-gray-200 focus:bg-teal-500/20 focus:text-teal-300">
                           All tags
                         </SelectItem>
                         {availableTags.map(tag => (
@@ -341,7 +340,7 @@ export const SmartLibraryPanel: React.FC = () => {
                               boxShadow: '0 8px 25px rgba(20, 184, 166, 0.2)'
                             }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => setSelectedTag(selectedTag === tag ? '' : tag)}
+                            onClick={() => setSelectedTag(selectedTag === tag ? 'all' : tag)}
                           >
                             <div className="text-center">
                               <div className="text-lg mb-1">🏷️</div>
