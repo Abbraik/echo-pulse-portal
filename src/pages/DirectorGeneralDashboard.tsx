@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -158,7 +159,43 @@ const DirectorGeneralDashboard: React.FC = () => {
         onClose={() => setFullscreenPanel(null)}
         title={`${fullscreenPanel} Panel`}
       >
-        {/* ... keep existing code (fullscreen panel content) */}
+        <div className="p-6">
+          {fullscreenPanel === 'approvals' && (
+            <ApprovalsDecisionsPanel 
+              data={dashboardData?.approvals}
+              onFocusMode={(isFocused) => handleFocusMode(isFocused ? 'approvals' : '')}
+              onContextualAction={(action, itemTitle) => {
+                if (action === 'approve') {
+                  handleContextualAction('THINK', `Approved: ${itemTitle}`, 'approvals');
+                }
+              }}
+            />
+          )}
+          {fullscreenPanel === 'health' && (
+            <SystemHealthAlertsPanel 
+              data={dashboardData?.systemHealth}
+              onAlertClick={(alertType) => {
+                handleContextualAction('MONITOR', `Alert: ${alertType}`, 'health');
+              }}
+            />
+          )}
+          {fullscreenPanel === 'coordination' && (
+            <CoordinationTriggersPanel 
+              data={dashboardData?.coordination}
+              onRedesignFlag={(flagType) => {
+                handleContextualAction('INNOVATE', `Redesign Flag: ${flagType}`, 'coordination');
+              }}
+              onEscalationAction={(action, zone) => {
+                if (action === 'reassign') {
+                  handleContextualAction('ACT', `Reassignment in ${zone}`, 'coordination');
+                }
+              }}
+              onZoneLeadClick={(zone) => {
+                handleContextualAction('LEARN', `Zone Lead: ${zone}`, 'coordination');
+              }}
+            />
+          )}
+        </div>
       </FullscreenOverlay>
       
       <motion.div 
