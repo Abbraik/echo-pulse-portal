@@ -80,7 +80,7 @@ export const WorkingCanvasContent: React.FC<WorkingCanvasContentProps> = ({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
-        className="h-full"
+        className="h-full w-full"
       >
         {content}
       </motion.div>
@@ -88,8 +88,8 @@ export const WorkingCanvasContent: React.FC<WorkingCanvasContentProps> = ({
   };
 
   return (
-    <div className="h-full overflow-hidden">
-      <div className="working-canvas-content h-full">
+    <div className="h-full w-full overflow-hidden flex items-center justify-center">
+      <div className="working-canvas-content-container w-full h-full max-w-[960px] mx-auto">
         {renderTabContent()}
       </div>
     </div>
