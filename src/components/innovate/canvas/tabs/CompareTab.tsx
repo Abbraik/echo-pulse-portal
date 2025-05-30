@@ -33,10 +33,11 @@ export const CompareTab: React.FC = () => {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
+  const [spineAnimated, setSpineAnimated] = useState(false);
   const diagramRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLDivElement>(null);
 
-  // Enhanced scenario data with more realistic metrics
+  // Enhanced scenario data with baseline as anchor
   const scenarios: ScenarioData[] = [
     { 
       id: 'baseline', 
@@ -51,7 +52,7 @@ export const CompareTab: React.FC = () => {
     },
     { 
       id: 'policy-focus', 
-      name: 'Policy-Focused Reform', 
+      name: 'Policy Reform', 
       popDev: 12, 
       resource: -5, 
       social: 18,
@@ -62,7 +63,7 @@ export const CompareTab: React.FC = () => {
     },
     { 
       id: 'tech-innovation', 
-      name: 'Tech Innovation Hub', 
+      name: 'Tech Hub', 
       popDev: 25, 
       resource: 15, 
       social: 8,
@@ -73,7 +74,7 @@ export const CompareTab: React.FC = () => {
     },
     { 
       id: 'community-driven', 
-      name: 'Community-Driven Model', 
+      name: 'Community Model', 
       popDev: 18, 
       resource: 8, 
       social: 32,
@@ -109,42 +110,56 @@ export const CompareTab: React.FC = () => {
     return () => window.removeEventListener('resize', updateDimensions);
   }, [viewMode]);
 
-  // Calculate branch positions dynamically
+  // Trigger spine animation
+  useEffect(() => {
+    if (containerDimensions.width > 0 && viewMode === 'fishbone') {
+      const timer = setTimeout(() => setSpineAnimated(true), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [containerDimensions.width, viewMode]);
+
+  // Calculate branch positions with proper spine anchor
   const calculateBranchPositions = () => {
     const { width, height } = containerDimensions;
-    const spineStartX = width * 0.05;
-    const spineEndX = width * 0.95;
-    const spineY = height * 0.5;
-    const maxBranchLength = Math.min(150, height * 0.35);
+    if (width === 0 || height === 0) return [];
+
+    // Spine configuration: 30% down from top, 150px height area
+    const spineY = height * 0.3;
+    const spineStartX = width * 0.08; // 8% from left edge
+    const spineEndX = width * 0.92;   // 8% from right edge
+    const spineLength = spineEndX - spineStartX;
+    
+    const baseline = scenarios[0]; // Current Baseline
+    const redesignScenarios = scenarios.slice(1); // All others
     const isSmallScreen = width < 600;
+    const maxBranchLength = isSmallScreen ? 80 : 120;
 
-    return scenarios.map((scenario, index) => {
-      if (index === 0) {
-        // Baseline stays on the spine
-        return {
-          ...scenario,
-          spineX: spineStartX + 50,
-          spineY: spineY,
-          branchX: spineStartX + 50,
-          branchY: spineY,
-          branchLength: 0,
-          angle: 0
-        };
-      }
+    // Position baseline at spine start
+    const baselinePosition = {
+      ...baseline,
+      spineX: spineStartX,
+      spineY: spineY,
+      branchX: spineStartX,
+      branchY: spineY,
+      branchLength: 0,
+      angle: 0,
+      isBaseline: true
+    };
 
-      // Calculate position along spine for non-baseline scenarios
-      const segmentIndex = index - 1;
-      const totalSegments = scenarios.length - 2; // Exclude baseline and account for spacing
-      const segmentWidth = (spineEndX - spineStartX - 100) / Math.max(totalSegments, 1);
-      const spineX = spineStartX + 100 + (segmentIndex * segmentWidth);
+    // Calculate redesign scenario positions along spine
+    const redesignPositions = redesignScenarios.map((scenario, index) => {
+      // Equally space along spine
+      const segmentWidth = spineLength / (redesignScenarios.length + 1);
+      const spineX = spineStartX + segmentWidth * (index + 1);
 
       // Calculate branch length based on DEI improvement
-      const deiImprovement = Math.abs(scenario.dei - scenarios[0].dei);
+      const deiImprovement = Math.abs(scenario.dei - baseline.dei);
       const branchLength = Math.min(maxBranchLength, (deiImprovement / 50) * maxBranchLength);
 
       // Alternate branches above and below spine
-      const isUp = isSmallScreen ? segmentIndex % 2 === 0 : segmentIndex % 2 === 0;
-      const angle = isSmallScreen ? (isUp ? -60 : 60) : (isUp ? -45 : 45);
+      const isUp = index % 2 === 0;
+      const angle = isSmallScreen ? (isUp ? -60 : 60) : (isUp ? -30 : 30);
+      
       const branchX = spineX + Math.cos((angle * Math.PI) / 180) * branchLength;
       const branchY = spineY + Math.sin((angle * Math.PI) / 180) * branchLength;
 
@@ -155,9 +170,12 @@ export const CompareTab: React.FC = () => {
         branchX,
         branchY,
         branchLength,
-        angle
+        angle,
+        isBaseline: false
       };
     });
+
+    return [baselinePosition, ...redesignPositions];
   };
 
   const positionedScenarios = calculateBranchPositions();
@@ -165,7 +183,6 @@ export const CompareTab: React.FC = () => {
   const handleBranchClick = (scenario: ScenarioData) => {
     setSelectedScenario(selectedScenario === scenario.id ? null : scenario.id);
     
-    // Scroll to table row
     if (tableRef.current) {
       const rowElement = tableRef.current.querySelector(`[data-scenario-id="${scenario.id}"]`);
       if (rowElement) {
@@ -198,54 +215,59 @@ export const CompareTab: React.FC = () => {
 
   const renderFishboneDiagram = () => {
     const { width, height } = containerDimensions;
-    if (width === 0 || height === 0) return null;
+    if (width === 0 || height === 0 || positionedScenarios.length === 0) return null;
 
-    const spineStartX = width * 0.05;
-    const spineEndX = width * 0.95;
-    const spineY = height * 0.5;
+    const spineY = height * 0.3;
+    const spineStartX = width * 0.08;
+    const spineEndX = width * 0.92;
 
     return (
-      <svg className="absolute inset-0 w-full h-full">
+      <svg className="absolute inset-0 w-full h-full" role="img" aria-label="Fishbone diagram comparing scenarios to current baseline">
         <defs>
           <linearGradient id="spineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(20, 184, 166, 0.4)" />
-            <stop offset="50%" stopColor="rgba(20, 184, 166, 0.9)" />
-            <stop offset="100%" stopColor="rgba(59, 130, 246, 0.7)" />
+            <stop offset="0%" stopColor="rgba(20, 184, 166, 0.6)" />
+            <stop offset="50%" stopColor="rgba(20, 184, 166, 1)" />
+            <stop offset="100%" stopColor="rgba(59, 130, 246, 0.8)" />
           </linearGradient>
           <filter id="neonGlow">
-            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
             <feMerge> 
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
-          <marker id="arrowhead-spine" markerWidth="12" markerHeight="8" 
-                  refX="12" refY="4" orient="auto">
-            <polygon points="0 0, 12 4, 0 8" fill="url(#spineGradient)" />
-          </marker>
+          <filter id="pulseGlow">
+            <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+            <feMerge> 
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
         
-        {/* Main Enhanced Spine */}
+        {/* Enhanced Main Spine */}
         <motion.line 
           x1={spineStartX} y1={spineY} 
           x2={spineEndX} y2={spineY}
           stroke="url(#spineGradient)" 
-          strokeWidth="4" 
+          strokeWidth="6" 
           strokeLinecap="round"
-          markerEnd="url(#arrowhead-spine)"
-          filter="url(#neonGlow)"
+          filter={hoveredNode === 'baseline' ? "url(#pulseGlow)" : "url(#neonGlow)"}
           initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          animate={{ pathLength: spineAnimated ? 1 : 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="cursor-pointer"
+          onMouseEnter={() => setHoveredNode('baseline')}
+          onMouseLeave={() => setHoveredNode(null)}
         />
         
-        {/* Dynamic Scenario Branches */}
+        {/* Scenario Branches */}
         {positionedScenarios.map((scenario, index) => {
-          if (scenario.branchLength === 0) return null; // Skip baseline
+          if (scenario.isBaseline || scenario.branchLength === 0) return null;
           
-          // Create smooth Bézier curve
-          const controlX = scenario.spineX + (scenario.branchX - scenario.spineX) * 0.4;
-          const controlY = scenario.spineY + (scenario.branchY - scenario.spineY) * 0.6;
+          // Create smooth Bézier curve for branch
+          const controlX = scenario.spineX + (scenario.branchX - scenario.spineX) * 0.6;
+          const controlY = scenario.spineY + (scenario.branchY - scenario.spineY) * 0.8;
           const pathData = `M ${scenario.spineX} ${scenario.spineY} Q ${controlX} ${controlY} ${scenario.branchX} ${scenario.branchY}`;
           
           const branchColor = scenario.loopType === 'reinforcing' ? '#14b8a6' : '#f97316';
@@ -257,12 +279,16 @@ export const CompareTab: React.FC = () => {
               key={scenario.id}
               d={pathData}
               stroke={branchColor}
-              strokeWidth={isSelected ? "5" : isHovered ? "4" : "3"}
+              strokeWidth={isSelected ? "8" : isHovered ? "6" : "4"}
               fill="none"
               filter="url(#neonGlow)"
               initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ delay: 0.8 + index * 0.15, duration: 0.6, ease: "easeOut" }}
+              animate={{ pathLength: spineAnimated ? 1 : 0 }}
+              transition={{ 
+                delay: 0.5 + (index - 1) * 0.1, 
+                duration: 0.3, 
+                ease: "easeOut" 
+              }}
               style={{ 
                 transition: 'stroke-width 0.3s ease',
                 opacity: isSelected || isHovered ? 1 : 0.8
@@ -275,54 +301,68 @@ export const CompareTab: React.FC = () => {
   };
 
   const renderBranchHeads = () => {
-    return positionedScenarios.map((scenario, index) => (
-      <motion.div
-        key={scenario.id}
-        className="absolute cursor-pointer"
-        style={{ 
-          left: scenario.branchX, 
-          top: scenario.branchY,
-          transform: 'translate(-50%, -50%)'
-        }}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 1.2 + index * 0.1, type: "spring", stiffness: 200 }}
-        whileHover={{ scale: 1.1 }}
-        onClick={() => handleBranchClick(scenario)}
-        onMouseEnter={(e) => handleBranchHover(scenario, e, true)}
-        onMouseLeave={(e) => handleBranchHover(scenario, e, false)}
-        role="button"
-        aria-label={`Scenario ${scenario.name}: DEI improvement ${scenario.dei - scenarios[0].dei}%`}
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleBranchClick(scenario);
-          }
-        }}
-      >
-        <div 
-          className={`w-15 h-15 rounded-full border-2 flex flex-col items-center justify-center glass-panel-deep transition-all duration-300 ${
-            selectedScenario === scenario.id || hoveredNode === scenario.id
-              ? 'border-white shadow-2xl shadow-white/30 backdrop-blur-[32px]' 
-              : 'border-white/40 backdrop-blur-[20px]'
-          }`}
+    return positionedScenarios.map((scenario, index) => {
+      const isBaseline = scenario.isBaseline;
+      const isSelected = selectedScenario === scenario.id;
+      const isHovered = hoveredNode === scenario.id;
+      
+      return (
+        <motion.div
+          key={scenario.id}
+          className="absolute cursor-pointer"
           style={{ 
-            backgroundColor: `${scenario.color}30`,
-            borderColor: hoveredNode === scenario.id ? scenario.color : undefined,
-            minWidth: '60px',
-            minHeight: '60px'
+            left: scenario.branchX, 
+            top: scenario.branchY,
+            transform: 'translate(-50%, -50%)'
+          }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ 
+            delay: isBaseline ? 0.1 : 0.8 + (index - 1) * 0.1, 
+            type: "spring", 
+            stiffness: 200 
+          }}
+          whileHover={{ scale: 1.1 }}
+          onClick={() => handleBranchClick(scenario)}
+          onMouseEnter={(e) => handleBranchHover(scenario, e, true)}
+          onMouseLeave={(e) => handleBranchHover(scenario, e, false)}
+          role="button"
+          aria-label={`Scenario ${scenario.name}: DEI ${isBaseline ? scenario.dei : `+${scenario.dei - scenarios[0].dei}`}%`}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleBranchClick(scenario);
+            }
           }}
         >
-          <span className="text-white font-bold text-sm text-center leading-tight px-1">
-            {scenario.name.split(' ')[0]}
-          </span>
-          <span className="text-xs text-white/80">
-            +{scenario.dei - scenarios[0].dei}
-          </span>
-        </div>
-      </motion.div>
-    ));
+          <div 
+            className={`${
+              isBaseline 
+                ? 'w-20 h-20 rounded-full' 
+                : 'w-25 h-12 rounded-lg'
+            } border-2 flex flex-col items-center justify-center glass-panel-deep transition-all duration-300 ${
+              isSelected || isHovered
+                ? 'border-white shadow-2xl shadow-white/30 backdrop-blur-[32px]' 
+                : 'border-white/40 backdrop-blur-[20px]'
+            }`}
+            style={{ 
+              backgroundColor: `${scenario.color}40`,
+              borderColor: isHovered ? scenario.color : undefined,
+              minWidth: isBaseline ? '80px' : '100px',
+              minHeight: isBaseline ? '80px' : '50px'
+            }}
+          >
+            <span className="text-white font-bold text-xs text-center leading-tight px-1">
+              {isBaseline ? 'Current' : scenario.name.split(' ')[0]}
+            </span>
+            <span className="text-xs text-white/80">
+              {isBaseline ? '(+0)' : `+${scenario.dei - scenarios[0].dei}`}
+            </span>
+          </div>
+        </motion.div>
+      );
+    });
   };
 
   return (
@@ -357,11 +397,11 @@ export const CompareTab: React.FC = () => {
               {renderFishboneDiagram()}
               {renderBranchHeads()}
 
-              {/* Spine Labels */}
-              <div className="absolute left-6 top-1/2 transform -translate-y-1/2 text-sm text-gray-300 font-medium">
+              {/* Enhanced Spine Labels */}
+              <div className="absolute left-6 top-8 text-sm text-gray-300 font-medium">
                 Current State
               </div>
-              <div className="absolute right-6 top-1/2 transform -translate-y-1/2 text-sm text-gray-300 font-medium">
+              <div className="absolute right-6 top-8 text-sm text-gray-300 font-medium">
                 Future Vision
               </div>
             </div>
@@ -414,7 +454,7 @@ export const CompareTab: React.FC = () => {
           </motion.div>
         </div>
       ) : (
-        /* Detailed Table View - Full Height */
+        /* ... keep existing code (Detailed Table View) */
         <motion.div
           ref={tableRef}
           className="flex-1 glass-panel mx-6 mb-6 rounded-xl overflow-hidden"
@@ -519,6 +559,7 @@ export const CompareTab: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
             transition={{ duration: 0.2 }}
+            role="tooltip"
           >
             <div className="glass-panel-deep p-4 rounded-xl border border-teal-400/30 min-w-64">
               <div className="text-sm font-bold text-white mb-3">{tooltip.scenario.name}</div>
@@ -527,7 +568,7 @@ export const CompareTab: React.FC = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-300">DEI Change:</span>
                     <span className="text-teal-400">
-                      +{tooltip.scenario.dei - scenarios[0].dei}%
+                      {tooltip.scenario.id === 'baseline' ? '0%' : `+${tooltip.scenario.dei - scenarios[0].dei}%`}
                     </span>
                   </div>
                   <div className="flex justify-between">
