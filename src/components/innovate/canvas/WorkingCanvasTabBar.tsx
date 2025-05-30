@@ -14,6 +14,7 @@ import {
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { motion } from 'framer-motion';
 
 interface WorkingCanvasTabBarProps {
   activeTab: string;
@@ -39,27 +40,75 @@ export const WorkingCanvasTabBar: React.FC<WorkingCanvasTabBarProps> = ({
   ];
 
   return (
-    <div className="h-12 px-6 border-b border-white/10">
+    <div className="h-14 px-6 relative">
       <ScrollArea className="w-full">
-        <div className="flex items-center gap-1 min-w-max">
-          {tabs.map((tab) => (
-            <Button
+        <div className="flex items-center gap-1 min-w-max py-2">
+          {tabs.map((tab, index) => (
+            <motion.div
               key={tab.id}
-              size="sm"
-              variant="ghost"
-              onClick={() => onTabChange(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
-                activeTab === tab.id 
-                  ? 'bg-teal-500/20 text-teal-300 shadow-lg shadow-teal-500/10 border-b-2 border-teal-400' 
-                  : 'hover:bg-white/10 hover:text-white'
-              }`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.3 }}
             >
-              {tab.icon}
-              <span className="hidden sm:inline text-sm">{tab.label}</span>
-            </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => onTabChange(tab.id)}
+                className={`relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
+                  activeTab === tab.id 
+                    ? 'text-teal-300 shadow-lg' 
+                    : 'hover:bg-white/10 hover:text-white text-gray-400'
+                }`}
+                style={{
+                  fontFamily: 'Noto Sans',
+                  fontWeight: activeTab === tab.id ? 'bold' : 'medium'
+                }}
+              >
+                {/* Icon with jiggle animation on activation */}
+                <motion.div
+                  animate={activeTab === tab.id ? {
+                    rotate: [0, -5, 5, 0],
+                    scale: [1, 1.1, 1]
+                  } : {}}
+                  transition={{ duration: 0.5 }}
+                >
+                  {tab.icon}
+                </motion.div>
+                
+                <span className="hidden sm:inline text-sm">{tab.label}</span>
+                
+                {/* Active tab underline with morph animation */}
+                {activeTab === tab.id && (
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-400 to-blue-500 rounded-full"
+                    layoutId="activeTabUnderline"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                
+                {/* Active tab glow */}
+                {activeTab === tab.id && (
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background: 'rgba(20, 184, 166, 0.1)',
+                      boxShadow: 'inset 0 0 20px rgba(20, 184, 166, 0.2)'
+                    }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
+              </Button>
+            </motion.div>
           ))}
         </div>
       </ScrollArea>
+
+      {/* Section divider */}
+      <div 
+        className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-teal-400/50 to-transparent"
+      />
     </div>
   );
 };
