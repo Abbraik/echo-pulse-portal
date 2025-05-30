@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -6,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, L
 import { useTranslation } from '@/hooks/use-translation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown, Minus, ChevronRight, X, Activity, Target, BarChart3 } from 'lucide-react';
-import { FishboneDiagram } from '../components/FishboneDiagram';
+import RadialDendrogram from '../components/RadialDendrogram';
 
 interface ScenarioData {
   id: string;
@@ -260,16 +259,26 @@ export const CompareTab: React.FC = () => {
     </Dialog>
   );
 
-  // Convert scenarios to branches for FishboneDiagram
+  // Convert scenarios to format expected by RadialDendrogram
   const baseline = scenarios[0];
-  const branches = scenarios.slice(1).map(scenario => ({
-    id: scenario.id,
-    name: scenario.name,
-    deltaValue: scenario.dei - baseline.dei,
-    impactMetric: Math.abs(scenario.dei - baseline.dei),
-    type: scenario.loopType,
-    color: scenario.color
-  }));
+  const radialScenarios = scenarios.slice(1).map(scenario => {
+    // Calculate normalized impact and disturbance scores
+    const impactScore = Math.abs(scenario.dei - baseline.dei) / 50; // normalized to 0-1
+    const disturbanceScore = (Math.abs(scenario.popDev) + Math.abs(scenario.resource) + Math.abs(scenario.social)) / 100; // normalized to 0-1
+    
+    return {
+      id: scenario.id,
+      name: scenario.name,
+      impact: Math.min(impactScore, 1),
+      disturbance: Math.min(disturbanceScore, 1),
+      deltaMetrics: {
+        'Population Dev': scenario.popDev,
+        'Resource': scenario.resource,
+        'Social': scenario.social,
+        'DEI Score': scenario.dei - baseline.dei
+      }
+    };
+  });
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -284,7 +293,7 @@ export const CompareTab: React.FC = () => {
         <div className="w-full max-w-[960px] h-full glass-panel-deep rounded-2xl overflow-hidden flex flex-col">
           <div className="h-full flex flex-col p-6 min-h-0">
             
-            {/* Fishbone Diagram - 60% height, Fixed */}
+            {/* Radial Dendrogram - 60% height, Fixed */}
             <motion.div
               className="relative rounded-xl overflow-hidden mb-4 flex-shrink-0"
               style={{ height: '60%' }}
@@ -292,13 +301,13 @@ export const CompareTab: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4 }}
             >
-              <FishboneDiagram
-                baselineLabel="Current Baseline"
-                branches={branches}
+              <RadialDendrogram
                 width={912} // 960 - 48px padding
                 height={300} // Fixed height for 60%
-                onBranchSelect={handleBranchSelect}
-                selectedBranchId={selectedScenario}
+                baselineLabel="Current Baseline"
+                scenarios={radialScenarios}
+                onSelectScenario={handleBranchSelect}
+                selectedScenarioId={selectedScenario}
               />
             </motion.div>
 
