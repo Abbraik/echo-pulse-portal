@@ -1,12 +1,11 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, LineChart, Line, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, Legend } from 'recharts';
 import { useTranslation } from '@/hooks/use-translation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, TrendingDown, Minus, BarChart3, ChevronRight, X, Activity, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, ChevronRight, X, Activity, Target, BarChart3 } from 'lucide-react';
 import { FishboneDiagram } from '../components/FishboneDiagram';
 
 interface ScenarioData {
@@ -148,13 +147,6 @@ export const CompareTab: React.FC = () => {
 
   const handleBranchSelect = (branchId: string) => {
     setSelectedScenario(selectedScenario === branchId ? null : branchId);
-    
-    if (tableRef.current) {
-      const rowElement = tableRef.current.querySelector(`[data-scenario-id="${branchId}"]`);
-      if (rowElement) {
-        rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
   };
 
   const handleRowGraphToggle = (scenarioId: string) => {
@@ -173,7 +165,7 @@ export const CompareTab: React.FC = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="text-teal-400 hover:text-teal-300 hover:bg-teal-400/10"
+          className="text-teal-400 hover:text-teal-300 hover:bg-teal-400/10 flex items-center gap-1"
           onClick={() => setSelectedScenarioDetails(scenario)}
         >
           Details <ChevronRight size={14} />
@@ -280,21 +272,21 @@ export const CompareTab: React.FC = () => {
   }));
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Header - Fixed Height */}
       <div className="flex-shrink-0 p-6 pb-4">
         <h2 className="font-noto-bold text-2xl text-teal-300 mb-2">Scenario Comparison</h2>
         <p className="text-gray-300 text-sm">Interactive analysis of intervention scenarios and their systemic impacts</p>
       </div>
 
-      {/* Main Container - Fixed Width 960px */}
-      <div className="flex-1 flex justify-center px-6 pb-6">
-        <div className="w-full max-w-[960px] glass-panel-deep rounded-2xl overflow-hidden">
-          <div className="h-full flex flex-col p-6">
+      {/* Main Container - Fixed Width 960px, Full Remaining Height */}
+      <div className="flex-1 flex justify-center px-6 pb-6 min-h-0 overflow-hidden">
+        <div className="w-full max-w-[960px] h-full glass-panel-deep rounded-2xl overflow-hidden flex flex-col">
+          <div className="h-full flex flex-col p-6 min-h-0">
             
-            {/* Fishbone Diagram - 60% height */}
+            {/* Fishbone Diagram - 60% height, Fixed */}
             <motion.div
-              className="relative rounded-xl overflow-hidden mb-4"
+              className="relative rounded-xl overflow-hidden mb-4 flex-shrink-0"
               style={{ height: '60%' }}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -304,26 +296,26 @@ export const CompareTab: React.FC = () => {
                 baselineLabel="Current Baseline"
                 branches={branches}
                 width={912} // 960 - 48px padding
-                height={340} // Approximate 60% height
+                height={300} // Fixed height for 60%
                 onBranchSelect={handleBranchSelect}
                 selectedBranchId={selectedScenario}
               />
             </motion.div>
 
-            {/* Scenario Forks Overview - 15% height */}
+            {/* Scenario Forks Overview - 15% height, Fixed */}
             <motion.div
-              className="mb-4 rounded-lg bg-white/5 p-4"
-              style={{ height: '15%' }}
+              className="mb-4 rounded-lg bg-white/5 p-4 flex-shrink-0 overflow-hidden"
+              style={{ height: '15%', minHeight: '120px' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
             >
               <h3 className="font-medium text-gray-200 mb-3">Scenario Forks Overview</h3>
-              <div className="flex gap-4 overflow-x-auto">
+              <div className="flex gap-4 overflow-x-auto h-full">
                 {scenarios.slice(1).map((scenario) => (
                   <div
                     key={scenario.id}
-                    className="flex-shrink-0 bg-white/5 rounded-lg p-3 min-w-[200px] hover:bg-white/10 transition-colors"
+                    className="flex-shrink-0 bg-white/5 rounded-lg p-3 min-w-[200px] hover:bg-white/10 transition-colors h-fit"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <div 
@@ -332,7 +324,7 @@ export const CompareTab: React.FC = () => {
                       />
                       <span className="font-medium text-gray-200 text-sm">{scenario.name}</span>
                     </div>
-                    <div className="text-xs text-gray-300 space-y-1">
+                    <div className="text-xs text-gray-300 space-y-1 mb-2">
                       <div>ΔDEI: <span className="text-teal-400">+{scenario.dei - baseline.dei}</span></div>
                       <div>Top Change: <span className="text-green-400">+{Math.max(...Object.values(scenario.subIndicators))}%</span></div>
                     </div>
@@ -342,19 +334,20 @@ export const CompareTab: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Comparison Table & Graphs - 25% height */}
+            {/* Comparison Table & Graphs - 25% height, Scrollable */}
             <motion.div
               ref={tableRef}
-              className="rounded-lg bg-white/5 overflow-hidden"
-              style={{ height: '25%' }}
+              className="rounded-lg bg-white/5 overflow-hidden flex-1 min-h-0 flex flex-col"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.4 }}
             >
-              <div className="h-full overflow-auto">
-                <h3 className="font-medium text-gray-200 p-4 pb-2">Detailed Comparison</h3>
+              <div className="p-4 pb-2 flex-shrink-0">
+                <h3 className="font-medium text-gray-200">Detailed Comparison</h3>
+              </div>
+              <div className="flex-1 overflow-auto min-h-0">
                 <table className="w-full">
-                  <thead className="bg-slate-900/50">
+                  <thead className="bg-slate-900/50 sticky top-0 z-10">
                     <tr className="border-b border-white/10">
                       <th className="text-left py-2 px-4 text-sm font-medium text-gray-300">Scenario</th>
                       <th className="text-center py-2 px-4 text-sm font-medium text-gray-300">Population Δ</th>
@@ -415,11 +408,11 @@ export const CompareTab: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-blue-400 hover:text-blue-300 hover:bg-blue-400/10"
+                                className="text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 flex items-center gap-1"
                                 onClick={() => handleRowGraphToggle(scenario.id)}
                                 aria-expanded={expandedRow === scenario.id}
                               >
-                                <Activity size={14} className="mr-1" />
+                                <Activity size={14} />
                                 Graph
                               </Button>
                             </div>
