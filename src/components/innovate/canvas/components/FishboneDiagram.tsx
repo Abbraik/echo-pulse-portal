@@ -41,21 +41,23 @@ export const FishboneDiagram: React.FC<FishboneDiagramProps> = ({
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Layout constants
-  const marginLeft = width * 0.1;
-  const marginRight = width * 0.1;
-  const centerY = height * 0.5;
-  const usableSpineLength = width - marginLeft - marginRight;
+  const marginLeft = Math.max(60, width * 0.08);
+  const marginRight = Math.max(60, width * 0.08);
+  const centerY = height * 0.3; // Position spine at 30% from top
+  const spineStartX = marginLeft + 50; // Start after baseline node
+  const spineEndX = width - marginRight;
+  const spineLength = spineEndX - spineStartX;
   const maxBranchLength = width < 600 ? 80 : 120;
   const maxImpactMetric = Math.max(...branches.map(b => b.impactMetric), 1);
   const isSmallScreen = width < 600;
 
   // Trigger spine animation
   useEffect(() => {
-    if (width > 0) {
-      const timer = setTimeout(() => setSpineAnimated(true), 100);
+    if (width > 0 && height > 0) {
+      const timer = setTimeout(() => setSpineAnimated(true), 200);
       return () => clearTimeout(timer);
     }
-  }, [width]);
+  }, [width, height]);
 
   // Calculate branch positions
   const calculateBranchPositions = () => {
@@ -63,8 +65,8 @@ export const FishboneDiagram: React.FC<FishboneDiagramProps> = ({
     if (n === 0) return [];
 
     return branches.map((branch, index) => {
-      // Anchor point on spine
-      const anchorX = marginLeft + ((index + 1) * (usableSpineLength / (n + 1)));
+      // Anchor point on spine - evenly distributed
+      const anchorX = spineStartX + ((index + 1) * (spineLength / (n + 1)));
       
       // Branch length based on impact metric
       const branchLength = Math.min(maxBranchLength, (branch.impactMetric / maxImpactMetric) * maxBranchLength);
@@ -121,33 +123,23 @@ export const FishboneDiagram: React.FC<FishboneDiagramProps> = ({
     onBranchSelect?.(branchId);
   };
 
-  const getBranchColor = (type: 'reinforcing' | 'balancing') => {
-    return type === 'reinforcing' ? '#14b8a6' : '#f97316';
-  };
-
   return (
     <div className="relative w-full h-full">
       <svg
         ref={svgRef}
         className="w-full h-full"
+        viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-label={`Fishbone diagram comparing scenarios to ${baselineLabel}`}
       >
         <defs>
           <linearGradient id="spineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(20, 184, 166, 0.6)" />
-            <stop offset="50%" stopColor="rgba(20, 184, 166, 1)" />
-            <stop offset="100%" stopColor="rgba(59, 130, 246, 0.8)" />
+            <stop offset="0%" stopColor="#14b8a6" />
+            <stop offset="50%" stopColor="#0d9488" />
+            <stop offset="100%" stopColor="#0f766e" />
           </linearGradient>
-          <filter id="neonGlow">
-            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
-            <feMerge> 
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-          <filter id="pulseGlow">
-            <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+          <filter id="glowEffect" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
             <feMerge> 
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
@@ -155,49 +147,75 @@ export const FishboneDiagram: React.FC<FishboneDiagramProps> = ({
           </filter>
         </defs>
 
-        {/* Baseline Spine */}
+        {/* Main Baseline Spine - Fixed and Visible */}
         <motion.line
-          x1={marginLeft}
+          x1={spineStartX}
           y1={centerY}
-          x2={width - marginRight}
+          x2={spineEndX}
           y2={centerY}
           stroke="url(#spineGradient)"
           strokeWidth="6"
           strokeLinecap="round"
-          filter="url(#neonGlow)"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: spineAnimated ? 1 : 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          filter="url(#glowEffect)"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: spineAnimated ? 1 : 0, opacity: spineAnimated ? 1 : 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
         />
+
+        {/* Current State Label - Left Side */}
+        <motion.text
+          x={marginLeft - 10}
+          y={centerY - 20}
+          textAnchor="end"
+          className="fill-gray-300 text-sm font-medium"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          Current State
+        </motion.text>
+
+        {/* Future Vision Label - Right Side */}
+        <motion.text
+          x={spineEndX + 10}
+          y={centerY - 20}
+          textAnchor="start"
+          className="fill-gray-300 text-sm font-medium"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          Future Vision
+        </motion.text>
 
         {/* Baseline Node */}
         <motion.g
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
         >
           <circle
             cx={marginLeft}
             cy={centerY}
             r="40"
-            fill="rgba(20, 184, 166, 0.2)"
-            stroke="rgba(20, 184, 166, 0.8)"
-            strokeWidth="4"
-            filter="url(#neonGlow)"
+            fill="rgba(20, 30, 50, 0.7)"
+            stroke="#14b8a6"
+            strokeWidth="3"
+            filter="url(#glowEffect)"
             style={{ backdropFilter: 'blur(20px)' }}
           />
           <text
             x={marginLeft}
-            y={centerY - 5}
+            y={centerY - 8}
             textAnchor="middle"
             className="fill-white text-sm font-bold"
             style={{ fontFamily: 'Noto Sans' }}
           >
-            {baselineLabel}
+            Current
           </text>
           <text
             x={marginLeft}
-            y={centerY + 12}
+            y={centerY + 8}
             textAnchor="middle"
             className="fill-teal-300 text-xs"
             style={{ fontFamily: 'Noto Sans' }}
@@ -210,7 +228,7 @@ export const FishboneDiagram: React.FC<FishboneDiagramProps> = ({
         {positionedBranches.map((branch, index) => {
           const isSelected = selectedBranchId === branch.id;
           const isHovered = hoveredBranch === branch.id;
-          const branchColor = getBranchColor(branch.type);
+          const branchColor = branch.type === 'reinforcing' ? '#14b8a6' : '#f97316';
 
           return (
             <motion.path
@@ -219,12 +237,12 @@ export const FishboneDiagram: React.FC<FishboneDiagramProps> = ({
               stroke={branchColor}
               strokeWidth={isSelected ? "8" : isHovered ? "6" : "4"}
               fill="none"
-              filter="url(#neonGlow)"
+              filter="url(#glowEffect)"
               initial={{ pathLength: 0 }}
               animate={{ pathLength: spineAnimated ? 1 : 0 }}
               transition={{
-                delay: 0.6 + index * 0.1,
-                duration: 0.3,
+                delay: 1.0 + index * 0.15,
+                duration: 0.4,
                 ease: "easeOut"
               }}
               style={{
@@ -248,7 +266,7 @@ export const FishboneDiagram: React.FC<FishboneDiagramProps> = ({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{
-                delay: 0.8 + index * 0.1,
+                delay: 1.2 + index * 0.15,
                 type: "spring",
                 stiffness: 200
               }}
@@ -268,10 +286,10 @@ export const FishboneDiagram: React.FC<FishboneDiagramProps> = ({
                 height={nodeHeight}
                 rx="8"
                 ry="8"
-                fill="rgba(20, 30, 50, 0.6)"
+                fill="rgba(20, 30, 50, 0.7)"
                 stroke={isSelected || isHovered ? branch.color : 'rgba(255, 255, 255, 0.4)'}
                 strokeWidth={isSelected ? "4" : "2"}
-                filter="url(#neonGlow)"
+                filter="url(#glowEffect)"
                 style={{
                   backdropFilter: 'blur(20px)',
                   transition: 'all 0.3s ease'
@@ -314,8 +332,6 @@ export const FishboneDiagram: React.FC<FishboneDiagramProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
             transition={{ duration: 0.2 }}
-            role="tooltip"
-            aria-describedby={`tooltip-${tooltip.branch.id}`}
           >
             <div className="glass-panel-deep p-4 rounded-xl border border-teal-400/30 min-w-64">
               <div className="text-sm font-bold text-white mb-3">{tooltip.branch.name}</div>
