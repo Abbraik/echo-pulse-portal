@@ -75,48 +75,50 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
               onTabChange={setActiveTab}
             />
 
-            {/* Main Content Area - Fixed Height */}
-            <div className="flex-1 relative overflow-hidden">
-              <div className="absolute inset-0">
-                <WorkingCanvasContent
-                  activeTab={activeTab}
-                  selectedItem={selectedItem}
-                  onLeverageSidebarToggle={() => setLeverageSidebarOpen(!leverageSidebarOpen)}
-                />
-              </div>
+            {/* Main Content Area - Flex Container */}
+            <div className="flex-1 relative overflow-hidden min-h-0">
+              <div className="absolute inset-0 flex">
+                <div className="working-canvas-content-container">
+                  <WorkingCanvasContent
+                    activeTab={activeTab}
+                    selectedItem={selectedItem}
+                    onLeverageSidebarToggle={() => setLeverageSidebarOpen(!leverageSidebarOpen)}
+                  />
+                </div>
 
-              {/* Enhanced Leverage Point Sidebar */}
-              <AnimatePresence>
-                {leverageSidebarOpen && (
-                  <>
-                    {/* Backdrop overlay */}
-                    <motion.div
-                      className="absolute inset-0 bg-black/20 backdrop-blur-sm z-10"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      onClick={() => setLeverageSidebarOpen(false)}
-                    />
-                    
-                    {/* Sidebar */}
-                    <motion.div
-                      className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} h-full z-20 w-80`}
-                      initial={{ x: isRTL ? '-100%' : '100%' }}
-                      animate={{ x: 0 }}
-                      exit={{ x: isRTL ? '-100%' : '100%' }}
-                      transition={{ duration: 0.3, ease: 'easeOut' }}
-                    >
-                      <div className="glass-panel-deep h-full rounded-l-xl border-l border-teal-400/30">
-                        <LeveragePointSidebar
-                          onClose={() => setLeverageSidebarOpen(false)}
-                          viewMode={viewMode}
-                        />
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
+                {/* Enhanced Leverage Point Sidebar */}
+                <AnimatePresence>
+                  {leverageSidebarOpen && (
+                    <>
+                      {/* Backdrop overlay */}
+                      <motion.div
+                        className="absolute inset-0 bg-black/20 backdrop-blur-sm z-10"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        onClick={() => setLeverageSidebarOpen(false)}
+                      />
+                      
+                      {/* Sidebar */}
+                      <motion.div
+                        className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} h-full z-20 w-80`}
+                        initial={{ x: isRTL ? '-100%' : '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: isRTL ? '-100%' : '100%' }}
+                        transition={{ duration: 0.3, ease: 'easeOut' }}
+                      >
+                        <div className="glass-panel-deep h-full rounded-l-xl border-l border-teal-400/30">
+                          <LeveragePointSidebar
+                            onClose={() => setLeverageSidebarOpen(false)}
+                            viewMode={viewMode}
+                          />
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </motion.div>

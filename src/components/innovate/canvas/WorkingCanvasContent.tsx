@@ -69,18 +69,12 @@ export const WorkingCanvasContent: React.FC<WorkingCanvasContentProps> = ({
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="h-full w-full"
+        className="h-full w-full flex flex-col"
       >
         {content}
       </motion.div>
     );
   };
 
-  return (
-    <div className="h-full w-full overflow-hidden">
-      <div className="working-canvas-content-container w-full h-full max-w-[960px] mx-auto">
-        {renderTabContent()}
-      </div>
-    </div>
-  );
+  return renderTabContent();
 };
