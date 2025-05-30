@@ -1,4 +1,3 @@
-
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { useRef } from 'react';
 import CytoScape from 'react-cytoscapejs';
@@ -35,7 +34,6 @@ export const KnowledgeGraph = forwardRef<any, KnowledgeGraphProps>((props, ref) 
   const { searchQuery = '', nodeTypeFilter } = props;
   const { t } = useTranslation();
   const cyRef = useRef<any>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
   
   // Sample knowledge graph data
   const [nodes] = useState<GraphNode[]>([
@@ -93,41 +91,29 @@ export const KnowledgeGraph = forwardRef<any, KnowledgeGraphProps>((props, ref) 
   // Expose cytoscape instance methods via ref
   useImperativeHandle(ref, () => ({
     zoomIn: () => {
-      if (cyRef.current && isInitialized) {
-        try {
-          const currentZoom = cyRef.current.zoom();
-          cyRef.current.zoom({
-            level: currentZoom * 1.2,
-            renderedPosition: { x: cyRef.current.width() / 2, y: cyRef.current.height() / 2 }
-          });
-        } catch (error) {
-          console.warn('Error zooming in:', error);
-        }
+      if (cyRef.current) {
+        const currentZoom = cyRef.current.zoom();
+        cyRef.current.zoom({
+          level: currentZoom * 1.2,
+          renderedPosition: { x: cyRef.current.width() / 2, y: cyRef.current.height() / 2 }
+        });
       }
     },
     zoomOut: () => {
-      if (cyRef.current && isInitialized) {
-        try {
-          const currentZoom = cyRef.current.zoom();
-          cyRef.current.zoom({
-            level: currentZoom / 1.2,
-            renderedPosition: { x: cyRef.current.width() / 2, y: cyRef.current.height() / 2 }
-          });
-        } catch (error) {
-          console.warn('Error zooming out:', error);
-        }
+      if (cyRef.current) {
+        const currentZoom = cyRef.current.zoom();
+        cyRef.current.zoom({
+          level: currentZoom / 1.2,
+          renderedPosition: { x: cyRef.current.width() / 2, y: cyRef.current.height() / 2 }
+        });
       }
     },
     spotlight: (nodeId: string) => {
-      if (cyRef.current && isInitialized) {
-        try {
-          const node = cyRef.current.getElementById(nodeId);
-          if (node.length > 0) {
-            cyRef.current.fit(node, 50);
-            node.select();
-          }
-        } catch (error) {
-          console.warn('Error spotlighting node:', error);
+      if (cyRef.current) {
+        const node = cyRef.current.getElementById(nodeId);
+        if (node.length > 0) {
+          cyRef.current.fit(node, 50);
+          node.select();
         }
       }
     }
@@ -280,62 +266,66 @@ export const KnowledgeGraph = forwardRef<any, KnowledgeGraphProps>((props, ref) 
   
   // Handle search highlighting effect
   useEffect(() => {
-    if (cyRef.current && isInitialized && searchQuery) {
-      try {
-        cyRef.current.elements().removeClass('highlighted').removeClass('faded');
+    if (cyRef.current && searchQuery) {
+      cyRef.current.elements().removeClass('highlighted').removeClass('faded');
+      
+      const matchedNodes = cyRef.current.nodes().filter(node => 
+        node.data('label').toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      
+      if (matchedNodes.length > 0) {
+        // Highlight matched nodes and their connected edges and nodes
+        const neighborhood = matchedNodes.neighborhood().add(matchedNodes);
+        neighborhood.addClass('highlighted');
         
-        const matchedNodes = cyRef.current.nodes().filter(node => 
-          node.data('label').toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        // Fade all other elements
+        cyRef.current.elements().difference(neighborhood).addClass('faded');
         
-        if (matchedNodes.length > 0) {
-          // Highlight matched nodes and their connected edges and nodes
-          const neighborhood = matchedNodes.neighborhood().add(matchedNodes);
-          neighborhood.addClass('highlighted');
-          
-          // Fade all other elements
-          cyRef.current.elements().difference(neighborhood).addClass('faded');
-          
-          // Center on matched nodes
-          cyRef.current.fit(matchedNodes, 50);
-        }
-      } catch (error) {
-        console.warn('Error handling search highlighting:', error);
+        // Center on matched nodes
+        cyRef.current.fit(matchedNodes, 50);
       }
-    } else if (cyRef.current && isInitialized) {
-      try {
-        // Remove any existing highlighting
-        cyRef.current.elements().removeClass('highlighted').removeClass('faded');
-        cyRef.current.fit();
-      } catch (error) {
-        console.warn('Error removing highlighting:', error);
-      }
+    } else if (cyRef.current) {
+      // Remove any existing highlighting
+      cyRef.current.elements().removeClass('highlighted').removeClass('faded');
+      cyRef.current.fit();
     }
-  }, [searchQuery, isInitialized]);
+  }, [searchQuery]);
   
   // Update on node type filter change
   useEffect(() => {
-    if (cyRef.current && isInitialized && nodeTypeFilter) {
-      try {
-        cyRef.current.elements().removeClass('highlighted').removeClass('faded');
+    if (cyRef.current && nodeTypeFilter) {
+      cyRef.current.elements().removeClass('highlighted').removeClass('faded');
+      
+      const matchedNodes = cyRef.current.nodes().filter(node => 
+        node.data('type') === nodeTypeFilter
+      );
+      
+      if (matchedNodes.length > 0) {
+        // Highlight matched nodes and their connected edges and nodes
+        const neighborhood = matchedNodes.neighborhood().add(matchedNodes);
+        neighborhood.addClass('highlighted');
         
-        const matchedNodes = cyRef.current.nodes().filter(node => 
-          node.data('type') === nodeTypeFilter
-        );
-        
-        if (matchedNodes.length > 0) {
-          // Highlight matched nodes and their connected edges and nodes
-          const neighborhood = matchedNodes.neighborhood().add(matchedNodes);
-          neighborhood.addClass('highlighted');
-          
-          // Fade all other elements
-          cyRef.current.elements().difference(neighborhood).addClass('faded');
-        }
-      } catch (error) {
-        console.warn('Error handling node type filter:', error);
+        // Fade all other elements
+        cyRef.current.elements().difference(neighborhood).addClass('faded');
       }
     }
-  }, [nodeTypeFilter, isInitialized]);
+  }, [nodeTypeFilter]);
+  
+  // CSS styles for the component
+  const styles = {
+    highlighted: {
+      opacity: 1,
+    },
+    faded: {
+      opacity: 0.25,
+    },
+    cytoscapeContainer: {
+      cursor: 'grab',
+    },
+    cytoscapeContainerActive: {
+      cursor: 'grabbing',
+    }
+  };
   
   return (
     <div className="w-full h-full">
@@ -363,71 +353,62 @@ export const KnowledgeGraph = forwardRef<any, KnowledgeGraphProps>((props, ref) 
         cy={(cy) => {
           cyRef.current = cy;
           
-          try {
-            // Initialize with force-directed layout
-            const layout = cy.layout({
-              name: 'cose',
-              randomize: false,
-              animate: true,
-              animationDuration: 1000,
-              nodeDimensionsIncludeLabels: true,
-              refresh: 20,
-              fit: true,
-              padding: 30,
-              componentSpacing: 100,
-              nodeRepulsion: function(node) { return 400000 * (node.data('size') || 25); },
-              nodeOverlap: 20,
-              idealEdgeLength: function(edge) { return 100 * (edge.data('weight') || 1); },
-              edgeElasticity: function(edge) { return 100 * (edge.data('weight') || 1); },
-              nestingFactor: 1.2,
-              gravity: 80,
-              numIter: 1000
+          // Initialize with force-directed layout
+          const layout = cy.layout({
+            name: 'cose',
+            randomize: false,
+            animate: true,
+            animationDuration: 1000,
+            nodeDimensionsIncludeLabels: true,
+            refresh: 20,
+            fit: true,
+            padding: 30,
+            componentSpacing: 100,
+            nodeRepulsion: function(node) { return 400000 * (node.data('size') || 25); },
+            nodeOverlap: 20,
+            idealEdgeLength: function(edge) { return 100 * (edge.data('weight') || 1); },
+            edgeElasticity: function(edge) { return 100 * (edge.data('weight') || 1); },
+            nestingFactor: 1.2,
+            gravity: 80,
+            numIter: 1000
+          });
+          
+          layout.run();
+          
+          // Add node hover effects
+          cy.on('mouseover', 'node', function(e) {
+            e.target.animate({
+              style: { 
+                'border-width': '3px',
+                'border-opacity': 1,
+                'background-opacity': 0.3
+              },
+              duration: 150
             });
-            
-            layout.run();
-            
-            // Mark as initialized after layout completes
-            layout.on('layoutstop', () => {
-              setIsInitialized(true);
-            });
-            
-            // Add node hover effects
-            cy.on('mouseover', 'node', function(e) {
+          });
+          
+          cy.on('mouseout', 'node', function(e) {
+            if (!e.target.selected()) {
               e.target.animate({
                 style: { 
-                  'border-width': '3px',
-                  'border-opacity': 1,
-                  'background-opacity': 0.3
+                  'border-width': '2px',
+                  'border-opacity': 0.8,
+                  'background-opacity': 0.2
                 },
                 duration: 150
               });
-            });
-            
-            cy.on('mouseout', 'node', function(e) {
-              if (!e.target.selected()) {
-                e.target.animate({
-                  style: { 
-                    'border-width': '2px',
-                    'border-opacity': 0.8,
-                    'background-opacity': 0.2
-                  },
-                  duration: 150
-                });
-              }
-            });
-            
-            // Make interaction smoother
-            cy.userZoomingEnabled(true);
-            cy.userPanningEnabled(true);
-            cy.autoungrabify(false); // Allow nodes to be grabbed
-            cy.autounselectify(false); // Allow nodes to be selected
-            
-            // Set zoom constraints
-            cy.minZoom(0.4);
-            cy.maxZoom(2.0);
-          } catch (error) {
-            console.error('Error initializing Cytoscape:', error);
-          }
+            }
+          });
+          
+          // Make interaction smoother
+          cy.userZoomingEnabled(true);
+          cy.userPanningEnabled(true);
+          cy.autoungrabify(false); // Allow nodes to be grabbed
+          cy.autounselectify(false); // Allow nodes to be selected
+          
+          // Set zoom constraints
+          cy.minZoom(0.4);
+          cy.maxZoom(2.0);
         }}
         userZoomingEnabled={true}
         userPanningEnabled={true}
