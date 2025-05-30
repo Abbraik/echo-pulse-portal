@@ -58,7 +58,7 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.97 }}
-          transition={{ duration: 0.4, ease: 'easeInOut' }}
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
         >
           <div className="w-full h-full glass-panel-cinematic rounded-2xl flex flex-col relative overflow-hidden">
             {/* Enhanced Header */}
@@ -75,23 +75,14 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
               onTabChange={setActiveTab}
             />
 
-            {/* Main Content Area with Grid Layout */}
+            {/* Main Content Area - Fixed Height */}
             <div className="flex-1 relative overflow-hidden">
-              <div className="working-canvas-grid h-full">
-                <motion.div
-                  key={activeTab}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="h-full"
-                >
-                  <WorkingCanvasContent
-                    activeTab={activeTab}
-                    selectedItem={selectedItem}
-                    onLeverageSidebarToggle={() => setLeverageSidebarOpen(!leverageSidebarOpen)}
-                  />
-                </motion.div>
+              <div className="absolute inset-0">
+                <WorkingCanvasContent
+                  activeTab={activeTab}
+                  selectedItem={selectedItem}
+                  onLeverageSidebarToggle={() => setLeverageSidebarOpen(!leverageSidebarOpen)}
+                />
               </div>
 
               {/* Enhanced Leverage Point Sidebar */}

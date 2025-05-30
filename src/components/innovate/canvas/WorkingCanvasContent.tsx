@@ -3,14 +3,10 @@ import React from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { motion } from 'framer-motion';
 import { SketchTab } from './tabs/SketchTab';
-import { SimulateTab } from './tabs/SimulateTab';
-import { ResultsTab } from './tabs/ResultsTab';
-import { BlueprintTab } from './tabs/BlueprintTab';
+import { SimulationTab } from './tabs/SimulationTab';
 import { CompareTab } from './tabs/CompareTab';
+import { BlueprintTab } from './tabs/BlueprintTab';
 import { CoCreateTab } from './tabs/CoCreateTab';
-import { EnsembleTab } from './tabs/EnsembleTab';
-import { BreakpointsTab } from './tabs/BreakpointsTab';
-import { PathwaysTab } from './tabs/PathwaysTab';
 
 interface ConceptBlock {
   id: string;
@@ -46,22 +42,14 @@ export const WorkingCanvasContent: React.FC<WorkingCanvasContentProps> = ({
       switch (activeTab) {
         case 'sketch':
           return <SketchTab onLeverageSidebarToggle={onLeverageSidebarToggle} />;
-        case 'simulate':
-          return <SimulateTab />;
-        case 'results':
-          return <ResultsTab />;
-        case 'blueprint':
-          return <BlueprintTab />;
+        case 'simulation':
+          return <SimulationTab />;
         case 'compare':
           return <CompareTab />;
         case 'co-create':
           return <CoCreateTab />;
-        case 'ensemble':
-          return <EnsembleTab />;
-        case 'breakpoints':
-          return <BreakpointsTab />;
-        case 'pathways':
-          return <PathwaysTab />;
+        case 'blueprint':
+          return <BlueprintTab />;
         default:
           return (
             <div className="h-full flex items-center justify-center">
@@ -77,9 +65,10 @@ export const WorkingCanvasContent: React.FC<WorkingCanvasContentProps> = ({
     return (
       <motion.div
         key={activeTab}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.15, ease: 'easeOut' }}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
         className="h-full w-full"
       >
         {content}
@@ -88,7 +77,7 @@ export const WorkingCanvasContent: React.FC<WorkingCanvasContentProps> = ({
   };
 
   return (
-    <div className="h-full w-full overflow-hidden flex items-center justify-center">
+    <div className="h-full w-full overflow-hidden">
       <div className="working-canvas-content-container w-full h-full max-w-[960px] mx-auto">
         {renderTabContent()}
       </div>
