@@ -1,7 +1,8 @@
-
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useIsMobile } from '@/hooks/use-mobile';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Maximize2, X, Grip } from 'lucide-react';
+import { GlassCard } from '@/components/ui/glass-card';
+import { Button } from '@/components/ui/button';
 import DEIStabilityWidget from './widgets/DEIStabilityWidget';
 import BundleSuccessWidget from './widgets/BundleSuccessWidget';
 import ScenarioKPIsWidget from './widgets/ScenarioKPIsWidget';
@@ -16,367 +17,347 @@ import KPISummaryWidget from './widgets/KPISummaryWidget';
 
 interface WidgetConfig {
   id: string;
+  name: string;
   component: React.ComponentType<any>;
   defaultSize: { width: number; height: number };
-  defaultPosition: { x: number; y: number }; // percentage
+  defaultPosition: { x: string; y: string };
   weight: number;
   props?: any;
 }
 
 const FocusContextDashboard: React.FC = () => {
-  const isMobile = useIsMobile();
-  const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredWidget, setHoveredWidget] = useState<string | null>(null);
   const [fullscreenWidget, setFullscreenWidget] = useState<string | null>(null);
-  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
+  const canvasRef = useRef<HTMLDivElement>(null);
 
-  // Define all widgets with their configurations
   const widgets: WidgetConfig[] = [
-    // Weight 5 (Highest Priority)
     {
       id: 'dei-stability',
+      name: 'DEI Stability',
       component: DEIStabilityWidget,
       defaultSize: { width: 300, height: 300 },
-      defaultPosition: { x: 40, y: 30 },
+      defaultPosition: { x: '40%', y: '30%' },
       weight: 5
     },
     {
-      id: 'system-alerts',
-      component: SystemAlertsWidget,
-      defaultSize: { width: 300, height: 200 },
-      defaultPosition: { x: 75, y: 35 },
-      weight: 5
+      id: 'bundle-infra',
+      name: 'Infrastructure Development',
+      component: BundleSuccessWidget,
+      defaultSize: { width: 180, height: 120 },
+      defaultPosition: { x: '60%', y: '15%' },
+      weight: 3,
+      props: { bundleName: 'Infra Dev', success: 72, roi: 15, timeToComplete: '8 mo' }
     },
-    // Weight 4
+    {
+      id: 'bundle-climate',
+      name: 'Climate Resilience',
+      component: BundleSuccessWidget,
+      defaultSize: { width: 180, height: 120 },
+      defaultPosition: { x: '20%', y: '15%' },
+      weight: 3,
+      props: { bundleName: 'Climate Resist.', success: 85, roi: 20, timeToComplete: '5 mo' }
+    },
+    {
+      id: 'bundle-education',
+      name: 'Education Reform',
+      component: BundleSuccessWidget,
+      defaultSize: { width: 180, height: 120 },
+      defaultPosition: { x: '60%', y: '45%' },
+      weight: 3,
+      props: { bundleName: 'Edu Reform', success: 60, roi: 8, timeToComplete: '10 mo' }
+    },
+    {
+      id: 'bundle-mobility',
+      name: 'Smart Mobility',
+      component: BundleSuccessWidget,
+      defaultSize: { width: 180, height: 120 },
+      defaultPosition: { x: '20%', y: '45%' },
+      weight: 3,
+      props: { bundleName: 'Smart Mob.', success: 90, roi: 25, timeToComplete: '6 mo' }
+    },
     {
       id: 'scenario-kpis',
+      name: 'Scenario & KPIs',
       component: ScenarioKPIsWidget,
       defaultSize: { width: 300, height: 200 },
-      defaultPosition: { x: 75, y: 20 },
+      defaultPosition: { x: '75%', y: '20%' },
       weight: 4
     },
     {
       id: 'system-trends',
+      name: 'System Trends',
       component: SystemTrendsWidget,
       defaultSize: { width: 240, height: 120 },
-      defaultPosition: { x: 55, y: 15 },
+      defaultPosition: { x: '55%', y: '15%' },
       weight: 4
-    },
-    {
-      id: 'zone-entropy',
-      component: ZoneEntropyWidget,
-      defaultSize: { width: 300, height: 120 },
-      defaultPosition: { x: 70, y: 65 },
-      weight: 4
-    },
-    // Weight 3
-    {
-      id: 'bundle-infra',
-      component: BundleSuccessWidget,
-      defaultSize: { width: 180, height: 120 },
-      defaultPosition: { x: 55, y: 25 },
-      weight: 3,
-      props: { bundleName: 'Infra Dev', success: 72, roi: 15, time: '8 mo' }
-    },
-    {
-      id: 'bundle-climate',
-      component: BundleSuccessWidget,
-      defaultSize: { width: 180, height: 120 },
-      defaultPosition: { x: 25, y: 25 },
-      weight: 3,
-      props: { bundleName: 'Climate Resilience', success: 85, roi: 20, time: '5 mo' }
-    },
-    {
-      id: 'bundle-education',
-      component: BundleSuccessWidget,
-      defaultSize: { width: 180, height: 120 },
-      defaultPosition: { x: 55, y: 45 },
-      weight: 3,
-      props: { bundleName: 'Education Reform', success: 60, roi: 8, time: '10 mo' }
-    },
-    {
-      id: 'bundle-mobility',
-      component: BundleSuccessWidget,
-      defaultSize: { width: 180, height: 120 },
-      defaultPosition: { x: 25, y: 45 },
-      weight: 3,
-      props: { bundleName: 'Smart Mobility', success: 90, roi: 25, time: '6 mo' }
     },
     {
       id: 'claims',
+      name: 'Claims',
       component: ClaimsWidget,
       defaultSize: { width: 240, height: 120 },
-      defaultPosition: { x: 20, y: 65 },
+      defaultPosition: { x: '20%', y: '65%' },
       weight: 3
     },
     {
       id: 'handoff-queue',
+      name: 'Handoff Queue',
       component: HandoffQueueWidget,
       defaultSize: { width: 180, height: 100 },
-      defaultPosition: { x: 35, y: 70 },
+      defaultPosition: { x: '35%', y: '70%' },
       weight: 3
+    },
+    {
+      id: 'zone-entropy',
+      name: 'Zone Entropy',
+      component: ZoneEntropyWidget,
+      defaultSize: { width: 300, height: 120 },
+      defaultPosition: { x: '70%', y: '65%' },
+      weight: 4
+    },
+    {
+      id: 'system-alerts',
+      name: 'System Alerts',
+      component: SystemAlertsWidget,
+      defaultSize: { width: 300, height: 200 },
+      defaultPosition: { x: '75%', y: '35%' },
+      weight: 5
     },
     {
       id: 'risk-matrix',
+      name: 'Risk Matrix',
       component: RiskMatrixWidget,
       defaultSize: { width: 180, height: 120 },
-      defaultPosition: { x: 40, y: 90 },
+      defaultPosition: { x: '40%', y: '90%' },
       weight: 3
     },
-    // Weight 2 Indicators
-    ...['Population Dev', 'Resource Stock', 'Renewal vs Consumption', 'Extraction Pressure', 
-        'Price Deviation', 'Capacity Utilization', 'Employment Rate', 'Education Completion',
-        'Health Status', 'Living Consumption', 'Household Revenue', 'Environmental Quality'].map((name, index) => ({
-      id: `indicator-${index}`,
+    // Weight 2 indicators
+    {
+      id: 'population-deviation',
+      name: 'Population Deviation',
       component: IndicatorWidget,
       defaultSize: { width: 120, height: 120 },
-      defaultPosition: { 
-        x: 5 + (index % 4) * 25, 
-        y: 80 + Math.floor(index / 4) * 15 
-      },
+      defaultPosition: { x: '5%', y: '5%' },
       weight: 2,
-      props: { name, value: Math.random() > 0.5 ? '0.85' : '+3%', status: 'green' }
-    })),
-    // Weight 1
+      props: { title: 'Population Deviation', value: '0.02', status: 'good', unit: '' }
+    },
+    {
+      id: 'resource-stock',
+      name: 'Resource Stock vs Target',
+      component: IndicatorWidget,
+      defaultSize: { width: 120, height: 120 },
+      defaultPosition: { x: '15%', y: '5%' },
+      weight: 2,
+      props: { title: 'Resource Stock', value: '0.92×', status: 'good', unit: '' }
+    },
+    {
+      id: 'renewal-consumption',
+      name: 'Renewal vs Consumption',
+      component: IndicatorWidget,
+      defaultSize: { width: 120, height: 120 },
+      defaultPosition: { x: '85%', y: '5%' },
+      weight: 2,
+      props: { title: 'Renewal/Consumption', value: '1.05× / 1.00×', status: 'good', unit: '' }
+    },
+    {
+      id: 'extraction-pressure',
+      name: 'Extraction Pressure',
+      component: IndicatorWidget,
+      defaultSize: { width: 120, height: 120 },
+      defaultPosition: { x: '5%', y: '85%' },
+      weight: 2,
+      props: { title: 'Extraction Pressure', value: '0.35', status: 'warning', unit: '' }
+    },
+    {
+      id: 'employment-rate',
+      name: 'Employment Rate',
+      component: IndicatorWidget,
+      defaultSize: { width: 120, height: 120 },
+      defaultPosition: { x: '85%', y: '85%' },
+      weight: 2,
+      props: { title: 'Employment Rate', value: '72%', status: 'good', unit: '' }
+    },
     {
       id: 'kpi-summary',
+      name: 'High-Level KPI Summary',
       component: KPISummaryWidget,
       defaultSize: { width: 120, height: 120 },
-      defaultPosition: { x: 5, y: 5 },
+      defaultPosition: { x: '5%', y: '35%' },
       weight: 1
     }
   ];
 
-  // Update container dimensions
-  useEffect(() => {
-    const updateDimensions = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setContainerDimensions({ width, height });
-      }
+  const getNeighbors = (widgetId: string) => {
+    const widget = widgets.find(w => w.id === widgetId);
+    if (!widget) return [];
+
+    // Calculate expanded bounding box (20px padding)
+    const expandedBox = {
+      left: parseFloat(widget.defaultPosition.x) - 2,
+      right: parseFloat(widget.defaultPosition.x) + (widget.defaultSize.width / 10) + 2,
+      top: parseFloat(widget.defaultPosition.y) - 2,
+      bottom: parseFloat(widget.defaultPosition.y) + (widget.defaultSize.height / 10) + 2
     };
 
-    updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
-  }, []);
+    return widgets.filter(w => {
+      if (w.id === widgetId) return false;
+      
+      const otherBox = {
+        left: parseFloat(w.defaultPosition.x),
+        right: parseFloat(w.defaultPosition.x) + (w.defaultSize.width / 10),
+        top: parseFloat(w.defaultPosition.y),
+        bottom: parseFloat(w.defaultPosition.y) + (w.defaultSize.height / 10)
+      };
 
-  // Calculate actual pixel positions
-  const getActualPosition = useCallback((widget: WidgetConfig) => {
-    const scaleX = containerDimensions.width / 100;
-    const scaleY = containerDimensions.height / 100;
-    
-    return {
-      x: widget.defaultPosition.x * scaleX,
-      y: widget.defaultPosition.y * scaleY
-    };
-  }, [containerDimensions]);
+      // Check if boxes intersect
+      return !(expandedBox.right < otherBox.left || 
+               expandedBox.left > otherBox.right || 
+               expandedBox.bottom < otherBox.top || 
+               expandedBox.top > otherBox.bottom);
+    }).map(w => w.id);
+  };
 
-  // Check if widgets are neighbors (overlapping bounding boxes with 20px expansion)
-  const areNeighbors = useCallback((widget1: WidgetConfig, widget2: WidgetConfig) => {
-    const pos1 = getActualPosition(widget1);
-    const pos2 = getActualPosition(widget2);
-    
-    const expandedBounds1 = {
-      left: pos1.x - 20,
-      right: pos1.x + widget1.defaultSize.width + 20,
-      top: pos1.y - 20,
-      bottom: pos1.y + widget1.defaultSize.height + 20
-    };
-    
-    const bounds2 = {
-      left: pos2.x,
-      right: pos2.x + widget2.defaultSize.width,
-      top: pos2.y,
-      bottom: pos2.y + widget2.defaultSize.height
-    };
-    
-    return !(expandedBounds1.right < bounds2.left || 
-             expandedBounds1.left > bounds2.right || 
-             expandedBounds1.bottom < bounds2.top || 
-             expandedBounds1.top > bounds2.bottom);
-  }, [getActualPosition]);
-
-  // Handle widget hover
-  const handleWidgetHover = useCallback((widgetId: string | null) => {
-    if (isMobile) return;
+  const handleWidgetHover = (widgetId: string | null) => {
     setHoveredWidget(widgetId);
-  }, [isMobile]);
+  };
 
-  // Handle fullscreen toggle
-  const handleFullscreen = useCallback((widgetId: string | null) => {
+  const handleFullscreen = (widgetId: string) => {
     setFullscreenWidget(widgetId);
-  }, []);
+  };
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setFullscreenWidget(null);
-        setHoveredWidget(null);
-      }
+  const handleCloseFullscreen = () => {
+    setFullscreenWidget(null);
+  };
+
+  const renderWidget = (widget: WidgetConfig) => {
+    const isHovered = hoveredWidget === widget.id;
+    const isNeighbor = hoveredWidget ? getNeighbors(hoveredWidget).includes(widget.id) : false;
+    const isFullscreen = fullscreenWidget === widget.id;
+    const isDimmed = fullscreenWidget && fullscreenWidget !== widget.id;
+
+    const getScale = () => {
+      if (isFullscreen) return 1;
+      if (isHovered) return 1.15;
+      if (isNeighbor) return 0.9;
+      return 1;
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+    const getOpacity = () => {
+      if (isFullscreen) return 1;
+      if (isDimmed) return 0.5;
+      if (hoveredWidget && !isHovered) return 0.8;
+      return 1;
+    };
 
-  // Get widget transform styles
-  const getWidgetTransform = useCallback((widget: WidgetConfig) => {
-    if (fullscreenWidget) {
-      if (widget.id === fullscreenWidget) {
-        return {
-          transform: 'translate(0, 0) scale(1)',
-          zIndex: 1000,
-          opacity: 1
-        };
-      } else {
-        return {
-          transform: 'scale(0.95)',
-          zIndex: 1,
-          opacity: 0.5
-        };
+    const getTranslate = () => {
+      if (isFullscreen) return { x: 0, y: 0 };
+      if (isNeighbor && hoveredWidget) {
+        // Simple outward push effect
+        const dx = Math.random() * 20 - 10;
+        const dy = Math.random() * 20 - 10;
+        return { x: dx, y: dy };
       }
-    }
+      return { x: 0, y: 0 };
+    };
 
-    if (isMobile || !hoveredWidget) {
-      return {
-        transform: 'scale(1)',
-        zIndex: widget.weight * 10,
-        opacity: 1
-      };
-    }
+    const translate = getTranslate();
+    const Component = widget.component;
 
-    const isHovered = widget.id === hoveredWidget;
-    const hoveredWidgetConfig = widgets.find(w => w.id === hoveredWidget);
-    const isNeighbor = hoveredWidgetConfig && areNeighbors(widget, hoveredWidgetConfig);
-
-    if (isHovered) {
-      return {
-        transform: 'scale(1.15)',
-        zIndex: 1000,
-        opacity: 1
-      };
-    } else if (isNeighbor) {
-      const hoveredPos = hoveredWidgetConfig ? getActualPosition(hoveredWidgetConfig) : { x: 0, y: 0 };
-      const currentPos = getActualPosition(widget);
-      
-      // Calculate push direction
-      const dx = currentPos.x - hoveredPos.x;
-      const dy = currentPos.y - hoveredPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const pushDistance = 15;
-      
-      const pushX = distance > 0 ? (dx / distance) * pushDistance : 0;
-      const pushY = distance > 0 ? (dy / distance) * pushDistance : 0;
-      
-      return {
-        transform: `translate(${pushX}px, ${pushY}px) scale(0.9)`,
-        zIndex: widget.weight * 10,
-        opacity: 0.8
-      };
-    } else {
-      return {
-        transform: 'scale(1)',
-        zIndex: widget.weight * 10,
-        opacity: 0.8
-      };
-    }
-  }, [hoveredWidget, fullscreenWidget, isMobile, widgets, areNeighbors, getActualPosition]);
-
-  if (isMobile) {
-    // Mobile accordion layout
     return (
-      <div className="w-full h-full overflow-y-auto p-4 space-y-4">
-        {widgets.map((widget) => {
-          const WidgetComponent = widget.component;
-          return (
-            <motion.div
-              key={widget.id}
-              className="w-full glass-panel-cinematic p-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+      <motion.div
+        key={widget.id}
+        className={`absolute ${isFullscreen ? 'inset-0 z-50' : ''}`}
+        style={
+          isFullscreen
+            ? {}
+            : {
+                left: widget.defaultPosition.x,
+                top: widget.defaultPosition.y,
+                width: widget.defaultSize.width,
+                height: widget.defaultSize.height,
+              }
+        }
+        animate={{
+          scale: getScale(),
+          opacity: getOpacity(),
+          x: translate.x,
+          y: translate.y,
+          zIndex: isHovered ? 10 : isFullscreen ? 50 : 1,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+          duration: isFullscreen ? 0.4 : 0.2,
+        }}
+        onMouseEnter={() => !fullscreenWidget && handleWidgetHover(widget.id)}
+        onMouseLeave={() => !fullscreenWidget && handleWidgetHover(null)}
+        role="region"
+        tabIndex={0}
+        aria-label={`${widget.name}: Interactive widget`}
+      >
+        <GlassCard 
+          className={`h-full w-full relative overflow-hidden transition-all duration-200 ${
+            isHovered && !fullscreenWidget ? 'shadow-lg shadow-teal-500/20 border-teal-500/40' : ''
+          }`}
+        >
+          {/* Widget Header */}
+          <div className="absolute top-2 right-2 z-10 flex items-center space-x-1">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 w-6 p-0 text-gray-400 hover:text-teal-400"
+              onClick={() => handleFullscreen(widget.id)}
+              aria-label={`Full-screen ${widget.name}`}
             >
-              <WidgetComponent 
-                onFullscreen={() => handleFullscreen(widget.id)}
-                isFullscreen={fullscreenWidget === widget.id}
-                onClose={() => handleFullscreen(null)}
-                {...(widget.props || {})}
-              />
-            </motion.div>
-          );
-        })}
-      </div>
+              <Maximize2 className="h-3 w-3" />
+            </Button>
+            {isFullscreen && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 w-6 p-0 text-gray-400 hover:text-red-400"
+                onClick={handleCloseFullscreen}
+                aria-label="Close full-screen"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+
+          {/* Widget Content */}
+          <Component 
+            {...(widget.props || {})} 
+            isFullscreen={isFullscreen}
+            isHovered={isHovered}
+          />
+        </GlassCard>
+      </motion.div>
     );
-  }
+  };
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative w-full h-full overflow-hidden"
-      style={{
-        background: 'rgba(10, 20, 40, 0.6)',
-        backdropFilter: 'blur(24px)',
-        borderRadius: '1rem',
-        boxShadow: '0 16px 32px rgba(0, 0, 0, 0.4)',
-        padding: '24px'
-      }}
-      role="application"
-      aria-label="Monitor Zone Focus Context Dashboard"
-    >
-      <AnimatePresence>
-        {widgets.map((widget) => {
-          const WidgetComponent = widget.component;
-          const position = getActualPosition(widget);
-          const transform = getWidgetTransform(widget);
-          const isFullscreen = fullscreenWidget === widget.id;
+    <div className="h-full w-full relative">
+      {/* Canvas Container */}
+      <div
+        ref={canvasRef}
+        className="h-full w-full relative overflow-auto bg-gradient-to-br from-slate-900/60 via-slate-800/40 to-slate-900/60 backdrop-blur-2xl rounded-2xl shadow-2xl p-6"
+        role="application"
+        aria-label="Monitor Zone Focus Context Dashboard"
+      >
+        {widgets.map(renderWidget)}
+      </div>
 
-          return (
-            <motion.div
-              key={widget.id}
-              className="absolute cursor-pointer"
-              style={{
-                left: isFullscreen ? 0 : position.x,
-                top: isFullscreen ? 0 : position.y,
-                width: isFullscreen ? '100%' : widget.defaultSize.width,
-                height: isFullscreen ? '100%' : widget.defaultSize.height,
-                ...transform,
-                transition: fullscreenWidget 
-                  ? 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)' 
-                  : 'all 400ms cubic-bezier(0.68, -0.55, 0.27, 1.55)'
-              }}
-              onMouseEnter={() => handleWidgetHover(widget.id)}
-              onMouseLeave={() => handleWidgetHover(null)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  if (hoveredWidget === widget.id) {
-                    handleFullscreen(widget.id);
-                  } else {
-                    handleWidgetHover(widget.id);
-                  }
-                }
-              }}
-              tabIndex={0}
-              role="region"
-              aria-label={`${widget.id} widget`}
-              whileHover={!isMobile ? { 
-                boxShadow: '0 0 30px rgba(20, 184, 166, 0.3)' 
-              } : undefined}
-            >
-              <div className="w-full h-full glass-panel-cinematic p-4">
-                <WidgetComponent 
-                  onFullscreen={() => handleFullscreen(widget.id)}
-                  isFullscreen={isFullscreen}
-                  onClose={() => handleFullscreen(null)}
-                  {...(widget.props || {})}
-                />
-              </div>
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
+      {/* Fullscreen Overlay Background */}
+      {fullscreenWidget && (
+        <motion.div
+          className="fixed inset-0 bg-black/60 z-40"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+        />
+      )}
     </div>
   );
 };

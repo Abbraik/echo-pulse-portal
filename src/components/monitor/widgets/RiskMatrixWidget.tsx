@@ -1,149 +1,98 @@
 
 import React from 'react';
-import { Maximize2, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Shield } from 'lucide-react';
 
 interface RiskMatrixWidgetProps {
-  onFullscreen: () => void;
-  isFullscreen: boolean;
-  onClose: () => void;
+  isFullscreen?: boolean;
+  isHovered?: boolean;
 }
 
-const RiskMatrixWidget: React.FC<RiskMatrixWidgetProps> = ({
-  onFullscreen,
-  isFullscreen,
-  onClose
+const RiskMatrixWidget: React.FC<RiskMatrixWidgetProps> = ({ 
+  isFullscreen, 
+  isHovered 
 }) => {
   const risks = [
-    { name: 'Loop Drift', likelihood: 0.3, impact: 0.6, quadrant: 'TR' },
-    { name: 'Extraction Over-Quota', likelihood: 0.5, impact: 0.4, quadrant: 'BL' },
-    { name: 'Population Surge', likelihood: 0.7, impact: 0.8, quadrant: 'BR' }
+    { name: 'Loop Drift', likelihood: 0.3, impact: 0.6, quadrant: 'tr' },
+    { name: 'Extraction Over-Quota', likelihood: 0.5, impact: 0.4, quadrant: 'bl' },
+    { name: 'Population Surge', likelihood: 0.7, impact: 0.8, quadrant: 'br' }
   ];
 
-  const quadrantColors = {
-    TL: 'bg-green-500/20',
-    TR: 'bg-yellow-500/20',
-    BL: 'bg-orange-500/20',
-    BR: 'bg-red-500/20'
+  const getQuadrantColor = (quadrant: string) => {
+    switch (quadrant) {
+      case 'tl': return 'bg-green-500/40';
+      case 'tr': return 'bg-amber-500/40';
+      case 'bl': return 'bg-orange-500/40';
+      case 'br': return 'bg-red-500/40';
+      default: return 'bg-gray-500/40';
+    }
   };
 
-  if (isFullscreen) {
-    return (
-      <div className="w-full h-full flex flex-col">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-teal-400">Risk Matrix Analysis</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-gray-400 hover:text-white"
-          >
-            <X size={20} />
-          </Button>
-        </div>
-        
-        <div className="flex-1 flex justify-center items-center">
-          <div className="relative w-96 h-96">
-            {/* Matrix Grid */}
-            <div className="grid grid-cols-2 grid-rows-2 w-full h-full gap-1">
-              <div className={`${quadrantColors.TL} border border-green-500/30 rounded-lg flex items-center justify-center`}>
-                <span className="text-sm text-gray-300">Low Risk</span>
-              </div>
-              <div className={`${quadrantColors.TR} border border-yellow-500/30 rounded-lg flex items-center justify-center relative`}>
-                <span className="text-sm text-gray-300">Medium Risk</span>
-                <div 
-                  className="absolute w-3 h-3 bg-yellow-400 rounded-full cursor-move"
-                  style={{ left: '30%', top: '60%' }}
-                  draggable
-                  title="Loop Drift"
-                />
-              </div>
-              <div className={`${quadrantColors.BL} border border-orange-500/30 rounded-lg flex items-center justify-center relative`}>
-                <span className="text-sm text-gray-300">Medium Risk</span>
-                <div 
-                  className="absolute w-3 h-3 bg-orange-400 rounded-full cursor-move"
-                  style={{ left: '50%', top: '40%' }}
-                  draggable
-                  title="Extraction Over-Quota"
-                />
-              </div>
-              <div className={`${quadrantColors.BR} border border-red-500/30 rounded-lg flex items-center justify-center relative`}>
-                <span className="text-sm text-gray-300">High Risk</span>
-                <div 
-                  className="absolute w-3 h-3 bg-red-400 rounded-full cursor-move"
-                  style={{ left: '70%', top: '80%' }}
-                  draggable
-                  title="Population Surge"
-                />
-              </div>
-            </div>
-            
-            {/* Axis Labels */}
-            <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-sm text-gray-400">
-              Impact →
-            </div>
-            <div className="absolute -left-16 top-1/2 transform -translate-y-1/2 -rotate-90 text-sm text-gray-400">
-              Likelihood →
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-6 space-y-3">
-          <h3 className="text-lg font-semibold text-white">Risk Items</h3>
-          {risks.map((risk, index) => (
-            <div key={index} className="bg-black/20 rounded-lg p-3 flex justify-between items-center">
-              <span className="text-white">{risk.name}</span>
-              <div className="flex space-x-4 text-sm">
-                <span className="text-gray-400">L: {risk.likelihood}</span>
-                <span className="text-gray-400">I: {risk.impact}</span>
-              </div>
-            </div>
-          ))}
-          
-          <div className="flex justify-center mt-6">
-            <Button className="bg-amber-600 hover:bg-amber-700">
-              Reassess Risk ▶
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white">Risk Matrix</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onFullscreen}
-          className="text-gray-400 hover:text-white"
-        >
-          <Maximize2 size={14} />
-        </Button>
+    <div className="h-full w-full p-3">
+      <div className="flex items-center mb-3">
+        <Shield className="h-4 w-4 text-orange-400 mr-2" />
+        <h4 className="text-sm font-medium text-white">Risk Matrix</h4>
       </div>
-      
-      <div className="flex-1 flex justify-center items-center">
-        <div className="relative w-24 h-24">
-          <div className="grid grid-cols-2 grid-rows-2 w-full h-full gap-0.5">
-            <div className={`${quadrantColors.TL} border border-green-500/30 rounded-sm`}></div>
-            <div className={`${quadrantColors.TR} border border-yellow-500/30 rounded-sm relative`}>
-              <div className="absolute w-1.5 h-1.5 bg-yellow-400 rounded-full top-1/2 left-1/3" />
+
+      <div className="relative">
+        {/* 2x2 Risk Matrix Grid */}
+        <div className="grid grid-cols-2 gap-1 h-16 w-16 mx-auto mb-2">
+          <div className={`${getQuadrantColor('tl')} border border-white/20 relative`}>
+            {/* Top-left quadrant (low likelihood, high impact) */}
+          </div>
+          <div className={`${getQuadrantColor('tr')} border border-white/20 relative`}>
+            {/* Top-right quadrant (high likelihood, high impact) */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-1 h-1 bg-white rounded-full" title="Loop Drift" />
             </div>
-            <div className={`${quadrantColors.BL} border border-orange-500/30 rounded-sm relative`}>
-              <div className="absolute w-1.5 h-1.5 bg-orange-400 rounded-full top-1/3 left-1/2" />
+          </div>
+          <div className={`${getQuadrantColor('bl')} border border-white/20 relative`}>
+            {/* Bottom-left quadrant (low likelihood, low impact) */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-1 h-1 bg-white rounded-full" title="Extraction Over-Quota" />
             </div>
-            <div className={`${quadrantColors.BR} border border-red-500/30 rounded-sm relative`}>
-              <div className="absolute w-1.5 h-1.5 bg-red-400 rounded-full bottom-1/4 right-1/4" />
+          </div>
+          <div className={`${getQuadrantColor('br')} border border-white/20 relative`}>
+            {/* Bottom-right quadrant (high likelihood, low impact) */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-1 h-1 bg-white rounded-full" title="Population Surge" />
             </div>
           </div>
         </div>
+
+        <div className="text-center">
+          <div className="text-xs text-gray-400">{risks.length} Risk Factors</div>
+        </div>
       </div>
-      
-      <div className="text-xs text-gray-400 text-center">
-        3 risks plotted
-      </div>
+
+      {isFullscreen && (
+        <div className="mt-8 w-full">
+          <h4 className="text-xl font-semibold text-white mb-4">Risk Assessment Matrix</h4>
+          <div className="bg-white/5 rounded-lg p-4">
+            <div className="grid grid-cols-2 gap-2 h-80 w-80 mx-auto mb-4">
+              {/* Large interactive 2x2 matrix would be here */}
+              <div className="bg-green-500/20 border border-white/20 p-4">
+                <div className="text-xs text-white">Low Risk</div>
+              </div>
+              <div className="bg-amber-500/20 border border-white/20 p-4 relative">
+                <div className="text-xs text-white">Medium Risk</div>
+                <div className="absolute bottom-2 left-2 w-2 h-2 bg-white rounded-full" />
+              </div>
+              <div className="bg-orange-500/20 border border-white/20 p-4 relative">
+                <div className="text-xs text-white">Medium Risk</div>
+                <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full" />
+              </div>
+              <div className="bg-red-500/20 border border-white/20 p-4 relative">
+                <div className="text-xs text-white">High Risk</div>
+                <div className="absolute center w-2 h-2 bg-white rounded-full" />
+              </div>
+            </div>
+            <button className="px-4 py-2 bg-orange-500/20 text-orange-400 rounded border border-orange-500/30">
+              Reassess Risk ▶
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

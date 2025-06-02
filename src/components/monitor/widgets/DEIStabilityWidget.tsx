@@ -1,194 +1,92 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Maximize2, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import SparklineChart from '@/components/think/components/SparklineChart';
+import { Activity, TrendingUp } from 'lucide-react';
 
 interface DEIStabilityWidgetProps {
-  onFullscreen: () => void;
-  isFullscreen: boolean;
-  onClose: () => void;
+  isFullscreen?: boolean;
+  isHovered?: boolean;
 }
 
-const DEIStabilityWidget: React.FC<DEIStabilityWidgetProps> = ({
-  onFullscreen,
-  isFullscreen,
-  onClose
+const DEIStabilityWidget: React.FC<DEIStabilityWidgetProps> = ({ 
+  isFullscreen, 
+  isHovered 
 }) => {
   const deiValue = 78;
-  const inBandValue = 82;
+  const inBandPercentage = 82;
   const sparklineData = [78, 79, 81, 83, 82, 82];
 
-  const radius = isFullscreen ? 180 : 120;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (deiValue / 100) * circumference;
-
-  if (isFullscreen) {
-    return (
-      <div className="w-full h-full flex flex-col">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-teal-400">DEI Stability Analysis</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-gray-400 hover:text-white"
-            aria-label="Close full-screen"
-          >
-            <X size={20} />
-          </Button>
-        </div>
-        
-        <div className="flex-1 grid grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="text-center">
-              <div className="relative inline-block">
-                <svg width={radius * 2 + 40} height={radius * 2 + 40}>
-                  <circle
-                    cx={radius + 20}
-                    cy={radius + 20}
-                    r={radius}
-                    fill="none"
-                    stroke="rgba(255, 255, 255, 0.1)"
-                    strokeWidth="8"
-                  />
-                  <circle
-                    cx={radius + 20}
-                    cy={radius + 20}
-                    r={radius}
-                    fill="none"
-                    stroke="#14b8a6"
-                    strokeWidth="8"
-                    strokeDasharray={strokeDasharray}
-                    strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round"
-                    transform={`rotate(-90 ${radius + 20} ${radius + 20})`}
-                    style={{ filter: 'drop-shadow(0 0 10px rgba(20, 184, 166, 0.5))' }}
-                  />
-                  <text
-                    x={radius + 20}
-                    y={radius + 10}
-                    textAnchor="middle"
-                    className="text-4xl font-bold fill-current text-teal-400"
-                  >
-                    {deiValue}%
-                  </text>
-                  <text
-                    x={radius + 20}
-                    y={radius + 35}
-                    textAnchor="middle"
-                    className="text-lg fill-current text-gray-300"
-                  >
-                    DEI Score
-                  </text>
-                </svg>
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <p className="text-lg text-gray-300">{inBandValue}% in-band</p>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">12-Month Trend</h3>
-            <div className="bg-black/20 rounded-lg p-4">
-              <SparklineChart 
-                data={[...sparklineData, ...Array(6).fill(0).map(() => Math.random() * 10 + 75)]} 
-                height={200} 
-                width={400}
-                color="#14b8a6"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" defaultChecked className="text-teal-400" />
-                <span className="text-sm text-gray-300">Show Trust Index</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" defaultChecked className="text-teal-400" />
-                <span className="text-sm text-gray-300">Show Migration Flow</span>
-              </label>
-            </div>
-            
-            <Button className="w-full bg-teal-600 hover:bg-teal-700">
-              Apply Changes ▶
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-white">DEI Stability</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onFullscreen}
-          className="text-gray-400 hover:text-white"
-          aria-label="Full-screen DEI Stability"
-        >
-          <Maximize2 size={16} />
-        </Button>
-      </div>
-      
-      <div className="flex-1 flex flex-col items-center justify-center space-y-4">
-        <div className="relative">
-          <svg width={radius * 2 + 20} height={radius * 2 + 20}>
+    <div className="h-full w-full p-4 flex flex-col items-center justify-center">
+      <div className="text-center mb-4">
+        <h3 className="text-lg font-semibold text-white mb-2">DEI Stability</h3>
+        
+        {/* Radial Gauge */}
+        <div className="relative mb-4">
+          <svg width="120" height="120" className="transform -rotate-90">
+            {/* Background circle */}
             <circle
-              cx={radius + 10}
-              cy={radius + 10}
-              r={radius}
+              cx="60"
+              cy="60"
+              r="50"
               fill="none"
-              stroke="rgba(255, 255, 255, 0.1)"
-              strokeWidth="6"
+              stroke="rgba(255,255,255,0.1)"
+              strokeWidth="8"
             />
+            {/* Progress arc */}
             <circle
-              cx={radius + 10}
-              cy={radius + 10}
-              r={radius}
+              cx="60"
+              cy="60"
+              r="50"
               fill="none"
-              stroke="#14b8a6"
-              strokeWidth="6"
-              strokeDasharray={strokeDasharray}
-              strokeDashoffset={strokeDashoffset}
+              stroke="rgb(20, 184, 166)"
+              strokeWidth="8"
               strokeLinecap="round"
-              transform={`rotate(-90 ${radius + 10} ${radius + 10})`}
-              style={{ filter: 'drop-shadow(0 0 8px rgba(20, 184, 166, 0.5))' }}
+              strokeDasharray={`${(deiValue / 100) * 314} 314`}
+              className="transition-all duration-500"
             />
-            <text
-              x={radius + 10}
-              y={radius + 5}
-              textAnchor="middle"
-              className="text-2xl font-bold fill-current text-teal-400"
-            >
-              {deiValue}%
-            </text>
-            <text
-              x={radius + 10}
-              y={radius + 25}
-              textAnchor="middle"
-              className="text-sm fill-current text-gray-300"
-            >
-              DEI
-            </text>
           </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-2xl font-bold text-white">{deiValue}%</span>
+            <span className="text-xs text-gray-400">DEI</span>
+          </div>
         </div>
-        
-        <div className="text-center">
-          <p className="text-sm text-gray-300">{inBandValue}% in-band</p>
+
+        <div className="text-sm text-teal-400 mb-4">
+          {inBandPercentage}% in-band
         </div>
-        
-        <div className="w-full">
-          <SparklineChart data={sparklineData} height={30} width={200} color="#14b8a6" />
+
+        {/* 6-month sparkline */}
+        <div className="flex items-center justify-center space-x-1">
+          <span className="text-xs text-gray-400 mr-2">6mo:</span>
+          <svg width="80" height="20">
+            <polyline
+              points={sparklineData.map((value, i) => `${i * 13},${20 - (value - 75) * 2}`).join(' ')}
+              fill="none"
+              stroke="rgb(20, 184, 166)"
+              strokeWidth="2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          </svg>
+          <TrendingUp className="h-3 w-3 text-green-400 ml-1" />
         </div>
       </div>
+
+      {isFullscreen && (
+        <div className="mt-8 w-full max-w-4xl">
+          <h4 className="text-xl font-semibold text-white mb-4">12-Month DEI Analysis</h4>
+          <div className="bg-white/5 rounded-lg p-4">
+            <p className="text-gray-300">
+              Interactive 12-month chart with Trust and Migration toggles would appear here.
+            </p>
+            <div className="mt-4 flex space-x-4">
+              <button className="px-4 py-2 bg-teal-500/20 text-teal-400 rounded border border-teal-500/30">
+                Apply Changes ▶
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

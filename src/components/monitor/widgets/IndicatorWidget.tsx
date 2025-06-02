@@ -1,118 +1,66 @@
 
 import React from 'react';
-import { Maximize2, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import SparklineChart from '@/components/think/components/SparklineChart';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface IndicatorWidgetProps {
-  name: string;
+  title: string;
   value: string;
-  status: 'green' | 'amber' | 'red';
-  onFullscreen: () => void;
-  isFullscreen: boolean;
-  onClose: () => void;
+  status: 'good' | 'warning' | 'danger';
+  unit?: string;
+  isFullscreen?: boolean;
+  isHovered?: boolean;
 }
 
-const IndicatorWidget: React.FC<IndicatorWidgetProps> = ({
-  name,
-  value,
-  status,
-  onFullscreen,
-  isFullscreen,
-  onClose
+const IndicatorWidget: React.FC<IndicatorWidgetProps> = ({ 
+  title, 
+  value, 
+  status, 
+  unit = '',
+  isFullscreen, 
+  isHovered 
 }) => {
-  const getStatusColor = (status: string) => {
+  const getStatusColor = () => {
     switch (status) {
-      case 'green': return 'text-green-400';
-      case 'amber': return 'text-yellow-400';
-      case 'red': return 'text-red-400';
+      case 'good': return 'text-green-400';
+      case 'warning': return 'text-amber-400';
+      case 'danger': return 'text-red-400';
       default: return 'text-gray-400';
     }
   };
 
-  const generateMockData = () => {
-    return Array.from({ length: 12 }, () => Math.random() * 100 + 50);
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'good': return <TrendingUp className="h-3 w-3" />;
+      case 'warning': return <Minus className="h-3 w-3" />;
+      case 'danger': return <TrendingDown className="h-3 w-3" />;
+      default: return <Minus className="h-3 w-3" />;
+    }
   };
 
-  if (isFullscreen) {
-    return (
-      <div className="w-full h-full flex flex-col">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-teal-400">{name} Analysis</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-gray-400 hover:text-white"
-          >
-            <X size={20} />
-          </Button>
-        </div>
-        
-        <div className="flex-1 space-y-6">
-          <div className="grid grid-cols-2 gap-6">
-            <div className="bg-black/20 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Current Value</h3>
-              <div className="text-center">
-                <div className={`text-4xl font-bold ${getStatusColor(status)}`}>
-                  {value}
-                </div>
-                <div className="text-sm text-gray-400 mt-2">Status: {status.toUpperCase()}</div>
-              </div>
-            </div>
-            
-            <div className="bg-black/20 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">12-Month Trend</h3>
-              <SparklineChart 
-                data={generateMockData()} 
-                height={150} 
-                width={300}
-                color="#14b8a6"
-              />
-            </div>
-          </div>
-          
-          <div className="bg-black/20 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Historical Data</h3>
-            <div className="grid grid-cols-4 gap-4">
-              {['3M', '6M', '9M', '12M'].map((period, index) => (
-                <div key={period} className="text-center">
-                  <div className="text-lg font-semibold text-white">
-                    {(parseFloat(value.replace(/[^0-9.]/g, '')) + (Math.random() - 0.5) * 10).toFixed(2)}
-                    {value.includes('%') ? '%' : ''}
-                  </div>
-                  <div className="text-sm text-gray-400">{period} ago</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-xs font-semibold text-white truncate">{name}</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onFullscreen}
-          className="text-gray-400 hover:text-white flex-shrink-0"
-        >
-          <Maximize2 size={12} />
-        </Button>
-      </div>
-      
-      <div className="flex-1 flex flex-col justify-center items-center">
-        <div className={`text-lg font-bold ${getStatusColor(status)} mb-2`}>
+    <div className="h-full w-full p-3 flex flex-col justify-center">
+      <div className="text-center">
+        <div className="text-xs text-gray-400 mb-1 leading-tight">
+          {title}
+        </div>
+        <div className={`text-lg font-bold ${getStatusColor()} mb-1`}>
           {value}
         </div>
-        <div className="w-full">
-          <SparklineChart data={generateMockData().slice(0, 6)} height={20} width={80} color="#14b8a6" />
+        <div className={`flex items-center justify-center ${getStatusColor()}`}>
+          {getStatusIcon()}
         </div>
       </div>
+
+      {isFullscreen && (
+        <div className="mt-8 w-full">
+          <h4 className="text-xl font-semibold text-white mb-4">{title} - 12 Month Trend</h4>
+          <div className="bg-white/5 rounded-lg p-4">
+            <p className="text-gray-300">
+              12-month line/bar chart for {title} would appear here.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
