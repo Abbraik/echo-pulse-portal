@@ -3,14 +3,11 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PillarOverviewDrawer } from '../quadrant/PillarOverviewDrawer';
 
-interface PillarQuadrantsProps {
-  onHover: (element: string | null) => void;
-  onModalToggle: (isOpen: boolean) => void;
-}
-
 interface PillarData {
   name: string;
   description: string;
+  angle: number;
+  gradient: string;
   indicators: Array<{
     name: string;
     current: number;
@@ -19,16 +16,21 @@ interface PillarData {
   }>;
 }
 
+interface PillarQuadrantsProps {
+  onHover: (element: string | null) => void;
+  onModalToggle: (isOpen: boolean) => void;
+}
+
 export const PillarQuadrants: React.FC<PillarQuadrantsProps> = ({ 
   onHover, 
   onModalToggle 
 }) => {
   const [selectedPillar, setSelectedPillar] = useState<PillarData | null>(null);
 
-  const pillars = [
+  const pillars: PillarData[] = [
     {
       name: 'Population Dynamics',
-      angle: 45, // 0°-90° midpoint
+      angle: 45,
       gradient: 'linear-gradient(135deg, #0288D1 0%, #00BCD4 100%)',
       description: 'Targeting balanced growth through policies',
       indicators: [
@@ -39,7 +41,7 @@ export const PillarQuadrants: React.FC<PillarQuadrantsProps> = ({
     },
     {
       name: 'Resource Market',
-      angle: 135, // 90°-180° midpoint
+      angle: 135,
       gradient: 'linear-gradient(135deg, #009688 0%, #26A69A 100%)',
       description: 'Sustainable resource allocation and pricing',
       indicators: [
@@ -50,7 +52,7 @@ export const PillarQuadrants: React.FC<PillarQuadrantsProps> = ({
     },
     {
       name: 'Products & Services Market',
-      angle: 225, // 180°-270° midpoint
+      angle: 225,
       gradient: 'linear-gradient(135deg, #3F51B5 0%, #5C6BC0 100%)',
       description: 'Market efficiency and service delivery',
       indicators: [
@@ -61,7 +63,7 @@ export const PillarQuadrants: React.FC<PillarQuadrantsProps> = ({
     },
     {
       name: 'Social Outcomes',
-      angle: 315, // 270°-360° midpoint
+      angle: 315,
       gradient: 'linear-gradient(135deg, #283593 0%, #3949AB 100%)',
       description: 'Community wellbeing and social cohesion',
       indicators: [
@@ -77,111 +79,129 @@ export const PillarQuadrants: React.FC<PillarQuadrantsProps> = ({
     onModalToggle(true);
   };
 
-  const handleDrawerClose = () => {
+  const handleCloseDrawer = () => {
     setSelectedPillar(null);
     onModalToggle(false);
   };
 
   return (
     <>
-      {/* Quadrant Rings */}
+      {/* Pillar Quadrant Ring SVG */}
       <svg 
-        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-        width="500" 
-        height="500"
-        style={{ zIndex: 10 }}
+        className="absolute inset-0 w-full h-full pointer-events-none" 
+        style={{ zIndex: 5 }}
+        width="800" 
+        height="800"
       >
         <defs>
           {pillars.map((pillar, index) => (
-            <linearGradient key={index} id={`gradient-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={pillar.gradient.match(/#[A-Fa-f0-9]{6}/g)?.[0]} stopOpacity="0.2" />
-              <stop offset="100%" stopColor={pillar.gradient.match(/#[A-Fa-f0-9]{6}/g)?.[1]} stopOpacity="0.2" />
+            <linearGradient key={`gradient-${index}`} id={`pillar-gradient-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={pillar.gradient.match(/#[0-9A-F]{6}/gi)?.[0] || '#0288D1'} stopOpacity="0.2" />
+              <stop offset="100%" stopColor={pillar.gradient.match(/#[0-9A-F]{6}/gi)?.[1] || '#00BCD4'} stopOpacity="0.2" />
             </linearGradient>
           ))}
         </defs>
         
-        {/* Quadrant Arcs */}
         {pillars.map((pillar, index) => {
-          const startAngle = index * 90;
-          const endAngle = (index + 1) * 90;
-          const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+          const startAngle = (index * 90 - 90) * Math.PI / 180; // Convert to radians, offset by -90°
+          const endAngle = ((index + 1) * 90 - 90) * Math.PI / 180;
+          const centerX = 400;
+          const centerY = 400;
+          const innerRadius = 150;
+          const outerRadius = 220;
           
-          const x1 = 250 + 150 * Math.cos((startAngle * Math.PI) / 180);
-          const y1 = 250 + 150 * Math.sin((startAngle * Math.PI) / 180);
-          const x2 = 250 + 150 * Math.cos((endAngle * Math.PI) / 180);
-          const y2 = 250 + 150 * Math.sin((endAngle * Math.PI) / 180);
+          // Create path for sector
+          const x1 = centerX + innerRadius * Math.cos(startAngle);
+          const y1 = centerY + innerRadius * Math.sin(startAngle);
+          const x2 = centerX + outerRadius * Math.cos(startAngle);
+          const y2 = centerY + outerRadius * Math.sin(startAngle);
+          const x3 = centerX + outerRadius * Math.cos(endAngle);
+          const y3 = centerY + outerRadius * Math.sin(endAngle);
+          const x4 = centerX + innerRadius * Math.cos(endAngle);
+          const y4 = centerY + innerRadius * Math.sin(endAngle);
           
-          const x3 = 250 + 220 * Math.cos((endAngle * Math.PI) / 180);
-          const y3 = 250 + 220 * Math.sin((endAngle * Math.PI) / 180);
-          const x4 = 250 + 220 * Math.cos((startAngle * Math.PI) / 180);
-          const y4 = 250 + 220 * Math.sin((startAngle * Math.PI) / 180);
+          const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0;
+          
+          const pathData = [
+            `M ${x1} ${y1}`,
+            `L ${x2} ${y2}`,
+            `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x3} ${y3}`,
+            `L ${x4} ${y4}`,
+            `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x1} ${y1}`,
+            'Z'
+          ].join(' ');
 
           return (
             <motion.path
-              key={index}
-              d={`M ${x1} ${y1} A 150 150 0 ${largeArcFlag} 1 ${x2} ${y2} L ${x3} ${y3} A 220 220 0 ${largeArcFlag} 0 ${x4} ${y4} Z`}
-              fill={`url(#gradient-${index})`}
-              stroke="#00FFC3"
-              strokeWidth="0"
+              key={`quadrant-${index}`}
+              d={pathData}
+              fill={`url(#pillar-gradient-${index})`}
+              stroke="rgba(0, 255, 195, 0.3)"
+              strokeWidth="1"
               className="pointer-events-auto cursor-pointer"
-              whileHover={{ 
-                fill: `url(#gradient-${index})`,
-                strokeWidth: 2,
-                transition: { duration: 0.2 }
-              }}
-              onClick={() => handlePillarClick(pillar)}
-              onMouseEnter={() => onHover(`pillar-${index}`)}
-              onMouseLeave={() => onHover(null)}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 + index * 0.1, duration: 0.3 }}
+              whileHover={{ 
+                fill: `url(#pillar-gradient-${index})`,
+                stroke: "rgba(0, 255, 195, 0.6)",
+                strokeWidth: 2
+              }}
+              onClick={() => handlePillarClick(pillar)}
+              onMouseEnter={() => onHover(`quadrant-${index}`)}
+              onMouseLeave={() => onHover(null)}
             />
           );
         })}
       </svg>
 
       {/* Pillar Labels */}
-      {pillars.map((pillar, index) => (
-        <motion.div
-          key={pillar.name}
-          className="absolute cursor-pointer pointer-events-auto"
-          role="button"
-          aria-label={`${pillar.name} pillar overview`}
-          style={{
-            left: '50%',
-            top: '50%',
-            transform: `translate(-50%, -50%) rotate(${pillar.angle}deg) translateY(-185px) rotate(-${pillar.angle}deg)`,
-            zIndex: 20
-          }}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6 + index * 0.1, duration: 0.4 }}
-          whileHover={{ scale: 1.1 }}
-          onClick={() => handlePillarClick(pillar)}
-          onMouseEnter={() => onHover(`pillar-${index}`)}
-          onMouseLeave={() => onHover(null)}
-        >
-          <div 
-            className="px-4 py-2 rounded-lg backdrop-blur-[24px] border border-white/20 text-center"
+      {pillars.map((pillar, index) => {
+        const angle = pillar.angle * Math.PI / 180;
+        const radius = 185;
+        const x = 400 + radius * Math.cos(angle);
+        const y = 400 + radius * Math.sin(angle);
+
+        return (
+          <motion.div
+            key={`label-${index}`}
+            className="absolute cursor-pointer pointer-events-auto"
             style={{
-              background: 'rgba(10, 20, 40, 0.8)',
-              boxShadow: '0 0 15px rgba(0, 255, 195, 0.1)'
+              left: x,
+              top: y,
+              transform: 'translate(-50%, -50%)',
+              zIndex: 15
             }}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7 + index * 0.1, duration: 0.4 }}
+            whileHover={{ scale: 1.1 }}
+            onClick={() => handlePillarClick(pillar)}
+            onMouseEnter={() => onHover(`label-${index}`)}
+            onMouseLeave={() => onHover(null)}
           >
             <div 
-              className="text-sm font-bold"
-              style={{ color: '#00FFC3' }}
+              className="px-3 py-1 rounded-lg backdrop-blur-[16px] border border-white/20 text-center"
+              style={{
+                background: 'rgba(20, 30, 50, 0.4)',
+                boxShadow: '0 0 15px rgba(0, 255, 195, 0.1)'
+              }}
             >
-              {pillar.name}
+              <div 
+                className="text-sm font-bold whitespace-nowrap"
+                style={{ color: '#00FFC3' }}
+              >
+                {pillar.name}
+              </div>
             </div>
-          </div>
-        </motion.div>
-      ))}
+          </motion.div>
+        );
+      })}
 
       <PillarOverviewDrawer
         pillar={selectedPillar}
         isOpen={selectedPillar !== null}
-        onClose={handleDrawerClose}
+        onClose={handleCloseDrawer}
       />
     </>
   );

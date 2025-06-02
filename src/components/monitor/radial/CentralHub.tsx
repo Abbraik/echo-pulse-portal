@@ -6,13 +6,9 @@ import { DeiDrillDownModal } from '../DeiDrillDownModal';
 
 interface CentralHubProps {
   onModalToggle: (isOpen: boolean) => void;
-  onFullscreenToggle: () => void;
 }
 
-export const CentralHub: React.FC<CentralHubProps> = ({ 
-  onModalToggle, 
-  onFullscreenToggle 
-}) => {
+export const CentralHub: React.FC<CentralHubProps> = ({ onModalToggle }) => {
   const [showModal, setShowModal] = useState(false);
   
   // Mock data
