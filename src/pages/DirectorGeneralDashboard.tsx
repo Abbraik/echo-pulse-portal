@@ -232,7 +232,7 @@ const DirectorGeneralDashboard: React.FC = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  {greeting}, Director General
+                  {greeting}, Secretary General
                 </motion.h1>
                 <motion.p 
                   className="text-sm text-gray-300 mt-2"
