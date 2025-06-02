@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -38,11 +37,11 @@ export const OperationalHealthPanel: React.FC = () => {
   ];
 
   const entropyData = {
-    Think: { value: 0.24, trend: 'up' },
-    Act: { value: 0.30, trend: 'down' },
-    Monitor: { value: 0.27, trend: 'stable' },
-    Learn: { value: 0.18, trend: 'up' },
-    Innovate: { value: 0.22, trend: 'down' }
+    Think: { value: 0.24, trend: 'up' as const },
+    Act: { value: 0.30, trend: 'down' as const },
+    Monitor: { value: 0.27, trend: 'stable' as const },
+    Learn: { value: 0.18, trend: 'up' as const },
+    Innovate: { value: 0.22, trend: 'down' as const }
   };
 
   const systemAlerts = [
