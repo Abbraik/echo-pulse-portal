@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
 
-// Import new components
+// Import existing components
 import MasterTreemap from '@/components/monitor/MasterTreemap';
 import UniversalAlertHub from '@/components/monitor/UniversalAlertHub';
 import CombinedAnomalyDetector from '@/components/monitor/CombinedAnomalyDetector';
@@ -71,7 +71,7 @@ const MonitorPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
                 >
-                  MONITOR 📊: OPERATIONAL & STRATEGIC TRACKING
+                  MONITOR ▮ : OPERATIONAL & STRATEGIC TRACKING
                 </motion.h1>
                 <motion.p 
                   className="text-base text-gray-300 font-['Noto_Sans']"
@@ -95,6 +95,32 @@ const MonitorPage: React.FC = () => {
             </Tooltip>
           </div>
         </motion.header>
+
+        {/* Zone Selector Pills */}
+        <motion.div 
+          className="max-w-[1440px] mx-auto px-6 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="flex justify-center">
+            <div className="flex items-center gap-2 p-2 rounded-2xl border border-white/20" 
+                 style={{ background: 'rgba(20,30,50,0.6)', backdropFilter: 'blur(24px)' }}>
+              {['think', 'act', 'monitor', 'learn', 'innovate'].map((zone, index) => (
+                <button
+                  key={zone}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 font-['Noto_Sans'] ${
+                    zone === 'monitor' 
+                      ? 'bg-[#00FFC3] text-white' 
+                      : 'text-gray-400 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  {zone}
+                </button>
+              ))}
+            </div>
+          </div>
+        </motion.div>
 
         {/* Main Content Container */}
         <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">

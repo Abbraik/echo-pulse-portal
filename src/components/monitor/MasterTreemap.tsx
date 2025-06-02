@@ -177,7 +177,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
         </div>
 
         {/* Filter Toggle */}
-        <div className="flex justify-center py-2 px-6 gap-4">
+        <div className="flex justify-center py-3 px-6 gap-4">
           {(['all', 'strategic', 'operational'] as const).map((filterOption) => (
             <button
               key={filterOption}
