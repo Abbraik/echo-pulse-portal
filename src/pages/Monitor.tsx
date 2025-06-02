@@ -5,17 +5,22 @@ import { Monitor, Info } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Import components
 import MasterTreemap from '@/components/monitor/MasterTreemap';
 import UniversalAlertHub from '@/components/monitor/UniversalAlertHub';
 import CombinedAnomalyDetector from '@/components/monitor/CombinedAnomalyDetector';
+import StrategicIndicatorsPanel from '@/components/monitor/StrategicIndicatorsPanel';
+import OperationalIndicatorsPanel from '@/components/monitor/OperationalIndicatorsPanel';
+
+type ViewMode = 'treemap' | 'list';
 
 const MonitorPage: React.FC = () => {
   const { t, isRTL } = useTranslation();
   const [hideHeader, setHideHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [viewMode, setViewMode] = useState<ViewMode>('treemap');
 
   // Handle scroll behavior for header
   useEffect(() => {
@@ -125,36 +130,128 @@ const MonitorPage: React.FC = () => {
         {/* Main Content Container with ACT-style spacing */}
         <div className="max-w-[1440px] mx-auto px-8 pb-8 relative z-10">
           
-          {/* Master Treemap Section - ACT-style glass card */}
-          <motion.section 
-            className="mb-6"
-            style={{ height: '65vh', minHeight: '400px' }}
-            initial={{ opacity: 0, y: 30, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+          {/* View Toggle Pills */}
+          <motion.div 
+            className="flex justify-center py-4 mb-6 gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <div 
-              className="rounded-[1.5rem] border overflow-hidden relative h-full"
-              style={{
-                background: 'rgba(10, 20, 40, 0.45)',
-                backdropFilter: 'blur(24px)',
-                border: '1px solid rgba(0,255,195,0.15)',
-                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)'
-              }}
-            >
-              <div 
-                className="h-full m-0.5 rounded-[1.25rem] overflow-hidden relative"
+            {(['treemap', 'list'] as ViewMode[]).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className="px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 font-['Noto_Sans']"
                 style={{
-                  background: 'rgba(20, 30, 50, 0.6)',
-                  backdropFilter: 'blur(32px)'
+                  width: '120px',
+                  height: '32px',
+                  fontSize: '14px',
+                  background: viewMode === mode ? '#00FFC3' : 'rgba(255,255,255,0.05)',
+                  color: viewMode === mode ? '#081226' : '#E0E0E0',
+                  border: viewMode === mode ? 'none' : '1px solid rgba(255,255,255,0.10)',
+                  boxShadow: viewMode === mode ? '0 0 8px rgba(0,255,195,0.6)' : 'none'
                 }}
               >
-                <MasterTreemap className="h-full" />
-              </div>
-            </div>
-          </motion.section>
+                {mode === 'treemap' ? 'Treemap View' : 'List View'}
+              </button>
+            ))}
+          </motion.div>
+
+          {/* Content Views */}
+          <AnimatePresence mode="wait">
+            {viewMode === 'treemap' ? (
+              <motion.div
+                key="treemap"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                {/* Master Treemap Section */}
+                <section 
+                  className="mb-6"
+                  style={{ height: '65vh', minHeight: '400px' }}
+                >
+                  <div 
+                    className="rounded-[1.5rem] border overflow-hidden relative h-full"
+                    style={{
+                      background: 'rgba(10, 20, 40, 0.45)',
+                      backdropFilter: 'blur(24px)',
+                      border: '1px solid rgba(0,255,195,0.15)',
+                      boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)'
+                    }}
+                  >
+                    <div 
+                      className="h-full m-0.5 rounded-[1.25rem] overflow-hidden relative"
+                      style={{
+                        background: 'rgba(20, 30, 50, 0.6)',
+                        backdropFilter: 'blur(32px)'
+                      }}
+                    >
+                      <MasterTreemap className="h-full" />
+                    </div>
+                  </div>
+                </section>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="list"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                {/* List View - Dual Panels */}
+                <section className="mb-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" style={{ height: '65vh', minHeight: '400px' }}>
+                    {/* Strategic Indicators Panel */}
+                    <div 
+                      className="rounded-[1.5rem] border overflow-hidden relative h-full"
+                      style={{
+                        background: 'rgba(10, 20, 40, 0.45)',
+                        backdropFilter: 'blur(24px)',
+                        border: '1px solid rgba(0,255,195,0.15)',
+                        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)'
+                      }}
+                    >
+                      <div 
+                        className="h-full m-0.5 rounded-[1.25rem] overflow-hidden relative"
+                        style={{
+                          background: 'rgba(20, 30, 50, 0.6)',
+                          backdropFilter: 'blur(32px)'
+                        }}
+                      >
+                        <StrategicIndicatorsPanel className="h-full" />
+                      </div>
+                    </div>
+
+                    {/* Operational Indicators Panel */}
+                    <div 
+                      className="rounded-[1.5rem] border overflow-hidden relative h-full"
+                      style={{
+                        background: 'rgba(10, 20, 40, 0.45)',
+                        backdropFilter: 'blur(24px)',
+                        border: '1px solid rgba(0,255,195,0.15)',
+                        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)'
+                      }}
+                    >
+                      <div 
+                        className="h-full m-0.5 rounded-[1.25rem] overflow-hidden relative"
+                        style={{
+                          background: 'rgba(20, 30, 50, 0.6)',
+                          backdropFilter: 'blur(32px)'
+                        }}
+                      >
+                        <OperationalIndicatorsPanel className="h-full" />
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
-          {/* Alert & Anomaly Section with ACT-style glass cards */}
+          {/* Alert & Anomaly Section - Always visible */}
           <motion.section
             className="h-[35vh] min-h-[240px]"
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
@@ -162,7 +259,7 @@ const MonitorPage: React.FC = () => {
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
           >
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
-              {/* Universal Alert Hub - ACT-style glass card */}
+              {/* Universal Alert Hub */}
               <div className="lg:col-span-3">
                 <div 
                   className="h-full rounded-[1.5rem] border overflow-hidden relative"
@@ -185,7 +282,7 @@ const MonitorPage: React.FC = () => {
                 </div>
               </div>
               
-              {/* Combined Anomaly Detector - ACT-style glass card */}
+              {/* Combined Anomaly Detector */}
               <div className="lg:col-span-2">
                 <div 
                   className="h-full rounded-[1.5rem] border overflow-hidden relative"
