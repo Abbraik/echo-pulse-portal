@@ -1,17 +1,18 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Maximize2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CentralHub } from './quadrant/CentralHub';
-import { PillarQuadrants } from './quadrant/PillarQuadrants';
-import { InnerStrategicPods } from './quadrant/InnerStrategicPods';
-import { OuterOperationalPods } from './quadrant/OuterOperationalPods';
-import { ConnectorLines } from './quadrant/ConnectorLines';
+import { CentralHub } from './radial/CentralHub';
+import { PillarQuadrants } from './radial/PillarQuadrants';
+import { InnerStrategicPods } from './radial/InnerStrategicPods';
+import { OuterOperationalPods } from './radial/OuterOperationalPods';
+import { RadialConnectors } from './radial/RadialConnectors';
 
 export const RadialDashboard: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [hoveredPod, setHoveredPod] = useState<string | null>(null);
+  const [hoveredElement, setHoveredElement] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
@@ -23,46 +24,52 @@ export const RadialDashboard: React.FC = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.addEventListener('keydown', handleEscKey);
     return () => document.removeEventListener('keydown', handleEscKey);
   }, [isFullscreen]);
 
   const dashboardContent = (
-    <div className="relative w-full h-[800px]">
-      {/* Connector Lines */}
-      <ConnectorLines hoveredPod={hoveredPod} />
+    <div className="relative w-full h-[800px] overflow-hidden">
+      {/* Radial Connectors */}
+      <RadialConnectors 
+        hoveredElement={hoveredElement}
+        isModalOpen={isModalOpen}
+      />
 
       {/* Central Hub (DEI Stability) */}
       <div 
-        className="absolute"
-        style={{
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 20
-        }}
-        onMouseEnter={() => setHoveredPod('hub')}
-        onMouseLeave={() => setHoveredPod(null)}
+        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        style={{ zIndex: 30 }}
+        onMouseEnter={() => setHoveredElement('hub')}
+        onMouseLeave={() => setHoveredElement(null)}
       >
-        <CentralHub />
+        <CentralHub 
+          onModalToggle={setIsModalOpen}
+          onFullscreenToggle={toggleFullscreen}
+        />
       </div>
 
-      {/* Four Pillar Quadrants */}
-      <PillarQuadrants />
-
-      {/* Inner Ring - Strategic Pods */}
-      <InnerStrategicPods 
-        onPodHover={setHoveredPod}
+      {/* Pillar Quadrant Ring */}
+      <PillarQuadrants 
+        onHover={setHoveredElement}
+        onModalToggle={setIsModalOpen}
       />
 
-      {/* Outer Ring - Operational Pods */}
+      {/* Inner Strategic Pods Ring */}
+      <InnerStrategicPods 
+        onHover={setHoveredElement}
+        onModalToggle={setIsModalOpen}
+      />
+
+      {/* Outer Operational Pods Ring */}
       <OuterOperationalPods 
-        onPodHover={setHoveredPod}
+        onHover={setHoveredElement}
+        onModalToggle={setIsModalOpen}
       />
 
       {/* Full-Screen Toggle */}
-      <div className="absolute top-4 right-4 z-30">
+      <div className="absolute top-4 right-4 z-40">
         <Button
           variant="ghost"
           size="sm"
@@ -74,7 +81,7 @@ export const RadialDashboard: React.FC = () => {
       </div>
 
       {/* Data Refresh Indicator */}
-      <div className="absolute top-4 left-4 z-30">
+      <div className="absolute top-4 left-4 z-40">
         <motion.div
           className="w-3 h-3 rounded-full bg-teal-400"
           animate={{ opacity: [1, 0.3, 1] }}
@@ -104,7 +111,7 @@ export const RadialDashboard: React.FC = () => {
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <div className="absolute top-4 right-4 z-30">
+          <div className="absolute top-4 right-4 z-50">
             <Button
               variant="ghost"
               size="sm"
@@ -116,7 +123,7 @@ export const RadialDashboard: React.FC = () => {
           </div>
           
           <div className="w-full h-full flex items-center justify-center p-8">
-            <div style={{ transform: 'scale(1.5)', transformOrigin: 'center' }}>
+            <div style={{ transform: 'scale(1.4)', transformOrigin: 'center' }}>
               {dashboardContent}
             </div>
           </div>
