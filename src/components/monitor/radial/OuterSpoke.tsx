@@ -46,9 +46,26 @@ export const OuterSpoke: React.FC<OuterSpokeProps> = ({ type, index }) => {
     }
   };
 
+  const getTooltipText = () => {
+    switch (type) {
+      case 'claims':
+        return 'Claims distribution: Think 3, Act 4, Learn 2, Innovate 3';
+      case 'handoff':
+        return 'Item #17: pending since 05-28; Item #21: pending 05-29';
+      case 'entropy-think':
+        return 'Think Entropy: trending up';
+      case 'entropy-act':
+        return 'Act Entropy: trending down';
+      case 'alerts':
+        return '3 Critical, 5 Warning, 10 Info';
+      case 'risk':
+        return 'Population Surge: likelihood 0.7, impact 0.8';
+      default:
+        return 'Unknown';
+    }
+  };
+
   const renderContent = () => {
-    const data = spokeData[type as keyof typeof spokeData];
-    
     switch (type) {
       case 'claims':
         return (
@@ -138,11 +155,7 @@ export const OuterSpoke: React.FC<OuterSpokeProps> = ({ type, index }) => {
           </motion.div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{type === 'claims' ? 'Claims distribution: Think 3, Act 4, Learn 2, Innovate 3' : 
-             type === 'handoff' ? 'Item #17: pending since 05-28; Item #21: pending 05-29' : 
-             type.includes('entropy') ? `${type.split('-')[1]} Entropy: trending ${spokeData[type as keyof typeof spokeData].trend}` : 
-             type === 'alerts' ? '3 Critical, 5 Warning, 10 Info' : 
-             'Population Surge: likelihood 0.7, impact 0.8'}</p>
+          <p>{getTooltipText()}</p>
         </TooltipContent>
       </Tooltip>
 
