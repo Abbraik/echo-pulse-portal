@@ -3,36 +3,15 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Maximize2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { HubWidget } from './radial/HubWidget';
-import { InnerSpoke } from './radial/InnerSpoke';
-import { OuterSpoke } from './radial/OuterSpoke';
+import { CentralHub } from './quadrant/CentralHub';
+import { PillarQuadrants } from './quadrant/PillarQuadrants';
+import { InnerStrategicPods } from './quadrant/InnerStrategicPods';
+import { OuterOperationalPods } from './quadrant/OuterOperationalPods';
+import { ConnectorLines } from './quadrant/ConnectorLines';
 
 export const RadialDashboard: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Calculate positions for spokes
-  const innerRadius = 280;
-  const outerRadius = 420;
-  const centerX = 400;
-  const centerY = 400;
-
-  // Inner spokes positions (4 spokes)
-  const innerSpokes = [
-    { angle: 0, x: centerX + innerRadius, y: centerY, type: 'bundle' },
-    { angle: 90, x: centerX, y: centerY - innerRadius, type: 'resource' },
-    { angle: 180, x: centerX - innerRadius, y: centerY, type: 'scenario' },
-    { angle: 270, x: centerX, y: centerY + innerRadius, type: 'trust' }
-  ];
-
-  // Outer spokes positions (6 spokes)
-  const outerSpokes = [
-    { angle: 30, x: centerX + outerRadius * Math.cos(Math.PI/6), y: centerY - outerRadius * Math.sin(Math.PI/6), type: 'claims' },
-    { angle: 90, x: centerX, y: centerY - outerRadius, type: 'handoff' },
-    { angle: 150, x: centerX - outerRadius * Math.cos(Math.PI/6), y: centerY - outerRadius * Math.sin(Math.PI/6), type: 'entropy-think' },
-    { angle: 210, x: centerX - outerRadius * Math.cos(Math.PI/6), y: centerY + outerRadius * Math.sin(Math.PI/6), type: 'entropy-act' },
-    { angle: 270, x: centerX, y: centerY + outerRadius, type: 'alerts' },
-    { angle: 330, x: centerX + outerRadius * Math.cos(Math.PI/6), y: centerY + outerRadius * Math.sin(Math.PI/6), type: 'risk' }
-  ];
+  const [hoveredPod, setHoveredPod] = useState<string | null>(null);
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
@@ -51,87 +30,39 @@ export const RadialDashboard: React.FC = () => {
 
   const dashboardContent = (
     <div className="relative w-full h-[800px]">
-      {/* SVG for connecting lines */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
-        {/* Connect hub to inner spokes */}
-        {innerSpokes.map((spoke, index) => (
-          <motion.line
-            key={`inner-${index}`}
-            x1={centerX}
-            y1={centerY}
-            x2={spoke.x}
-            y2={spoke.y}
-            stroke="rgba(20, 184, 166, 0.3)"
-            strokeWidth="2"
-            strokeDasharray="5,5"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.5 }}
-            transition={{ delay: 1 + index * 0.1, duration: 0.8 }}
-          />
-        ))}
-        
-        {/* Connect hub to outer spokes */}
-        {outerSpokes.map((spoke, index) => (
-          <motion.line
-            key={`outer-${index}`}
-            x1={centerX}
-            y1={centerY}
-            x2={spoke.x}
-            y2={spoke.y}
-            stroke="rgba(20, 184, 166, 0.2)"
-            strokeWidth="1"
-            strokeDasharray="3,3"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.3 }}
-            transition={{ delay: 1.5 + index * 0.1, duration: 0.8 }}
-          />
-        ))}
-      </svg>
+      {/* Connector Lines */}
+      <ConnectorLines hoveredPod={hoveredPod} />
 
-      {/* Center Hub Widget */}
+      {/* Central Hub (DEI Stability) */}
       <div 
         className="absolute"
         style={{
-          left: centerX - 100,
-          top: centerY - 100,
-          zIndex: 10
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 20
         }}
+        onMouseEnter={() => setHoveredPod('hub')}
+        onMouseLeave={() => setHoveredPod(null)}
       >
-        <HubWidget />
+        <CentralHub />
       </div>
 
-      {/* Inner Ring Spokes */}
-      {innerSpokes.map((spoke, index) => (
-        <div
-          key={`inner-spoke-${index}`}
-          className="absolute"
-          style={{
-            left: spoke.x - 60,
-            top: spoke.y - 60,
-            zIndex: 5
-          }}
-        >
-          <InnerSpoke type={spoke.type} index={index} />
-        </div>
-      ))}
+      {/* Four Pillar Quadrants */}
+      <PillarQuadrants />
 
-      {/* Outer Ring Spokes */}
-      {outerSpokes.map((spoke, index) => (
-        <div
-          key={`outer-spoke-${index}`}
-          className="absolute"
-          style={{
-            left: spoke.x - 50,
-            top: spoke.y - 50,
-            zIndex: 5
-          }}
-        >
-          <OuterSpoke type={spoke.type} index={index} />
-        </div>
-      ))}
+      {/* Inner Ring - Strategic Pods */}
+      <InnerStrategicPods 
+        onPodHover={setHoveredPod}
+      />
+
+      {/* Outer Ring - Operational Pods */}
+      <OuterOperationalPods 
+        onPodHover={setHoveredPod}
+      />
 
       {/* Full-Screen Toggle */}
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-4 right-4 z-30">
         <Button
           variant="ghost"
           size="sm"
@@ -143,7 +74,7 @@ export const RadialDashboard: React.FC = () => {
       </div>
 
       {/* Data Refresh Indicator */}
-      <div className="absolute top-4 left-4 z-20">
+      <div className="absolute top-4 left-4 z-30">
         <motion.div
           className="w-3 h-3 rounded-full bg-teal-400"
           animate={{ opacity: [1, 0.3, 1] }}
