@@ -1,19 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { 
-  Monitor, Info, Settings, Maximize2, X, ChevronDown, ChevronUp
-} from 'lucide-react';
+import { Monitor, Info } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
-
-// Import radial dashboard components
-import { RadialDashboard } from '@/components/monitor/RadialDashboard';
+import { MosaicDashboard } from '@/components/monitor/MosaicDashboard';
 
 const MonitorPage: React.FC = () => {
-  const { t, isRTL } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
@@ -57,7 +53,7 @@ const MonitorPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
                 >
-                  MONITOR 📊: {t("operationalStrategicTracking", { defaultValue: "HUB & SPOKES DASHBOARD" })}
+                  MONITOR 📊: {t("operationalStrategicTracking", { defaultValue: "MOSAIC DASHBOARD" })}
                 </motion.h1>
                 <motion.p 
                   className="text-base text-gray-300 font-noto-medium"
@@ -65,7 +61,7 @@ const MonitorPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
                 >
-                  {t("monitorCoreDesc", { defaultValue: "Radial system health and performance insights" })}
+                  {t("monitorCoreDesc", { defaultValue: "Draggable & resizable widget system" })}
                 </motion.p>
               </div>
             </div>
@@ -83,9 +79,8 @@ const MonitorPage: React.FC = () => {
         </motion.header>
 
         {/* Main Content Container */}
-        <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
-          {/* Radial Dashboard Container */}
-          <RadialDashboard />
+        <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10 h-[calc(100vh-120px)]">
+          <MosaicDashboard />
         </div>
       </AnimatedPage>
     </div>
