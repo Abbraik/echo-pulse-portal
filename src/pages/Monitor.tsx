@@ -1,19 +1,17 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
-import { 
-  Monitor, Info, Settings, Maximize2, X, ChevronDown, ChevronUp
-} from 'lucide-react';
+import { Monitor, Info } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
 
-// Import radial dashboard components
-import { RadialDashboard } from '@/components/monitor/RadialDashboard';
+// Import the new tile dashboard
+import { TileDashboard } from '@/components/monitor/TileDashboard';
 
 const MonitorPage: React.FC = () => {
-  const { t, isRTL } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
@@ -57,7 +55,7 @@ const MonitorPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
                 >
-                  MONITOR 📊: {t("operationalStrategicTracking", { defaultValue: "HUB & SPOKES DASHBOARD" })}
+                  MONITOR 📊: {t("operationalStrategicTracking", { defaultValue: "TILE DASHBOARD" })}
                 </motion.h1>
                 <motion.p 
                   className="text-base text-gray-300 font-noto-medium"
@@ -65,7 +63,7 @@ const MonitorPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
                 >
-                  {t("monitorCoreDesc", { defaultValue: "Radial system health and performance insights" })}
+                  {t("monitorCoreDesc", { defaultValue: "Draggable widgets for comprehensive system monitoring" })}
                 </motion.p>
               </div>
             </div>
@@ -76,7 +74,7 @@ const MonitorPage: React.FC = () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="max-w-xs">{t('monitorTooltip')}</p>
+                <p className="max-w-xs">{t('monitorTooltip', { defaultValue: 'Drag, resize, collapse, and expand tiles' })}</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -84,8 +82,8 @@ const MonitorPage: React.FC = () => {
 
         {/* Main Content Container */}
         <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
-          {/* Radial Dashboard Container */}
-          <RadialDashboard />
+          {/* Tile Dashboard Container */}
+          <TileDashboard />
         </div>
       </AnimatedPage>
     </div>
