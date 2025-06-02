@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, AlertTriangle, Target } from 'lucide-react';
+import { X, AlertTriangle, Search } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
 
 interface AlertsRiskModalProps {
@@ -21,170 +22,195 @@ export const AlertsRiskModal: React.FC<AlertsRiskModalProps> = ({
   isOpen,
   onClose
 }) => {
-  const [draggedRisk, setDraggedRisk] = useState<string | null>(null);
+  const [selectedAlert, setSelectedAlert] = useState<any>(null);
 
-  const mockAlerts = [
-    { id: 1, severity: 'critical', title: 'Data sync lag with Act Zone', timestamp: '05-30 10:12', cause: 'Network latency spike' },
-    { id: 2, severity: 'warning', title: 'Loop Inconsistency detected', timestamp: '05-30 09:48', cause: 'Model drift in Think Zone' },
-    { id: 3, severity: 'info', title: 'Minor UI glitch in Learn Canvas', timestamp: '05-30 09:30', cause: 'Browser compatibility' }
+  // Mock alerts data
+  const alerts = [
+    {
+      id: 1,
+      severity: 'critical',
+      title: 'Data sync lag with Act Zone',
+      timestamp: '2025-05-30 10:12',
+      cause: 'Network connectivity issues detected'
+    },
+    {
+      id: 2,
+      severity: 'warning',
+      title: 'Loop Inconsistency detected',
+      timestamp: '2025-05-30 09:48',
+      cause: 'Feedback loop parameters out of range'
+    },
+    {
+      id: 3,
+      severity: 'info',
+      title: 'Minor UI glitch in Learn Canvas',
+      timestamp: '2025-05-30 09:30',
+      cause: 'Component rendering delay'
+    }
   ];
 
-  const mockRisks = [
-    { id: 'population-surge', name: 'Population Surge', likelihood: 0.7, impact: 0.8, quadrant: 'high-high' },
-    { id: 'extraction-quota', name: 'Extraction Over-Quota', likelihood: 0.5, impact: 0.4, quadrant: 'medium-low' },
-    { id: 'loop-drift', name: 'Loop Drift', likelihood: 0.3, impact: 0.6, quadrant: 'low-medium' }
+  // Mock risk data
+  const risks = [
+    { name: 'Population Surge', likelihood: 0.7, impact: 0.8, id: 1 },
+    { name: 'Extraction Over-Quota', likelihood: 0.5, impact: 0.4, id: 2 },
+    { name: 'Loop Drift', likelihood: 0.3, impact: 0.6, id: 3 }
   ];
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-500/20 text-red-400';
-      case 'warning': return 'bg-amber-500/20 text-amber-400';
-      case 'info': return 'bg-green-500/20 text-green-400';
-      default: return 'bg-gray-500/20 text-gray-400';
+      case 'critical': return 'bg-red-500/20 text-red-400 border-red-500/30';
+      case 'warning': return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+      case 'info': return 'bg-green-500/20 text-green-400 border-green-500/30';
+      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
 
-  const getRiskPosition = (likelihood: number, impact: number) => {
-    return {
-      left: `${likelihood * 100}%`,
-      bottom: `${impact * 100}%`
-    };
-  };
-
-  const getQuadrantColor = (quadrant: string) => {
-    switch (quadrant) {
-      case 'low-low': return 'bg-green-500/20';
-      case 'low-medium': case 'medium-low': return 'bg-amber-500/20';
-      case 'high-high': case 'high-low': case 'low-high': return 'bg-red-500/20';
-      default: return 'bg-gray-500/20';
-    }
+  const getRiskQuadrantColor = (likelihood: number, impact: number) => {
+    if (likelihood > 0.5 && impact > 0.5) return 'bg-red-500/20';
+    if (likelihood > 0.5 || impact > 0.5) return 'bg-amber-500/20';
+    return 'bg-green-500/20';
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl glass-panel-deep border-0">
+      <DialogContent className="max-w-6xl glass-panel-deep border-0 max-h-[80vh]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-500">
+          <DialogTitle className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-500">
             <AlertTriangle size={20} className="inline mr-2" />
             Alerts & Risk Matrix
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="alerts" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="alerts">Alerts Feed</TabsTrigger>
-            <TabsTrigger value="risk">Risk Matrix</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="alerts" className="mt-6">
-            <motion.div 
-              className="space-y-4 max-h-96 overflow-y-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              {mockAlerts.map((alert, index) => (
-                <motion.div
-                  key={alert.id}
-                  className="glass-panel p-4 hover:scale-[1.02] transition-transform"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-3">
-                      <Badge className={getSeverityColor(alert.severity)}>
-                        {alert.severity}
-                      </Badge>
-                      <h4 className="font-medium text-white">{alert.title}</h4>
-                    </div>
-                    <span className="text-xs text-gray-400">{alert.timestamp}</span>
-                  </div>
-                  
-                  <p className="text-sm text-gray-300 mb-3">{alert.cause}</p>
-                  
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="text-xs">
-                      Investigate ▶
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-xs">
-                      Snooze ⏸
-                    </Button>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-            
-            <div className="flex justify-center mt-6">
-              <Button className="bg-gradient-to-r from-red-500 to-orange-500">
-                Acknowledge All ▶
-              </Button>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="risk" className="mt-6">
-            <motion.div 
-              className="space-y-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              {/* Risk Matrix */}
-              <div className="glass-panel p-6">
-                <h3 className="text-lg font-medium text-gray-200 mb-4">Risk Matrix</h3>
-                
-                <div className="relative w-full h-80 border border-gray-600 rounded-lg overflow-hidden">
-                  {/* Quadrants */}
-                  <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-green-500/10 border-r border-b border-gray-600"></div>
-                  <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-amber-500/10 border-b border-gray-600"></div>
-                  <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-amber-500/10 border-r border-gray-600"></div>
-                  <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-red-500/10 border-gray-600"></div>
-                  
-                  {/* Risk pins */}
-                  {mockRisks.map((risk) => (
-                    <motion.div
-                      key={risk.id}
-                      className="absolute w-4 h-4 bg-teal-400 rounded-full cursor-grab flex items-center justify-center"
-                      style={getRiskPosition(risk.likelihood, risk.impact)}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.5 }}
-                      whileHover={{ scale: 1.2 }}
-                      title={`${risk.name}: L${risk.likelihood}, I${risk.impact}`}
-                    >
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
-                    </motion.div>
-                  ))}
-                  
-                  {/* Axis labels */}
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-xs text-gray-400">
-                    Likelihood →
-                  </div>
-                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2 -rotate-90 text-xs text-gray-400">
-                    Impact →
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Alerts Feed */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-200">System Alerts</h3>
+            <div className="glass-panel p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex gap-2">
+                  <Badge className="bg-red-500/20 text-red-400">3 Critical</Badge>
+                  <Badge className="bg-amber-500/20 text-amber-400">5 Warning</Badge>
+                  <Badge className="bg-green-500/20 text-green-400">10 Info</Badge>
                 </div>
+                <Button size="sm" variant="outline">
+                  Acknowledge All ▶
+                </Button>
               </div>
-
-              {/* Risk List */}
-              <div className="glass-panel p-4">
-                <h4 className="text-sm font-medium text-gray-300 mb-3">Risk Registry</h4>
+              
+              <ScrollArea className="h-64">
                 <div className="space-y-2">
-                  {mockRisks.map((risk) => (
-                    <div key={risk.id} className="flex justify-between items-center text-sm">
-                      <span className="text-white">{risk.name}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400">L: {risk.likelihood}</span>
-                        <span className="text-gray-400">I: {risk.impact}</span>
-                        <Button size="sm" variant="outline" className="text-xs">
-                          Reassess
+                  {alerts.map((alert, index) => (
+                    <motion.div
+                      key={alert.id}
+                      className={`p-3 rounded-lg border transition-all duration-300 hover:scale-[1.02] ${getSeverityColor(alert.severity)}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h5 className="text-sm font-medium">{alert.title}</h5>
+                          <p className="text-xs text-gray-400 mt-1">{alert.cause}</p>
+                        </div>
+                        <div className="text-xs text-gray-400">{alert.timestamp}</div>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-xs"
+                          onClick={() => setSelectedAlert(alert)}
+                        >
+                          <Search size={12} className="mr-1" />
+                          Investigate
+                        </Button>
+                        <Button size="sm" variant="ghost" className="text-xs">
+                          ⏸ Snooze
                         </Button>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
+              </ScrollArea>
+            </div>
+          </div>
+
+          {/* Risk Matrix */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-200">Risk Matrix</h3>
+            <div className="glass-panel p-4">
+              <div className="relative h-64 grid grid-cols-2 gap-2 mb-4">
+                {/* Risk quadrants */}
+                <div className="bg-green-500/10 rounded border border-green-500/20 p-2 flex items-center justify-center text-xs text-green-400">
+                  Low Impact<br/>Low Likelihood
+                </div>
+                <div className="bg-amber-500/10 rounded border border-amber-500/20 p-2 flex items-center justify-center text-xs text-amber-400">
+                  High Impact<br/>Low Likelihood
+                </div>
+                <div className="bg-orange-500/10 rounded border border-orange-500/20 p-2 flex items-center justify-center text-xs text-orange-400">
+                  Low Impact<br/>High Likelihood
+                </div>
+                <div className="bg-red-500/10 rounded border border-red-500/20 p-2 flex items-center justify-center text-xs text-red-400">
+                  High Impact<br/>High Likelihood
+                </div>
+                
+                {/* Risk pins */}
+                {risks.map((risk, index) => (
+                  <Tooltip key={risk.id}>
+                    <TooltipTrigger asChild>
+                      <motion.div
+                        className="absolute w-3 h-3 bg-teal-400 rounded-full cursor-pointer shadow-lg"
+                        style={{
+                          left: `${risk.likelihood * 50}%`,
+                          top: `${(1 - risk.impact) * 50}%`,
+                          transform: 'translate(-50%, -50%)'
+                        }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.5 + index * 0.1, type: "spring" }}
+                        whileHover={{ scale: 1.5, boxShadow: '0 0 20px rgba(20, 184, 166, 0.6)' }}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div>
+                        <div className="font-medium">{risk.name}</div>
+                        <div className="text-xs">Likelihood: {risk.likelihood}, Impact: {risk.impact}</div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
               </div>
-            </motion.div>
-          </TabsContent>
-        </Tabs>
+              
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-300">Risk Items</h4>
+                {risks.map((risk, index) => (
+                  <motion.div
+                    key={risk.id}
+                    className="flex items-center justify-between p-2 rounded bg-gray-700/20"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <span className="text-sm text-gray-300">{risk.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400">
+                        L:{risk.likelihood} I:{risk.impact}
+                      </span>
+                      <div className={`w-3 h-3 rounded-full ${getRiskQuadrantColor(risk.likelihood, risk.impact)}`}></div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              
+              <div className="flex gap-2 mt-4">
+                <Button size="sm" variant="outline">
+                  Reassess Risk ▶
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="flex justify-end">
           <Button variant="outline" onClick={onClose}>
