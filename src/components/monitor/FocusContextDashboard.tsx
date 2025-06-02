@@ -1,20 +1,19 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Maximize2, X, Grip } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
-import { DEIStabilityWidget } from './widgets/DEIStabilityWidget';
-import { BundleSuccessWidget } from './widgets/BundleSuccessWidget';
-import { ScenarioKPIsWidget } from './widgets/ScenarioKPIsWidget';
-import { SystemTrendsWidget } from './widgets/SystemTrendsWidget';
-import { ClaimsWidget } from './widgets/ClaimsWidget';
-import { HandoffQueueWidget } from './widgets/HandoffQueueWidget';
-import { ZoneEntropyWidget } from './widgets/ZoneEntropyWidget';
-import { SystemAlertsWidget } from './widgets/SystemAlertsWidget';
-import { RiskMatrixWidget } from './widgets/RiskMatrixWidget';
-import { IndicatorWidget } from './widgets/IndicatorWidget';
-import { KPISummaryWidget } from './widgets/KPISummaryWidget';
+import DEIStabilityWidget from './widgets/DEIStabilityWidget';
+import BundleSuccessWidget from './widgets/BundleSuccessWidget';
+import ScenarioKPIsWidget from './widgets/ScenarioKPIsWidget';
+import SystemTrendsWidget from './widgets/SystemTrendsWidget';
+import ClaimsWidget from './widgets/ClaimsWidget';
+import HandoffQueueWidget from './widgets/HandoffQueueWidget';
+import ZoneEntropyWidget from './widgets/ZoneEntropyWidget';
+import SystemAlertsWidget from './widgets/SystemAlertsWidget';
+import RiskMatrixWidget from './widgets/RiskMatrixWidget';
+import IndicatorWidget from './widgets/IndicatorWidget';
+import KPISummaryWidget from './widgets/KPISummaryWidget';
 
 interface WidgetConfig {
   id: string;
