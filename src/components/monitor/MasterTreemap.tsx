@@ -34,7 +34,9 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [hoveredRect, setHoveredRect] = useState<string | null>(null);
   const [selectedRect, setSelectedRect] = useState<IndicatorData | null>(null);
+  const [svgDimensions, setSvgDimensions] = useState({ width: 800, height: 400 });
   const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Mock data for the 8 main indicators
   const allIndicators: IndicatorData[] = [
@@ -55,6 +57,23 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
     return true;
   });
 
+  // Update SVG dimensions based on container size
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setSvgDimensions({
+          width: rect.width - 32, // 16px padding on each side
+          height: rect.height - 32
+        });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, [isFullScreen]);
+
   // Calculate color based on indicator type and performance
   const getIndicatorColor = (indicator: IndicatorData): string => {
     if (indicator.type === 'strategic') {
@@ -70,7 +89,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
     }
   };
 
-  // Simple treemap layout algorithm
+  // Simple treemap layout algorithm - now uses full dimensions
   const calculateTreemapLayout = (width: number, height: number): TreemapRect[] => {
     const totalWeight = filteredIndicators.reduce((sum, ind) => sum + ind.weight, 0);
     const totalArea = width * height;
@@ -110,9 +129,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
     return rectangles;
   };
 
-  const svgWidth = 800;
-  const svgHeight = isFullScreen ? 400 : 300;
-  const rectangles = calculateTreemapLayout(svgWidth - 48, svgHeight - 48);
+  const rectangles = calculateTreemapLayout(svgDimensions.width, svgDimensions.height);
 
   const handleRectClick = (indicator: IndicatorData) => {
     setSelectedRect(indicator);
@@ -137,11 +154,11 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
   };
 
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn('w-full h-full', className)}>
       {/* Enhanced Two-Layer Glass Container */}
       <motion.div 
         className={cn(
-          'rounded-[1.5rem] border overflow-hidden relative transition-all duration-400',
+          'rounded-[1.5rem] border overflow-hidden relative transition-all duration-400 h-full',
           isFullScreen ? 'fixed inset-0 z-50' : 'w-full'
         )}
         style={{
@@ -155,7 +172,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
       >
         {/* Inner fill container */}
         <div 
-          className="h-full m-0.5 rounded-[1.25rem] overflow-hidden"
+          className="h-full m-0.5 rounded-[1.25rem] overflow-hidden flex flex-col"
           style={{
             background: 'rgba(20, 30, 50, 0.6)',
             backdropFilter: 'blur(32px)'
@@ -163,7 +180,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
         >
           {/* Gradient Header Bar */}
           <div 
-            className="h-10 flex items-center justify-between px-6"
+            className="h-10 flex items-center justify-between px-6 relative z-10"
             style={{ 
               background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)'
             }}
@@ -197,7 +214,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
           </div>
 
           {/* Enhanced Filter Pills */}
-          <div className="flex justify-center py-4 px-6 gap-4">
+          <div className="flex justify-center py-3 px-6 gap-4 relative z-10">
             {(['all', 'strategic', 'operational'] as const).map((filterOption) => (
               <button
                 key={filterOption}
@@ -225,7 +242,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
 
           {/* Full-screen legend */}
           {isFullScreen && (
-            <div className="flex items-center justify-between px-6 py-2 border-b border-white/10">
+            <div className="flex items-center justify-between px-6 py-2 border-b border-white/10 relative z-10">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded" style={{ background: 'rgba(0,255,195,0.6)' }} />
@@ -251,14 +268,18 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
             </div>
           )}
 
-          {/* Enhanced Treemap SVG */}
-          <div className="p-6">
+          {/* Enhanced Treemap SVG - Now fills remaining space */}
+          <div 
+            ref={containerRef}
+            className="flex-1 relative"
+            style={{ minHeight: 0 }}
+          >
             <motion.svg
               ref={svgRef}
               width="100%"
-              height={svgHeight}
-              viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-              className="w-full"
+              height="100%"
+              viewBox={`0 0 ${svgDimensions.width} ${svgDimensions.height}`}
+              className="absolute inset-4"
               layout
             >
               <AnimatePresence>
@@ -269,8 +290,8 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
                     animate={{ 
                       opacity: hoveredRect && hoveredRect !== rect.data.name ? 0.8 : 1, 
                       scale: hoveredRect === rect.data.name ? 1.15 : 1,
-                      x: rect.x + 24,
-                      y: rect.y + 24
+                      x: rect.x,
+                      y: rect.y
                     }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ 
@@ -291,9 +312,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
                         filter: hoveredRect === rect.data.name 
                           ? 'drop-shadow(0 0 16px rgba(0,255,195,0.5))'
                           : 'none',
-                        boxShadow: hoveredRect === rect.data.name 
-                          ? 'inset 0 2px 4px rgba(0,0,0,0.3)' 
-                          : 'inset 0 2px 4px rgba(0,0,0,0.3)'
+                        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
                       }}
                       onMouseEnter={() => setHoveredRect(rect.data.name)}
                       onMouseLeave={() => setHoveredRect(null)}
