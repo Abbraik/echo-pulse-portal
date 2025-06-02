@@ -96,32 +96,6 @@ const MonitorPage: React.FC = () => {
           </div>
         </motion.header>
 
-        {/* Zone Selector Pills */}
-        <motion.div 
-          className="max-w-[1440px] mx-auto px-6 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="flex justify-center">
-            <div className="flex items-center gap-2 p-2 rounded-2xl border border-white/20" 
-                 style={{ background: 'rgba(20,30,50,0.6)', backdropFilter: 'blur(24px)' }}>
-              {['think', 'act', 'monitor', 'learn', 'innovate'].map((zone, index) => (
-                <button
-                  key={zone}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 font-['Noto_Sans'] ${
-                    zone === 'monitor' 
-                      ? 'bg-[#00FFC3] text-white' 
-                      : 'text-gray-400 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {zone}
-                </button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
         {/* Main Content Container */}
         <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
           
