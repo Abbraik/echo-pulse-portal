@@ -101,7 +101,7 @@ const CombinedAnomalyDetector: React.FC<CombinedAnomalyDetectorProps> = ({ class
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.4 }}
     >
-      {/* Gradient Header - matching ACT style */}
+      {/* ACT-style Header Bar with Neon Gradient */}
       <div 
         className="h-10 flex items-center justify-between px-6 flex-shrink-0"
         style={{ 
@@ -123,7 +123,7 @@ const CombinedAnomalyDetector: React.FC<CombinedAnomalyDetectorProps> = ({ class
           </h3>
         </div>
         
-        {/* Enhanced Navigation arrows - matching ACT style */}
+        {/* ACT-style Navigation arrows */}
         {anomalies.length > 1 && (
           <div className="flex items-center gap-2">
             <motion.button
@@ -147,7 +147,7 @@ const CombinedAnomalyDetector: React.FC<CombinedAnomalyDetectorProps> = ({ class
         )}
       </div>
 
-      {/* Enhanced Anomaly Card - matching ACT carousel style */}
+      {/* ACT-style Anomaly Carousel Card */}
       <div className="flex-1 p-6">
         <AnimatePresence mode="wait">
           <motion.div
@@ -248,7 +248,7 @@ const CombinedAnomalyDetector: React.FC<CombinedAnomalyDetectorProps> = ({ class
               </motion.button>
             </div>
 
-            {/* Enhanced Indicator dots - matching ACT style */}
+            {/* ACT-style Indicator dots */}
             {anomalies.length > 1 && (
               <div className="flex justify-center gap-2 mt-4 pt-4 border-t border-white/10">
                 {anomalies.map((_, index) => (

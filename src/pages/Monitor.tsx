@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
 
-// Import existing components
+// Import components
 import MasterTreemap from '@/components/monitor/MasterTreemap';
 import UniversalAlertHub from '@/components/monitor/UniversalAlertHub';
 import CombinedAnomalyDetector from '@/components/monitor/CombinedAnomalyDetector';
@@ -31,7 +31,7 @@ const MonitorPage: React.FC = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Enhanced Background matching ACT */}
+      {/* ACT-style Background */}
       <div className="fixed inset-0 z-0" style={{
         background: 'linear-gradient(180deg, #081226 0%, #04132A 100%)'
       }}>
@@ -47,7 +47,7 @@ const MonitorPage: React.FC = () => {
       </div>
 
       <AnimatedPage>
-        {/* Enhanced Glass Strip Header - exactly matching ACT */}
+        {/* ACT-style Glass Strip Header */}
         <motion.header 
           className="sticky top-0 z-50 w-full py-6 px-8 mb-6"
           style={{

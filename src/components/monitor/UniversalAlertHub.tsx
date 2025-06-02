@@ -78,7 +78,7 @@ const UniversalAlertHub: React.FC<UniversalAlertHubProps> = ({ className }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.3 }}
     >
-      {/* Gradient Header - matching ACT style */}
+      {/* ACT-style Header Bar with Neon Gradient */}
       <div 
         className="h-10 flex items-center px-6 flex-shrink-0"
         style={{ 
@@ -96,7 +96,7 @@ const UniversalAlertHub: React.FC<UniversalAlertHubProps> = ({ className }) => {
         </div>
       </div>
 
-      {/* Enhanced Alert Table - matching ACT data table style */}
+      {/* ACT-style Data Table */}
       <div className="flex-1 p-6 overflow-auto">
         <div className="overflow-x-auto">
           <Table>
@@ -211,7 +211,7 @@ const UniversalAlertHub: React.FC<UniversalAlertHubProps> = ({ className }) => {
           </Table>
         </div>
 
-        {/* Enhanced Footer - matching ACT style */}
+        {/* ACT-style Footer */}
         <div className="flex justify-end mt-6 pt-4 border-t border-white/10">
           <motion.button
             className="text-[#00B8FF] hover:text-white font-['Noto_Sans'] transition-all duration-200"

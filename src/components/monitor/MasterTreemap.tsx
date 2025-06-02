@@ -172,16 +172,12 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
             <div className="flex items-center gap-3">
               <button 
                 className="text-white/50 hover:text-white transition-all duration-200"
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
                 aria-label="Drag handle"
               >
                 <MoreHorizontal size={16} />
               </button>
               <button 
                 className="text-white/50 hover:text-white transition-all duration-200"
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
                 onClick={() => setIsFullScreen(!isFullScreen)}
                 aria-label={isFullScreen ? "Exit full-screen" : "Enter full-screen"}
               >
@@ -380,9 +376,9 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
                       variant={
                         selectedRect.type === 'strategic' 
                           ? (selectedRect.value / selectedRect.target >= 1.0 ? 'default' : 
-                             selectedRect.value / selectedRect.target >= 0.9 ? 'warning' : 'destructive')
+                             selectedRect.value / selectedRect.target >= 0.9 ? 'secondary' : 'destructive')
                           : (selectedRect.value === 0 ? 'default' : 
-                             selectedRect.value <= 5 ? 'warning' : 'destructive')
+                             selectedRect.value <= 5 ? 'secondary' : 'destructive')
                       }
                     >
                       {selectedRect.type === 'strategic' 
