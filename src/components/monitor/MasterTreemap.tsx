@@ -275,7 +275,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ 
                       duration: hoveredRect === rect.data.name ? 0.2 : 0.4, 
-                      ease: hoveredRect === rect.data.name ? "easeOut" : "cubicBezier(0.68, -0.6, 0.32, 1.6)"
+                      ease: hoveredRect === rect.data.name ? "easeOut" : [0.68, -0.55, 0.265, 1.55]
                     }}
                     style={{ transformOrigin: 'center' }}
                   >
