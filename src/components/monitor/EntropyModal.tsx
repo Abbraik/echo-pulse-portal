@@ -11,10 +11,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
+interface ZoneData {
+  value: number;
+  trend: 'up' | 'down' | 'stable';
+}
+
+interface EntropyData {
+  [zone: string]: ZoneData;
+}
+
 interface EntropyModalProps {
   isOpen: boolean;
   onClose: () => void;
-  data: any;
+  data: EntropyData;
 }
 
 export const EntropyModal: React.FC<EntropyModalProps> = ({
@@ -69,7 +78,7 @@ export const EntropyModal: React.FC<EntropyModalProps> = ({
               <div key={zone} className="glass-panel p-4 text-center">
                 <h4 className="text-sm font-medium text-gray-300 mb-2">{zone}</h4>
                 <div className={`text-2xl font-bold ${getEntropyColor(zoneData.value)}`}>
-                  {zoneData.value}
+                  {zoneData.value.toFixed(2)}
                 </div>
                 <div className="flex items-center justify-center mt-2">
                   {getTrendIcon(zoneData.trend)}
