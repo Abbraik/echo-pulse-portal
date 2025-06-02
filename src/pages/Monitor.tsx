@@ -30,24 +30,29 @@ const MonitorPage: React.FC = () => {
   }, [lastScrollY]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-      {/* Enhanced cinematic background */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-radial from-teal-500/10 via-transparent to-transparent"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>
-        <div className="absolute inset-0 opacity-50" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314b8a6' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 4s ease-in-out infinite'
-        }}></div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Enhanced Background with Vertical Gradient */}
+      <div className="fixed inset-0 z-0" style={{
+        background: 'linear-gradient(180deg, #0A1632 0%, #081226 100%)'
+      }}>
+        {/* Particle Field Overlay */}
+        <div className="absolute inset-0 opacity-5" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300FFC3' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          animation: 'drift 20s ease-in-out infinite'
+        }}>
+        </div>
+        {/* Additional atmospheric layers */}
+        <div className="absolute inset-0 bg-gradient-radial from-teal-500/5 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/10 to-transparent"></div>
       </div>
 
       <AnimatedPage>
-        {/* Cinematic Header Bar */}
+        {/* Enhanced Cinematic Header Bar */}
         <motion.header 
-          className="sticky top-0 z-50 w-full backdrop-blur-[24px] py-4 px-6 mb-8"
+          className="sticky top-0 z-50 w-full backdrop-blur-[32px] py-4 px-8 mb-8"
           style={{
-            background: 'rgba(20, 30, 50, 0.6)',
-            borderBottom: '1px solid rgba(20, 184, 166, 0.3)',
+            background: 'rgba(10, 20, 40, 0.8)',
+            borderBottom: '1px solid rgba(0, 255, 195, 0.3)',
             boxShadow: 'inset 0 0 30px rgba(59, 130, 246, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
           }}
           initial={{ y: -100, opacity: 0 }}
@@ -57,16 +62,27 @@ const MonitorPage: React.FC = () => {
           <div className="max-w-[1440px] mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <motion.div 
-                className="p-3 rounded-2xl bg-purple-500/20 text-purple-400"
+                className="p-3 rounded-2xl"
+                style={{
+                  background: 'rgba(138, 43, 226, 0.3)',
+                  boxShadow: '0 0 12px rgba(138, 43, 226, 0.4)'
+                }}
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <Monitor size={28} />
+                <Monitor size={28} className="text-purple-300" />
               </motion.div>
               <div className="text-left">
                 <motion.h1 
-                  className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-teal-500 font-['Noto_Sans']"
-                  style={{ letterSpacing: '0.05em' }}
+                  className="text-3xl font-bold text-white font-['Noto_Sans']"
+                  style={{ 
+                    letterSpacing: '0.05em',
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.6)',
+                    background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
@@ -85,7 +101,7 @@ const MonitorPage: React.FC = () => {
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-gray-400">
+                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
                   <Info size={18} />
                 </Button>
               </TooltipTrigger>
@@ -96,24 +112,31 @@ const MonitorPage: React.FC = () => {
           </div>
         </motion.header>
 
-        {/* Zone Selector Pills */}
+        {/* Enhanced Zone Selector Pills */}
         <motion.div 
-          className="max-w-[1440px] mx-auto px-6 mb-8"
+          className="max-w-[1440px] mx-auto px-8 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
           <div className="flex justify-center">
-            <div className="flex items-center gap-2 p-2 rounded-2xl border border-white/20" 
-                 style={{ background: 'rgba(20,30,50,0.6)', backdropFilter: 'blur(24px)' }}>
+            <div className="flex items-center gap-3 p-3 rounded-2xl border border-white/20" 
+                 style={{ 
+                   background: 'rgba(10, 20, 40, 0.45)', 
+                   backdropFilter: 'blur(24px)',
+                   boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
+                 }}>
               {['think', 'act', 'monitor', 'learn', 'innovate'].map((zone, index) => (
                 <button
                   key={zone}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 font-['Noto_Sans'] ${
+                  className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 font-['Noto_Sans'] ${
                     zone === 'monitor' 
-                      ? 'bg-[#00FFC3] text-white' 
-                      : 'text-gray-400 hover:text-white hover:bg-white/10'
+                      ? 'bg-[#00FFC3] text-[#081226] shadow-[0_0_8px_rgba(0,255,195,0.6)]' 
+                      : 'bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.10)] text-[#E0E0E0] hover:bg-[rgba(255,255,255,0.10)] hover:text-white'
                   }`}
+                  style={zone === 'monitor' ? { 
+                    boxShadow: '0 0 8px rgba(0,255,195,0.6)' 
+                  } : {}}
                 >
                   {zone}
                 </button>
@@ -122,12 +145,12 @@ const MonitorPage: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Main Content Container */}
-        <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
+        {/* Main Content Container with Enhanced Spacing */}
+        <div className="max-w-[1440px] mx-auto px-8 pb-8 relative z-10">
           
-          {/* Master Treemap Section - Top 65% */}
+          {/* Master Treemap Section - Enhanced Glass Design */}
           <motion.section 
-            className="mb-8"
+            className="mb-6"
             style={{ height: '65vh', minHeight: '400px' }}
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -136,20 +159,20 @@ const MonitorPage: React.FC = () => {
             <MasterTreemap className="h-full" />
           </motion.section>
           
-          {/* Alert & Anomaly Section - Bottom 35% */}
+          {/* Alert & Anomaly Section with Enhanced Spacing */}
           <motion.section
-            className="h-[35vh] min-h-[200px]"
+            className="h-[35vh] min-h-[240px]"
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
           >
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
-              {/* Universal Alert Hub - 60% width */}
+              {/* Universal Alert Hub - Enhanced Design */}
               <div className="lg:col-span-3">
                 <UniversalAlertHub className="h-full" />
               </div>
               
-              {/* Combined Anomaly Detector - 40% width */}
+              {/* Combined Anomaly Detector - Enhanced Design */}
               <div className="lg:col-span-2">
                 <CombinedAnomalyDetector className="h-full" />
               </div>
@@ -157,6 +180,16 @@ const MonitorPage: React.FC = () => {
           </motion.section>
         </div>
       </AnimatedPage>
+
+      {/* CSS for particle drift animation */}
+      <style jsx>{`
+        @keyframes drift {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          25% { transform: translateY(-10px) translateX(5px); }
+          50% { transform: translateY(-5px) translateX(-3px); }
+          75% { transform: translateY(-15px) translateX(8px); }
+        }
+      `}</style>
     </div>
   );
 };
