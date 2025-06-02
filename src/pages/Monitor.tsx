@@ -7,9 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
 
-// Import the new tile dashboard
-import { TileDashboard } from '@/components/monitor/TileDashboard';
-
 const MonitorPage: React.FC = () => {
   const { t } = useTranslation();
 
@@ -55,7 +52,7 @@ const MonitorPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
                 >
-                  MONITOR 📊: {t("operationalStrategicTracking", { defaultValue: "TILE DASHBOARD" })}
+                  MONITOR 📊: {t("operationalStrategicTracking", { defaultValue: "System Monitoring" })}
                 </motion.h1>
                 <motion.p 
                   className="text-base text-gray-300 font-noto-medium"
@@ -63,7 +60,7 @@ const MonitorPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
                 >
-                  {t("monitorCoreDesc", { defaultValue: "Draggable widgets for comprehensive system monitoring" })}
+                  {t("monitorCoreDesc", { defaultValue: "Monitor system performance and metrics" })}
                 </motion.p>
               </div>
             </div>
@@ -74,7 +71,7 @@ const MonitorPage: React.FC = () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="max-w-xs">{t('monitorTooltip', { defaultValue: 'Drag, resize, collapse, and expand tiles' })}</p>
+                <p className="max-w-xs">{t('monitorTooltip', { defaultValue: 'System monitoring dashboard' })}</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -82,8 +79,21 @@ const MonitorPage: React.FC = () => {
 
         {/* Main Content Container */}
         <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
-          {/* Tile Dashboard Container */}
-          <TileDashboard />
+          <motion.div
+            className="w-full h-[400px] rounded-2xl backdrop-blur-[24px] border border-white/20 flex items-center justify-center"
+            style={{
+              background: 'rgba(10, 20, 40, 0.6)',
+              boxShadow: '0 16px 32px rgba(0, 0, 0, 0.4)'
+            }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-teal-400 mb-4">Monitor Dashboard</h2>
+              <p className="text-gray-300">Dashboard content will be implemented here</p>
+            </div>
+          </motion.div>
         </div>
       </AnimatedPage>
     </div>
