@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Maximize2, Minimize2, MoreHorizontal, X, Info, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Maximize2, Minimize2, MoreHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/hooks/use-translation';
@@ -38,7 +37,6 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Mock data for the 8 main indicators
   const allIndicators: IndicatorData[] = [
     { name: 'DEI Composite', weight: 4, value: 78, target: 80, type: 'strategic' },
     { name: 'Network Dev Index', weight: 3, value: 64, target: 100, type: 'strategic' },
@@ -50,21 +48,19 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
     { name: 'System Error Count', weight: 3, value: 5, target: 0, type: 'operational' }
   ];
 
-  // Filter indicators based on current filter
   const filteredIndicators = allIndicators.filter(indicator => {
     if (filter === 'strategic') return indicator.type === 'strategic';
     if (filter === 'operational') return indicator.type === 'operational';
     return true;
   });
 
-  // Update SVG dimensions based on container size
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         setSvgDimensions({
-          width: rect.width - 32, // 16px padding on each side
-          height: rect.height - 32
+          width: rect.width,
+          height: rect.height
         });
       }
     };
@@ -74,22 +70,19 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
     return () => window.removeEventListener('resize', updateDimensions);
   }, [isFullScreen]);
 
-  // Calculate color based on indicator type and performance
   const getIndicatorColor = (indicator: IndicatorData): string => {
     if (indicator.type === 'strategic') {
       const ratio = indicator.value / indicator.target;
-      if (ratio >= 1.0) return 'rgba(0,255,195,0.12)'; // neon-teal
-      if (ratio >= 0.9) return 'rgba(255,193,7,0.12)'; // amber
-      return 'rgba(255,110,110,0.12)'; // coral
+      if (ratio >= 1.0) return 'rgba(0,255,195,0.12)';
+      if (ratio >= 0.9) return 'rgba(255,193,7,0.12)';
+      return 'rgba(255,110,110,0.12)';
     } else {
-      // Operational (lower is better for queues/errors)
       if (indicator.value === 0) return 'rgba(0,255,195,0.12)';
       if (indicator.value <= 5) return 'rgba(255,193,7,0.12)';
       return 'rgba(255,110,110,0.12)';
     }
   };
 
-  // Simple treemap layout algorithm - now uses full dimensions
   const calculateTreemapLayout = (width: number, height: number): TreemapRect[] => {
     const totalWeight = filteredIndicators.reduce((sum, ind) => sum + ind.weight, 0);
     const totalArea = width * height;
@@ -139,7 +132,6 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
     setFilter(newFilter);
   };
 
-  // Determine if rectangle is large enough for text
   const canShowText = (rect: TreemapRect) => {
     return rect.width >= 100 && rect.height >= 60;
   };
@@ -155,45 +147,30 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
 
   return (
     <div className={cn('w-full h-full', className)}>
-      {/* Enhanced Two-Layer Glass Container */}
       <motion.div 
         className={cn(
-          'rounded-[1.5rem] border overflow-hidden relative transition-all duration-400 h-full',
-          isFullScreen ? 'fixed inset-0 z-50' : 'w-full'
+          'w-full h-full overflow-hidden relative',
+          isFullScreen ? 'fixed inset-0 z-50' : ''
         )}
-        style={{
-          // Outer frame
-          background: 'rgba(10, 20, 40, 0.45)',
-          backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(0,255,195,0.15)',
-          boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)'
-        }}
         layout
       >
-        {/* Inner fill container */}
-        <div 
-          className="h-full m-0.5 rounded-[1.25rem] overflow-hidden flex flex-col"
-          style={{
-            background: 'rgba(20, 30, 50, 0.6)',
-            backdropFilter: 'blur(32px)'
-          }}
-        >
-          {/* Gradient Header Bar */}
+        <div className="h-full flex flex-col">
+          {/* Gradient Header Bar - matching ACT style */}
           <div 
-            className="h-10 flex items-center justify-between px-6 relative z-10"
+            className="h-10 flex items-center justify-between px-6 relative z-10 flex-shrink-0"
             style={{ 
               background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)'
             }}
           >
             <h2 className="text-base font-bold text-white font-['Noto_Sans']" style={{
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.6)'
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.6)',
+              fontSize: '16px'
             }}>
               Master Treemap: Key Monitor Indicators
             </h2>
             <div className="flex items-center gap-3">
               <button 
-                className="text-white/50 hover:text-white transition-all duration-200 cursor-grab"
-                style={{ opacity: 0.5 }}
+                className="text-white/50 hover:text-white transition-all duration-200"
                 onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
                 onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
                 aria-label="Drag handle"
@@ -202,7 +179,6 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
               </button>
               <button 
                 className="text-white/50 hover:text-white transition-all duration-200"
-                style={{ opacity: 0.5 }}
                 onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
                 onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
                 onClick={() => setIsFullScreen(!isFullScreen)}
@@ -213,17 +189,17 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
             </div>
           </div>
 
-          {/* Enhanced Filter Pills */}
-          <div className="flex justify-center py-3 px-6 gap-4 relative z-10">
+          {/* Enhanced Filter Pills - matching ACT style */}
+          <div className="flex justify-center py-4 px-6 gap-4 relative z-10 flex-shrink-0">
             {(['all', 'strategic', 'operational'] as const).map((filterOption) => (
               <button
                 key={filterOption}
                 onClick={() => handleFilterChange(filterOption)}
                 className={cn(
-                  'px-6 py-2 rounded-full text-sm font-semibold transition-all duration-150',
+                  'px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200',
                   'font-["Noto_Sans"]',
                   filter === filterOption
-                    ? 'text-[#081226]'
+                    ? 'text-[#081226] shadow-[0_0_8px_rgba(0,255,195,0.6)]'
                     : 'text-[#E0E0E0] hover:bg-[rgba(255,255,255,0.10)]'
                 )}
                 style={filter === filterOption ? {
@@ -240,35 +216,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
             ))}
           </div>
 
-          {/* Full-screen legend */}
-          {isFullScreen && (
-            <div className="flex items-center justify-between px-6 py-2 border-b border-white/10 relative z-10">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ background: 'rgba(0,255,195,0.6)' }} />
-                  <span className="text-xs text-white font-['Noto_Sans']">In-Band</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ background: 'rgba(255,193,7,0.6)' }} />
-                  <span className="text-xs text-white font-['Noto_Sans']">Warning</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ background: 'rgba(255,110,110,0.6)' }} />
-                  <span className="text-xs text-white font-['Noto_Sans']">Critical</span>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsFullScreen(false)}
-                className="text-[#00B8FF] border-[#00B8FF]/30 hover:bg-[#00B8FF]/10"
-              >
-                Back to Monitor
-              </Button>
-            </div>
-          )}
-
-          {/* Enhanced Treemap SVG - Now fills remaining space */}
+          {/* Enhanced Treemap SVG - fills remaining space */}
           <div 
             ref={containerRef}
             className="flex-1 relative"
@@ -279,7 +227,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
               width="100%"
               height="100%"
               viewBox={`0 0 ${svgDimensions.width} ${svgDimensions.height}`}
-              className="absolute inset-4"
+              className="absolute inset-0"
               layout
             >
               <AnimatePresence>
@@ -289,7 +237,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ 
                       opacity: hoveredRect && hoveredRect !== rect.data.name ? 0.8 : 1, 
-                      scale: hoveredRect === rect.data.name ? 1.15 : 1,
+                      scale: hoveredRect === rect.data.name ? 1.15 : (hoveredRect && hoveredRect !== rect.data.name ? 0.92 : 1),
                       x: rect.x,
                       y: rect.y
                     }}
@@ -327,7 +275,10 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
                           textAnchor="middle"
                           className="text-sm font-bold font-['Noto_Sans'] pointer-events-none"
                           fill="#00FFC3"
-                          style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}
+                          style={{ 
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+                            fontSize: '14px'
+                          }}
                         >
                           {rect.data.name}
                         </text>
@@ -370,7 +321,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
         </div>
       </motion.div>
 
-      {/* Enhanced Detail Modal */}
+      {/* Enhanced Detail Modal - matching ACT style */}
       <AnimatePresence>
         {selectedRect && (
           <motion.div

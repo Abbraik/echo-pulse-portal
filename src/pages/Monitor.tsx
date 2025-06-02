@@ -31,9 +31,9 @@ const MonitorPage: React.FC = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Enhanced Background with Vertical Gradient */}
+      {/* Enhanced Background matching ACT */}
       <div className="fixed inset-0 z-0" style={{
-        background: 'linear-gradient(180deg, #0A1632 0%, #081226 100%)'
+        background: 'linear-gradient(180deg, #081226 0%, #04132A 100%)'
       }}>
         {/* Particle Field Overlay */}
         <div className="absolute inset-0 opacity-5" style={{
@@ -47,41 +47,39 @@ const MonitorPage: React.FC = () => {
       </div>
 
       <AnimatedPage>
-        {/* Enhanced Cinematic Header Bar */}
+        {/* Enhanced Cinematic Header Bar - matching ACT */}
         <motion.header 
-          className="sticky top-0 z-50 w-full backdrop-blur-[32px] py-4 px-8 mb-8"
+          className="sticky top-0 z-50 w-full backdrop-blur-[20px] py-6 px-8 mb-8"
           style={{
-            background: 'rgba(10, 20, 40, 0.8)',
-            borderBottom: '1px solid rgba(0, 255, 195, 0.3)',
-            boxShadow: 'inset 0 0 30px rgba(59, 130, 246, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
+            background: 'rgba(10, 20, 40, 0.6)',
+            borderBottom: '1px solid rgba(0, 255, 195, 0.15)',
+            boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)',
+            height: '80px'
           }}
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: hideHeader ? -100 : 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <div className="max-w-[1440px] mx-auto flex items-center justify-between">
+          <div className="max-w-[1440px] mx-auto flex items-center justify-between h-full">
             <div className="flex items-center space-x-4">
               <motion.div 
                 className="p-3 rounded-2xl"
                 style={{
-                  background: 'rgba(138, 43, 226, 0.3)',
-                  boxShadow: '0 0 12px rgba(138, 43, 226, 0.4)'
+                  background: 'rgba(0, 255, 195, 0.2)',
+                  boxShadow: '0 0 12px rgba(0, 255, 195, 0.4)'
                 }}
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <Monitor size={28} className="text-purple-300" />
+                <Monitor size={28} className="text-[#00FFC3]" />
               </motion.div>
               <div className="text-left">
                 <motion.h1 
-                  className="text-3xl font-bold text-white font-['Noto_Sans']"
+                  className="text-xl font-bold text-[#00FFC3] font-['Noto_Sans']"
                   style={{ 
                     letterSpacing: '0.05em',
                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.6)',
-                    background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text'
+                    fontSize: '20px'
                   }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -90,7 +88,8 @@ const MonitorPage: React.FC = () => {
                   MONITOR ▮ : OPERATIONAL & STRATEGIC TRACKING
                 </motion.h1>
                 <motion.p 
-                  className="text-base text-gray-300 font-['Noto_Sans']"
+                  className="text-sm text-[#E0E0E0] font-['Noto_Sans']"
+                  style={{ fontSize: '14px' }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
@@ -99,56 +98,33 @@ const MonitorPage: React.FC = () => {
                 </motion.p>
               </div>
             </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                  <Info size={18} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="max-w-xs">Monitor key indicators, track alerts, and detect anomalies</p>
-              </TooltipContent>
-            </Tooltip>
+            <div className="flex items-center gap-3">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-white/50 hover:text-white border border-white/10 hover:border-[#00FFC3]/50 transition-all duration-200"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      backdropFilter: 'blur(8px)'
+                    }}
+                  >
+                    <Info size={18} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Monitor key indicators, track alerts, and detect anomalies</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         </motion.header>
 
-        {/* Enhanced Zone Selector Pills */}
-        <motion.div 
-          className="max-w-[1440px] mx-auto px-8 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="flex justify-center">
-            <div className="flex items-center gap-3 p-3 rounded-2xl border border-white/20" 
-                 style={{ 
-                   background: 'rgba(10, 20, 40, 0.45)', 
-                   backdropFilter: 'blur(24px)',
-                   boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
-                 }}>
-              {['think', 'act', 'monitor', 'learn', 'innovate'].map((zone, index) => (
-                <button
-                  key={zone}
-                  className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 font-['Noto_Sans'] ${
-                    zone === 'monitor' 
-                      ? 'bg-[#00FFC3] text-[#081226] shadow-[0_0_8px_rgba(0,255,195,0.6)]' 
-                      : 'bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.10)] text-[#E0E0E0] hover:bg-[rgba(255,255,255,0.10)] hover:text-white'
-                  }`}
-                  style={zone === 'monitor' ? { 
-                    boxShadow: '0 0 8px rgba(0,255,195,0.6)' 
-                  } : {}}
-                >
-                  {zone}
-                </button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Main Content Container with Enhanced Spacing */}
+        {/* Main Content Container with Enhanced Spacing - matching ACT */}
         <div className="max-w-[1440px] mx-auto px-8 pb-8 relative z-10">
           
-          {/* Master Treemap Section - Enhanced Glass Design */}
+          {/* Master Treemap Section - Enhanced Glass Design matching ACT */}
           <motion.section 
             className="mb-6"
             style={{ height: '65vh', minHeight: '400px' }}
@@ -156,10 +132,28 @@ const MonitorPage: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           >
-            <MasterTreemap className="h-full" />
+            <div 
+              className="rounded-[1.5rem] border overflow-hidden relative h-full"
+              style={{
+                background: 'rgba(10, 20, 40, 0.45)',
+                backdropFilter: 'blur(24px)',
+                border: '1px solid rgba(0,255,195,0.15)',
+                boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)'
+              }}
+            >
+              <div 
+                className="h-full m-0.5 rounded-[1.25rem] overflow-hidden relative"
+                style={{
+                  background: 'rgba(20, 30, 50, 0.6)',
+                  backdropFilter: 'blur(32px)'
+                }}
+              >
+                <MasterTreemap className="h-full" />
+              </div>
+            </div>
           </motion.section>
           
-          {/* Alert & Anomaly Section with Enhanced Spacing */}
+          {/* Alert & Anomaly Section with Enhanced Spacing - matching ACT */}
           <motion.section
             className="h-[35vh] min-h-[240px]"
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
@@ -167,14 +161,50 @@ const MonitorPage: React.FC = () => {
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
           >
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
-              {/* Universal Alert Hub - Enhanced Design */}
+              {/* Universal Alert Hub - Enhanced Design matching ACT */}
               <div className="lg:col-span-3">
-                <UniversalAlertHub className="h-full" />
+                <div 
+                  className="h-full rounded-[1.5rem] border overflow-hidden relative"
+                  style={{
+                    background: 'rgba(10, 20, 40, 0.45)',
+                    backdropFilter: 'blur(24px)',
+                    border: '1px solid rgba(0,255,195,0.15)',
+                    boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)'
+                  }}
+                >
+                  <div 
+                    className="h-full m-0.5 rounded-[1.25rem] overflow-hidden relative"
+                    style={{
+                      background: 'rgba(20, 30, 50, 0.6)',
+                      backdropFilter: 'blur(32px)'
+                    }}
+                  >
+                    <UniversalAlertHub className="h-full" />
+                  </div>
+                </div>
               </div>
               
-              {/* Combined Anomaly Detector - Enhanced Design */}
+              {/* Combined Anomaly Detector - Enhanced Design matching ACT */}
               <div className="lg:col-span-2">
-                <CombinedAnomalyDetector className="h-full" />
+                <div 
+                  className="h-full rounded-[1.5rem] border overflow-hidden relative"
+                  style={{
+                    background: 'rgba(10, 20, 40, 0.45)',
+                    backdropFilter: 'blur(24px)',
+                    border: '1px solid rgba(0,255,195,0.15)',
+                    boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)'
+                  }}
+                >
+                  <div 
+                    className="h-full m-0.5 rounded-[1.25rem] overflow-hidden relative"
+                    style={{
+                      background: 'rgba(20, 30, 50, 0.6)',
+                      backdropFilter: 'blur(32px)'
+                    }}
+                  >
+                    <CombinedAnomalyDetector className="h-full" />
+                  </div>
+                </div>
               </div>
             </div>
           </motion.section>
