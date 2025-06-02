@@ -8,7 +8,6 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
-import LoopNavigation from '@/components/home/LoopNavigation';
 
 // Import radial dashboard components
 import { RadialDashboard } from '@/components/monitor/RadialDashboard';
@@ -85,16 +84,6 @@ const MonitorPage: React.FC = () => {
 
         {/* Main Content Container */}
         <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
-          {/* Loop Navigation Ribbon */}
-          <motion.div 
-            className="mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <LoopNavigation />
-          </motion.div>
-          
           {/* Radial Dashboard Container */}
           <RadialDashboard />
         </div>
