@@ -47,11 +47,12 @@ const MonitorPage: React.FC = () => {
       </div>
 
       <AnimatedPage>
-        {/* Enhanced Cinematic Header Bar - matching ACT */}
+        {/* Enhanced Glass Strip Header - exactly matching ACT */}
         <motion.header 
-          className="sticky top-0 z-50 w-full backdrop-blur-[20px] py-6 px-8 mb-8"
+          className="sticky top-0 z-50 w-full py-6 px-8 mb-6"
           style={{
             background: 'rgba(10, 20, 40, 0.6)',
+            backdropFilter: 'blur(20px)',
             borderBottom: '1px solid rgba(0, 255, 195, 0.15)',
             boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)',
             height: '80px'
@@ -121,10 +122,10 @@ const MonitorPage: React.FC = () => {
           </div>
         </motion.header>
 
-        {/* Main Content Container with Enhanced Spacing - matching ACT */}
+        {/* Main Content Container with ACT-style spacing */}
         <div className="max-w-[1440px] mx-auto px-8 pb-8 relative z-10">
           
-          {/* Master Treemap Section - Enhanced Glass Design matching ACT */}
+          {/* Master Treemap Section - ACT-style glass card */}
           <motion.section 
             className="mb-6"
             style={{ height: '65vh', minHeight: '400px' }}
@@ -153,7 +154,7 @@ const MonitorPage: React.FC = () => {
             </div>
           </motion.section>
           
-          {/* Alert & Anomaly Section with Enhanced Spacing - matching ACT */}
+          {/* Alert & Anomaly Section with ACT-style glass cards */}
           <motion.section
             className="h-[35vh] min-h-[240px]"
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
@@ -161,7 +162,7 @@ const MonitorPage: React.FC = () => {
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
           >
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
-              {/* Universal Alert Hub - Enhanced Design matching ACT */}
+              {/* Universal Alert Hub - ACT-style glass card */}
               <div className="lg:col-span-3">
                 <div 
                   className="h-full rounded-[1.5rem] border overflow-hidden relative"
@@ -184,7 +185,7 @@ const MonitorPage: React.FC = () => {
                 </div>
               </div>
               
-              {/* Combined Anomaly Detector - Enhanced Design matching ACT */}
+              {/* Combined Anomaly Detector - ACT-style glass card */}
               <div className="lg:col-span-2">
                 <div 
                   className="h-full rounded-[1.5rem] border overflow-hidden relative"

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Maximize2, Minimize2, MoreHorizontal, X } from 'lucide-react';
@@ -155,7 +156,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
         layout
       >
         <div className="h-full flex flex-col">
-          {/* Gradient Header Bar - matching ACT style */}
+          {/* ACT-style Header Bar with Neon Gradient */}
           <div 
             className="h-10 flex items-center justify-between px-6 relative z-10 flex-shrink-0"
             style={{ 
@@ -189,7 +190,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
             </div>
           </div>
 
-          {/* Enhanced Filter Pills - matching ACT style */}
+          {/* ACT-style Filter Pills */}
           <div className="flex justify-center py-4 px-6 gap-4 relative z-10 flex-shrink-0">
             {(['all', 'strategic', 'operational'] as const).map((filterOption) => (
               <button
@@ -216,7 +217,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
             ))}
           </div>
 
-          {/* Enhanced Treemap SVG - fills remaining space */}
+          {/* Treemap SVG - fills remaining space with no margins */}
           <div 
             ref={containerRef}
             className="flex-1 relative"
@@ -244,7 +245,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ 
                       duration: hoveredRect === rect.data.name ? 0.2 : 0.4, 
-                      ease: hoveredRect === rect.data.name ? "easeOut" : [0.68, -0.55, 0.265, 1.55]
+                      ease: hoveredRect === rect.data.name ? "easeOut" : "easeInOut"
                     }}
                     style={{ transformOrigin: 'center' }}
                   >
@@ -321,7 +322,7 @@ const MasterTreemap: React.FC<MasterTreemapProps> = ({ className }) => {
         </div>
       </motion.div>
 
-      {/* Enhanced Detail Modal - matching ACT style */}
+      {/* ACT-style Detail Modal */}
       <AnimatePresence>
         {selectedRect && (
           <motion.div
