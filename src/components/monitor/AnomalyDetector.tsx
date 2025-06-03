@@ -222,7 +222,6 @@ const AnomalyDetector: React.FC = () => {
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
               borderColor: "rgba(255, 255, 255, 0.2)"
             }}
-            transition={{ duration: 0.2 }}
             role="region"
             aria-labelledby="anomaly-heading"
           >
