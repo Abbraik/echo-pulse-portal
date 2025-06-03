@@ -29,11 +29,11 @@ const InstrumentPanel: React.FC<InstrumentPanelProps> = ({
     color: '#E0E0E0',
     border: '1px solid rgba(255, 255, 255, 0.10)',
     borderRadius: '6px',
-    padding: '8px 12px',
+    padding: '6px 10px',
     fontFamily: 'Noto Sans',
     fontSize: '12px',
     fontWeight: 400,
-    width: '100%',
+    minWidth: '120px',
   };
 
   const labelStyle = {
@@ -41,33 +41,29 @@ const InstrumentPanel: React.FC<InstrumentPanelProps> = ({
     fontSize: '12px',
     fontWeight: 400,
     color: '#E0E0E0',
-    marginBottom: '8px',
-    display: 'block',
+    marginRight: '8px',
   };
 
   return (
     <motion.div
-      className="h-fit"
+      className="flex items-center gap-4 p-3 rounded-lg"
       style={{
-        background: 'rgba(10, 20, 40, 0.45)',
-        backdropFilter: 'blur(24px)',
-        border: '1px solid rgba(0, 255, 195, 0.15)',
-        borderRadius: '1.5rem',
-        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)',
-        padding: '16px',
+        background: 'rgba(10, 20, 35, 0.45)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(0, 255, 195, 0.12)',
+        borderRadius: '1rem',
       }}
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4 }}
     >
       {/* Time Range Selector */}
-      <div className="mb-6">
+      <div className="flex items-center">
         <label style={labelStyle}>Time Range:</label>
         <select
           value={timeRange}
           onChange={(e) => onTimeRangeChange(e.target.value)}
           style={selectStyle}
-          className="w-full"
         >
           {timeRangeOptions.map((option) => (
             <option key={option} value={option}>
@@ -78,13 +74,12 @@ const InstrumentPanel: React.FC<InstrumentPanelProps> = ({
       </div>
 
       {/* Domain Filter */}
-      <div className="mb-6">
+      <div className="flex items-center">
         <label style={labelStyle}>Domain:</label>
         <select
           value={domainFilter}
           onChange={(e) => onDomainFilterChange(e.target.value)}
           style={selectStyle}
-          className="w-full"
         >
           {domainOptions.map((option) => (
             <option key={option} value={option}>
@@ -96,15 +91,25 @@ const InstrumentPanel: React.FC<InstrumentPanelProps> = ({
 
       {/* Chart Type Toggle */}
       {showChartType && (
-        <div className="mb-6">
+        <div className="flex items-center">
           <label style={labelStyle}>Chart Style:</label>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <label className="flex items-center cursor-pointer">
               <div
-                className="w-4 h-4 rounded-full border mr-2"
+                className="w-4 h-4 rounded-full border-2 mr-2 transition-all duration-150"
                 style={{
                   background: chartType === 'bar' ? '#00FFC3' : 'transparent',
                   borderColor: chartType === 'bar' ? '#00FFC3' : '#E0E0E0',
+                }}
+                onMouseEnter={(e) => {
+                  if (chartType !== 'bar') {
+                    e.currentTarget.style.borderColor = '#00FFC3';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (chartType !== 'bar') {
+                    e.currentTarget.style.borderColor = '#E0E0E0';
+                  }
                 }}
               />
               <input
@@ -116,16 +121,24 @@ const InstrumentPanel: React.FC<InstrumentPanelProps> = ({
                 className="hidden"
                 aria-label="Bar chart"
               />
-              <span style={{ ...labelStyle, marginBottom: 0, color: '#E0E0E0' }}>
-                Bar
-              </span>
+              <span style={labelStyle}>Bar</span>
             </label>
             <label className="flex items-center cursor-pointer">
               <div
-                className="w-4 h-4 rounded-full border mr-2"
+                className="w-4 h-4 rounded-full border-2 mr-2 transition-all duration-150"
                 style={{
                   background: chartType === 'line' ? '#00FFC3' : 'transparent',
                   borderColor: chartType === 'line' ? '#00FFC3' : '#E0E0E0',
+                }}
+                onMouseEnter={(e) => {
+                  if (chartType !== 'line') {
+                    e.currentTarget.style.borderColor = '#00FFC3';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (chartType !== 'line') {
+                    e.currentTarget.style.borderColor = '#E0E0E0';
+                  }
                 }}
               />
               <input
@@ -137,41 +150,11 @@ const InstrumentPanel: React.FC<InstrumentPanelProps> = ({
                 className="hidden"
                 aria-label="Line chart"
               />
-              <span style={{ ...labelStyle, marginBottom: 0, color: '#E0E0E0' }}>
-                Line
-              </span>
+              <span style={labelStyle}>Line</span>
             </label>
           </div>
         </div>
       )}
-
-      {/* Legend */}
-      <div>
-        <label style={labelStyle}>Status Legend:</label>
-        <div className="space-y-2">
-          <div className="flex items-center">
-            <div
-              className="w-2.5 h-2.5 rounded-full mr-2"
-              style={{ background: '#00FFC3' }}
-            />
-            <span style={{ ...labelStyle, marginBottom: 0 }}>Healthy/In-Band</span>
-          </div>
-          <div className="flex items-center">
-            <div
-              className="w-2.5 h-2.5 rounded-full mr-2"
-              style={{ background: '#FFC107' }}
-            />
-            <span style={{ ...labelStyle, marginBottom: 0 }}>Warning/Near Threshold</span>
-          </div>
-          <div className="flex items-center">
-            <div
-              className="w-2.5 h-2.5 rounded-full mr-2"
-              style={{ background: '#FF6E6E' }}
-            />
-            <span style={{ ...labelStyle, marginBottom: 0 }}>Critical/Out-of-Band</span>
-          </div>
-        </div>
-      </div>
     </motion.div>
   );
 };

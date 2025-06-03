@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MoreVertical, Minimize2, Maximize2, GripVertical, CornerDownRight, X } from 'lucide-react';
+import { MoreVertical, Minimize2, Maximize2, GripVertical, X } from 'lucide-react';
 
 interface TileDashboardViewProps {
   timeRange: string;
@@ -52,10 +52,10 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({
 
   const getTileSize = (size: string) => {
     switch (size) {
-      case '2x2': return { width: 'col-span-2 row-span-2', height: 'h-48' };
-      case '1x2': return { width: 'col-span-1 row-span-2', height: 'h-48' };
-      case '1x1': return { width: 'col-span-1 row-span-1', height: 'h-24' };
-      default: return { width: 'col-span-1 row-span-1', height: 'h-24' };
+      case '2x2': return 'col-span-2 row-span-2 h-48';
+      case '1x2': return 'col-span-1 row-span-2 h-48';
+      case '1x1': return 'col-span-1 row-span-1 h-24';
+      default: return 'col-span-1 row-span-1 h-24';
     }
   };
 
@@ -79,8 +79,10 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({
         background: 'rgba(10, 20, 40, 0.45)',
         backdropFilter: 'blur(24px)',
         border: '1px solid rgba(0, 255, 195, 0.15)',
-        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)',
-        minHeight: isFullscreen ? '80vh' : '500px',
+        borderRadius: '1.5rem',
+        boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6)',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {/* Header Strip */}
@@ -103,20 +105,32 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({
         </h2>
         <div className="flex items-center space-x-2">
           <motion.button
-            className="text-white opacity-50 hover:opacity-100"
-            whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+            className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all duration-200"
+            style={{ opacity: 0.6 }}
+            whileHover={{ 
+              opacity: 1,
+              filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+            }}
           >
             <MoreVertical size={16} />
           </motion.button>
           <motion.button
-            className="text-white opacity-50 hover:opacity-100"
-            whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+            className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all duration-200"
+            style={{ opacity: 0.6 }}
+            whileHover={{ 
+              opacity: 1,
+              filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+            }}
           >
             <Minimize2 size={16} />
           </motion.button>
           <motion.button
-            className="text-white opacity-50 hover:opacity-100"
-            whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+            className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all duration-200"
+            style={{ opacity: 0.6 }}
+            whileHover={{ 
+              opacity: 1,
+              filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+            }}
             onClick={() => onFullscreen('main-view')}
           >
             <Maximize2 size={16} />
@@ -125,99 +139,112 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({
       </div>
 
       {/* Masonry Grid */}
-      <div className="p-4 h-full overflow-auto">
+      <div className="flex-1 p-4 overflow-auto">
         <div className="grid grid-cols-4 gap-4 auto-rows-max">
-          {activeTiles.map((tile) => {
-            const sizeClasses = getTileSize(tile.size);
-            
-            return (
-              <motion.div
-                key={tile.id}
-                className={`${sizeClasses.width} ${sizeClasses.height} p-3 rounded-xl relative`}
-                style={{
-                  background: 'rgba(20, 30, 50, 0.6)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(0, 255, 195, 0.10)',
-                  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
-                }}
-                whileHover={{
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 0 12px rgba(0,255,195,0.4)',
-                }}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-                layout
-              >
-                {/* Tile Header */}
-                <div className="flex items-start justify-between mb-2">
+          {activeTiles.map((tile) => (
+            <motion.div
+              key={tile.id}
+              className={`${getTileSize(tile.size)} p-3 rounded-xl relative transition-all duration-200`}
+              style={{
+                background: 'rgba(20, 30, 50, 0.6)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.10)',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+              }}
+              whileHover={{
+                transform: 'translateY(-4px)',
+                boxShadow: '0 0 16px rgba(0,255,195,0.5)',
+                zIndex: 5,
+              }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              layout
+            >
+              {/* Tile Header */}
+              <div className="flex items-start justify-between mb-2">
+                <motion.button
+                  className="text-white transition-all duration-200"
+                  style={{ opacity: 0.6 }}
+                  whileHover={{ 
+                    opacity: 1,
+                    filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+                  }}
+                >
+                  <GripVertical size={12} />
+                </motion.button>
+                <div className="flex space-x-1">
                   <motion.button
-                    className="text-white opacity-50 hover:opacity-100"
-                    whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+                    className="text-white transition-all duration-200"
+                    style={{ opacity: 0.6 }}
+                    whileHover={{ 
+                      opacity: 1,
+                      filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+                    }}
+                    onClick={() => collapseTile(tile.id)}
                   >
-                    <GripVertical size={12} />
+                    <Minimize2 size={12} />
                   </motion.button>
-                  <div className="flex space-x-1">
-                    <motion.button
-                      className="text-white opacity-50 hover:opacity-100"
-                      whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
-                      onClick={() => collapseTile(tile.id)}
-                    >
-                      <Minimize2 size={12} />
-                    </motion.button>
-                    <motion.button
-                      className="text-white opacity-50 hover:opacity-100"
-                      whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
-                      onClick={() => expandTile(tile.id)}
-                    >
-                      <Maximize2 size={12} />
-                    </motion.button>
-                  </div>
+                  <motion.button
+                    className="text-white transition-all duration-200"
+                    style={{ opacity: 0.6 }}
+                    whileHover={{ 
+                      opacity: 1,
+                      filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+                    }}
+                    onClick={() => expandTile(tile.id)}
+                  >
+                    <Maximize2 size={12} />
+                  </motion.button>
+                </div>
+              </div>
+
+              {/* Tile Content */}
+              <div className="flex flex-col justify-between h-full">
+                <div>
+                  <h3
+                    className="mb-1"
+                    style={{
+                      fontFamily: 'Noto Sans',
+                      fontWeight: 600,
+                      fontSize: '14px',
+                      color: '#00FFC3',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                    }}
+                  >
+                    {tile.name}
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: 'Noto Sans',
+                      fontSize: '12px',
+                      color: '#E0E0E0',
+                    }}
+                  >
+                    {tile.current}/{tile.target}
+                  </p>
                 </div>
 
-                {/* Tile Content */}
-                <div className="flex flex-col justify-between h-full">
-                  <div>
-                    <h3
-                      className="mb-1"
-                      style={{
-                        fontFamily: 'Noto Sans',
-                        fontWeight: 600,
-                        fontSize: '14px',
-                        color: '#00FFC3',
-                      }}
-                    >
-                      {tile.name}
-                    </h3>
-                    <p
-                      style={{
-                        fontFamily: 'Noto Sans',
-                        fontSize: '12px',
-                        color: '#E0E0E0',
-                      }}
-                    >
-                      {tile.current}/{tile.target}
-                    </p>
+                <div className="flex items-end justify-between">
+                  {/* Mini Sparkline */}
+                  <div className="w-20 h-10 bg-white/5 rounded flex items-center justify-center">
+                    <span className="text-xs text-gray-400">
+                      {chartType === 'bar' ? '▂▃▅▃▄' : '⟋⟍⟋⟍'}
+                    </span>
                   </div>
 
-                  <div className="flex items-end justify-between">
-                    {/* Mini Sparkline */}
-                    <div className="w-20 h-10 bg-white/5 rounded flex items-center justify-center">
-                      <span className="text-xs text-gray-400">
-                        {chartType === 'bar' ? '▂▃▅▃▄' : '⟋⟍⟋⟍'}
-                      </span>
-                    </div>
-
-                    {/* Status Dot */}
-                    <div
-                      className="w-2.5 h-2.5 rounded-full"
-                      style={{ background: getStatusColor(tile.status) }}
-                    />
-                  </div>
+                  {/* Status Dot */}
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ 
+                      background: getStatusColor(tile.status),
+                      boxShadow: `0 0 8px ${getStatusColor(tile.status)}40`,
+                    }}
+                  />
                 </div>
-              </motion.div>
-            );
-          })}
+              </div>
+            </motion.div>
+          ))}
         </div>
 
         {/* Collapsed Tiles Strip */}
@@ -278,6 +305,7 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({
                 background: 'rgba(20, 30, 50, 0.85)',
                 backdropFilter: 'blur(32px)',
                 border: '1px solid rgba(0, 255, 195, 0.15)',
+                borderRadius: '1rem',
                 boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)',
               }}
               initial={{ scale: 0.9, opacity: 0 }}

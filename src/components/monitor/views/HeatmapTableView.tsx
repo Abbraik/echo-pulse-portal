@@ -63,8 +63,11 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
           background: 'rgba(10, 20, 40, 0.45)',
           backdropFilter: 'blur(24px)',
           border: '1px solid rgba(0, 255, 195, 0.15)',
-          boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)',
+          borderRadius: '1.5rem',
+          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6)',
           height: isFullscreen ? '40%' : '45%',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         {/* Header */}
@@ -87,20 +90,32 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
           </h2>
           <div className="flex items-center space-x-2">
             <motion.button
-              className="text-white opacity-50 hover:opacity-100"
-              whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+              className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all duration-200"
+              style={{ opacity: 0.6 }}
+              whileHover={{ 
+                opacity: 1,
+                filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+              }}
             >
               <MoreVertical size={16} />
             </motion.button>
             <motion.button
-              className="text-white opacity-50 hover:opacity-100"
-              whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+              className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all duration-200"
+              style={{ opacity: 0.6 }}
+              whileHover={{ 
+                opacity: 1,
+                filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+              }}
             >
               <Minimize2 size={16} />
             </motion.button>
             <motion.button
-              className="text-white opacity-50 hover:opacity-100"
-              whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+              className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all duration-200"
+              style={{ opacity: 0.6 }}
+              whileHover={{ 
+                opacity: 1,
+                filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+              }}
               onClick={() => onFullscreen('main-view')}
             >
               <Maximize2 size={16} />
@@ -109,10 +124,18 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
         </div>
 
         {/* Heatmap Grid */}
-        <div className="p-6 h-full">
-          <div className="grid grid-cols-4 gap-4 h-full">
+        <div 
+          className="flex-1 p-4"
+          style={{
+            background: 'rgba(20, 30, 50, 0.6)',
+            backdropFilter: 'blur(32px)',
+            borderRadius: '1.25rem',
+            margin: '12px 16px 6px 16px',
+          }}
+        >
+          <div className="grid grid-cols-4 gap-3 h-full">
             {heatmapData[0].map((domain, colIndex) => (
-              <div key={domain} className="flex flex-col gap-4">
+              <div key={domain} className="flex flex-col gap-3">
                 {['Strategic', 'Operational'].map((category, rowIndex) => {
                   const value = heatmapData[rowIndex + 1][colIndex] as number;
                   const cellId = `${category}-${domain}`;
@@ -120,7 +143,7 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
                   return (
                     <motion.div
                       key={cellId}
-                      className="flex-1 flex items-center justify-center rounded-lg cursor-pointer"
+                      className="flex-1 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200"
                       style={{
                         background: getStatusColor(value),
                         boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)',
@@ -129,6 +152,7 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
                       whileHover={{
                         scale: 1.1,
                         boxShadow: '0 0 12px rgba(0,255,195,0.5)',
+                        zIndex: 5,
                       }}
                       onClick={() => setSelectedCell(cellId)}
                       role="button"
@@ -173,7 +197,10 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
           background: 'rgba(10, 20, 40, 0.45)',
           backdropFilter: 'blur(24px)',
           border: '1px solid rgba(0, 255, 195, 0.15)',
-          boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)',
+          borderRadius: '1.5rem',
+          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6)',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         {/* Header */}
@@ -198,7 +225,7 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={14} />
               <input
                 type="text"
-                placeholder="Search indicators..."
+                placeholder="Search…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-8 pr-3 py-1 text-sm rounded"
@@ -208,21 +235,34 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
                   border: '1px solid rgba(255,255,255,0.10)',
                   fontFamily: 'Noto Sans',
                   fontSize: '12px',
+                  width: '120px',
                 }}
               />
             </div>
             <motion.button
               className="p-1 rounded text-white"
-              style={{ background: '#00FFC3' }}
-              whileHover={{ scale: 1.05 }}
+              style={{ 
+                background: '#00FFC3',
+                boxShadow: '0 4px 8px rgba(0,255,195,0.4)',
+              }}
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: '0 4px 12px rgba(0,255,195,0.6)',
+              }}
               aria-label="Export CSV"
             >
               <Download size={14} />
             </motion.button>
             <motion.button
               className="p-1 rounded text-white"
-              style={{ background: '#00B8FF' }}
-              whileHover={{ scale: 1.05 }}
+              style={{ 
+                background: '#00B8FF',
+                boxShadow: '0 4px 8px rgba(0,184,255,0.4)',
+              }}
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: '0 4px 12px rgba(0,184,255,0.6)',
+              }}
               aria-label="Open Full Trend Chart"
             >
               <TrendingUp size={14} />
@@ -231,7 +271,7 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
         </div>
 
         {/* Table */}
-        <div className="p-4 overflow-auto h-full">
+        <div className="flex-1 p-4 overflow-auto">
           <table className="w-full">
             <thead>
               <tr
@@ -245,6 +285,7 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
                 <th className="text-left p-3 text-white font-bold text-sm">Current</th>
                 <th className="text-left p-3 text-white font-bold text-sm">Target</th>
                 <th className="text-left p-3 text-white font-bold text-sm">Deviation %</th>
+                <th className="text-left p-3 text-white font-bold text-sm">Trend</th>
                 <th className="text-left p-3 text-white font-bold text-sm">Actions</th>
               </tr>
             </thead>
@@ -260,6 +301,7 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
                     background: 'rgba(0,255,195,0.10)',
                     transform: 'translateY(-2px)',
                     boxShadow: '0 0 12px rgba(0,255,195,0.4)',
+                    transition: { duration: 0.2 },
                   }}
                   role="row"
                 >
@@ -270,6 +312,8 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
                       style={{
                         background: indicator.category === 'Strategic' ? '#00FFC3' : '#00B8FF',
                         color: '#081226',
+                        fontFamily: 'Noto Sans',
+                        fontWeight: 500,
                       }}
                     >
                       {indicator.category}
@@ -285,12 +329,26 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({
                     {indicator.deviation > 0 ? '+' : ''}{indicator.deviation.toFixed(1)}%
                   </td>
                   <td className="p-3">
+                    <div className="w-20 h-6 bg-white/5 rounded flex items-center justify-center">
+                      <span className="text-xs text-gray-400">
+                        {chartType === 'bar' ? '▂▃▅▃▄' : '⟋⟍⟋⟍'}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-3">
                     <motion.button
-                      className="w-5 h-5 rounded-full bg-teal-400 flex items-center justify-center"
-                      whileHover={{ scale: 1.1, boxShadow: '0 0 8px #00FFC3' }}
+                      className="w-6 h-6 rounded-full flex items-center justify-center"
+                      style={{ 
+                        background: '#00FFC3',
+                        color: '#081226',
+                      }}
+                      whileHover={{ 
+                        scale: 1.1, 
+                        boxShadow: '0 0 8px rgba(0,255,195,0.6)',
+                      }}
                       aria-label={`Drill down into ${indicator.name}`}
                     >
-                      <Search size={12} className="text-gray-900" />
+                      <Search size={12} />
                     </motion.button>
                   </td>
                 </motion.tr>

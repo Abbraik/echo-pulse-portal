@@ -27,17 +27,17 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
   };
 
   const strategicSpokes = [
-    { name: 'Network Dev Index', value: 64, max: 100, position: { x: 0, y: -120 } },
-    { name: 'Trust Recovery Index', value: 89, max: 100, position: { x: 120, y: 0 } },
-    { name: 'Bundle Coherence', value: 72, max: 100, position: { x: 0, y: 120 } },
-    { name: 'Scenario Validation', value: 85, max: 100, position: { x: -120, y: 0 } },
+    { name: 'Network Dev Index', value: 64, max: 100, position: { x: 0, y: -180 } },
+    { name: 'Trust Recovery Index', value: 89, max: 100, position: { x: 180, y: 0 } },
+    { name: 'Bundle Coherence', value: 72, max: 100, position: { x: 0, y: 180 } },
+    { name: 'Scenario Validation', value: 85, max: 100, position: { x: -180, y: 0 } },
   ];
 
   const operationalSpokes = [
-    { name: 'Open Facilitator Claims', value: 12, label: '12', position: { x: 85, y: -85 } },
-    { name: 'Think→Act Queue', value: 4, label: '4', position: { x: 85, y: 85 } },
-    { name: 'Act→Monitor Queue', value: 3, label: '3', position: { x: -85, y: 85 } },
-    { name: 'System Error Count', value: 5, label: '5', position: { x: -85, y: -85 } },
+    { name: 'Open Facilitator Claims', value: 12, label: '12', position: { x: 127, y: -127 } },
+    { name: 'Think→Act Queue', value: 4, label: '4', position: { x: 127, y: 127 } },
+    { name: 'Act→Monitor Queue', value: 3, label: '3', position: { x: -127, y: 127 } },
+    { name: 'System Error Count', value: 5, label: '5', position: { x: -127, y: -127 } },
   ];
 
   const handleSpokeClick = (spokeName: string) => {
@@ -58,8 +58,10 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
         background: 'rgba(10, 20, 40, 0.45)',
         backdropFilter: 'blur(24px)',
         border: '1px solid rgba(0, 255, 195, 0.15)',
-        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)',
-        minHeight: isFullscreen ? '80vh' : '500px',
+        borderRadius: '1.5rem',
+        boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6)',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {/* Header Strip */}
@@ -82,20 +84,32 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
         </h2>
         <div className="flex items-center space-x-2">
           <motion.button
-            className="text-white opacity-50 hover:opacity-100"
-            whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+            className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all duration-200"
+            style={{ opacity: 0.6 }}
+            whileHover={{ 
+              opacity: 1,
+              filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+            }}
           >
             <MoreVertical size={16} />
           </motion.button>
           <motion.button
-            className="text-white opacity-50 hover:opacity-100"
-            whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+            className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all duration-200"
+            style={{ opacity: 0.6 }}
+            whileHover={{ 
+              opacity: 1,
+              filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+            }}
           >
             <Minimize2 size={16} />
           </motion.button>
           <motion.button
-            className="text-white opacity-50 hover:opacity-100"
-            whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
+            className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all duration-200"
+            style={{ opacity: 0.6 }}
+            whileHover={{ 
+              opacity: 1,
+              filter: 'drop-shadow(0 0 10px rgba(0, 255, 195, 0.6))',
+            }}
             onClick={() => onFullscreen('main-view')}
           >
             <Maximize2 size={16} />
@@ -105,45 +119,60 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
 
       {/* Radial Layout */}
       <div className="flex-1 relative flex items-center justify-center">
-        <svg width="100%" height="100%" viewBox="-300 -300 600 600" className="overflow-visible">
+        <svg width="100%" height="100%" viewBox="-400 -400 800 800" className="overflow-visible">
           {/* Center Hub */}
           <motion.g
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5 }}
           >
+            <defs>
+              <radialGradient id="hubGradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="rgba(0,255,195,0.3)" />
+                <stop offset="100%" stopColor="rgba(0,255,195,0.1)" />
+              </radialGradient>
+              <filter id="hubGlow">
+                <feGaussianBlur stdDeviation="3"/>
+                <feMerge>
+                  <feMergeNode/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
             <circle
               cx="0"
               cy="0"
-              r="60"
-              fill="rgba(20, 30, 50, 0.6)"
+              r="90"
+              fill="url(#hubGradient)"
               stroke="#00FFC3"
               strokeWidth="3"
+              filter="url(#hubGlow)"
               style={{
-                filter: 'drop-shadow(0 0 24px rgba(0,255,195,0.6))',
+                boxShadow: '0 0 24px rgba(0,255,195,0.6)',
               }}
             />
             <text
               x="0"
-              y="-5"
+              y="-10"
               textAnchor="middle"
               style={{
                 fontFamily: 'Noto Sans',
                 fontWeight: 700,
-                fontSize: '24px',
+                fontSize: '28px',
                 fill: '#FFFFFF',
+                textShadow: '0 2px 4px rgba(0,0,0,0.5)',
               }}
             >
               {centerHub.value}%
             </text>
             <text
               x="0"
-              y="15"
+              y="20"
               textAnchor="middle"
               style={{
                 fontFamily: 'Noto Sans',
                 fontWeight: 400,
-                fontSize: '12px',
+                fontSize: '14px',
                 fill: '#E0E0E0',
               }}
             >
@@ -168,7 +197,7 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
               <circle
                 cx={spoke.position.x}
                 cy={spoke.position.y}
-                r="40"
+                r="60"
                 fill="rgba(20, 30, 50, 0.6)"
                 stroke="rgba(255, 255, 255, 0.10)"
                 strokeWidth="1"
@@ -178,12 +207,12 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
               />
               <text
                 x={spoke.position.x}
-                y={spoke.position.y - 5}
+                y={spoke.position.y - 10}
                 textAnchor="middle"
                 style={{
                   fontFamily: 'Noto Sans',
                   fontWeight: 600,
-                  fontSize: '16px',
+                  fontSize: '18px',
                   fill: getStatusColor(spoke.value, spoke.max),
                 }}
               >
@@ -191,12 +220,12 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
               </text>
               <text
                 x={spoke.position.x}
-                y={spoke.position.y + 10}
+                y={spoke.position.y + 15}
                 textAnchor="middle"
                 style={{
                   fontFamily: 'Noto Sans',
                   fontWeight: 400,
-                  fontSize: '8px',
+                  fontSize: '10px',
                   fill: '#E0E0E0',
                 }}
               >
@@ -222,7 +251,7 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
               <circle
                 cx={spoke.position.x}
                 cy={spoke.position.y}
-                r="30"
+                r="50"
                 fill="rgba(20, 30, 50, 0.6)"
                 stroke="rgba(255, 255, 255, 0.10)"
                 strokeWidth="1"
@@ -234,7 +263,7 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
                 style={{
                   fontFamily: 'Noto Sans',
                   fontWeight: 600,
-                  fontSize: '14px',
+                  fontSize: '16px',
                   fill: '#00B8FF',
                 }}
               >
@@ -253,7 +282,7 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
               y2={spoke.position.y}
               stroke="rgba(0, 255, 195, 0.3)"
               strokeWidth="1"
-              strokeDasharray="2 2"
+              strokeDasharray="3 3"
               initial={{ pathLength: 0 }}
               animate={{ pathLength: 1 }}
               transition={{ duration: 0.5, delay: 0.1 * (index + 1) }}
@@ -269,7 +298,7 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
               y2={spoke.position.y}
               stroke="rgba(0, 184, 255, 0.3)"
               strokeWidth="1"
-              strokeDasharray="2 2"
+              strokeDasharray="3 3"
               initial={{ pathLength: 0 }}
               animate={{ pathLength: 1 }}
               transition={{ duration: 0.5, delay: 0.1 * (index + 5) }}
@@ -281,12 +310,19 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
         <AnimatePresence>
           {selectedSpoke && (
             <motion.div
-              className="absolute top-4 right-4 w-64 p-4 rounded-xl"
+              className="absolute top-4 right-4 rounded-xl"
               style={{
+                width: '250px',
                 background: 'rgba(20, 30, 50, 0.85)',
                 backdropFilter: 'blur(24px)',
                 border: '1px solid rgba(0, 255, 195, 0.15)',
-                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.6)',
+                borderRadius: '1rem',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
+                padding: '12px',
+                color: '#E0E0E0',
+                fontFamily: 'Noto Sans',
+                fontSize: '12px',
+                zIndex: 1000,
               }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -312,7 +348,7 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
                 </motion.button>
               </div>
               
-              {/* Mini Trend Chart Placeholder */}
+              {/* Mini Trend Chart */}
               <div className="h-16 mb-3 bg-white/5 rounded flex items-center justify-center">
                 <span className="text-xs text-gray-400">
                   {chartType === 'bar' ? 'Bar' : 'Line'} Chart
@@ -327,7 +363,7 @@ const RadialHubView: React.FC<RadialHubViewProps> = ({
                   boxShadow: '0 4px 8px rgba(0, 184, 255, 0.4)',
                 }}
                 whileHover={{ 
-                  backgroundColor: 'rgba(0, 184, 255, 0.9)',
+                  backgroundColor: '#1EC8FF',
                   boxShadow: '0 6px 12px rgba(0, 184, 255, 0.6)',
                 }}
               >
