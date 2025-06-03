@@ -1,0 +1,179 @@
+
+import React from 'react';
+import { motion } from 'framer-motion';
+
+interface InstrumentPanelProps {
+  timeRange: string;
+  onTimeRangeChange: (range: string) => void;
+  domainFilter: string;
+  onDomainFilterChange: (domain: string) => void;
+  chartType: 'bar' | 'line';
+  onChartTypeChange: (type: 'bar' | 'line') => void;
+  showChartType: boolean;
+}
+
+const InstrumentPanel: React.FC<InstrumentPanelProps> = ({
+  timeRange,
+  onTimeRangeChange,
+  domainFilter,
+  onDomainFilterChange,
+  chartType,
+  onChartTypeChange,
+  showChartType,
+}) => {
+  const timeRangeOptions = ['Last 7 Days', 'Last 30 Days', 'Last 90 Days'];
+  const domainOptions = ['All Domains', 'Population', 'Resources', 'Social', 'Workflow'];
+
+  const selectStyle = {
+    background: 'rgba(20, 30, 50, 0.6)',
+    color: '#E0E0E0',
+    border: '1px solid rgba(255, 255, 255, 0.10)',
+    borderRadius: '6px',
+    padding: '8px 12px',
+    fontFamily: 'Noto Sans',
+    fontSize: '12px',
+    fontWeight: 400,
+    width: '100%',
+  };
+
+  const labelStyle = {
+    fontFamily: 'Noto Sans',
+    fontSize: '12px',
+    fontWeight: 400,
+    color: '#E0E0E0',
+    marginBottom: '8px',
+    display: 'block',
+  };
+
+  return (
+    <motion.div
+      className="h-fit"
+      style={{
+        background: 'rgba(10, 20, 40, 0.45)',
+        backdropFilter: 'blur(24px)',
+        border: '1px solid rgba(0, 255, 195, 0.15)',
+        borderRadius: '1.5rem',
+        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.6)',
+        padding: '16px',
+      }}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      {/* Time Range Selector */}
+      <div className="mb-6">
+        <label style={labelStyle}>Time Range:</label>
+        <select
+          value={timeRange}
+          onChange={(e) => onTimeRangeChange(e.target.value)}
+          style={selectStyle}
+          className="w-full"
+        >
+          {timeRangeOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Domain Filter */}
+      <div className="mb-6">
+        <label style={labelStyle}>Domain:</label>
+        <select
+          value={domainFilter}
+          onChange={(e) => onDomainFilterChange(e.target.value)}
+          style={selectStyle}
+          className="w-full"
+        >
+          {domainOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Chart Type Toggle */}
+      {showChartType && (
+        <div className="mb-6">
+          <label style={labelStyle}>Chart Style:</label>
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center cursor-pointer">
+              <div
+                className="w-4 h-4 rounded-full border mr-2"
+                style={{
+                  background: chartType === 'bar' ? '#00FFC3' : 'transparent',
+                  borderColor: chartType === 'bar' ? '#00FFC3' : '#E0E0E0',
+                }}
+              />
+              <input
+                type="radio"
+                name="chartType"
+                value="bar"
+                checked={chartType === 'bar'}
+                onChange={() => onChartTypeChange('bar')}
+                className="hidden"
+                aria-label="Bar chart"
+              />
+              <span style={{ ...labelStyle, marginBottom: 0, color: '#E0E0E0' }}>
+                Bar
+              </span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <div
+                className="w-4 h-4 rounded-full border mr-2"
+                style={{
+                  background: chartType === 'line' ? '#00FFC3' : 'transparent',
+                  borderColor: chartType === 'line' ? '#00FFC3' : '#E0E0E0',
+                }}
+              />
+              <input
+                type="radio"
+                name="chartType"
+                value="line"
+                checked={chartType === 'line'}
+                onChange={() => onChartTypeChange('line')}
+                className="hidden"
+                aria-label="Line chart"
+              />
+              <span style={{ ...labelStyle, marginBottom: 0, color: '#E0E0E0' }}>
+                Line
+              </span>
+            </label>
+          </div>
+        </div>
+      )}
+
+      {/* Legend */}
+      <div>
+        <label style={labelStyle}>Status Legend:</label>
+        <div className="space-y-2">
+          <div className="flex items-center">
+            <div
+              className="w-2.5 h-2.5 rounded-full mr-2"
+              style={{ background: '#00FFC3' }}
+            />
+            <span style={{ ...labelStyle, marginBottom: 0 }}>Healthy/In-Band</span>
+          </div>
+          <div className="flex items-center">
+            <div
+              className="w-2.5 h-2.5 rounded-full mr-2"
+              style={{ background: '#FFC107' }}
+            />
+            <span style={{ ...labelStyle, marginBottom: 0 }}>Warning/Near Threshold</span>
+          </div>
+          <div className="flex items-center">
+            <div
+              className="w-2.5 h-2.5 rounded-full mr-2"
+              style={{ background: '#FF6E6E' }}
+            />
+            <span style={{ ...labelStyle, marginBottom: 0 }}>Critical/Out-of-Band</span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default InstrumentPanel;

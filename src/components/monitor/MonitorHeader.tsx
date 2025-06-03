@@ -1,61 +1,74 @@
 
 import React from 'react';
-import { Monitor, Info } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-
-const narrativeMessages = [
-  'monitorNarrativeOne',
-  'monitorNarrativeTwo',
-  'monitorNarrativeThree'
-];
+import { Monitor, HelpCircle, Maximize2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const MonitorHeader: React.FC = () => {
-  const { t } = useTranslation();
-  const [activeNarrative, setActiveNarrative] = React.useState(0);
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveNarrative((prev) => (prev + 1) % narrativeMessages.length);
-    }, 7000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <header className="mb-8">
-      <div className="glass-panel p-6 flex items-center space-x-4">
-        <div className="p-3 rounded-xl bg-amber-500/20 text-amber-400">
-          <Monitor size={24} />
-        </div>
-        <div className="text-left">
-          <h1 className="text-3xl font-extrabold">{t('monitor')}</h1>
-          <p className="text-gray-400">
-            {t('monitorDesc')}
+    <motion.header 
+      className="w-full h-20 flex items-center justify-between px-8"
+      style={{
+        background: 'rgba(10, 20, 40, 0.6)',
+        backdropFilter: 'blur(20px)',
+        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.4)',
+      }}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Left Side */}
+      <div className="flex items-center">
+        <Monitor className="text-white mr-4" size={24} />
+        <div>
+          <h1 
+            className="text-xl font-bold"
+            style={{
+              fontFamily: 'Noto Sans',
+              fontWeight: 700,
+              fontSize: '20px',
+              color: '#00FFC3',
+              textShadow: '0px 2px 4px rgba(0, 0, 0, 0.6)',
+            }}
+          >
+            MONITOR ▮ : OPERATIONAL & STRATEGIC TRACKING
+          </h1>
+          <p 
+            className="mt-1"
+            style={{
+              fontFamily: 'Noto Sans',
+              fontWeight: 400,
+              fontSize: '14px',
+              color: '#E0E0E0',
+            }}
+          >
+            Real-time system health and performance insights
           </p>
         </div>
       </div>
-      
-      {/* Narrative Banner */}
-      <div className="mt-6 glass-panel-deep p-4 border-l-4 border-teal-500">
-        <div className="flex items-center justify-between">
-          <p className="text-left animate-fade-in font-medium text-lg">
-            {t(narrativeMessages[activeNarrative] as any)}
-          </p>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" className="ml-4">
-                <Info size={18} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-xs">{t('monitorInfoTooltip')}</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
+
+      {/* Right Side */}
+      <div className="flex items-center space-x-4">
+        <motion.button
+          className="p-2 text-white opacity-50 hover:opacity-100 transition-all duration-200"
+          whileHover={{ 
+            filter: 'drop-shadow(0 0 8px #00FFC3)',
+          }}
+          aria-label="Help"
+        >
+          <HelpCircle size={20} />
+        </motion.button>
+        <motion.button
+          className="p-2 text-white opacity-50 hover:opacity-100 transition-all duration-200"
+          whileHover={{ 
+            filter: 'drop-shadow(0 0 8px #00FFC3)',
+          }}
+          aria-label="Full Screen"
+          disabled
+        >
+          <Maximize2 size={20} />
+        </motion.button>
       </div>
-    </header>
+    </motion.header>
   );
 };
 
