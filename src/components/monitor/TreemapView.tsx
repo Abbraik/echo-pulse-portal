@@ -676,19 +676,19 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   );
 
   const getBaseColor = (category: string) => {
-    return category === 'strategic' ? 'rgba(0,184,255,0.08)' : 'rgba(0,255,195,0.08)';
+    return category === 'strategic' ? 'rgba(0,184,255,0.8)' : 'rgba(0,255,195,0.8)';
   };
 
   const getStatusOverlay = (status: string) => {
     switch (status) {
-      case 'in-band': return 'rgba(0,255,195,0.12)';
-      case 'warning': return 'rgba(255,193,7,0.12)';
-      case 'critical': return 'rgba(255,110,110,0.12)';
-      default: return 'rgba(0,255,195,0.12)';
+      case 'in-band': return 'rgba(0,255,195,0.2)';
+      case 'warning': return 'rgba(255,193,7,0.2)';
+      case 'critical': return 'rgba(255,110,110,0.2)';
+      default: return 'rgba(0,255,195,0.2)';
     }
   };
 
-  // Proper treemap algorithm with squarified layout (like S&P 500)
+  // Squarified treemap algorithm similar to S&P 500
   const calculateLayout = (data: TreemapData[]) => {
     if (data.length === 0) return [];
 
@@ -697,84 +697,87 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     const containerHeight = 100;
     const totalArea = containerWidth * containerHeight;
 
-    // Sort by weight descending for better visual hierarchy
+    // Sort by weight descending (largest first, like S&P 500)
     const sortedData = [...data].sort((a, b) => b.weight - a.weight);
     
     // Calculate normalized areas
     const itemsWithArea = sortedData.map(item => ({
       ...item,
       area: (item.weight / totalWeight) * totalArea,
-      placed: false
     }));
 
     const result: (TreemapData & { x: number; y: number; width: number; height: number })[] = [];
 
-    // Simple squarified-like treemap algorithm
+    // Squarified treemap implementation
     let currentX = 0;
     let currentY = 0;
     let remainingWidth = containerWidth;
     let remainingHeight = containerHeight;
-    let currentRowHeight = 0;
+    let i = 0;
 
-    for (let i = 0; i < itemsWithArea.length; i++) {
-      const item = itemsWithArea[i];
-      
-      // Calculate optimal width and height for this area
-      let width = Math.sqrt(item.area * (remainingWidth / remainingHeight));
-      let height = item.area / width;
+    while (i < itemsWithArea.length) {
+      // Determine how many items to place in current row
+      let rowItems: typeof itemsWithArea = [];
+      let rowArea = 0;
+      let bestAspectRatio = Infinity;
+      let bestRowItems: typeof itemsWithArea = [];
 
-      // Ensure minimum size for readability
-      const minSize = Math.min(3, Math.sqrt(item.area));
-      width = Math.max(width, minSize);
-      height = Math.max(height, minSize);
-
-      // Check if this item fits in current row
-      if (currentX + width > containerWidth) {
-        // Start new row
-        currentX = 0;
-        currentY += currentRowHeight;
-        remainingHeight -= currentRowHeight;
-        currentRowHeight = 0;
+      // Try different row lengths to find best aspect ratio
+      for (let j = i; j < itemsWithArea.length; j++) {
+        const testItems = itemsWithArea.slice(i, j + 1);
+        const testArea = testItems.reduce((sum, item) => sum + item.area, 0);
         
-        // Recalculate dimensions for new row
-        width = Math.sqrt(item.area * (containerWidth / remainingHeight));
-        height = item.area / width;
-        width = Math.max(width, minSize);
-        height = Math.max(height, minSize);
+        if (testArea > remainingWidth * remainingHeight) break;
+        
+        // Calculate aspect ratios for this row configuration
+        const rowHeight = testArea / remainingWidth;
+        let maxAspectRatio = 0;
+        
+        testItems.forEach(item => {
+          const itemWidth = item.area / rowHeight;
+          const aspectRatio = Math.max(itemWidth / rowHeight, rowHeight / itemWidth);
+          maxAspectRatio = Math.max(maxAspectRatio, aspectRatio);
+        });
+
+        if (maxAspectRatio < bestAspectRatio) {
+          bestAspectRatio = maxAspectRatio;
+          bestRowItems = [...testItems];
+          rowArea = testArea;
+        } else {
+          break; // Adding more items makes aspect ratio worse
+        }
       }
 
-      // Ensure we don't exceed container bounds
-      if (currentX + width > containerWidth) {
-        width = containerWidth - currentX;
-        height = item.area / width;
-      }
+      rowItems = bestRowItems.length > 0 ? bestRowItems : [itemsWithArea[i]];
+      rowArea = rowItems.reduce((sum, item) => sum + item.area, 0);
+
+      // Calculate row height
+      const rowHeight = Math.min(rowArea / remainingWidth, remainingHeight);
       
-      if (currentY + height > containerHeight) {
-        height = containerHeight - currentY;
-        width = item.area / height;
-      }
-
-      // Final bounds check
-      width = Math.min(width, containerWidth - currentX);
-      height = Math.min(height, containerHeight - currentY);
-
-      result.push({
-        ...item,
-        x: currentX,
-        y: currentY,
-        width: Math.max(width, minSize),
-        height: Math.max(height, minSize)
+      // Place items in this row
+      let itemX = currentX;
+      rowItems.forEach(item => {
+        const itemWidth = item.area / rowHeight;
+        
+        result.push({
+          ...item,
+          x: itemX,
+          y: currentY,
+          width: itemWidth,
+          height: rowHeight
+        });
+        
+        itemX += itemWidth;
       });
 
-      currentX += width;
-      currentRowHeight = Math.max(currentRowHeight, height);
-
-      // If we've filled the width, start a new row
-      if (currentX >= containerWidth - 0.1) {
-        currentX = 0;
-        currentY += currentRowHeight;
-        remainingHeight -= currentRowHeight;
-        currentRowHeight = 0;
+      // Update position for next row
+      i += rowItems.length;
+      currentY += rowHeight;
+      remainingHeight -= rowHeight;
+      
+      // If we're running out of height, expand remaining items to fill
+      if (i < itemsWithArea.length && remainingHeight < 5) {
+        remainingHeight = containerHeight - currentY;
       }
     }
 
@@ -802,18 +805,18 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   };
 
   const canShowLabels = (width: number, height: number) => {
-    return width >= 8 && height >= 4;
+    return width >= 6 && height >= 3;
   };
 
   const getTextSize = (width: number, height: number, textLength: number) => {
-    const maxFontSize = Math.min(width / 6, height / 2.5);
-    const textBasedSize = Math.max(width / (textLength * 0.6), 1.0);
-    return Math.min(maxFontSize, textBasedSize, 2.0);
+    const maxFontSize = Math.min(width / 8, height / 3);
+    const textBasedSize = Math.max(width / (textLength * 0.7), 0.8);
+    return Math.min(maxFontSize, textBasedSize, 2.2);
   };
 
   const getSecondaryTextSize = (width: number, height: number) => {
-    const maxSize = Math.min(width / 8, height / 3.5);
-    return Math.min(maxSize, 1.5);
+    const maxSize = Math.min(width / 10, height / 4);
+    return Math.min(maxSize, 1.4);
   };
 
   const truncateText = (text: string, maxLength: number) => {
@@ -896,7 +899,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
               ].map((item) => (
                 <div key={item.label} className="flex items-center gap-3">
                   <div
-                    className="w-4 h-4 rounded-full"
+                    className="w-4 h-4 rounded-sm"
                     style={{ background: item.color }}
                   />
                   <span
@@ -925,21 +928,20 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                   
                   const titleFontSize = getTextSize(item.width, item.height, item.name.length);
                   const valueFontSize = getSecondaryTextSize(item.width, item.height);
-                  const maxTitleLength = Math.floor(item.width / 1.2);
+                  const maxTitleLength = Math.floor(item.width / 1.0);
                   const truncatedTitle = truncateText(item.name, maxTitleLength);
                   
                   return (
                     <motion.g
                       key={item.id}
-                      initial={{ opacity: 0, scale: 0.8 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ 
-                        opacity: hoveredRect && hoveredRect !== item.id ? 0.8 : 1,
-                        scale: hoveredRect === item.id ? 1.1 : hoveredRect && hoveredRect !== item.id ? 0.95 : 1,
+                        opacity: hoveredRect && hoveredRect !== item.id ? 0.7 : 1,
+                        scale: hoveredRect === item.id ? 1.02 : 1,
                       }}
                       transition={{ 
-                        duration: hoveredRect ? 0.2 : 0.4,
-                        ease: hoveredRect ? "easeOut" : [0.68, -0.6, 0.32, 1.6],
-                        delay: hoveredRect ? 0 : index * 0.02 
+                        duration: 0.2,
+                        ease: "easeOut",
                       }}
                       style={{ transformOrigin: `${item.x + item.width/2}% ${item.y + item.height/2}%` }}
                     >
@@ -950,8 +952,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                         height={item.height}
                         fill={getBaseColor(item.category)}
                         stroke="rgba(255,255,255,0.1)"
-                        strokeWidth="0.08"
-                        rx="0.8"
+                        strokeWidth="0.05"
                         style={{
                           cursor: 'pointer',
                         }}
@@ -970,7 +971,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                         width={item.width}
                         height={item.height}
                         fill={getStatusOverlay(actualStatus)}
-                        rx="0.8"
                         style={{ pointerEvents: 'none' }}
                       />
 
@@ -979,42 +979,42 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                           <defs>
                             <clipPath id={`textClip-${item.id}`}>
                               <rect
-                                x={item.x + 0.3}
-                                y={item.y + 0.3}
-                                width={Math.max(0, item.width - 0.6)}
-                                height={Math.max(0, item.height - 0.6)}
+                                x={item.x + 0.2}
+                                y={item.y + 0.2}
+                                width={Math.max(0, item.width - 0.4)}
+                                height={Math.max(0, item.height - 0.4)}
                               />
                             </clipPath>
                           </defs>
                           <text
                             x={item.x + item.width/2}
-                            y={item.y + item.height/2 - 0.5}
+                            y={item.y + item.height/2 - 0.3}
                             textAnchor="middle"
                             clipPath={`url(#textClip-${item.id})`}
-                            className="font-semibold"
+                            className="font-bold"
                             style={{ 
                               fontFamily: 'Noto Sans, system-ui, sans-serif',
-                              textShadow: '0 1px 2px rgba(0,0,0,0.8)',
                               pointerEvents: 'none',
-                              fill: '#00FFC3',
+                              fill: '#FFFFFF',
                               overflow: 'hidden',
                             }}
-                            fontSize={Math.max(titleFontSize, 1.0)}
+                            fontSize={Math.max(titleFontSize, 0.8)}
                           >
                             {truncatedTitle}
                           </text>
                           <text
                             x={item.x + item.width/2}
-                            y={item.y + item.height/2 + 0.8}
+                            y={item.y + item.height/2 + 0.5}
                             textAnchor="middle"
                             clipPath={`url(#textClip-${item.id})`}
+                            className="font-medium"
                             style={{ 
                               fontFamily: 'Noto Sans, system-ui, sans-serif',
                               pointerEvents: 'none',
                               fill: '#E0E0E0',
                               overflow: 'hidden',
                             }}
-                            fontSize={Math.max(valueFontSize, 0.8)}
+                            fontSize={Math.max(valueFontSize, 0.6)}
                           >
                             {item.value} / {item.target}
                           </text>
@@ -1024,8 +1024,8 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                           x={item.x + item.width/2}
                           y={item.y + item.height/2}
                           textAnchor="middle"
-                          fontSize={Math.min(item.width/3, item.height/3, 1.5)}
-                          fill="#00FFC3"
+                          fontSize={Math.min(item.width/4, item.height/4, 1.2)}
+                          fill="#FFFFFF"
                           style={{ pointerEvents: 'none' }}
                         >
                           ℹ️
