@@ -688,7 +688,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     }
   };
 
-  // Squarified treemap algorithm similar to S&P 500
+  // Improved treemap algorithm that ensures all items fit within the container
   const calculateLayout = (data: TreemapData[]) => {
     if (data.length === 0) return [];
 
@@ -700,7 +700,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     // Sort by weight descending (largest first, like S&P 500)
     const sortedData = [...data].sort((a, b) => b.weight - a.weight);
     
-    // Calculate normalized areas
+    // Calculate normalized areas based on weights
     const itemsWithArea = sortedData.map(item => ({
       ...item,
       area: (item.weight / totalWeight) * totalArea,
@@ -708,77 +708,61 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
 
     const result: (TreemapData & { x: number; y: number; width: number; height: number })[] = [];
 
-    // Squarified treemap implementation
+    // Use a simple row-based layout that ensures all items fit
     let currentX = 0;
     let currentY = 0;
+    let rowHeight = 0;
     let remainingWidth = containerWidth;
     let remainingHeight = containerHeight;
-    let i = 0;
 
-    while (i < itemsWithArea.length) {
-      // Determine how many items to place in current row
-      let rowItems: typeof itemsWithArea = [];
-      let rowArea = 0;
-      let bestAspectRatio = Infinity;
-      let bestRowItems: typeof itemsWithArea = [];
-
-      // Try different row lengths to find best aspect ratio
-      for (let j = i; j < itemsWithArea.length; j++) {
-        const testItems = itemsWithArea.slice(i, j + 1);
-        const testArea = testItems.reduce((sum, item) => sum + item.area, 0);
+    for (let i = 0; i < itemsWithArea.length; i++) {
+      const item = itemsWithArea[i];
+      
+      // Calculate item dimensions based on area
+      const aspectRatio = 1.6; // Golden ratio-ish for better appearance
+      let itemWidth = Math.sqrt(item.area * aspectRatio);
+      let itemHeight = item.area / itemWidth;
+      
+      // Check if item fits in current row
+      if (currentX + itemWidth > containerWidth || itemWidth > remainingWidth) {
+        // Move to next row
+        currentY += rowHeight;
+        currentX = 0;
+        remainingHeight -= rowHeight;
+        remainingWidth = containerWidth;
+        rowHeight = 0;
         
-        if (testArea > remainingWidth * remainingHeight) break;
-        
-        // Calculate aspect ratios for this row configuration
-        const rowHeight = testArea / remainingWidth;
-        let maxAspectRatio = 0;
-        
-        testItems.forEach(item => {
-          const itemWidth = item.area / rowHeight;
-          const aspectRatio = Math.max(itemWidth / rowHeight, rowHeight / itemWidth);
-          maxAspectRatio = Math.max(maxAspectRatio, aspectRatio);
-        });
-
-        if (maxAspectRatio < bestAspectRatio) {
-          bestAspectRatio = maxAspectRatio;
-          bestRowItems = [...testItems];
-          rowArea = testArea;
-        } else {
-          break; // Adding more items makes aspect ratio worse
-        }
+        // Recalculate dimensions for new row
+        itemWidth = Math.sqrt(item.area * aspectRatio);
+        itemHeight = item.area / itemWidth;
+      }
+      
+      // Ensure item doesn't exceed remaining space
+      if (currentY + itemHeight > containerHeight) {
+        // Scale down to fit remaining height
+        const scale = remainingHeight / itemHeight;
+        itemHeight = remainingHeight;
+        itemWidth = itemWidth * scale;
+      }
+      
+      if (currentX + itemWidth > containerWidth) {
+        // Scale down to fit remaining width
+        const scale = remainingWidth / itemWidth;
+        itemWidth = remainingWidth;
+        itemHeight = itemHeight * scale;
       }
 
-      rowItems = bestRowItems.length > 0 ? bestRowItems : [itemsWithArea[i]];
-      rowArea = rowItems.reduce((sum, item) => sum + item.area, 0);
-
-      // Calculate row height
-      const rowHeight = Math.min(rowArea / remainingWidth, remainingHeight);
-      
-      // Place items in this row
-      let itemX = currentX;
-      rowItems.forEach(item => {
-        const itemWidth = item.area / rowHeight;
-        
-        result.push({
-          ...item,
-          x: itemX,
-          y: currentY,
-          width: itemWidth,
-          height: rowHeight
-        });
-        
-        itemX += itemWidth;
+      result.push({
+        ...item,
+        x: currentX,
+        y: currentY,
+        width: itemWidth,
+        height: itemHeight
       });
 
-      // Update position for next row
-      i += rowItems.length;
-      currentY += rowHeight;
-      remainingHeight -= rowHeight;
-      
-      // If we're running out of height, expand remaining items to fill
-      if (i < itemsWithArea.length && remainingHeight < 5) {
-        remainingHeight = containerHeight - currentY;
-      }
+      currentX += itemWidth;
+      remainingWidth -= itemWidth;
+      rowHeight = Math.max(rowHeight, itemHeight);
     }
 
     return result;
@@ -805,18 +789,18 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   };
 
   const canShowLabels = (width: number, height: number) => {
-    return width >= 6 && height >= 3;
+    return width >= 8 && height >= 4;
   };
 
   const getTextSize = (width: number, height: number, textLength: number) => {
-    const maxFontSize = Math.min(width / 8, height / 3);
-    const textBasedSize = Math.max(width / (textLength * 0.7), 0.8);
-    return Math.min(maxFontSize, textBasedSize, 2.2);
+    const maxFontSize = Math.min(width / 10, height / 4);
+    const textBasedSize = Math.max(width / (textLength * 0.8), 0.6);
+    return Math.min(maxFontSize, textBasedSize, 2.0);
   };
 
   const getSecondaryTextSize = (width: number, height: number) => {
-    const maxSize = Math.min(width / 10, height / 4);
-    return Math.min(maxSize, 1.4);
+    const maxSize = Math.min(width / 12, height / 5);
+    return Math.min(maxSize, 1.2);
   };
 
   const truncateText = (text: string, maxLength: number) => {
@@ -913,14 +897,20 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
             </div>
           )}
 
-          {/* SVG Treemap */}
-          <div className="flex-1 p-6 relative">
+          {/* SVG Treemap - Improved container sizing */}
+          <div className="flex-1 p-2 relative">
             <motion.div
               layout
               transition={{ duration: 0.2 }}
               className="w-full h-full"
             >
-              <svg width="100%" height="100%" viewBox="0 0 100 100" className="w-full h-full">
+              <svg 
+                width="100%" 
+                height="100%" 
+                viewBox="0 0 100 100" 
+                className="w-full h-full"
+                preserveAspectRatio="xMidYMid meet"
+              >
                 {layoutData.map((item, index) => {
                   const percentage = getPercentage(item.value, item.target);
                   const isOperational = item.category === 'operational';
@@ -928,7 +918,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                   
                   const titleFontSize = getTextSize(item.width, item.height, item.name.length);
                   const valueFontSize = getSecondaryTextSize(item.width, item.height);
-                  const maxTitleLength = Math.floor(item.width / 1.0);
+                  const maxTitleLength = Math.floor(item.width / 1.2);
                   const truncatedTitle = truncateText(item.name, maxTitleLength);
                   
                   return (
