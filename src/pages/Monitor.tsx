@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, HelpCircle, Maximize2 } from 'lucide-react';
@@ -27,46 +26,13 @@ const Monitor: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Parallax Background Layers */}
-      <div className="fixed inset-0 bg-gradient-to-b from-[#041225] to-[#0B122A]" />
-      
-      {/* Backdrop Layer 1 */}
-      <div 
-        className="fixed inset-0 opacity-30"
-        style={{ backdropFilter: 'blur(16px)', background: 'rgba(8,17,42,0.3)' }}
-      />
-      
-      {/* Backdrop Layer 2 */}
-      <div 
-        className="fixed inset-0 opacity-60"
-        style={{ backdropFilter: 'blur(32px)', background: 'rgba(4,18,37,0.6)' }}
-      />
-
-      {/* Particle Field */}
-      <div className="fixed inset-0 opacity-[0.02] pointer-events-none">
-        {Array.from({ length: 80 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-[#00FFC3] rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 8}s`,
-              animationDuration: `${4 + Math.random() * 6}s`,
-              filter: 'drop-shadow(0 0 4px rgba(0,255,195,0.8))',
-            }}
-          />
-        ))}
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <div className="relative z-10">
         {/* Primary Monitor Header Bar */}
         <header 
-          className="w-full h-20 flex items-center justify-between px-8"
+          className="w-full h-20 flex items-center justify-between px-8 backdrop-blur-[24px]"
           style={{
             background: 'rgba(4,18,37,0.65)',
-            backdropFilter: 'blur(24px)',
             boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
             borderBottom: '1px solid rgba(0,255,195,0.20)',
           }}
@@ -123,10 +89,9 @@ const Monitor: React.FC = () => {
         {/* View Toggle & Instrument Panel */}
         <div className="px-8 mt-6">
           <div 
-            className="w-full h-12 flex items-center justify-between px-4 rounded-2xl"
+            className="w-full h-12 flex items-center justify-between px-4 rounded-2xl backdrop-blur-[20px]"
             style={{
               background: 'rgba(8,14,25,0.55)',
-              backdropFilter: 'blur(20px)',
               border: '1px solid rgba(0,255,195,0.15)',
               boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
             }}
@@ -182,10 +147,9 @@ const Monitor: React.FC = () => {
         {/* Main Visualization Area */}
         <div className="px-8 mt-6">
           <div 
-            className="rounded-3xl border relative"
+            className="rounded-3xl border relative backdrop-blur-[24px]"
             style={{
               background: 'rgba(10,20,40,0.45)',
-              backdropFilter: 'blur(24px)',
               borderColor: 'rgba(0,255,195,0.15)',
               borderRadius: '1.5rem',
               boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
