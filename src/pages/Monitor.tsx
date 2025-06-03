@@ -42,32 +42,26 @@ const Monitor: React.FC = () => {
       <AnimatedPage>
         {/* Primary Monitor Header Bar */}
         <motion.header 
-          className="sticky top-0 z-50 w-full backdrop-blur-[24px] py-4 px-8 mb-8"
-          style={{
-            background: 'rgba(20, 30, 50, 0.6)',
-            borderBottom: '1px solid rgba(20, 184, 166, 0.3)',
-            boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
-          }}
+          className="sticky top-0 z-50 w-full backdrop-blur-md bg-slate-900/20 border-b border-white/10 py-6 px-8 mb-8"
           role="banner"
           aria-labelledby="monitor-title"
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <div className="max-w-[1440px] mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-6">
               <motion.div 
-                className="p-3 rounded-2xl bg-teal-500/20 text-teal-400"
+                className="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-blue-500/20 border border-teal-400/30"
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <Activity size={28} />
+                <Activity size={32} className="text-teal-400" />
               </motion.div>
               <div className="text-left">
                 <motion.h1 
                   id="monitor-title"
-                  className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500 font-noto-bold"
-                  style={{ letterSpacing: '0.05em' }}
+                  className="text-4xl font-bold bg-gradient-to-r from-white via-teal-200 to-blue-400 bg-clip-text text-transparent"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
@@ -75,7 +69,7 @@ const Monitor: React.FC = () => {
                   MONITOR ▮ : OPERATIONAL & STRATEGIC TRACKING
                 </motion.h1>
                 <motion.p 
-                  className="text-base text-gray-300 font-noto-medium"
+                  className="text-lg text-slate-300 mt-2"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
@@ -85,16 +79,12 @@ const Monitor: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <button
-                className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-teal-400 transition-all duration-200 hover:bg-teal-500/10"
-                aria-label="Help"
-              >
+            <div className="flex items-center space-x-3">
+              <button className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-teal-400 hover:bg-teal-500/10 transition-all duration-200">
                 <HelpCircle className="w-6 h-6" />
               </button>
-              <button
-                className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-teal-400 transition-all duration-200 hover:bg-teal-500/10"
-                aria-label="Full Screen"
+              <button 
+                className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-teal-400 hover:bg-teal-500/10 transition-all duration-200"
                 disabled={!isExpanded}
               >
                 <Maximize2 className="w-6 h-6" />
@@ -104,52 +94,29 @@ const Monitor: React.FC = () => {
         </motion.header>
 
         {/* Main Content Container */}
-        <div className="max-w-[1440px] mx-auto px-8 pb-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-8 pb-8 relative z-10 space-y-8">
           {/* View Toggle & Instrument Panel */}
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-            className="mb-6"
           >
-            <div 
-              className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
-              style={{
-                background: 'rgba(20, 30, 50, 0.6)',
-                boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-2xl"></div>
-              <div className="relative">
-                <div 
-                  className="w-full h-12 flex items-center justify-between px-4"
-                >
+            <div className="rounded-2xl backdrop-blur-md bg-slate-800/30 border border-white/10 overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center justify-between">
                   {/* View Toggles */}
-                  <div className="flex space-x-3" role="tablist">
+                  <div className="flex space-x-4" role="tablist">
                     {(['treemap', 'heatmap', 'radial', 'tile'] as ViewType[]).map((view) => (
                       <button
                         key={view}
                         role="tab"
                         aria-selected={activeView === view}
                         onClick={() => setActiveView(view)}
-                        className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
+                        className={`px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                           activeView === view
-                            ? 'text-[#081226]'
-                            : 'text-[#E0E0E0] hover:bg-[rgba(255,255,255,0.10)]'
+                            ? 'bg-gradient-to-r from-teal-500 to-blue-500 text-white shadow-lg'
+                            : 'text-slate-300 hover:text-white hover:bg-white/5 border border-white/10'
                         }`}
-                        style={{
-                          fontFamily: 'Noto Sans',
-                          ...(activeView === view
-                            ? {
-                                background: '#00FFC3',
-                                boxShadow: '0 0 12px rgba(0,255,195,0.6), 0 2px 4px rgba(0,0,0,0.3)',
-                              }
-                            : {
-                                background: 'transparent',
-                                border: '1px solid rgba(255,255,255,0.12)',
-                              }
-                          ),
-                        }}
                       >
                         {view === 'treemap' && 'Treemap View'}
                         {view === 'heatmap' && 'Heatmap + Table View'}
@@ -179,94 +146,70 @@ const Monitor: React.FC = () => {
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-            className="mb-6"
           >
-            <div 
-              className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
-              style={{
-                background: 'rgba(20, 30, 50, 0.6)',
-                boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)',
-                height: '60vh',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-blue-500/5 rounded-2xl"></div>
-              <div className="relative flex flex-col h-full">
-                {/* Card Header */}
-                <div 
-                  className="h-10 flex items-center justify-between px-4 flex-shrink-0"
-                  style={{
-                    background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
-                  }}
-                >
-                  <h3 
-                    className="font-bold text-white text-base"
-                    style={{ 
-                      fontFamily: 'Noto Sans',
-                      textShadow: '0 2px 4px rgba(0,0,0,0.6)' 
-                    }}
+            <div className="rounded-2xl backdrop-blur-md bg-slate-800/30 border border-white/10 overflow-hidden h-[60vh] flex flex-col">
+              {/* Card Header */}
+              <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <h3 className="text-2xl font-bold text-white">
+                  {viewTitles[activeView]}
+                </h3>
+                <div className="flex items-center space-x-3">
+                  <button className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200">
+                    <span className="text-lg">⋮</span>
+                  </button>
+                  <button className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200">
+                    <span className="text-lg">—</span>
+                  </button>
+                  <button 
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+                    onClick={() => setIsExpanded(!isExpanded)}
                   >
-                    {viewTitles[activeView]}
-                  </h3>
-                  <div className="flex items-center space-x-2">
-                    <button className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200">
-                      <span className="text-lg">⋮</span>
-                    </button>
-                    <button className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200">
-                      <span className="text-lg">—</span>
-                    </button>
-                    <button 
-                      className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200"
-                      onClick={() => setIsExpanded(!isExpanded)}
-                    >
-                      <span className="text-lg">⛶</span>
-                    </button>
-                  </div>
+                    <span className="text-lg">⛶</span>
+                  </button>
                 </div>
+              </div>
 
-                {/* View Content */}
-                <div className="flex-1 relative">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={activeView}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute inset-0"
-                    >
-                      {activeView === 'treemap' && (
-                        <TreemapView 
-                          timeRange={timeRange}
-                          domainFilter={domainFilter}
-                          chartType={chartType}
-                        />
-                      )}
-                      {activeView === 'heatmap' && (
-                        <HeatmapTableView 
-                          timeRange={timeRange}
-                          domainFilter={domainFilter}
-                          chartType={chartType}
-                        />
-                      )}
-                      {activeView === 'radial' && (
-                        <RadialHubView 
-                          timeRange={timeRange}
-                          domainFilter={domainFilter}
-                          chartType={chartType}
-                        />
-                      )}
-                      {activeView === 'tile' && (
-                        <TileDashboardView 
-                          timeRange={timeRange}
-                          domainFilter={domainFilter}
-                          chartType={chartType}
-                        />
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
+              {/* View Content */}
+              <div className="flex-1 relative">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeView}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0"
+                  >
+                    {activeView === 'treemap' && (
+                      <TreemapView 
+                        timeRange={timeRange}
+                        domainFilter={domainFilter}
+                        chartType={chartType}
+                      />
+                    )}
+                    {activeView === 'heatmap' && (
+                      <HeatmapTableView 
+                        timeRange={timeRange}
+                        domainFilter={domainFilter}
+                        chartType={chartType}
+                      />
+                    )}
+                    {activeView === 'radial' && (
+                      <RadialHubView 
+                        timeRange={timeRange}
+                        domainFilter={domainFilter}
+                        chartType={chartType}
+                      />
+                    )}
+                    {activeView === 'tile' && (
+                      <TileDashboardView 
+                        timeRange={timeRange}
+                        domainFilter={domainFilter}
+                        chartType={chartType}
+                      />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </div>
           </motion.div>
@@ -276,34 +219,16 @@ const Monitor: React.FC = () => {
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
-            className="flex gap-6 h-[35vh]"
+            className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[35vh]"
           >
-            <div className="flex-[3]">
-              <div 
-                className="h-full rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
-                style={{
-                  background: 'rgba(20, 30, 50, 0.6)',
-                  boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-purple-500/5 rounded-2xl"></div>
-                <div className="relative h-full">
-                  <UniversalAlertHub />
-                </div>
+            <div className="lg:col-span-2">
+              <div className="h-full rounded-2xl backdrop-blur-md bg-slate-800/30 border border-white/10 overflow-hidden">
+                <UniversalAlertHub />
               </div>
             </div>
-            <div className="flex-[2]">
-              <div 
-                className="h-full rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
-                style={{
-                  background: 'rgba(20, 30, 50, 0.6)',
-                  boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/5 rounded-2xl"></div>
-                <div className="relative h-full">
-                  <AnomalyDetector />
-                </div>
+            <div>
+              <div className="h-full rounded-2xl backdrop-blur-md bg-slate-800/30 border border-white/10 overflow-hidden">
+                <AnomalyDetector />
               </div>
             </div>
           </motion.div>
