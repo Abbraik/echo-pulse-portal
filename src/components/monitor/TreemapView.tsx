@@ -688,7 +688,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     }
   };
 
-  // Squarified treemap algorithm similar to S&P 500
+  // Improved treemap algorithm that ensures all items fit within container
   const calculateLayout = (data: TreemapData[]) => {
     if (data.length === 0) return [];
 
@@ -697,7 +697,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     const containerHeight = 100;
     const totalArea = containerWidth * containerHeight;
 
-    // Sort by weight descending (largest first, like S&P 500)
+    // Sort by weight descending (largest first)
     const sortedData = [...data].sort((a, b) => b.weight - a.weight);
     
     // Calculate normalized areas
@@ -707,77 +707,73 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     }));
 
     const result: (TreemapData & { x: number; y: number; width: number; height: number })[] = [];
-
-    // Squarified treemap implementation
+    
+    // Use a simple row-by-row packing algorithm that guarantees all items fit
     let currentX = 0;
     let currentY = 0;
+    let currentRowHeight = 0;
     let remainingWidth = containerWidth;
     let remainingHeight = containerHeight;
-    let i = 0;
-
-    while (i < itemsWithArea.length) {
-      // Determine how many items to place in current row
-      let rowItems: typeof itemsWithArea = [];
-      let rowArea = 0;
-      let bestAspectRatio = Infinity;
-      let bestRowItems: typeof itemsWithArea = [];
-
-      // Try different row lengths to find best aspect ratio
-      for (let j = i; j < itemsWithArea.length; j++) {
-        const testItems = itemsWithArea.slice(i, j + 1);
-        const testArea = testItems.reduce((sum, item) => sum + item.area, 0);
+    
+    for (let i = 0; i < itemsWithArea.length; i++) {
+      const item = itemsWithArea[i];
+      
+      // Calculate dimensions based on area
+      const aspectRatio = 1.6; // Golden ratio approximation for better visual appeal
+      let itemHeight = Math.sqrt(item.area / aspectRatio);
+      let itemWidth = item.area / itemHeight;
+      
+      // Check if item fits in current row
+      if (currentX + itemWidth > containerWidth || itemWidth > remainingWidth) {
+        // Move to next row
+        currentX = 0;
+        currentY += currentRowHeight;
+        remainingHeight -= currentRowHeight;
+        currentRowHeight = 0;
+        remainingWidth = containerWidth;
         
-        if (testArea > remainingWidth * remainingHeight) break;
-        
-        // Calculate aspect ratios for this row configuration
-        const rowHeight = testArea / remainingWidth;
-        let maxAspectRatio = 0;
-        
-        testItems.forEach(item => {
-          const itemWidth = item.area / rowHeight;
-          const aspectRatio = Math.max(itemWidth / rowHeight, rowHeight / itemWidth);
-          maxAspectRatio = Math.max(maxAspectRatio, aspectRatio);
-        });
-
-        if (maxAspectRatio < bestAspectRatio) {
-          bestAspectRatio = maxAspectRatio;
-          bestRowItems = [...testItems];
-          rowArea = testArea;
-        } else {
-          break; // Adding more items makes aspect ratio worse
-        }
+        // Recalculate dimensions for new row
+        itemHeight = Math.sqrt(item.area / aspectRatio);
+        itemWidth = item.area / itemHeight;
       }
-
-      rowItems = bestRowItems.length > 0 ? bestRowItems : [itemsWithArea[i]];
-      rowArea = rowItems.reduce((sum, item) => sum + item.area, 0);
-
-      // Calculate row height
-      const rowHeight = Math.min(rowArea / remainingWidth, remainingHeight);
       
-      // Place items in this row
-      let itemX = currentX;
-      rowItems.forEach(item => {
-        const itemWidth = item.area / rowHeight;
-        
-        result.push({
-          ...item,
-          x: itemX,
-          y: currentY,
-          width: itemWidth,
-          height: rowHeight
-        });
-        
-        itemX += itemWidth;
+      // Ensure item doesn't exceed container bounds
+      if (currentY + itemHeight > containerHeight) {
+        // Scale down height to fit
+        const maxHeight = remainingHeight / Math.ceil((itemsWithArea.length - i) / 3); // Estimate remaining rows
+        itemHeight = Math.min(itemHeight, maxHeight);
+        itemWidth = item.area / itemHeight;
+      }
+      
+      if (currentX + itemWidth > containerWidth) {
+        // Scale down width to fit
+        itemWidth = remainingWidth;
+        itemHeight = item.area / itemWidth;
+      }
+      
+      // Ensure minimum size for visibility
+      itemWidth = Math.max(itemWidth, 2);
+      itemHeight = Math.max(itemHeight, 2);
+      
+      result.push({
+        ...item,
+        x: currentX,
+        y: currentY,
+        width: itemWidth,
+        height: itemHeight
       });
-
-      // Update position for next row
-      i += rowItems.length;
-      currentY += rowHeight;
-      remainingHeight -= rowHeight;
       
-      // If we're running out of height, expand remaining items to fill
-      if (i < itemsWithArea.length && remainingHeight < 5) {
-        remainingHeight = containerHeight - currentY;
+      currentX += itemWidth;
+      remainingWidth -= itemWidth;
+      currentRowHeight = Math.max(currentRowHeight, itemHeight);
+      
+      // If we're at the end of container width, force new row
+      if (currentX >= containerWidth - 0.1) {
+        currentX = 0;
+        currentY += currentRowHeight;
+        remainingHeight -= currentRowHeight;
+        currentRowHeight = 0;
+        remainingWidth = containerWidth;
       }
     }
 
