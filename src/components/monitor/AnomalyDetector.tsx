@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 
 interface Anomaly {
   id: string;
@@ -50,10 +50,10 @@ const AnomalyDetector: React.FC = () => {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'high': return '#FF6E6E';
-      case 'medium': return '#FFC107';
-      case 'low': return '#00FFC3';
-      default: return '#00FFC3';
+      case 'high': return 'bg-red-500/80';
+      case 'medium': return 'bg-amber-500/80';
+      case 'low': return 'bg-green-500/80';
+      default: return 'bg-green-500/80';
     }
   };
 
@@ -76,176 +76,267 @@ const AnomalyDetector: React.FC = () => {
 
   const currentAnomaly = anomalies[currentIndex];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const headerButtonVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
-    <div 
-      className="h-full rounded-3xl flex flex-col"
-      style={{
-        background: 'rgba(10,20,40,0.45)',
-        backdropFilter: 'blur(24px)',
-        border: '1px solid rgba(0,255,195,0.15)',
-        boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
+    <motion.div 
+      className="h-full rounded-2xl flex flex-col backdrop-blur-xl bg-slate-800/40 border border-white/20 overflow-hidden shadow-2xl"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      whileHover={{ 
+        y: -2,
+        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)"
       }}
     >
       {/* Header */}
-      <div 
-        className="h-8 flex items-center justify-between px-4 rounded-t-3xl flex-shrink-0"
-        style={{
-          background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
+      <motion.div 
+        className="flex items-center justify-between px-6 py-4 border-b border-white/10"
+        initial={{ opacity: 0.9 }}
+        whileHover={{ 
+          opacity: 1,
+          backgroundColor: "rgba(15, 23, 42, 0.1)"
         }}
+        transition={{ duration: 0.2 }}
       >
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           {anomalies.length > 1 && (
             <>
-              <button 
+              <motion.button 
                 onClick={handlePrevious}
-                className="w-6 h-6 text-[#00FFC3] hover:text-white transition-colors flex items-center justify-center"
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-teal-400 hover:bg-teal-500/10 transition-all duration-200"
                 aria-label="Previous anomaly"
+                whileHover={{ 
+                  scale: 1.1,
+                  backgroundColor: "rgba(20, 184, 166, 0.15)",
+                  boxShadow: "0 0 15px rgba(20, 184, 166, 0.3)"
+                }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.15 }}
               >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button 
+                <ChevronLeft size={20} />
+              </motion.button>
+              <motion.button 
                 onClick={handleNext}
-                className="w-6 h-6 text-[#00FFC3] hover:text-white transition-colors flex items-center justify-center"
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-teal-400 hover:bg-teal-500/10 transition-all duration-200"
                 aria-label="Next anomaly"
+                whileHover={{ 
+                  scale: 1.1,
+                  backgroundColor: "rgba(20, 184, 166, 0.15)",
+                  boxShadow: "0 0 15px rgba(20, 184, 166, 0.3)"
+                }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.15 }}
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight size={20} />
               </button>
             </>
           )}
         </div>
-        <h3 
-          className="font-bold text-white text-base flex-1 text-center"
-          style={{ 
-            fontFamily: 'Noto Sans',
-            textShadow: '0 2px 4px rgba(0,0,0,0.6)' 
+        <motion.h3 
+          className="text-xl font-bold text-white flex-1 text-center"
+          whileHover={{ 
+            scale: 1.02,
+            textShadow: "0 0 10px rgba(255, 255, 255, 0.3)"
           }}
+          transition={{ duration: 0.2 }}
         >
           Anomaly Detector
-        </h3>
-        <div className="flex items-center space-x-2">
-          <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors">
-            <span className="text-sm">⋮</span>
-          </button>
-          <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors">
-            <span className="text-sm">—</span>
-          </button>
-          <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors">
-            <span className="text-sm">⛶</span>
-          </button>
-        </div>
-      </div>
+        </motion.h3>
+        <motion.div 
+          className="flex items-center space-x-3"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {['⋮', '—', '⛶'].map((symbol, index) => (
+            <motion.button 
+              key={symbol}
+              variants={headerButtonVariants}
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+              whileHover={{ 
+                scale: 1.1,
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                color: "rgba(255, 255, 255, 1)"
+              }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.15 }}
+            >
+              <span className="text-lg">{symbol}</span>
+            </motion.button>
+          ))}
+        </motion.div>
+      </motion.div>
 
       {/* Carousel Body */}
-      <div 
-        className="flex-1 p-3 flex items-center justify-center relative"
-        style={{
-          background: 'rgba(20,30,50,0.6)',
-          backdropFilter: 'blur(32px)',
-        }}
-      >
+      <div className="flex-1 p-6 flex items-center justify-center relative">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentAnomaly.id}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
-            className="w-full h-40 p-4 rounded-2xl relative"
-            style={{
-              background: 'rgba(20,30,50,0.4)',
-              backdropFilter: 'blur(24px)',
-              boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
+            initial={{ opacity: 0, x: 50, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -50, scale: 0.95 }}
+            transition={{ 
+              duration: 0.4,
+              ease: "easeInOut"
+            }}
+            className="w-full p-6 rounded-xl backdrop-blur-sm bg-white/5 border border-white/10 relative"
+            whileHover={{
+              scale: 1.02,
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)"
             }}
             role="region"
             aria-labelledby="anomaly-heading"
           >
+            {/* Severity Icon */}
+            <motion.div 
+              className="absolute top-4 right-4"
+              initial={{ opacity: 0, rotate: -90 }}
+              animate={{ opacity: 1, rotate: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <AlertTriangle 
+                size={24} 
+                className={`${
+                  currentAnomaly.severity === 'high' ? 'text-red-400' :
+                  currentAnomaly.severity === 'medium' ? 'text-amber-400' : 'text-green-400'
+                }`}
+              />
+            </motion.div>
+
             {/* Title and Severity */}
-            <div className="flex items-start justify-between mb-2">
-              <h4 
+            <div className="flex items-start justify-between mb-4">
+              <motion.h4 
                 id="anomaly-heading"
-                className="font-bold text-[#00FFC3] text-sm"
-                style={{ 
-                  fontFamily: 'Noto Sans',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.8)' 
-                }}
+                className="font-bold text-white text-lg pr-8"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
               >
                 {currentAnomaly.title}
-              </h4>
-              <span 
-                className="px-3 py-1 rounded-full font-medium text-white text-xs"
-                style={{ 
-                  fontFamily: 'Noto Sans',
-                  backgroundColor: getSeverityColor(currentAnomaly.severity),
-                  color: currentAnomaly.severity === 'low' ? '#081226' : '#FFFFFF'
+              </motion.h4>
+              <motion.span 
+                className={`px-3 py-1 rounded-full font-medium text-white text-sm ${getSeverityColor(currentAnomaly.severity)}`}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)"
                 }}
               >
                 {getSeverityLabel(currentAnomaly.severity)}
-              </span>
+              </motion.span>
             </div>
 
             {/* Timestamp */}
-            <p 
-              className="text-[#E0E0E0] text-xs mb-3"
-              style={{ fontFamily: 'Noto Sans' }}
+            <motion.p 
+              className="text-slate-400 text-sm mb-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
             >
               {currentAnomaly.timestamp}
-            </p>
+            </motion.p>
 
             {/* Description */}
-            <p 
-              className="text-[#E0E0E0] text-xs leading-relaxed mb-4 flex-1"
-              style={{ fontFamily: 'Noto Sans' }}
+            <motion.p 
+              className="text-slate-300 text-sm leading-relaxed mb-6"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
             >
               {currentAnomaly.description}
-            </p>
+            </motion.p>
 
             {/* Action Buttons */}
-            <div className="flex space-x-3 mt-auto absolute bottom-4 left-4 right-4">
-              <button
-                className="flex-1 h-8 rounded-lg font-medium text-[#081226] text-xs transition-all duration-200 hover:scale-105"
-                style={{
-                  fontFamily: 'Noto Sans',
-                  background: '#00FFC3',
-                  boxShadow: '0 4px 8px rgba(0,255,195,0.4)',
-                }}
+            <motion.div 
+              className="flex space-x-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+            >
+              <motion.button
+                className="flex-1 px-4 py-2 rounded-lg font-medium text-slate-900 text-sm bg-teal-500 transition-all duration-200"
                 aria-label="Investigate Anomaly"
+                whileHover={{ 
+                  scale: 1.02,
+                  backgroundColor: "rgba(20, 184, 166, 1)",
+                  boxShadow: "0 4px 12px rgba(20, 184, 166, 0.4)"
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.15 }}
               >
                 Investigate ▶
-              </button>
-              <button
-                className="flex-1 h-8 rounded-lg font-medium text-[#081226] text-xs transition-all duration-200 hover:scale-105"
-                style={{
-                  fontFamily: 'Noto Sans',
-                  background: '#00B8FF',
-                  boxShadow: '0 4px 8px rgba(0,184,255,0.4)',
-                }}
+              </motion.button>
+              <motion.button
+                className="flex-1 px-4 py-2 rounded-lg font-medium text-slate-900 text-sm bg-blue-500 transition-all duration-200"
                 aria-label="Trigger Playbook"
+                whileHover={{ 
+                  scale: 1.02,
+                  backgroundColor: "rgba(59, 130, 246, 1)",
+                  boxShadow: "0 4px 12px rgba(59, 130, 246, 0.4)"
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.15 }}
               >
                 Trigger Playbook ▶
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </motion.div>
         </AnimatePresence>
 
         {/* Navigation Dots */}
         {anomalies.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          <motion.div 
+            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.5 }}
+          >
             {anomalies.map((_, index) => (
-              <button
+              <motion.button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                className={`w-3 h-3 rounded-full transition-all duration-200 ${
                   index === currentIndex 
-                    ? 'bg-[#00FFC3]' 
+                    ? 'bg-teal-400' 
                     : 'bg-white/30 hover:bg-white/50'
                 }`}
                 aria-label={`Go to anomaly ${index + 1}`}
+                whileHover={{ 
+                  scale: 1.2,
+                  backgroundColor: index === currentIndex ? "rgba(20, 184, 166, 1)" : "rgba(255, 255, 255, 0.7)"
+                }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.15 }}
               />
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
