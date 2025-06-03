@@ -4,147 +4,285 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, HelpCircle, Maximize2 } from 'lucide-react';
 import TreemapView from '@/components/monitor/TreemapView';
 import HeatmapTableView from '@/components/monitor/HeatmapTableView';
+import RadialHubView from '@/components/monitor/RadialHubView';
+import TileDashboardView from '@/components/monitor/TileDashboardView';
+import UniversalAlertHub from '@/components/monitor/UniversalAlertHub';
+import AnomalyDetector from '@/components/monitor/AnomalyDetector';
+import InstrumentPanel from '@/components/monitor/InstrumentPanel';
+
+type ViewType = 'treemap' | 'heatmap' | 'radial' | 'tile';
 
 const Monitor: React.FC = () => {
-  const [activeView, setActiveView] = useState<'treemap' | 'heatmap'>('treemap');
+  const [activeView, setActiveView] = useState<ViewType>('treemap');
+  const [timeRange, setTimeRange] = useState('Last 30 Days');
+  const [domainFilter, setDomainFilter] = useState('All Domains');
+  const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const viewTitles = {
+    treemap: 'Master Treemap: Key Monitor Indicators',
+    heatmap: 'Heatmap + Table View',
+    radial: 'Radial Hub & Spokes',
+    tile: 'Tile Dashboard'
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#081226] to-[#04132A] relative overflow-hidden">
-      {/* Particle Field Background */}
-      <div className="absolute inset-0 opacity-20">
-        {Array.from({ length: 50 }).map((_, i) => (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Parallax Background Layers */}
+      <div className="fixed inset-0 bg-gradient-to-b from-[#041225] to-[#0B122A]" />
+      
+      {/* Backdrop Layer 1 */}
+      <div 
+        className="fixed inset-0 opacity-30"
+        style={{ backdropFilter: 'blur(16px)', background: 'rgba(8,17,42,0.3)' }}
+      />
+      
+      {/* Backdrop Layer 2 */}
+      <div 
+        className="fixed inset-0 opacity-60"
+        style={{ backdropFilter: 'blur(32px)', background: 'rgba(4,18,37,0.6)' }}
+      />
+
+      {/* Particle Field */}
+      <div className="fixed inset-0 opacity-[0.02] pointer-events-none">
+        {Array.from({ length: 80 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-[#00FFC3] rounded-full animate-float"
+            className="absolute w-1 h-1 bg-[#00FFC3] rounded-full animate-pulse"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 8}s`,
-              animationDuration: `${6 + Math.random() * 4}s`,
+              animationDuration: `${4 + Math.random() * 6}s`,
+              filter: 'drop-shadow(0 0 4px rgba(0,255,195,0.8))',
             }}
           />
         ))}
       </div>
 
-      {/* Global Header */}
-      <div 
-        className="w-full h-20 flex items-center justify-between px-8"
-        style={{
-          background: 'rgba(10,20,40,0.6)',
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 12px 24px rgba(0,0,0,0.4)',
-        }}
-        role="banner"
-        aria-labelledby="monitor-title"
-      >
-        <div className="flex items-center space-x-4">
-          <Activity className="w-8 h-8 text-[#00FFC3]" />
-          <div>
-            <h1 
-              id="monitor-title"
-              className="font-noto-bold text-[#00FFC3] text-xl leading-tight"
-              style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
-            >
-              MONITOR ▮ : OPERATIONAL & STRATEGIC TRACKING
-            </h1>
-            <p className="font-noto-regular text-[#E0E0E0] text-sm">
-              Real-time system health and performance insights
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <button
-            className="w-8 h-8 text-white/50 hover:text-[#00FFC3] transition-colors duration-200"
-            aria-label="Help"
-          >
-            <HelpCircle className="w-full h-full" />
-          </button>
-          <button
-            className="w-8 h-8 text-white/50 hover:text-[#00FFC3] transition-colors duration-200"
-            aria-label="Full Screen"
-            disabled
-          >
-            <Maximize2 className="w-full h-full" />
-          </button>
-        </div>
-      </div>
-
-      {/* View Toggle Bar */}
-      <div className="px-8 mt-4">
-        <div 
-          className="w-full h-12 flex items-center px-6 rounded-2xl border"
+      <div className="relative z-10">
+        {/* Primary Monitor Header Bar */}
+        <header 
+          className="w-full h-20 flex items-center justify-between px-8"
           style={{
-            background: 'rgba(10,20,40,0.5)',
-            backdropFilter: 'blur(20px)',
-            borderColor: 'rgba(0,255,195,0.15)',
-            boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+            background: 'rgba(4,18,37,0.65)',
+            backdropFilter: 'blur(24px)',
+            boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
+            borderBottom: '1px solid rgba(0,255,195,0.20)',
           }}
+          role="banner"
+          aria-labelledby="monitor-title"
         >
-          <div className="flex space-x-2" role="tablist">
+          <div className="flex items-center space-x-4">
+            <Activity 
+              className="w-8 h-8 text-[#00FFC3]" 
+              style={{ filter: 'drop-shadow(0 0 10px rgba(0,255,195,0.5))' }}
+            />
+            <div>
+              <h1 
+                id="monitor-title"
+                className="font-bold text-[#00FFC3] text-xl leading-tight"
+                style={{ 
+                  fontFamily: 'Noto Sans',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.6)' 
+                }}
+              >
+                MONITOR ▮ : OPERATIONAL & STRATEGIC TRACKING
+              </h1>
+              <p 
+                className="text-[#E0E0E0] text-sm"
+                style={{ 
+                  fontFamily: 'Noto Sans',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.4)' 
+                }}
+              >
+                Real-time system health and performance insights
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
             <button
-              role="tab"
-              aria-selected={activeView === 'treemap'}
-              onClick={() => setActiveView('treemap')}
-              className={`px-6 py-2 rounded-lg font-noto-medium text-sm transition-all duration-150 ${
-                activeView === 'treemap'
-                  ? 'bg-[#00FFC3] text-[#081226] shadow-lg'
-                  : 'bg-transparent border border-white/10 text-[#E0E0E0] hover:bg-white/10'
-              }`}
-              style={
-                activeView === 'treemap'
-                  ? { boxShadow: '0 0 8px rgba(0,255,195,0.6)' }
-                  : {}
-              }
+              className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200 hover:bg-[rgba(0,255,195,0.10)]"
+              style={{ filter: 'hover:drop-shadow(0 0 12px rgba(0,255,195,0.6))' }}
+              aria-label="Help"
             >
-              Treemap View
+              <HelpCircle className="w-6 h-6" />
             </button>
             <button
-              role="tab"
-              aria-selected={activeView === 'heatmap'}
-              onClick={() => setActiveView('heatmap')}
-              className={`px-6 py-2 rounded-lg font-noto-medium text-sm transition-all duration-150 ${
-                activeView === 'heatmap'
-                  ? 'bg-[#00FFC3] text-[#081226] shadow-lg'
-                  : 'bg-transparent border border-white/10 text-[#E0E0E0] hover:bg-white/10'
-              }`}
-              style={
-                activeView === 'heatmap'
-                  ? { boxShadow: '0 0 8px rgba(0,255,195,0.6)' }
-                  : {}
-              }
+              className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200 hover:bg-[rgba(0,255,195,0.10)]"
+              style={{ filter: 'hover:drop-shadow(0 0 12px rgba(0,255,195,0.6))' }}
+              aria-label="Full Screen"
+              disabled={!isExpanded}
             >
-              Heatmap + Table View
+              <Maximize2 className="w-6 h-6" />
             </button>
           </div>
-        </div>
-      </div>
+        </header>
 
-      {/* Content Area */}
-      <div className="px-8 mt-6 pb-8">
-        <AnimatePresence mode="wait">
-          {activeView === 'treemap' ? (
-            <motion.div
-              key="treemap"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+        {/* View Toggle & Instrument Panel */}
+        <div className="px-8 mt-6">
+          <div 
+            className="w-full h-12 flex items-center justify-between px-4 rounded-2xl"
+            style={{
+              background: 'rgba(8,14,25,0.55)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0,255,195,0.15)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+            }}
+          >
+            {/* View Toggles */}
+            <div className="flex space-x-3" role="tablist">
+              {(['treemap', 'heatmap', 'radial', 'tile'] as ViewType[]).map((view) => (
+                <button
+                  key={view}
+                  role="tab"
+                  aria-selected={activeView === view}
+                  onClick={() => setActiveView(view)}
+                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
+                    activeView === view
+                      ? 'text-[#081226]'
+                      : 'text-[#E0E0E0] hover:bg-[rgba(255,255,255,0.10)]'
+                  }`}
+                  style={{
+                    fontFamily: 'Noto Sans',
+                    ...(activeView === view
+                      ? {
+                          background: '#00FFC3',
+                          boxShadow: '0 0 12px rgba(0,255,195,0.6), 0 2px 4px rgba(0,0,0,0.3)',
+                        }
+                      : {
+                          background: 'transparent',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                        }
+                    ),
+                  }}
+                >
+                  {view === 'treemap' && 'Treemap View'}
+                  {view === 'heatmap' && 'Heatmap + Table View'}
+                  {view === 'radial' && 'Radial Hub & Spokes'}
+                  {view === 'tile' && 'Tile Dashboard'}
+                </button>
+              ))}
+            </div>
+
+            {/* Instrument Panel */}
+            <InstrumentPanel
+              timeRange={timeRange}
+              onTimeRangeChange={setTimeRange}
+              domainFilter={domainFilter}
+              onDomainFilterChange={setDomainFilter}
+              chartType={chartType}
+              onChartTypeChange={setChartType}
+              activeView={activeView}
+            />
+          </div>
+        </div>
+
+        {/* Main Visualization Area */}
+        <div className="px-8 mt-6">
+          <div 
+            className="rounded-3xl border relative"
+            style={{
+              background: 'rgba(10,20,40,0.45)',
+              backdropFilter: 'blur(24px)',
+              borderColor: 'rgba(0,255,195,0.15)',
+              borderRadius: '1.5rem',
+              boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
+              height: '60vh',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {/* Card Header */}
+            <div 
+              className="h-10 flex items-center justify-between px-4 flex-shrink-0"
+              style={{
+                background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
+              }}
             >
-              <TreemapView />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="heatmap"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <HeatmapTableView />
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <h3 
+                className="font-bold text-white text-base"
+                style={{ 
+                  fontFamily: 'Noto Sans',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.6)' 
+                }}
+              >
+                {viewTitles[activeView]}
+              </h3>
+              <div className="flex items-center space-x-2">
+                <button className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200">
+                  <span className="text-lg">⋮</span>
+                </button>
+                <button className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200">
+                  <span className="text-lg">—</span>
+                </button>
+                <button 
+                  className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                >
+                  <span className="text-lg">⛶</span>
+                </button>
+              </div>
+            </div>
+
+            {/* View Content */}
+            <div className="flex-1 relative">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeView}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0"
+                >
+                  {activeView === 'treemap' && (
+                    <TreemapView 
+                      timeRange={timeRange}
+                      domainFilter={domainFilter}
+                      chartType={chartType}
+                    />
+                  )}
+                  {activeView === 'heatmap' && (
+                    <HeatmapTableView 
+                      timeRange={timeRange}
+                      domainFilter={domainFilter}
+                      chartType={chartType}
+                    />
+                  )}
+                  {activeView === 'radial' && (
+                    <RadialHubView 
+                      timeRange={timeRange}
+                      domainFilter={domainFilter}
+                      chartType={chartType}
+                    />
+                  )}
+                  {activeView === 'tile' && (
+                    <TileDashboardView 
+                      timeRange={timeRange}
+                      domainFilter={domainFilter}
+                      chartType={chartType}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* Alerts & Anomaly Section */}
+        <div className="px-8 mt-6 pb-8">
+          <div className="flex gap-6 h-[35vh]">
+            <div className="flex-[3]">
+              <UniversalAlertHub />
+            </div>
+            <div className="flex-[2]">
+              <AnomalyDetector />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

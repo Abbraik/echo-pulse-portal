@@ -1,7 +1,13 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MoreVertical, Minus, Maximize2, Search, Filter, Download, TrendingUp, Eye } from 'lucide-react';
+import { Search, Download, TrendingUp, Eye } from 'lucide-react';
+
+interface HeatmapTableViewProps {
+  timeRange: string;
+  domainFilter: string;
+  chartType: 'bar' | 'line';
+}
 
 interface HeatmapCell {
   domain: string;
@@ -21,11 +27,10 @@ interface Indicator {
   trend: number[];
 }
 
-const HeatmapTableView: React.FC = () => {
+const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({ timeRange, domainFilter, chartType }) => {
   const [selectedCell, setSelectedCell] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'strategic' | 'operational'>('all');
-  const [domainFilter, setDomainFilter] = useState<'all' | 'population' | 'resources' | 'social' | 'workflow'>('all');
 
   const heatmapData: HeatmapCell[] = [
     { domain: 'Population', category: 'strategic', value: 78, status: 'warning' },
@@ -72,317 +77,341 @@ const HeatmapTableView: React.FC = () => {
   const filteredIndicators = indicators.filter(indicator => {
     const matchesSearch = indicator.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || indicator.category === categoryFilter;
-    const matchesDomain = domainFilter === 'all' || indicator.domain.toLowerCase() === domainFilter;
-    return matchesSearch && matchesCategory && matchesDomain;
+    return matchesSearch && matchesCategory;
   });
 
   const domains = ['Population', 'Resources', 'Social', 'Workflow'];
-  const categories = ['strategic', 'operational'];
 
   return (
-    <div className="space-y-6">
-      {/* Heatmap Panel */}
+    <div className="h-full flex flex-col">
+      {/* Heatmap Section */}
       <div 
-        className="h-[45vh] rounded-3xl border relative"
+        className="h-1/2 m-3 mb-1 rounded-2xl p-3"
         style={{
-          background: 'rgba(10,20,40,0.45)',
-          backdropFilter: 'blur(24px)',
-          borderColor: 'rgba(0,255,195,0.15)',
-          boxShadow: '0 12px 24px rgba(0,0,0,0.6)',
+          background: 'rgba(20,30,50,0.6)',
+          backdropFilter: 'blur(32px)',
         }}
       >
-        <div 
-          className="absolute inset-0.5 rounded-[1.25rem] p-4"
-          style={{
-            background: 'rgba(20,30,50,0.6)',
-            backdropFilter: 'blur(32px)',
-          }}
-        >
-          {/* Header */}
-          <div 
-            className="h-10 flex items-center justify-between px-4 rounded-lg mb-6"
-            style={{
-              background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
-            }}
-          >
-            <h3 
-              className="font-noto-bold text-white text-base"
-              style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
-            >
-              Domain Heatmap
-            </h3>
-            <div className="flex items-center space-x-2">
-              <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors">
-                <MoreVertical className="w-full h-full" />
-              </button>
-              <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors">
-                <Minus className="w-full h-full" />
-              </button>
-              <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors">
-                <Maximize2 className="w-full h-full" />
-              </button>
-            </div>
+        <div className="h-full grid grid-rows-3 grid-cols-4 gap-3">
+          {/* Column Headers */}
+          <div className="col-span-4 grid grid-cols-4 gap-3 items-center">
+            {domains.map(domain => (
+              <div key={domain} className="text-center">
+                <span 
+                  className="text-sm font-medium text-[#E0E0E0]"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  {domain}
+                </span>
+              </div>
+            ))}
           </div>
 
-          {/* Heatmap Grid */}
-          <div className="grid grid-cols-4 gap-4 h-[calc(100%-5rem)]">
-            {/* Column Headers */}
-            <div className="col-span-4 grid grid-cols-4 gap-4 mb-2">
-              {domains.map(domain => (
-                <div key={domain} className="text-center">
-                  <span className="font-noto-medium text-[#E0E0E0] text-sm">{domain}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Strategic Row */}
-            <div className="col-span-4 grid grid-cols-4 gap-4 mb-4">
-              {domains.map(domain => {
-                const cellData = heatmapData.find(cell => 
-                  cell.domain === domain && cell.category === 'strategic'
-                );
-                const cellKey = `${domain}-strategic`;
-                const isSelected = selectedCell === cellKey;
-                
-                return (
-                  <motion.div
-                    key={cellKey}
-                    className="aspect-square rounded-lg border cursor-pointer flex flex-col items-center justify-center relative"
-                    style={{
-                      background: getStatusColor(cellData?.status || 'healthy'),
-                      borderColor: isSelected ? '#00FFC3' : 'rgba(255,255,255,0.1)',
-                      boxShadow: isSelected ? '0 0 12px rgba(0,255,195,0.5)' : 'inset 0 2px 4px rgba(0,0,0,0.3)',
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => handleCellClick(domain, 'strategic')}
-                    role="button"
-                    aria-label={`${domain} (Strategic): ${cellData?.value}% ${cellData?.status}`}
+          {/* Strategic Row */}
+          <div className="col-span-4 grid grid-cols-4 gap-3">
+            {domains.map(domain => {
+              const cellData = heatmapData.find(cell => 
+                cell.domain === domain && cell.category === 'strategic'
+              );
+              const cellKey = `${domain}-strategic`;
+              const isSelected = selectedCell === cellKey;
+              
+              return (
+                <motion.div
+                  key={cellKey}
+                  className="aspect-square rounded-lg cursor-pointer flex flex-col items-center justify-center relative"
+                  style={{
+                    background: getStatusColor(cellData?.status || 'healthy'),
+                    border: isSelected ? '2px solid #00FFC3' : '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: isSelected ? '0 0 12px rgba(0,255,195,0.5)' : 'inset 0 2px 4px rgba(0,0,0,0.3)',
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => handleCellClick(domain, 'strategic')}
+                  role="button"
+                  aria-label={`${domain} (Strategic): ${cellData?.value}% ${cellData?.status}`}
+                >
+                  <span 
+                    className="text-xs font-medium text-[#00FFC3] mb-1"
+                    style={{ fontFamily: 'Noto Sans' }}
                   >
-                    <span className="font-noto-medium text-[#00FFC3] text-xs mb-1">Strategic</span>
-                    <span className="font-noto-bold text-[#00FFC3] text-lg">{cellData?.value}%</span>
-                    
-                    {/* Row Label */}
-                    {domain === 'Population' && (
-                      <div className="absolute -left-20 top-1/2 transform -translate-y-1/2">
-                        <span className="font-noto-medium text-[#E0E0E0] text-sm">Strategic</span>
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Operational Row */}
-            <div className="col-span-4 grid grid-cols-4 gap-4">
-              {domains.map(domain => {
-                const cellData = heatmapData.find(cell => 
-                  cell.domain === domain && cell.category === 'operational'
-                );
-                const cellKey = `${domain}-operational`;
-                const isSelected = selectedCell === cellKey;
-                
-                return (
-                  <motion.div
-                    key={cellKey}
-                    className="aspect-square rounded-lg border cursor-pointer flex flex-col items-center justify-center relative"
-                    style={{
-                      background: getStatusColor(cellData?.status || 'healthy'),
-                      borderColor: isSelected ? '#00FFC3' : 'rgba(255,255,255,0.1)',
-                      boxShadow: isSelected ? '0 0 12px rgba(0,255,195,0.5)' : 'inset 0 2px 4px rgba(0,0,0,0.3)',
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => handleCellClick(domain, 'operational')}
-                    role="button"
-                    aria-label={`${domain} (Operational): ${cellData?.value}% ${cellData?.status}`}
+                    Strategic
+                  </span>
+                  <span 
+                    className="text-lg font-bold text-[#00FFC3]"
+                    style={{ fontFamily: 'Noto Sans' }}
                   >
-                    <span className="font-noto-medium text-[#00FFC3] text-xs mb-1">Operational</span>
-                    <span className="font-noto-bold text-[#00FFC3] text-lg">{cellData?.value}%</span>
-                    
-                    {/* Row Label */}
-                    {domain === 'Population' && (
-                      <div className="absolute -left-20 top-1/2 transform -translate-y-1/2">
-                        <span className="font-noto-medium text-[#E0E0E0] text-sm">Operational</span>
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
+                    {cellData?.value}%
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Operational Row */}
+          <div className="col-span-4 grid grid-cols-4 gap-3">
+            {domains.map(domain => {
+              const cellData = heatmapData.find(cell => 
+                cell.domain === domain && cell.category === 'operational'
+              );
+              const cellKey = `${domain}-operational`;
+              const isSelected = selectedCell === cellKey;
+              
+              return (
+                <motion.div
+                  key={cellKey}
+                  className="aspect-square rounded-lg cursor-pointer flex flex-col items-center justify-center relative"
+                  style={{
+                    background: getStatusColor(cellData?.status || 'healthy'),
+                    border: isSelected ? '2px solid #00FFC3' : '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: isSelected ? '0 0 12px rgba(0,255,195,0.5)' : 'inset 0 2px 4px rgba(0,0,0,0.3)',
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => handleCellClick(domain, 'operational')}
+                  role="button"
+                  aria-label={`${domain} (Operational): ${cellData?.value}% ${cellData?.status}`}
+                >
+                  <span 
+                    className="text-xs font-medium text-[#00FFC3] mb-1"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    Operational
+                  </span>
+                  <span 
+                    className="text-lg font-bold text-[#00FFC3]"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {cellData?.value}%
+                  </span>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Indicator Table Panel */}
+      {/* Table Section */}
       <div 
-        className="h-[55vh] rounded-3xl border relative"
+        className="h-1/2 m-3 mt-1 rounded-2xl flex flex-col"
         style={{
-          background: 'rgba(10,20,40,0.45)',
-          backdropFilter: 'blur(24px)',
-          borderColor: 'rgba(0,255,195,0.15)',
-          boxShadow: '0 12px 24px rgba(0,0,0,0.6)',
+          background: 'rgba(20,30,50,0.6)',
+          backdropFilter: 'blur(32px)',
         }}
       >
+        {/* Table Header */}
         <div 
-          className="absolute inset-0.5 rounded-[1.25rem] p-4 flex flex-col"
+          className="h-8 flex items-center justify-between px-4 rounded-t-2xl flex-shrink-0"
           style={{
-            background: 'rgba(20,30,50,0.6)',
-            backdropFilter: 'blur(32px)',
+            background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
           }}
         >
-          {/* Header */}
-          <div 
-            className="h-8 flex items-center justify-between px-4 rounded-lg mb-4 flex-shrink-0"
-            style={{
-              background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
-            }}
+          <h3 
+            className="font-bold text-white text-sm"
+            style={{ fontFamily: 'Noto Sans' }}
           >
-            <h3 
-              className="font-noto-bold text-white text-base"
-              style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
-            >
-              All Indicators
-            </h3>
-            <div className="flex items-center space-x-3">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#E0E0E0]" />
-                <input
-                  type="text"
-                  placeholder="Search indicators..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8 pr-3 py-1 bg-white/10 border border-white/20 rounded-lg text-[#E0E0E0] text-xs placeholder-[#E0E0E0]/50 focus:outline-none focus:border-[#00FFC3]"
-                />
-              </div>
-              
-              {/* Filters */}
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value as any)}
-                className="px-2 py-1 bg-white/10 border border-white/20 rounded-lg text-[#E0E0E0] text-xs focus:outline-none focus:border-[#00FFC3]"
-              >
-                <option value="all">All Categories</option>
-                <option value="strategic">Strategic</option>
-                <option value="operational">Operational</option>
-              </select>
-              
-              <select
-                value={domainFilter}
-                onChange={(e) => setDomainFilter(e.target.value as any)}
-                className="px-2 py-1 bg-white/10 border border-white/20 rounded-lg text-[#E0E0E0] text-xs focus:outline-none focus:border-[#00FFC3]"
-              >
-                <option value="all">All Domains</option>
-                <option value="population">Population</option>
-                <option value="resources">Resources</option>
-                <option value="social">Social</option>
-                <option value="workflow">Workflow</option>
-              </select>
-              
-              <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors" aria-label="Export CSV">
-                <Download className="w-full h-full" />
-              </button>
-              <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors" aria-label="Open Full Trend Chart">
-                <TrendingUp className="w-full h-full" />
-              </button>
+            All Indicators
+          </h3>
+          <div className="flex items-center space-x-2">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-[#E0E0E0]" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-6 pr-2 py-1 text-xs rounded border-0 outline-none"
+                style={{
+                  background: 'rgba(20,30,50,0.6)',
+                  color: '#E0E0E0',
+                  fontFamily: 'Noto Sans',
+                  border: '1px solid rgba(255,255,255,0.20)',
+                  width: '100px',
+                }}
+              />
             </div>
+            
+            {/* Category Filter */}
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value as any)}
+              className="px-2 py-1 text-xs rounded border-0 outline-none"
+              style={{
+                background: 'rgba(20,30,50,0.6)',
+                color: '#E0E0E0',
+                fontFamily: 'Noto Sans',
+                border: '1px solid rgba(255,255,255,0.20)',
+              }}
+            >
+              <option value="all">All Categories</option>
+              <option value="strategic">Strategic</option>
+              <option value="operational">Operational</option>
+            </select>
+            
+            <button 
+              className="w-6 h-6 flex items-center justify-center text-white/50 hover:text-[#00FFC3] transition-colors"
+              aria-label="Export CSV"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+            <button 
+              className="w-6 h-6 flex items-center justify-center text-white/50 hover:text-[#00FFC3] transition-colors"
+              aria-label="Full Trend Chart"
+            >
+              <TrendingUp className="w-4 h-4" />
+            </button>
           </div>
+        </div>
 
-          {/* Table */}
-          <div className="flex-1 overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr 
-                  className="h-8"
-                  style={{
-                    background: 'linear-gradient(90deg, rgba(0,255,195,0.2) 0%, rgba(0,184,255,0.2) 100%)',
+        {/* Table */}
+        <div className="flex-1 overflow-auto">
+          <table className="w-full">
+            <thead>
+              <tr 
+                className="h-6"
+                style={{
+                  background: 'linear-gradient(90deg, rgba(0,255,195,0.2) 0%, rgba(0,184,255,0.2) 100%)',
+                }}
+              >
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Indicator
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Category
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Domain
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Current
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Target
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Deviation %
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Trend
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredIndicators.slice(0, 8).map((indicator, index) => (
+                <motion.tr
+                  key={indicator.id}
+                  className={`h-10 cursor-pointer transition-all duration-200 ${
+                    index % 2 === 0 ? 'bg-white/2' : 'bg-transparent'
+                  } hover:bg-[rgba(0,255,195,0.10)]`}
+                  whileHover={{
+                    y: -2,
+                    boxShadow: '0 0 12px rgba(0,255,195,0.4)',
                   }}
                 >
-                  <th className="text-left px-2 font-noto-bold text-white text-xs">Indicator</th>
-                  <th className="text-left px-2 font-noto-bold text-white text-xs">Category</th>
-                  <th className="text-left px-2 font-noto-bold text-white text-xs">Domain</th>
-                  <th className="text-left px-2 font-noto-bold text-white text-xs">Current</th>
-                  <th className="text-left px-2 font-noto-bold text-white text-xs">Target</th>
-                  <th className="text-left px-2 font-noto-bold text-white text-xs">Deviation %</th>
-                  <th className="text-left px-2 font-noto-bold text-white text-xs">Trend</th>
-                  <th className="text-left px-2 font-noto-bold text-white text-xs">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredIndicators.slice(0, 8).map((indicator, index) => (
-                  <motion.tr
-                    key={indicator.id}
-                    className={`h-12 cursor-pointer transition-all duration-200 ${
-                      index % 2 === 0 ? 'bg-white/2' : 'bg-transparent'
-                    } hover:bg-[rgba(0,255,195,0.10)] hover:-translate-y-0.5`}
-                    whileHover={{
-                      boxShadow: '0 0 12px rgba(0,255,195,0.4)',
-                    }}
+                  <td 
+                    className="px-2 font-medium text-[#00FFC3] text-xs"
+                    style={{ fontFamily: 'Noto Sans' }}
                   >
-                    <td className="px-2 font-noto-medium text-[#00FFC3] text-xs">
-                      {indicator.name}
-                    </td>
-                    <td className="px-2">
-                      <span 
-                        className={`px-2 py-1 rounded-full font-noto-medium text-white text-xs ${
-                          indicator.category === 'strategic' 
-                            ? 'bg-[#00FFC3] text-[#081226]' 
-                            : 'bg-[#00B8FF] text-[#081226]'
-                        }`}
-                      >
-                        {indicator.category === 'strategic' ? 'Strategic' : 'Operational'}
-                      </span>
-                    </td>
-                    <td className="px-2 font-noto-regular text-[#E0E0E0] text-xs">
-                      {indicator.domain}
-                    </td>
-                    <td className="px-2 font-noto-regular text-[#E0E0E0] text-xs">
-                      {indicator.currentValue}
-                    </td>
-                    <td className="px-2 font-noto-regular text-[#E0E0E0] text-xs">
-                      {indicator.target}
-                    </td>
-                    <td className={`px-2 font-noto-medium text-xs ${getDeviationColor(indicator.deviation)}`}>
-                      {indicator.deviation > 0 ? '+' : ''}{indicator.deviation}%
-                    </td>
-                    <td className="px-2">
-                      <svg width="60" height="20" viewBox="0 0 60 20">
+                    {indicator.name}
+                  </td>
+                  <td className="px-2">
+                    <span 
+                      className={`px-2 py-1 rounded-full font-medium text-xs ${
+                        indicator.category === 'strategic' 
+                          ? 'bg-[#00FFC3] text-[#081226]' 
+                          : 'bg-[#00B8FF] text-[#081226]'
+                      }`}
+                      style={{ fontFamily: 'Noto Sans' }}
+                    >
+                      {indicator.category === 'strategic' ? 'Strategic' : 'Operational'}
+                    </span>
+                  </td>
+                  <td 
+                    className="px-2 text-[#E0E0E0] text-xs"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {indicator.domain}
+                  </td>
+                  <td 
+                    className="px-2 text-[#E0E0E0] text-xs"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {indicator.currentValue}
+                  </td>
+                  <td 
+                    className="px-2 text-[#E0E0E0] text-xs"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {indicator.target}
+                  </td>
+                  <td 
+                    className={`px-2 font-medium text-xs ${getDeviationColor(indicator.deviation)}`}
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {indicator.deviation > 0 ? '+' : ''}{indicator.deviation}%
+                  </td>
+                  <td className="px-2">
+                    <svg width="60" height="20" viewBox="0 0 60 20">
+                      {chartType === 'line' ? (
                         <polyline
                           points={indicator.trend.map((value, i) => `${i * 15},${20 - (value / Math.max(...indicator.trend)) * 15}`).join(' ')}
                           fill="none"
                           stroke="#00FFC3"
                           strokeWidth="1"
                         />
-                      </svg>
-                    </td>
-                    <td className="px-2">
-                      <button 
-                        className="w-6 h-6 rounded-full bg-[#00FFC3] flex items-center justify-center hover:shadow-lg transition-all duration-200"
-                        style={{ boxShadow: '0 0 8px rgba(0,255,195,0.4)' }}
-                        aria-label={`Drill down into ${indicator.name}`}
-                      >
-                        <Eye className="w-3 h-3 text-[#081226]" />
-                      </button>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-between items-center mt-4 flex-shrink-0">
-            <span className="font-noto-regular text-[#E0E0E0] text-xs">
-              Showing {filteredIndicators.length} indicators
-            </span>
-            <div className="flex items-center space-x-2">
-              <button className="px-2 py-1 text-[#00FFC3] text-xs hover:underline">
-                ◀ Prev
-              </button>
-              <button className="px-2 py-1 text-[#00FFC3] text-xs hover:underline">
-                Next ▶
-              </button>
-            </div>
-          </div>
+                      ) : (
+                        indicator.trend.map((value, i) => (
+                          <rect
+                            key={i}
+                            x={i * 12}
+                            y={20 - (value / Math.max(...indicator.trend)) * 15}
+                            width="8"
+                            height={(value / Math.max(...indicator.trend)) * 15}
+                            fill="#00FFC3"
+                          />
+                        ))
+                      )}
+                    </svg>
+                  </td>
+                  <td className="px-2">
+                    <button 
+                      className="w-5 h-5 rounded-full bg-[#00FFC3] flex items-center justify-center hover:shadow-lg transition-all duration-200"
+                      style={{ boxShadow: '0 0 8px rgba(0,255,195,0.4)' }}
+                      aria-label={`Drill down into ${indicator.name}`}
+                    >
+                      <Eye className="w-3 h-3 text-[#081226]" />
+                    </button>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

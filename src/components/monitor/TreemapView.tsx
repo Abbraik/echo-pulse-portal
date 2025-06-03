@@ -1,22 +1,26 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MoreVertical, Minus, Maximize2 } from 'lucide-react';
-import UniversalAlertHub from './UniversalAlertHub';
-import AnomalyDetector from './AnomalyDetector';
+
+interface TreemapViewProps {
+  timeRange: string;
+  domainFilter: string;
+  chartType: 'bar' | 'line';
+}
 
 interface TreemapData {
   id: string;
   name: string;
   value: number;
   target: number;
-  category: 'strategic' | 'operational' | 'all';
+  category: 'strategic' | 'operational';
   status: 'healthy' | 'warning' | 'critical';
 }
 
-const TreemapView: React.FC = () => {
+const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, chartType }) => {
   const [filter, setFilter] = useState<'all' | 'strategic' | 'operational'>('all');
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [hoveredRect, setHoveredRect] = useState<string | null>(null);
+  const [tooltip, setTooltip] = useState<{ x: number; y: number; data: TreemapData } | null>(null);
 
   const treemapData: TreemapData[] = [
     { id: '1', name: 'DEI Composite', value: 78, target: 80, category: 'strategic', status: 'warning' },
@@ -50,7 +54,7 @@ const TreemapView: React.FC = () => {
     const containerWidth = 100;
     const containerHeight = 100;
 
-    return data.map((item, index) => {
+    return data.map((item) => {
       const percentage = item.value / total;
       const area = percentage * containerWidth * containerHeight;
       const width = Math.sqrt(area * 1.5);
@@ -78,194 +82,166 @@ const TreemapView: React.FC = () => {
 
   const layoutData = calculateLayout(filteredData);
 
+  const handleMouseEnter = (item: TreemapData & { x: number; y: number; width: number; height: number }, event: React.MouseEvent) => {
+    setHoveredRect(item.id);
+    setTooltip({
+      x: event.clientX,
+      y: event.clientY,
+      data: item,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredRect(null);
+    setTooltip(null);
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Master Treemap Card */}
-      <motion.div
-        className={`relative rounded-3xl border transition-all duration-400 ${
-          isExpanded ? 'fixed inset-4 z-50' : 'h-[65vh]'
-        }`}
-        style={{
-          background: 'rgba(10,20,40,0.45)',
-          backdropFilter: 'blur(24px)',
-          borderColor: 'rgba(0,255,195,0.15)',
-          boxShadow: '0 12px 24px rgba(0,0,0,0.6)',
-        }}
-        layout
-      >
-        {/* Inner Glass Layer */}
-        <div 
-          className="absolute inset-0.5 rounded-[1.25rem] p-4"
-          style={{
-            background: 'rgba(20,30,50,0.6)',
-            backdropFilter: 'blur(32px)',
-          }}
-        >
-          {/* Header Strip */}
-          <div 
-            className="h-10 flex items-center justify-between px-4 rounded-lg mb-4"
+    <div className="h-full flex flex-col">
+      {/* Filter Pills */}
+      <div className="flex justify-center gap-3 py-2 px-4">
+        {(['all', 'strategic', 'operational'] as const).map((filterOption) => (
+          <button
+            key={filterOption}
+            onClick={() => setFilter(filterOption)}
+            className={`px-6 py-2 rounded-full text-xs font-semibold transition-all duration-150 ${
+              filter === filterOption
+                ? 'text-[#081226]'
+                : 'text-[#E0E0E0] hover:bg-[rgba(255,255,255,0.10)]'
+            }`}
             style={{
-              background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
+              fontFamily: 'Noto Sans',
+              ...(filter === filterOption
+                ? {
+                    background: '#00FFC3',
+                    boxShadow: '0 0 8px rgba(0,255,195,0.6)',
+                  }
+                : {
+                    background: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                  }
+              ),
             }}
           >
-            <h3 
-              className="font-noto-bold text-white text-base"
-              style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
-            >
-              Master Treemap: Key Monitor Indicators
-            </h3>
-            <div className="flex items-center space-x-2">
-              <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors">
-                <MoreVertical className="w-full h-full" />
-              </button>
-              <button className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors">
-                <Minus className="w-full h-full" />
-              </button>
-              <button 
-                className="w-6 h-6 text-white/50 hover:text-[#00FFC3] transition-colors"
-                onClick={() => setIsExpanded(!isExpanded)}
-              >
-                <Maximize2 className="w-full h-full" />
-              </button>
-            </div>
-          </div>
+            {filterOption === 'all' ? 'All' : filterOption === 'strategic' ? 'Strategic Only' : 'Operational Only'}
+          </button>
+        ))}
+      </div>
 
-          {/* Filter Toggle */}
-          <div className="flex space-x-2 mb-4">
-            {(['all', 'strategic', 'operational'] as const).map((filterOption) => (
-              <button
-                key={filterOption}
-                onClick={() => setFilter(filterOption)}
-                className={`px-4 py-2 rounded-lg font-noto-medium text-xs transition-all duration-150 ${
-                  filter === filterOption
-                    ? 'bg-[#00FFC3] text-[#081226]'
-                    : 'bg-transparent border border-white/10 text-[#E0E0E0] hover:bg-white/10'
-                }`}
-                style={
-                  filter === filterOption
-                    ? { boxShadow: '0 0 8px rgba(0,255,195,0.6)' }
-                    : {}
-                }
-              >
-                {filterOption === 'all' ? 'All' : filterOption === 'strategic' ? 'Strategic Only' : 'Operational Only'}
-              </button>
-            ))}
-          </div>
-
-          {/* Legend (only visible when expanded) */}
-          {isExpanded && (
-            <div className="flex items-center space-x-6 mb-4 px-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 rounded" style={{ background: 'rgba(0,255,195,0.4)' }} />
-                <span className="font-noto-regular text-[#E0E0E0] text-xs">In-Band</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 rounded" style={{ background: 'rgba(255,193,7,0.4)' }} />
-                <span className="font-noto-regular text-[#E0E0E0] text-xs">Warning</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 rounded" style={{ background: 'rgba(255,110,110,0.4)' }} />
-                <span className="font-noto-regular text-[#E0E0E0] text-xs">Critical</span>
-              </div>
-            </div>
-          )}
-
-          {/* SVG Treemap */}
-          <div className="flex-1 relative">
-            <svg width="100%" height="100%" viewBox="0 0 100 100" className="w-full h-full">
-              {layoutData.map((item, index) => (
-                <motion.g
-                  key={item.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.15 }}
-                  style={{ transformOrigin: `${item.x + item.width/2}% ${item.y + item.height/2}%` }}
-                >
-                  <rect
-                    x={item.x}
-                    y={item.y}
-                    width={item.width}
-                    height={item.height}
-                    fill={getStatusColor(item.status)}
-                    stroke="rgba(255,255,255,0.2)"
-                    strokeWidth="0.1"
-                    rx="1"
-                    style={{
-                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
-                      cursor: 'pointer',
-                    }}
-                    role="button"
-                    aria-label={`${item.name}: ${item.value} of ${item.target}, ${Math.round((item.value/item.target)*100)}%`}
-                  />
-                  {item.width >= 15 && item.height >= 8 && (
-                    <>
-                      <text
-                        x={item.x + item.width/2}
-                        y={item.y + item.height/2 - 1}
-                        textAnchor="middle"
-                        className="font-noto-bold text-[#00FFC3] text-xs"
-                        style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
-                        fontSize="2"
-                        fill="#00FFC3"
-                      >
-                        {item.name}
-                      </text>
-                      <text
-                        x={item.x + item.width/2}
-                        y={item.y + item.height/2 + 2}
-                        textAnchor="middle"
-                        className="font-noto-regular text-[#E0E0E0]"
-                        fontSize="1.5"
-                        fill="#E0E0E0"
-                      >
-                        {item.value}/{item.target}
-                      </text>
-                    </>
-                  )}
-                </motion.g>
-              ))}
-            </svg>
-          </div>
-
-          {/* Back Button (only when expanded) */}
-          {isExpanded && (
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="absolute top-4 right-4 px-4 py-2 rounded-lg font-noto-medium text-sm text-white transition-all duration-200 hover:scale-105"
-              style={{
-                background: '#00B8FF',
-                boxShadow: '0 4px 8px rgba(0,184,255,0.4)',
+      {/* SVG Treemap */}
+      <div className="flex-1 p-4 relative">
+        <svg width="100%" height="100%" viewBox="0 0 100 100" className="w-full h-full">
+          <defs>
+            <filter id="innerShadow">
+              <feFlood floodColor="rgba(0,0,0,0.3)" />
+              <feComposite in="SourceGraphic" />
+              <feGaussianBlur stdDeviation="1" />
+              <feOffset dx="0" dy="2" result="offset" />
+              <feFlood floodColor="rgba(0,0,0,0.3)" />
+              <feComposite in2="offset" operator="in" />
+            </filter>
+          </defs>
+          
+          {layoutData.map((item, index) => (
+            <motion.g
+              key={item.id}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ 
+                opacity: hoveredRect && hoveredRect !== item.id ? 0.8 : 1,
+                scale: hoveredRect === item.id ? 1.15 : 1,
               }}
+              transition={{ duration: 0.2, delay: index * 0.05 }}
+              style={{ transformOrigin: `${item.x + item.width/2}% ${item.y + item.height/2}%` }}
             >
-              Back to Monitor
-            </button>
-          )}
-        </div>
-      </motion.div>
+              <rect
+                x={item.x}
+                y={item.y}
+                width={item.width}
+                height={item.height}
+                fill={getStatusColor(item.status)}
+                stroke="rgba(255,255,255,0.10)"
+                strokeWidth="0.1"
+                rx="1"
+                filter="url(#innerShadow)"
+                style={{
+                  cursor: 'pointer',
+                  boxShadow: hoveredRect === item.id ? '0 0 16px rgba(0,255,195,0.5)' : 'none',
+                }}
+                onMouseEnter={(e) => handleMouseEnter(item, e)}
+                onMouseLeave={handleMouseLeave}
+                role="button"
+                aria-label={`${item.name}: ${item.value} of ${item.target}, ${Math.round((item.value/item.target)*100)}%`}
+              />
+              {item.width >= 15 && item.height >= 8 ? (
+                <>
+                  <text
+                    x={item.x + item.width/2}
+                    y={item.y + item.height/2 - 1}
+                    textAnchor="middle"
+                    className="font-bold text-[#00FFC3]"
+                    style={{ 
+                      fontFamily: 'Noto Sans',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                      pointerEvents: 'none',
+                    }}
+                    fontSize="2"
+                    fill="#00FFC3"
+                  >
+                    {item.name}
+                  </text>
+                  <text
+                    x={item.x + item.width/2}
+                    y={item.y + item.height/2 + 2}
+                    textAnchor="middle"
+                    className="text-[#E0E0E0]"
+                    style={{ 
+                      fontFamily: 'Noto Sans',
+                      pointerEvents: 'none',
+                    }}
+                    fontSize="1.5"
+                    fill="#E0E0E0"
+                  >
+                    {item.value}/{item.target}
+                  </text>
+                </>
+              ) : (
+                <text
+                  x={item.x + item.width/2}
+                  y={item.y + item.height/2}
+                  textAnchor="middle"
+                  className="text-[#00FFC3]"
+                  fontSize="2"
+                  fill="#00FFC3"
+                  style={{ pointerEvents: 'none' }}
+                >
+                  ℹ️
+                </text>
+              )}
+            </motion.g>
+          ))}
+        </svg>
 
-      {/* Bottom Row: Alerts & Anomalies */}
-      {!isExpanded && (
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[35vh]">
-          <div className="lg:col-span-3">
-            <UniversalAlertHub />
+        {/* Tooltip */}
+        {tooltip && (
+          <div
+            className="fixed z-50 px-3 py-2 rounded-lg text-xs pointer-events-none"
+            style={{
+              left: tooltip.x + 10,
+              top: tooltip.y - 10,
+              background: 'rgba(20,30,50,0.6)',
+              backdropFilter: 'blur(12px)',
+              color: '#E0E0E0',
+              fontFamily: 'Noto Sans',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+            }}
+          >
+            <div className="font-bold text-[#00FFC3]">{tooltip.data.name}</div>
+            <div>Current: {tooltip.data.value}</div>
+            <div>Target: {tooltip.data.target}</div>
+            <div>Progress: {Math.round((tooltip.data.value/tooltip.data.target)*100)}%</div>
           </div>
-          <div className="lg:col-span-2">
-            <AnomalyDetector />
-          </div>
-        </div>
-      )}
-
-      {/* Overlay when expanded */}
-      {isExpanded && (
-        <motion.div
-          className="fixed inset-0 bg-black/40 z-40"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={() => setIsExpanded(false)}
-        />
-      )}
+        )}
+      </div>
     </div>
   );
 };
