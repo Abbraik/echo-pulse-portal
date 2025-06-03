@@ -694,115 +694,91 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     const totalWeight = data.reduce((sum, item) => sum + item.weight, 0);
     const containerWidth = 100;
     const containerHeight = 100;
-    const totalArea = containerWidth * containerHeight;
 
     // Sort by weight descending for better packing
     const sortedData = [...data].sort((a, b) => b.weight - a.weight);
     
     const result: (TreemapData & { x: number; y: number; width: number; height: number })[] = [];
-    const rows: { x: number; y: number; width: number; height: number; items: any[] }[] = [];
     
-    let currentY = 0;
-    let remainingHeight = containerHeight;
-    
-    for (const item of sortedData) {
-      const targetArea = (item.weight / totalWeight) * totalArea;
+    // Binary tree packing algorithm for perfect fit
+    const packRectangles = (items: TreemapData[]) => {
+      if (items.length === 0) return [];
       
-      // Calculate optimal dimensions with aspect ratio consideration
-      const aspectRatio = 1.6; // Golden ratio-ish for better visual appeal
-      let width = Math.sqrt(targetArea * aspectRatio);
-      let height = targetArea / width;
+      // Calculate aspect ratios for better layout
+      const totalArea = containerWidth * containerHeight;
+      const areas = items.map(item => (item.weight / totalWeight) * totalArea);
       
-      // Ensure minimum size for readability
-      const minSize = 3;
-      width = Math.max(width, minSize);
-      height = Math.max(height, minSize);
+      // Use a simple row-based packing for guaranteed fit
+      let currentY = 0;
+      let currentRowHeight = 0;
+      let currentRowWidth = 0;
+      const targetAspectRatio = containerWidth / containerHeight;
       
-      // Find or create a row for this item
-      let placedInRow = false;
-      
-      for (const row of rows) {
-        const availableWidth = containerWidth - row.items.reduce((sum, i) => sum + i.width, 0);
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const area = areas[i];
         
-        if (availableWidth >= width && Math.abs(row.height - height) < row.height * 0.3) {
-          // Place in existing row
-          const x = row.x + row.items.reduce((sum, i) => sum + i.width, 0);
-          const adjustedHeight = row.height;
-          const adjustedWidth = Math.min(width, availableWidth);
-          
-          const rectData = {
-            ...item,
-            x,
-            y: row.y,
-            width: adjustedWidth,
-            height: adjustedHeight
-          };
-          
-          row.items.push(rectData);
-          result.push(rectData);
-          placedInRow = true;
-          break;
+        // Calculate optimal dimensions
+        let width = Math.sqrt(area * targetAspectRatio);
+        let height = area / width;
+        
+        // Ensure minimum readable size
+        const minSize = Math.min(containerWidth * 0.03, containerHeight * 0.03);
+        width = Math.max(width, minSize);
+        height = Math.max(height, minSize);
+        
+        // Check if we need a new row
+        if (currentRowWidth + width > containerWidth || i === 0) {
+          // Start new row
+          if (i > 0) {
+            currentY += currentRowHeight;
+          }
+          currentRowWidth = 0;
+          currentRowHeight = height;
+        } else {
+          // Adjust height to match row
+          height = currentRowHeight;
         }
-      }
-      
-      if (!placedInRow) {
-        // Create new row
-        const rowHeight = Math.min(height, remainingHeight);
-        const adjustedWidth = Math.min(width, containerWidth);
         
-        const rectData = {
+        // Ensure we don't exceed container boundaries
+        if (currentY + height > containerHeight) {
+          // Scale down to fit remaining space
+          const remainingHeight = containerHeight - currentY;
+          height = Math.max(remainingHeight, minSize);
+          currentRowHeight = height;
+        }
+        
+        if (currentRowWidth + width > containerWidth) {
+          // Scale down width to fit
+          width = containerWidth - currentRowWidth;
+        }
+        
+        result.push({
           ...item,
-          x: 0,
+          x: currentRowWidth,
           y: currentY,
-          width: adjustedWidth,
-          height: rowHeight
-        };
+          width: width,
+          height: height
+        });
         
-        const newRow = {
-          x: 0,
-          y: currentY,
-          width: containerWidth,
-          height: rowHeight,
-          items: [rectData]
-        };
-        
-        rows.push(newRow);
-        result.push(rectData);
-        
-        currentY += rowHeight;
-        remainingHeight -= rowHeight;
-        
-        // Ensure we don't exceed container height
-        if (remainingHeight <= minSize) {
-          remainingHeight = minSize;
-        }
-      }
-    }
-    
-    // Post-process to ensure no overlaps and full coverage
-    let totalUsedHeight = 0;
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      row.y = totalUsedHeight;
-      
-      // Update all items in this row
-      for (const item of row.items) {
-        item.y = totalUsedHeight;
+        currentRowWidth += width;
+        currentRowHeight = Math.max(currentRowHeight, height);
       }
       
-      totalUsedHeight += row.height;
-    }
-    
-    // Scale to fit exactly within container if needed
-    if (totalUsedHeight > containerHeight) {
-      const scaleFactor = containerHeight / totalUsedHeight;
-      for (const item of result) {
-        item.y *= scaleFactor;
-        item.height *= scaleFactor;
+      // Final pass to ensure everything fits perfectly
+      let maxY = Math.max(...result.map(r => r.y + r.height));
+      if (maxY > containerHeight) {
+        const scaleFactor = containerHeight / maxY;
+        result.forEach(r => {
+          r.y *= scaleFactor;
+          r.height *= scaleFactor;
+        });
       }
-    }
-    
-    return result;
+      
+      return result;
+    };
+
+    return packRectangles(sortedData);
   };
 
   const layoutData = calculateLayout(filteredData);
