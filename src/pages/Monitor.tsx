@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, HelpCircle, Maximize2 } from 'lucide-react';
+import { AnimatedPage } from '@/components/ui/motion';
 import TreemapView from '@/components/monitor/TreemapView';
 import HeatmapTableView from '@/components/monitor/HeatmapTableView';
 import RadialHubView from '@/components/monitor/RadialHubView';
@@ -27,11 +28,21 @@ const Monitor: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-      <div className="relative z-10">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      {/* Enhanced cinematic background */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-radial from-teal-500/10 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>
+        <div className="absolute inset-0 opacity-50" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314b8a6' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          animation: 'pulse 4s ease-in-out infinite'
+        }}></div>
+      </div>
+
+      <AnimatedPage>
         {/* Primary Monitor Header Bar */}
-        <header 
-          className="w-full backdrop-blur-[24px] py-4 px-8"
+        <motion.header 
+          className="sticky top-0 z-50 w-full backdrop-blur-[24px] py-4 px-8 mb-8"
           style={{
             background: 'rgba(20, 30, 50, 0.6)',
             borderBottom: '1px solid rgba(20, 184, 166, 0.3)',
@@ -39,8 +50,11 @@ const Monitor: React.FC = () => {
           }}
           role="banner"
           aria-labelledby="monitor-title"
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <div className="flex items-center justify-between">
+          <div className="max-w-[1440px] mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <motion.div 
                 className="p-3 rounded-2xl bg-teal-500/20 text-teal-400"
@@ -49,7 +63,7 @@ const Monitor: React.FC = () => {
               >
                 <Activity size={28} />
               </motion.div>
-              <div>
+              <div className="text-left">
                 <motion.h1 
                   id="monitor-title"
                   className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500 font-noto-bold"
@@ -87,170 +101,214 @@ const Monitor: React.FC = () => {
               </button>
             </div>
           </div>
-        </header>
+        </motion.header>
 
-        {/* View Toggle & Instrument Panel */}
-        <div className="px-8 mt-6">
-          <div 
-            className="w-full h-12 flex items-center justify-between px-4 rounded-2xl backdrop-blur-[20px]"
-            style={{
-              background: 'rgba(8,14,25,0.55)',
-              border: '1px solid rgba(0,255,195,0.15)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-            }}
+        {/* Main Content Container */}
+        <div className="max-w-[1440px] mx-auto px-8 pb-8 relative z-10">
+          {/* View Toggle & Instrument Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+            className="mb-6"
           >
-            {/* View Toggles */}
-            <div className="flex space-x-3" role="tablist">
-              {(['treemap', 'heatmap', 'radial', 'tile'] as ViewType[]).map((view) => (
-                <button
-                  key={view}
-                  role="tab"
-                  aria-selected={activeView === view}
-                  onClick={() => setActiveView(view)}
-                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
-                    activeView === view
-                      ? 'text-[#081226]'
-                      : 'text-[#E0E0E0] hover:bg-[rgba(255,255,255,0.10)]'
-                  }`}
-                  style={{
-                    fontFamily: 'Noto Sans',
-                    ...(activeView === view
-                      ? {
-                          background: '#00FFC3',
-                          boxShadow: '0 0 12px rgba(0,255,195,0.6), 0 2px 4px rgba(0,0,0,0.3)',
-                        }
-                      : {
-                          background: 'transparent',
-                          border: '1px solid rgba(255,255,255,0.12)',
-                        }
-                    ),
-                  }}
-                >
-                  {view === 'treemap' && 'Treemap View'}
-                  {view === 'heatmap' && 'Heatmap + Table View'}
-                  {view === 'radial' && 'Radial Hub & Spokes'}
-                  {view === 'tile' && 'Tile Dashboard'}
-                </button>
-              ))}
-            </div>
-
-            {/* Instrument Panel */}
-            <InstrumentPanel
-              timeRange={timeRange}
-              onTimeRangeChange={setTimeRange}
-              domainFilter={domainFilter}
-              onDomainFilterChange={setDomainFilter}
-              chartType={chartType}
-              onChartTypeChange={setChartType}
-              activeView={activeView}
-            />
-          </div>
-        </div>
-
-        {/* Main Visualization Area */}
-        <div className="px-8 mt-6">
-          <div 
-            className="rounded-3xl border relative backdrop-blur-[24px]"
-            style={{
-              background: 'rgba(10,20,40,0.45)',
-              borderColor: 'rgba(0,255,195,0.15)',
-              borderRadius: '1.5rem',
-              boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
-              height: '60vh',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            {/* Card Header */}
             <div 
-              className="h-10 flex items-center justify-between px-4 flex-shrink-0"
+              className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
               style={{
-                background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
+                background: 'rgba(20, 30, 50, 0.6)',
+                boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
               }}
             >
-              <h3 
-                className="font-bold text-white text-base"
-                style={{ 
-                  fontFamily: 'Noto Sans',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.6)' 
-                }}
-              >
-                {viewTitles[activeView]}
-              </h3>
-              <div className="flex items-center space-x-2">
-                <button className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200">
-                  <span className="text-lg">⋮</span>
-                </button>
-                <button className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200">
-                  <span className="text-lg">—</span>
-                </button>
-                <button 
-                  className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200"
-                  onClick={() => setIsExpanded(!isExpanded)}
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-2xl"></div>
+              <div className="relative">
+                <div 
+                  className="w-full h-12 flex items-center justify-between px-4"
                 >
-                  <span className="text-lg">⛶</span>
-                </button>
+                  {/* View Toggles */}
+                  <div className="flex space-x-3" role="tablist">
+                    {(['treemap', 'heatmap', 'radial', 'tile'] as ViewType[]).map((view) => (
+                      <button
+                        key={view}
+                        role="tab"
+                        aria-selected={activeView === view}
+                        onClick={() => setActiveView(view)}
+                        className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
+                          activeView === view
+                            ? 'text-[#081226]'
+                            : 'text-[#E0E0E0] hover:bg-[rgba(255,255,255,0.10)]'
+                        }`}
+                        style={{
+                          fontFamily: 'Noto Sans',
+                          ...(activeView === view
+                            ? {
+                                background: '#00FFC3',
+                                boxShadow: '0 0 12px rgba(0,255,195,0.6), 0 2px 4px rgba(0,0,0,0.3)',
+                              }
+                            : {
+                                background: 'transparent',
+                                border: '1px solid rgba(255,255,255,0.12)',
+                              }
+                          ),
+                        }}
+                      >
+                        {view === 'treemap' && 'Treemap View'}
+                        {view === 'heatmap' && 'Heatmap + Table View'}
+                        {view === 'radial' && 'Radial Hub & Spokes'}
+                        {view === 'tile' && 'Tile Dashboard'}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Instrument Panel */}
+                  <InstrumentPanel
+                    timeRange={timeRange}
+                    onTimeRangeChange={setTimeRange}
+                    domainFilter={domainFilter}
+                    onDomainFilterChange={setDomainFilter}
+                    chartType={chartType}
+                    onChartTypeChange={setChartType}
+                    activeView={activeView}
+                  />
+                </div>
               </div>
             </div>
+          </motion.div>
 
-            {/* View Content */}
-            <div className="flex-1 relative">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeView}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0"
+          {/* Main Visualization Area */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+            className="mb-6"
+          >
+            <div 
+              className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
+              style={{
+                background: 'rgba(20, 30, 50, 0.6)',
+                boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)',
+                height: '60vh',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-blue-500/5 rounded-2xl"></div>
+              <div className="relative flex flex-col h-full">
+                {/* Card Header */}
+                <div 
+                  className="h-10 flex items-center justify-between px-4 flex-shrink-0"
+                  style={{
+                    background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
+                  }}
                 >
-                  {activeView === 'treemap' && (
-                    <TreemapView 
-                      timeRange={timeRange}
-                      domainFilter={domainFilter}
-                      chartType={chartType}
-                    />
-                  )}
-                  {activeView === 'heatmap' && (
-                    <HeatmapTableView 
-                      timeRange={timeRange}
-                      domainFilter={domainFilter}
-                      chartType={chartType}
-                    />
-                  )}
-                  {activeView === 'radial' && (
-                    <RadialHubView 
-                      timeRange={timeRange}
-                      domainFilter={domainFilter}
-                      chartType={chartType}
-                    />
-                  )}
-                  {activeView === 'tile' && (
-                    <TileDashboardView 
-                      timeRange={timeRange}
-                      domainFilter={domainFilter}
-                      chartType={chartType}
-                    />
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
+                  <h3 
+                    className="font-bold text-white text-base"
+                    style={{ 
+                      fontFamily: 'Noto Sans',
+                      textShadow: '0 2px 4px rgba(0,0,0,0.6)' 
+                    }}
+                  >
+                    {viewTitles[activeView]}
+                  </h3>
+                  <div className="flex items-center space-x-2">
+                    <button className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200">
+                      <span className="text-lg">⋮</span>
+                    </button>
+                    <button className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200">
+                      <span className="text-lg">—</span>
+                    </button>
+                    <button 
+                      className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200"
+                      onClick={() => setIsExpanded(!isExpanded)}
+                    >
+                      <span className="text-lg">⛶</span>
+                    </button>
+                  </div>
+                </div>
 
-        {/* Alerts & Anomaly Section */}
-        <div className="px-8 mt-6 pb-8">
-          <div className="flex gap-6 h-[35vh]">
+                {/* View Content */}
+                <div className="flex-1 relative">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeView}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute inset-0"
+                    >
+                      {activeView === 'treemap' && (
+                        <TreemapView 
+                          timeRange={timeRange}
+                          domainFilter={domainFilter}
+                          chartType={chartType}
+                        />
+                      )}
+                      {activeView === 'heatmap' && (
+                        <HeatmapTableView 
+                          timeRange={timeRange}
+                          domainFilter={domainFilter}
+                          chartType={chartType}
+                        />
+                      )}
+                      {activeView === 'radial' && (
+                        <RadialHubView 
+                          timeRange={timeRange}
+                          domainFilter={domainFilter}
+                          chartType={chartType}
+                        />
+                      )}
+                      {activeView === 'tile' && (
+                        <TileDashboardView 
+                          timeRange={timeRange}
+                          domainFilter={domainFilter}
+                          chartType={chartType}
+                        />
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Alerts & Anomaly Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+            className="flex gap-6 h-[35vh]"
+          >
             <div className="flex-[3]">
-              <UniversalAlertHub />
+              <div 
+                className="h-full rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
+                style={{
+                  background: 'rgba(20, 30, 50, 0.6)',
+                  boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-purple-500/5 rounded-2xl"></div>
+                <div className="relative h-full">
+                  <UniversalAlertHub />
+                </div>
+              </div>
             </div>
             <div className="flex-[2]">
-              <AnomalyDetector />
+              <div 
+                className="h-full rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
+                style={{
+                  background: 'rgba(20, 30, 50, 0.6)',
+                  boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/5 rounded-2xl"></div>
+                <div className="relative h-full">
+                  <AnomalyDetector />
+                </div>
+              </div>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </AnimatedPage>
     </div>
   );
 };
