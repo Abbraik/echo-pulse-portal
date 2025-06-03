@@ -17,6 +17,10 @@ interface TreemapData {
   category: 'strategic' | 'operational';
   weight: number;
   status: 'in-band' | 'warning' | 'critical';
+  description: string;
+  breakdown?: string[];
+  lastTrend: string;
+  actionHint: string;
 }
 
 interface DrillDownModalProps {
@@ -136,15 +140,146 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
 
   const treemapData: TreemapData[] = [
     // Strategic indicators
-    { id: '1', name: 'DEI Composite', value: 78, target: 100, category: 'strategic', weight: 5, status: 'warning' },
-    { id: '2', name: 'Network Dev Index', value: 92, target: 100, category: 'strategic', weight: 4, status: 'in-band' },
-    { id: '3', name: 'Trust Recovery', value: 85, target: 100, category: 'strategic', weight: 4, status: 'in-band' },
-    { id: '4', name: 'Bundle Coherence', value: 67, target: 100, category: 'strategic', weight: 3, status: 'warning' },
+    { 
+      id: '1', 
+      name: 'DEI Composite', 
+      value: 78, 
+      target: 80, 
+      category: 'strategic', 
+      weight: 5, 
+      status: 'in-band',
+      description: 'Overall "Demographic-Equilibrium Index" – a weighted blend of population, age-structure, fertility balance, and social cohesion metrics.',
+      breakdown: [
+        'Population Stability: 99%',
+        'Age Structure Balance: 95%', 
+        'Fertility Confidence: 96%',
+        'Social Cohesion: 100%'
+      ],
+      lastTrend: '↑1.5% last month',
+      actionHint: 'Hover to drill into full DEI report.'
+    },
+    { 
+      id: '2', 
+      name: 'Network Dev Index', 
+      value: 64, 
+      target: 100, 
+      category: 'strategic', 
+      weight: 4, 
+      status: 'warning',
+      description: 'Degree of causal network coverage in the Think zone: how many loops and CLD nodes have been robustly mapped vs. total recommended.',
+      breakdown: [
+        'Population → Resource loop (2/5 nodes missing)',
+        'Migration → Economic loop (1/4 nodes missing)',
+        'Environment Feedback loop (0/3 nodes missing)'
+      ],
+      lastTrend: '+4 loops mapped last week',
+      actionHint: 'Click to view full CLD mapping status.'
+    },
+    { 
+      id: '3', 
+      name: 'Trust Recovery', 
+      value: 89, 
+      target: 95, 
+      category: 'strategic', 
+      weight: 4, 
+      status: 'in-band',
+      description: 'A composite gauge of stakeholder trust (public surveys, partner feedback, system transparency scores).',
+      breakdown: [
+        'Public Survey Score: 92/100',
+        'Partner Feedback Score: 85/100',
+        'Transparency Index: 90/100'
+      ],
+      lastTrend: '↑2% last 7 days',
+      actionHint: 'Click to see detailed trust-building recommendations.'
+    },
+    { 
+      id: '4', 
+      name: 'Bundle Coherence', 
+      value: 72, 
+      target: 90, 
+      category: 'strategic', 
+      weight: 3, 
+      status: 'warning',
+      description: 'Average "loop coverage" across active strategic bundles (i.e., how many identified leverage points each bundle actually addresses).',
+      breakdown: [
+        'Missing "Resource Recycling" leverage point in Bundle Beta',
+        '"Education Budget" loop underweighted in Bundle Gamma'
+      ],
+      lastTrend: '+7% this month',
+      actionHint: 'Click to open strategy builder for coherence improvements.'
+    },
     // Operational indicators
-    { id: '5', name: 'Open Claims', value: 45, target: 100, category: 'operational', weight: 3, status: 'critical' },
-    { id: '6', name: 'Think→Act Queue', value: 88, target: 100, category: 'operational', weight: 2, status: 'in-band' },
-    { id: '7', name: 'Act→Monitor Queue', value: 82, target: 100, category: 'operational', weight: 2, status: 'in-band' },
-    { id: '8', name: 'System Errors', value: 91, target: 100, category: 'operational', weight: 1, status: 'in-band' },
+    { 
+      id: '5', 
+      name: 'Open Claims', 
+      value: 12, 
+      target: 0, 
+      category: 'operational', 
+      weight: 3, 
+      status: 'critical',
+      description: 'Number of workflow "claims" (roles/tasks) in any zone that remain unassigned or unresolved.',
+      breakdown: [
+        'Think: 4',
+        'Act: 3',
+        'Monitor: 2',
+        'Learn: 2',
+        'Innovate: 1'
+      ],
+      lastTrend: 'Oldest: 5 days',
+      actionHint: 'Click to view claim queue and assign resources.'
+    },
+    { 
+      id: '6', 
+      name: 'Think→Act Queue', 
+      value: 4, 
+      target: 0, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'How many analysis outputs (loop findings, simulations) are waiting for strategy translation in Act.',
+      breakdown: [
+        'DEI target adjustment proposal',
+        '"Population Volatility vs. Resource Gap" report',
+        '"Social Cohesion Feedback" network analysis',
+        '"Economic Stability Loop" sensitivity results'
+      ],
+      lastTrend: 'Avg Wait: 2.3 days',
+      actionHint: 'Click to forward to strategy builder or reassign to Act leads.'
+    },
+    { 
+      id: '7', 
+      name: 'Act→Monitor Queue', 
+      value: 3, 
+      target: 0, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Number of planned bundles/strategies sent to Monitor for validation that haven\'t yet been evaluated on real-world data.',
+      breakdown: [
+        'Bundle Delta (Population Incentives)',
+        'Bundle Epsilon (Resource Quotas)',
+        'Bundle Zeta (Social Cohesion Programs)'
+      ],
+      lastTrend: 'Avg Delay: 1.8 days',
+      actionHint: 'Click to run new simulations or update real-world data feeds.'
+    },
+    { 
+      id: '8', 
+      name: 'System Errors', 
+      value: 5, 
+      target: 0, 
+      category: 'operational', 
+      weight: 1, 
+      status: 'warning',
+      description: 'Number of software/system-integrity warnings or errors in the portal over the last 24 hours.',
+      breakdown: [
+        '2 × API timeout (Act zone)',
+        '1 × Database write failure (Monitor zone)',
+        '2 × UI rendering glitch (Learn zone)'
+      ],
+      lastTrend: 'Most Recent: Data sync failure at 03:45 UTC',
+      actionHint: 'Click to view full error logs and resolve issues.'
+    },
   ];
 
   const filteredData = treemapData.filter(item => 
@@ -165,7 +300,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   };
 
   const getLabelColor = (category: string) => {
-    return category === 'strategic' ? '#00B8FF' : '#00FFC3';
+    return '#00FFC3'; // Always neon-teal for indicator names
   };
 
   const calculateLayout = (data: TreemapData[]) => {
@@ -226,6 +361,25 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
 
   const canShowLabels = (width: number, height: number) => {
     return width >= 15 && height >= 8; // Adjusted for SVG viewBox scale
+  };
+
+  const getPercentage = (value: number, target: number) => {
+    if (target === 0) return value === 0 ? 100 : 0;
+    return Math.round((value / target) * 100);
+  };
+
+  const getStatusFromPercentage = (percentage: number, isInverted: boolean = false) => {
+    if (isInverted) {
+      // For operational metrics where lower is better (like error counts)
+      if (percentage <= 25) return 'in-band';
+      if (percentage <= 75) return 'warning';
+      return 'critical';
+    } else {
+      // For strategic metrics where higher is better
+      if (percentage >= 75) return 'in-band';
+      if (percentage >= 50) return 'warning';
+      return 'critical';
+    }
   };
 
   return (
@@ -323,99 +477,105 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                   </filter>
                 </defs>
                 
-                {layoutData.map((item, index) => (
-                  <motion.g
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ 
-                      opacity: hoveredRect && hoveredRect !== item.id ? 0.8 : 1,
-                      scale: hoveredRect === item.id ? 1.15 : hoveredRect && hoveredRect !== item.id ? 0.92 : 1,
-                    }}
-                    transition={{ 
-                      duration: hoveredRect ? 0.2 : 0.4,
-                      ease: hoveredRect ? "easeOut" : [0.68, -0.6, 0.32, 1.6],
-                      delay: hoveredRect ? 0 : index * 0.05 
-                    }}
-                    style={{ transformOrigin: `${item.x + item.width/2}% ${item.y + item.height/2}%` }}
-                  >
-                    <rect
-                      x={item.x}
-                      y={item.y}
-                      width={item.width}
-                      height={item.height}
-                      fill={getBaseColor(item.category)}
-                      stroke="rgba(255,255,255,0.1)"
-                      strokeWidth="0.1"
-                      rx="1"
-                      filter="url(#innerShadow)"
-                      style={{
-                        cursor: 'pointer',
-                        boxShadow: hoveredRect === item.id ? '0 0 16px rgba(0,255,195,0.5)' : 'none',
+                {layoutData.map((item, index) => {
+                  const percentage = getPercentage(item.value, item.target);
+                  const isOperational = item.category === 'operational';
+                  const actualStatus = isOperational ? getStatusFromPercentage(percentage, true) : item.status;
+                  
+                  return (
+                    <motion.g
+                      key={item.id}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ 
+                        opacity: hoveredRect && hoveredRect !== item.id ? 0.8 : 1,
+                        scale: hoveredRect === item.id ? 1.15 : hoveredRect && hoveredRect !== item.id ? 0.92 : 1,
                       }}
-                      onMouseEnter={(e) => handleMouseEnter(item, e)}
-                      onMouseLeave={handleMouseLeave}
-                      onClick={() => handleRectClick(item)}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`${item.name}: ${item.value}/${item.target} (${Math.round((item.value/item.target)*100)}%)`}
-                    />
-                    
-                    {/* Status Overlay */}
-                    <rect
-                      x={item.x}
-                      y={item.y}
-                      width={item.width}
-                      height={item.height}
-                      fill={getStatusOverlay(item.status)}
-                      rx="1"
-                      style={{ pointerEvents: 'none' }}
-                    />
-
-                    {canShowLabels(item.width, item.height) ? (
-                      <>
-                        <text
-                          x={item.x + item.width/2}
-                          y={item.y + item.height/2 - 1}
-                          textAnchor="middle"
-                          className="font-bold"
-                          style={{ 
-                            fontFamily: 'Noto Sans',
-                            textShadow: '0 1px 2px rgba(0,0,0,0.8)',
-                            pointerEvents: 'none',
-                            fill: getLabelColor(item.category),
-                          }}
-                          fontSize="2"
-                        >
-                          {item.name}
-                        </text>
-                        <text
-                          x={item.x + item.width/2}
-                          y={item.y + item.height/2 + 2}
-                          textAnchor="middle"
-                          style={{ 
-                            fontFamily: 'Noto Sans',
-                            pointerEvents: 'none',
-                            fill: '#E0E0E0',
-                          }}
-                          fontSize="1.5"
-                        >
-                          {item.value} / {item.target}
-                        </text>
-                      </>
-                    ) : (
-                      <text
-                        x={item.x + item.width/2}
-                        y={item.y + item.height/2}
-                        textAnchor="middle"
-                        fontSize="2"
-                        fill={getLabelColor(item.category)}
+                      transition={{ 
+                        duration: hoveredRect ? 0.2 : 0.4,
+                        ease: hoveredRect ? "easeOut" : [0.68, -0.6, 0.32, 1.6],
+                        delay: hoveredRect ? 0 : index * 0.05 
+                      }}
+                      style={{ transformOrigin: `${item.x + item.width/2}% ${item.y + item.height/2}%` }}
+                    >
+                      <rect
+                        x={item.x}
+                        y={item.y}
+                        width={item.width}
+                        height={item.height}
+                        fill={getBaseColor(item.category)}
+                        stroke="rgba(255,255,255,0.1)"
+                        strokeWidth="0.1"
+                        rx="1"
+                        filter="url(#innerShadow)"
+                        style={{
+                          cursor: 'pointer',
+                          boxShadow: hoveredRect === item.id ? '0 0 16px rgba(0,255,195,0.5)' : 'none',
+                        }}
+                        onMouseEnter={(e) => handleMouseEnter(item, e)}
+                        onMouseLeave={handleMouseLeave}
+                        onClick={() => handleRectClick(item)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${item.name}: ${item.value}/${item.target} (${percentage}%) ${actualStatus}`}
+                      />
+                      
+                      {/* Status Overlay */}
+                      <rect
+                        x={item.x}
+                        y={item.y}
+                        width={item.width}
+                        height={item.height}
+                        fill={getStatusOverlay(actualStatus)}
+                        rx="1"
                         style={{ pointerEvents: 'none' }}
-                      >
-                        ℹ️
-                      </text>
-                    )}
-                  </motion.g>
-                ))}
+                      />
+
+                      {canShowLabels(item.width, item.height) ? (
+                        <>
+                          <text
+                            x={item.x + item.width/2}
+                            y={item.y + item.height/2 - 1}
+                            textAnchor="middle"
+                            className="font-bold"
+                            style={{ 
+                              fontFamily: 'Noto Sans',
+                              textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                              pointerEvents: 'none',
+                              fill: getLabelColor(item.category),
+                            }}
+                            fontSize="2"
+                          >
+                            {item.name}
+                          </text>
+                          <text
+                            x={item.x + item.width/2}
+                            y={item.y + item.height/2 + 2}
+                            textAnchor="middle"
+                            style={{ 
+                              fontFamily: 'Noto Sans',
+                              pointerEvents: 'none',
+                              fill: '#E0E0E0',
+                            }}
+                            fontSize="1.5"
+                          >
+                            {item.value} / {item.target}
+                          </text>
+                        </>
+                      ) : (
+                        <text
+                          x={item.x + item.width/2}
+                          y={item.y + item.height/2}
+                          textAnchor="middle"
+                          fontSize="2"
+                          fill={getLabelColor(item.category)}
+                          style={{ pointerEvents: 'none' }}
+                        >
+                          ℹ️
+                        </text>
+                      )}
+                    </motion.g>
+                  );
+                })}
               </svg>
             </motion.div>
 
@@ -429,28 +589,40 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
               </button>
             )}
 
-            {/* Tooltip */}
+            {/* Enhanced Tooltip */}
             {tooltip && (
               <div
-                className="fixed z-50 px-3 py-2 rounded-lg text-xs pointer-events-none"
+                className="fixed z-50 px-4 py-3 rounded-lg text-xs pointer-events-none"
                 style={{
                   left: tooltip.x + 10,
                   top: tooltip.y - 10,
-                  background: 'rgba(20,30,50,0.85)',
-                  backdropFilter: 'blur(12px)',
+                  background: 'rgba(20,30,50,0.9)',
+                  backdropFilter: 'blur(16px)',
                   color: '#E0E0E0',
                   fontFamily: 'Noto Sans',
                   boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  maxWidth: '300px',
                 }}
               >
-                <div className="font-bold" style={{ color: getLabelColor(tooltip.data.category) }}>
+                <div className="font-bold mb-2" style={{ color: getLabelColor(tooltip.data.category) }}>
                   {tooltip.data.name}
                 </div>
-                <div>Current: {tooltip.data.value}</div>
-                <div>Target: {tooltip.data.target}</div>
-                <div>Progress: {Math.round((tooltip.data.value/tooltip.data.target)*100)}%</div>
-                <div className="text-xs text-slate-400 mt-1">
-                  30-day trend ▶
+                <div className="mb-1">Current: {tooltip.data.value} / {tooltip.data.target}</div>
+                <div className="mb-1">Progress: {getPercentage(tooltip.data.value, tooltip.data.target)}%</div>
+                <div className="mb-2 text-xs text-slate-400">{tooltip.data.lastTrend}</div>
+                
+                {tooltip.data.breakdown && (
+                  <div className="mb-2">
+                    <div className="text-xs font-semibold mb-1">Breakdown:</div>
+                    {tooltip.data.breakdown.slice(0, 3).map((item, idx) => (
+                      <div key={idx} className="text-xs text-slate-300">• {item}</div>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="text-xs text-slate-400 italic">
+                  {tooltip.data.actionHint}
                 </div>
               </div>
             )}
