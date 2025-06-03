@@ -688,7 +688,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     }
   };
 
-  // Improved treemap algorithm that ensures all items fit within the container
+  // Improved treemap algorithm that ensures all items fit within container
   const calculateLayout = (data: TreemapData[]) => {
     if (data.length === 0) return [];
 
@@ -697,61 +697,64 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     const containerHeight = 100;
     const totalArea = containerWidth * containerHeight;
 
-    // Sort by weight descending (largest first, like S&P 500)
+    // Sort by weight descending (largest first)
     const sortedData = [...data].sort((a, b) => b.weight - a.weight);
     
-    // Calculate normalized areas based on weights
+    // Calculate normalized areas
     const itemsWithArea = sortedData.map(item => ({
       ...item,
       area: (item.weight / totalWeight) * totalArea,
     }));
 
     const result: (TreemapData & { x: number; y: number; width: number; height: number })[] = [];
-
-    // Use a simple row-based layout that ensures all items fit
+    
+    // Use a simple row-by-row packing algorithm that guarantees all items fit
     let currentX = 0;
     let currentY = 0;
-    let rowHeight = 0;
+    let currentRowHeight = 0;
     let remainingWidth = containerWidth;
     let remainingHeight = containerHeight;
-
+    
     for (let i = 0; i < itemsWithArea.length; i++) {
       const item = itemsWithArea[i];
       
-      // Calculate item dimensions based on area
-      const aspectRatio = 1.6; // Golden ratio-ish for better appearance
-      let itemWidth = Math.sqrt(item.area * aspectRatio);
-      let itemHeight = item.area / itemWidth;
+      // Calculate dimensions based on area
+      const aspectRatio = 1.6; // Golden ratio approximation for better visual appeal
+      let itemHeight = Math.sqrt(item.area / aspectRatio);
+      let itemWidth = item.area / itemHeight;
       
       // Check if item fits in current row
       if (currentX + itemWidth > containerWidth || itemWidth > remainingWidth) {
         // Move to next row
-        currentY += rowHeight;
         currentX = 0;
-        remainingHeight -= rowHeight;
+        currentY += currentRowHeight;
+        remainingHeight -= currentRowHeight;
+        currentRowHeight = 0;
         remainingWidth = containerWidth;
-        rowHeight = 0;
         
         // Recalculate dimensions for new row
-        itemWidth = Math.sqrt(item.area * aspectRatio);
-        itemHeight = item.area / itemWidth;
+        itemHeight = Math.sqrt(item.area / aspectRatio);
+        itemWidth = item.area / itemHeight;
       }
       
-      // Ensure item doesn't exceed remaining space
+      // Ensure item doesn't exceed container bounds
       if (currentY + itemHeight > containerHeight) {
-        // Scale down to fit remaining height
-        const scale = remainingHeight / itemHeight;
-        itemHeight = remainingHeight;
-        itemWidth = itemWidth * scale;
+        // Scale down height to fit
+        const maxHeight = remainingHeight / Math.ceil((itemsWithArea.length - i) / 3); // Estimate remaining rows
+        itemHeight = Math.min(itemHeight, maxHeight);
+        itemWidth = item.area / itemHeight;
       }
       
       if (currentX + itemWidth > containerWidth) {
-        // Scale down to fit remaining width
-        const scale = remainingWidth / itemWidth;
+        // Scale down width to fit
         itemWidth = remainingWidth;
-        itemHeight = itemHeight * scale;
+        itemHeight = item.area / itemWidth;
       }
-
+      
+      // Ensure minimum size for visibility
+      itemWidth = Math.max(itemWidth, 2);
+      itemHeight = Math.max(itemHeight, 2);
+      
       result.push({
         ...item,
         x: currentX,
@@ -759,10 +762,19 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
         width: itemWidth,
         height: itemHeight
       });
-
+      
       currentX += itemWidth;
       remainingWidth -= itemWidth;
-      rowHeight = Math.max(rowHeight, itemHeight);
+      currentRowHeight = Math.max(currentRowHeight, itemHeight);
+      
+      // If we're at the end of container width, force new row
+      if (currentX >= containerWidth - 0.1) {
+        currentX = 0;
+        currentY += currentRowHeight;
+        remainingHeight -= currentRowHeight;
+        currentRowHeight = 0;
+        remainingWidth = containerWidth;
+      }
     }
 
     return result;
@@ -789,18 +801,18 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   };
 
   const canShowLabels = (width: number, height: number) => {
-    return width >= 8 && height >= 4;
+    return width >= 6 && height >= 3;
   };
 
   const getTextSize = (width: number, height: number, textLength: number) => {
-    const maxFontSize = Math.min(width / 10, height / 4);
-    const textBasedSize = Math.max(width / (textLength * 0.8), 0.6);
-    return Math.min(maxFontSize, textBasedSize, 2.0);
+    const maxFontSize = Math.min(width / 8, height / 3);
+    const textBasedSize = Math.max(width / (textLength * 0.7), 0.8);
+    return Math.min(maxFontSize, textBasedSize, 2.2);
   };
 
   const getSecondaryTextSize = (width: number, height: number) => {
-    const maxSize = Math.min(width / 12, height / 5);
-    return Math.min(maxSize, 1.2);
+    const maxSize = Math.min(width / 10, height / 4);
+    return Math.min(maxSize, 1.4);
   };
 
   const truncateText = (text: string, maxLength: number) => {
@@ -897,20 +909,14 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
             </div>
           )}
 
-          {/* SVG Treemap - Improved container sizing */}
-          <div className="flex-1 p-2 relative">
+          {/* SVG Treemap */}
+          <div className="flex-1 p-6 relative">
             <motion.div
               layout
               transition={{ duration: 0.2 }}
               className="w-full h-full"
             >
-              <svg 
-                width="100%" 
-                height="100%" 
-                viewBox="0 0 100 100" 
-                className="w-full h-full"
-                preserveAspectRatio="xMidYMid meet"
-              >
+              <svg width="100%" height="100%" viewBox="0 0 100 100" className="w-full h-full">
                 {layoutData.map((item, index) => {
                   const percentage = getPercentage(item.value, item.target);
                   const isOperational = item.category === 'operational';
@@ -918,7 +924,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                   
                   const titleFontSize = getTextSize(item.width, item.height, item.name.length);
                   const valueFontSize = getSecondaryTextSize(item.width, item.height);
-                  const maxTitleLength = Math.floor(item.width / 1.2);
+                  const maxTitleLength = Math.floor(item.width / 1.0);
                   const truncatedTitle = truncateText(item.name, maxTitleLength);
                   
                   return (
