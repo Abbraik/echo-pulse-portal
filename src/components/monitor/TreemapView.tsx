@@ -745,7 +745,24 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   };
 
   const canShowLabels = (width: number, height: number) => {
-    return width >= 15 && height >= 8;
+    return width >= 12 && height >= 6; // Reduced minimum size for better text fitting
+  };
+
+  const getTextSize = (width: number, height: number, textLength: number) => {
+    // Calculate appropriate font size based on container dimensions and text length
+    const maxFontSize = Math.min(width / 8, height / 3);
+    const textBasedSize = Math.max(width / (textLength * 0.7), 1.2);
+    return Math.min(maxFontSize, textBasedSize, 2.5);
+  };
+
+  const getSecondaryTextSize = (width: number, height: number) => {
+    const maxSize = Math.min(width / 10, height / 4);
+    return Math.min(maxSize, 1.8);
+  };
+
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength - 1) + '…';
   };
 
   const getPercentage = (value: number, target: number) => {
@@ -854,12 +871,20 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                     <feFlood floodColor="rgba(0,0,0,0.3)" />
                     <feComposite in2="offset" operator="in" />
                   </filter>
+                  <clipPath id="textClip">
+                    <rect x="0" y="0" width="100" height="100"/>
+                  </clipPath>
                 </defs>
                 
                 {layoutData.map((item, index) => {
                   const percentage = getPercentage(item.value, item.target);
                   const isOperational = item.category === 'operational';
                   const actualStatus = isOperational ? getStatusFromPercentage(percentage, true) : item.status;
+                  
+                  const titleFontSize = getTextSize(item.width, item.height, item.name.length);
+                  const valueFontSize = getSecondaryTextSize(item.width, item.height);
+                  const maxTitleLength = Math.floor(item.width / 1.5);
+                  const truncatedTitle = truncateText(item.name, maxTitleLength);
                   
                   return (
                     <motion.g
@@ -910,10 +935,20 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                       />
 
                       {canShowLabels(item.width, item.height) ? (
-                        <>
+                        <g clipPath={`url(#textClip-${item.id})`}>
+                          <defs>
+                            <clipPath id={`textClip-${item.id}`}>
+                              <rect
+                                x={item.x + 0.5}
+                                y={item.y + 0.5}
+                                width={item.width - 1}
+                                height={item.height - 1}
+                              />
+                            </clipPath>
+                          </defs>
                           <text
                             x={item.x + item.width/2}
-                            y={item.y + item.height/2 - 1}
+                            y={item.y + item.height/2 - 0.8}
                             textAnchor="middle"
                             className="font-semibold"
                             style={{ 
@@ -921,31 +956,33 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                               textShadow: '0 1px 2px rgba(0,0,0,0.8)',
                               pointerEvents: 'none',
                               fill: '#00FFC3',
+                              overflow: 'hidden',
                             }}
-                            fontSize="2.2"
+                            fontSize={titleFontSize}
                           >
-                            {item.name}
+                            {truncatedTitle}
                           </text>
                           <text
                             x={item.x + item.width/2}
-                            y={item.y + item.height/2 + 2}
+                            y={item.y + item.height/2 + 1.2}
                             textAnchor="middle"
                             style={{ 
                               fontFamily: 'Noto Sans',
                               pointerEvents: 'none',
                               fill: '#E0E0E0',
+                              overflow: 'hidden',
                             }}
-                            fontSize="1.6"
+                            fontSize={valueFontSize}
                           >
                             {item.value} / {item.target}
                           </text>
-                        </>
+                        </g>
                       ) : (
                         <text
                           x={item.x + item.width/2}
                           y={item.y + item.height/2}
                           textAnchor="middle"
-                          fontSize="2.5"
+                          fontSize={Math.min(item.width/4, item.height/4, 2.5)}
                           fill="#00FFC3"
                           style={{ pointerEvents: 'none' }}
                         >
