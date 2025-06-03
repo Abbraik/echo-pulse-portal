@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info, TrendingUp } from 'lucide-react';
@@ -118,14 +119,14 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const treemapData: TreemapData[] = [
-    // Strategic Indicators
+    // Strategic Indicators - SP500-style weights (few large, many small)
     { 
       id: 's1', 
       name: 'DEI Composite', 
       value: 78, 
       target: 80, 
       category: 'strategic', 
-      weight: 5, 
+      weight: 120, 
       status: 'in-band',
       description: 'Overall "Demographic-Equilibrium Index" – a weighted blend of population, age-structure, fertility balance, and social cohesion metrics.',
       breakdown: [
@@ -139,28 +140,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     },
     { 
       id: 's2', 
-      name: 'Network Development Index', 
-      value: 64, 
-      target: 100, 
-      category: 'strategic', 
-      weight: 4, 
-      status: 'warning',
-      description: 'Degree of causal network coverage in the Think zone: how many loops and CLD nodes have been robustly mapped vs. total recommended.',
-      breakdown: [
-        'Population → Resource loop (2/5 nodes missing)',
-        'Migration → Economic loop (1/4 nodes missing)',
-        'Environment Feedback loop (0/3 nodes missing)'
-      ],
-      lastTrend: '+4 loops mapped last week',
-      actionHint: 'Click to view full CLD mapping status.'
-    },
-    { 
-      id: 's3', 
       name: 'Trust Recovery Index', 
       value: 89, 
       target: 100, 
       category: 'strategic', 
-      weight: 4, 
+      weight: 90, 
       status: 'in-band',
       description: 'A composite gauge of stakeholder trust (public surveys, partner feedback, system transparency scores).',
       breakdown: [
@@ -172,12 +156,29 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Click to see detailed trust-building recommendations.'
     },
     { 
+      id: 's3', 
+      name: 'Network Development Index', 
+      value: 64, 
+      target: 100, 
+      category: 'strategic', 
+      weight: 80, 
+      status: 'warning',
+      description: 'Degree of causal network coverage in the Think zone: how many loops and CLD nodes have been robustly mapped vs. total recommended.',
+      breakdown: [
+        'Population → Resource loop (2/5 nodes missing)',
+        'Migration → Economic loop (1/4 nodes missing)',
+        'Environment Feedback loop (0/3 nodes missing)'
+      ],
+      lastTrend: '+4 loops mapped last week',
+      actionHint: 'Click to view full CLD mapping status.'
+    },
+    { 
       id: 's4', 
       name: 'Bundle Coherence Score', 
       value: 72, 
       target: 90, 
       category: 'strategic', 
-      weight: 4, 
+      weight: 70, 
       status: 'warning',
       description: 'Average "loop coverage" across active strategic bundles (i.e., how many identified leverage points each bundle actually addresses).',
       breakdown: [
@@ -193,7 +194,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       value: 85, 
       target: 90, 
       category: 'strategic', 
-      weight: 4, 
+      weight: 60, 
       status: 'in-band',
       description: 'Measure of population growth/decline stability within optimal ranges.',
       breakdown: ['Birth Rate: 94%', 'Migration Balance: 88%', 'Retention: 92%'],
@@ -202,29 +203,29 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     },
     { 
       id: 's6', 
-      name: 'Age-Structure Balance Ratio', 
-      value: 76, 
-      target: 80, 
+      name: 'Resource Stock vs. Target', 
+      value: 74, 
+      target: 85, 
       category: 'strategic', 
-      weight: 3, 
-      status: 'in-band',
-      description: 'Balance between working-age and dependent populations.',
-      breakdown: ['Working Age: 78%', 'Youth Dependency: 82%', 'Elder Dependency: 74%'],
-      lastTrend: '↓1% last month',
-      actionHint: 'Analyze demographic transitions.'
+      weight: 50, 
+      status: 'warning',
+      description: 'Current resource reserves compared to strategic targets.',
+      breakdown: ['Energy: 78%', 'Water: 71%', 'Materials: 73%'],
+      lastTrend: '↓2% last month',
+      actionHint: 'Optimize resource allocation strategies.'
     },
     { 
       id: 's7', 
-      name: 'Fertility Confidence Level', 
-      value: 68, 
-      target: 75, 
+      name: 'Economic Output Growth (%)', 
+      value: 3.2, 
+      target: 4.0, 
       category: 'strategic', 
-      weight: 3, 
+      weight: 45, 
       status: 'warning',
-      description: 'Composite measure of reproductive health and family planning confidence.',
-      breakdown: ['Health Access: 85%', 'Economic Security: 62%', 'Social Support: 77%'],
-      lastTrend: '↑2% last month',
-      actionHint: 'Review family support policies.'
+      description: 'Annual GDP growth rate and productivity measures.',
+      breakdown: ['Manufacturing: 2.8%', 'Services: 3.6%', 'Innovation: 3.1%'],
+      lastTrend: '↑0.3% last quarter',
+      actionHint: 'Review economic stimulus measures.'
     },
     { 
       id: 's8', 
@@ -232,7 +233,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       value: 82, 
       target: 85, 
       category: 'strategic', 
-      weight: 3, 
+      weight: 40, 
       status: 'in-band',
       description: 'Measurement of community bonds and social trust levels.',
       breakdown: ['Community Trust: 88%', 'Civic Participation: 79%', 'Social Networks: 85%'],
@@ -241,37 +242,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     },
     { 
       id: 's9', 
-      name: 'Economic Output Growth (%)', 
-      value: 3.2, 
-      target: 4.0, 
-      category: 'strategic', 
-      weight: 3, 
-      status: 'warning',
-      description: 'Annual GDP growth rate and productivity measures.',
-      breakdown: ['Manufacturing: 2.8%', 'Services: 3.6%', 'Innovation: 3.1%'],
-      lastTrend: '↑0.3% last quarter',
-      actionHint: 'Review economic stimulus measures.'
-    },
-    { 
-      id: 's10', 
-      name: 'Resource Stock vs. Target', 
-      value: 74, 
-      target: 85, 
-      category: 'strategic', 
-      weight: 3, 
-      status: 'warning',
-      description: 'Current resource reserves compared to strategic targets.',
-      breakdown: ['Energy: 78%', 'Water: 71%', 'Materials: 73%'],
-      lastTrend: '↓2% last month',
-      actionHint: 'Optimize resource allocation strategies.'
-    },
-    { 
-      id: 's11', 
       name: 'Renewal vs. Consumption Balance', 
       value: 87, 
       target: 90, 
       category: 'strategic', 
-      weight: 3, 
+      weight: 35, 
       status: 'in-band',
       description: 'Ratio of renewable resource generation to consumption rates.',
       breakdown: ['Renewable Energy: 92%', 'Water Cycle: 84%', 'Material Recycling: 85%'],
@@ -279,12 +254,38 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Accelerate sustainability initiatives.'
     },
     { 
+      id: 's10', 
+      name: 'Fertility Confidence Level', 
+      value: 68, 
+      target: 75, 
+      category: 'strategic', 
+      weight: 30, 
+      status: 'warning',
+      description: 'Composite measure of reproductive health and family planning confidence.',
+      breakdown: ['Health Access: 85%', 'Economic Security: 62%', 'Social Support: 77%'],
+      lastTrend: '↑2% last month',
+      actionHint: 'Review family support policies.'
+    },
+    { 
+      id: 's11', 
+      name: 'Age-Structure Balance Ratio', 
+      value: 76, 
+      target: 80, 
+      category: 'strategic', 
+      weight: 25, 
+      status: 'in-band',
+      description: 'Balance between working-age and dependent populations.',
+      breakdown: ['Working Age: 78%', 'Youth Dependency: 82%', 'Elder Dependency: 74%'],
+      lastTrend: '↓1% last month',
+      actionHint: 'Analyze demographic transitions.'
+    },
+    { 
       id: 's12', 
       name: 'Supply–Demand Gap', 
       value: 7, 
       target: 5, 
       category: 'strategic', 
-      weight: 3, 
+      weight: 20, 
       status: 'warning',
       description: 'Percentage gap between supply and demand across key sectors.',
       breakdown: ['Housing: 8%', 'Food: 5%', 'Energy: 9%'],
@@ -297,7 +298,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       value: 94, 
       target: 95, 
       category: 'strategic', 
-      weight: 2, 
+      weight: 15, 
       status: 'in-band',
       description: 'Measure of price volatility across essential goods and services.',
       breakdown: ['Food Prices: 96%', 'Energy Prices: 91%', 'Housing Costs: 95%'],
@@ -310,7 +311,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       value: 78, 
       target: 85, 
       category: 'strategic', 
-      weight: 2, 
+      weight: 12, 
       status: 'warning',
       description: 'Percentage of maximum capacity being utilized in critical sectors.',
       breakdown: ['Manufacturing: 82%', 'Healthcare: 76%', 'Education: 74%'],
@@ -319,63 +320,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     },
     { 
       id: 's15', 
-      name: 'Employment Rate', 
-      value: 91, 
-      target: 95, 
-      category: 'strategic', 
-      weight: 2, 
-      status: 'in-band',
-      description: 'Percentage of working-age population in employment.',
-      breakdown: ['Full-time: 85%', 'Part-time: 12%', 'Self-employed: 8%'],
-      lastTrend: '↑2% last quarter',
-      actionHint: 'Support job creation programs.'
-    },
-    { 
-      id: 's16', 
-      name: 'Education Completion Rate', 
-      value: 88, 
-      target: 92, 
-      category: 'strategic', 
-      weight: 2, 
-      status: 'in-band',
-      description: 'Percentage completing secondary and tertiary education.',
-      breakdown: ['Secondary: 94%', 'Tertiary: 67%', 'Vocational: 85%'],
-      lastTrend: '↑1% last year',
-      actionHint: 'Enhance educational pathways.'
-    },
-    { 
-      id: 's17', 
-      name: 'Health Status Index', 
-      value: 83, 
-      target: 88, 
-      category: 'strategic', 
-      weight: 2, 
-      status: 'in-band',
-      description: 'Composite health outcome measures across population.',
-      breakdown: ['Life Expectancy: 87%', 'Disease Prevention: 81%', 'Mental Health: 79%'],
-      lastTrend: '↑2% last year',
-      actionHint: 'Strengthen healthcare systems.'
-    },
-    { 
-      id: 's18', 
-      name: 'Household Revenue Level', 
-      value: 76, 
-      target: 80, 
-      category: 'strategic', 
-      weight: 2, 
-      status: 'in-band',
-      description: 'Average household income relative to living cost benchmarks.',
-      breakdown: ['Median Income: 78%', 'Income Distribution: 74%', 'Purchasing Power: 76%'],
-      lastTrend: '↑1% last quarter',
-      actionHint: 'Review income support policies.'
-    },
-    { 
-      id: 's19', 
       name: 'Environmental Quality Index', 
       value: 71, 
       target: 80, 
       category: 'strategic', 
-      weight: 2, 
+      weight: 10, 
       status: 'warning',
       description: 'Composite environmental health and sustainability metrics.',
       breakdown: ['Air Quality: 74%', 'Water Quality: 69%', 'Biodiversity: 70%'],
@@ -383,12 +332,64 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Accelerate environmental protection.'
     },
     { 
+      id: 's16', 
+      name: 'Employment Rate', 
+      value: 91, 
+      target: 95, 
+      category: 'strategic', 
+      weight: 8, 
+      status: 'in-band',
+      description: 'Percentage of working-age population in employment.',
+      breakdown: ['Full-time: 85%', 'Part-time: 12%', 'Self-employed: 8%'],
+      lastTrend: '↑2% last quarter',
+      actionHint: 'Support job creation programs.'
+    },
+    { 
+      id: 's17', 
+      name: 'Education Completion Rate', 
+      value: 88, 
+      target: 92, 
+      category: 'strategic', 
+      weight: 8, 
+      status: 'in-band',
+      description: 'Percentage completing secondary and tertiary education.',
+      breakdown: ['Secondary: 94%', 'Tertiary: 67%', 'Vocational: 85%'],
+      lastTrend: '↑1% last year',
+      actionHint: 'Enhance educational pathways.'
+    },
+    { 
+      id: 's18', 
+      name: 'Health Status Index', 
+      value: 83, 
+      target: 88, 
+      category: 'strategic', 
+      weight: 8, 
+      status: 'in-band',
+      description: 'Composite health outcome measures across population.',
+      breakdown: ['Life Expectancy: 87%', 'Disease Prevention: 81%', 'Mental Health: 79%'],
+      lastTrend: '↑2% last year',
+      actionHint: 'Strengthen healthcare systems.'
+    },
+    { 
+      id: 's19', 
+      name: 'Household Revenue Level', 
+      value: 76, 
+      target: 80, 
+      category: 'strategic', 
+      weight: 5, 
+      status: 'in-band',
+      description: 'Average household income relative to living cost benchmarks.',
+      breakdown: ['Median Income: 78%', 'Income Distribution: 74%', 'Purchasing Power: 76%'],
+      lastTrend: '↑1% last quarter',
+      actionHint: 'Review income support policies.'
+    },
+    { 
       id: 's20', 
       name: 'Global Influence Score', 
       value: 65, 
       target: 75, 
       category: 'strategic', 
-      weight: 2, 
+      weight: 5, 
       status: 'warning',
       description: 'Measure of international standing and diplomatic influence.',
       breakdown: ['Trade Relations: 72%', 'Diplomatic Ties: 61%', 'Cultural Impact: 63%'],
@@ -396,14 +397,14 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Strengthen international partnerships.'
     },
 
-    // Operational Indicators
+    // Operational Indicators - SP500-style weights (few large, many small)
     { 
       id: 'o1', 
       name: 'Open Facilitator Claims', 
       value: 12, 
       target: 0, 
       category: 'operational', 
-      weight: 5, 
+      weight: 100, 
       status: 'critical',
       description: 'Number of workflow "claims" (roles/tasks) in any zone that remain unassigned or unresolved.',
       breakdown: ['Think: 4', 'Act: 3', 'Monitor: 2', 'Learn: 2', 'Innovate: 1'],
@@ -412,45 +413,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     },
     { 
       id: 'o2', 
-      name: 'Think→Act Queue Length', 
-      value: 4, 
-      target: 0, 
-      category: 'operational', 
-      weight: 4, 
-      status: 'warning',
-      description: 'How many analysis outputs (loop findings, simulations) are waiting for strategy translation in Act.',
-      breakdown: [
-        'DEI target adjustment proposal',
-        '"Population Volatility vs. Resource Gap" report',
-        '"Social Cohesion Feedback" network analysis'
-      ],
-      lastTrend: 'Avg Wait: 2.3 days',
-      actionHint: 'Click to forward to strategy builder or reassign to Act leads.'
-    },
-    { 
-      id: 'o3', 
-      name: 'Act→Monitor Queue Length', 
-      value: 3, 
-      target: 0, 
-      category: 'operational', 
-      weight: 4, 
-      status: 'warning',
-      description: 'Number of planned bundles/strategies sent to Monitor for validation that haven\'t yet been evaluated on real-world data.',
-      breakdown: [
-        'Bundle Delta (Population Incentives)',
-        'Bundle Epsilon (Resource Quotas)',
-        'Bundle Zeta (Social Cohesion Programs)'
-      ],
-      lastTrend: 'Avg Delay: 1.8 days',
-      actionHint: 'Click to run new simulations or update real-world data feeds.'
-    },
-    { 
-      id: 'o4', 
       name: 'System Error Count', 
       value: 5, 
       target: 0, 
       category: 'operational', 
-      weight: 4, 
+      weight: 90, 
       status: 'warning',
       description: 'Number of software/system-integrity warnings or errors in the portal over the last 24 hours.',
       breakdown: [
@@ -462,12 +429,46 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Click to view full error logs and resolve issues.'
     },
     { 
+      id: 'o3', 
+      name: 'Think→Act Queue Length', 
+      value: 4, 
+      target: 0, 
+      category: 'operational', 
+      weight: 60, 
+      status: 'warning',
+      description: 'How many analysis outputs (loop findings, simulations) are waiting for strategy translation in Act.',
+      breakdown: [
+        'DEI target adjustment proposal',
+        '"Population Volatility vs. Resource Gap" report',
+        '"Social Cohesion Feedback" network analysis'
+      ],
+      lastTrend: 'Avg Wait: 2.3 days',
+      actionHint: 'Click to forward to strategy builder or reassign to Act leads.'
+    },
+    { 
+      id: 'o4', 
+      name: 'Act→Monitor Queue Length', 
+      value: 3, 
+      target: 0, 
+      category: 'operational', 
+      weight: 50, 
+      status: 'warning',
+      description: 'Number of planned bundles/strategies sent to Monitor for validation that haven\'t yet been evaluated on real-world data.',
+      breakdown: [
+        'Bundle Delta (Population Incentives)',
+        'Bundle Epsilon (Resource Quotas)',
+        'Bundle Zeta (Social Cohesion Programs)'
+      ],
+      lastTrend: 'Avg Delay: 1.8 days',
+      actionHint: 'Click to run new simulations or update real-world data feeds.'
+    },
+    { 
       id: 'o5', 
       name: 'DEI Stability Band %', 
       value: 94, 
       target: 98, 
       category: 'operational', 
-      weight: 3, 
+      weight: 45, 
       status: 'in-band',
       description: 'Percentage of time DEI metrics remain within acceptable variance bands.',
       breakdown: ['Within Target: 94%', 'Minor Variance: 4%', 'Major Variance: 2%'],
@@ -480,7 +481,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       value: 87, 
       target: 90, 
       category: 'operational', 
-      weight: 3, 
+      weight: 40, 
       status: 'in-band',
       description: 'Percentage of strategic bundles meeting their ROI targets.',
       breakdown: ['Above Target: 45%', 'On Target: 42%', 'Below Target: 13%'],
@@ -493,7 +494,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       value: 2.1, 
       target: 1.0, 
       category: 'operational', 
-      weight: 3, 
+      weight: 35, 
       status: 'warning',
       description: 'Average delay in hours between real-world events and system data updates.',
       breakdown: ['Economic Data: 1.8h', 'Social Data: 2.4h', 'Environmental: 2.1h'],
@@ -506,7 +507,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       value: 3.2, 
       target: 1.0, 
       category: 'operational', 
-      weight: 3, 
+      weight: 30, 
       status: 'critical',
       description: 'Average number of days open claims have been unresolved.',
       breakdown: ['<1 day: 25%', '1-3 days: 45%', '>3 days: 30%'],
@@ -519,7 +520,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       value: 6.5, 
       target: 2.0, 
       category: 'operational', 
-      weight: 3, 
+      weight: 25, 
       status: 'warning',
       description: 'Average delay in hours for workflow transitions between zones.',
       breakdown: ['Think→Act: 4.2h', 'Act→Monitor: 8.1h', 'Monitor→Learn: 7.2h'],
@@ -528,89 +529,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     },
     { 
       id: 'o10', 
-      name: 'Entropy Score (Think Zone)', 
-      value: 23, 
-      target: 15, 
-      category: 'operational', 
-      weight: 2, 
-      status: 'warning',
-      description: 'Measure of disorder/inefficiency in Think zone processes.',
-      breakdown: ['Process Variance: 28%', 'Resource Utilization: 18%', 'Output Quality: 23%'],
-      lastTrend: '↓2 points last month',
-      actionHint: 'Optimize Think zone workflows.'
-    },
-    { 
-      id: 'o11', 
-      name: 'Entropy Score (Act Zone)', 
-      value: 19, 
-      target: 15, 
-      category: 'operational', 
-      weight: 2, 
-      status: 'warning',
-      description: 'Measure of disorder/inefficiency in Act zone processes.',
-      breakdown: ['Process Variance: 22%', 'Resource Utilization: 16%', 'Output Quality: 19%'],
-      lastTrend: '↓1 point last week',
-      actionHint: 'Streamline Act zone operations.'
-    },
-    { 
-      id: 'o12', 
-      name: 'Entropy Score (Monitor Zone)', 
-      value: 14, 
-      target: 15, 
-      category: 'operational', 
-      weight: 2, 
-      status: 'in-band',
-      description: 'Measure of disorder/inefficiency in Monitor zone processes.',
-      breakdown: ['Process Variance: 12%', 'Resource Utilization: 16%', 'Output Quality: 14%'],
-      lastTrend: '→ stable last month',
-      actionHint: 'Maintain current efficiency levels.'
-    },
-    { 
-      id: 'o13', 
-      name: 'Entropy Score (Learn Zone)', 
-      value: 17, 
-      target: 15, 
-      category: 'operational', 
-      weight: 2, 
-      status: 'warning',
-      description: 'Measure of disorder/inefficiency in Learn zone processes.',
-      breakdown: ['Process Variance: 19%', 'Resource Utilization: 15%', 'Output Quality: 17%'],
-      lastTrend: '↓3 points last month',
-      actionHint: 'Continue Learn zone optimization.'
-    },
-    { 
-      id: 'o14', 
-      name: 'Entropy Score (Innovate Zone)', 
-      value: 21, 
-      target: 15, 
-      category: 'operational', 
-      weight: 2, 
-      status: 'warning',
-      description: 'Measure of disorder/inefficiency in Innovate zone processes.',
-      breakdown: ['Process Variance: 25%', 'Resource Utilization: 17%', 'Output Quality: 21%'],
-      lastTrend: '↓1 point last week',
-      actionHint: 'Focus on Innovate zone efficiency.'
-    },
-    { 
-      id: 'o15', 
-      name: 'User Session Errors / Hour', 
-      value: 0.8, 
-      target: 0.2, 
-      category: 'operational', 
-      weight: 2, 
-      status: 'warning',
-      description: 'Average number of user-facing errors per hour across all sessions.',
-      breakdown: ['UI Errors: 0.5/h', 'API Errors: 0.2/h', 'Auth Errors: 0.1/h'],
-      lastTrend: '↓0.2/h last week',
-      actionHint: 'Continue error reduction initiatives.'
-    },
-    { 
-      id: 'o16', 
       name: 'Data Pipeline Failure Rate (%)', 
       value: 2.1, 
       target: 0.5, 
       category: 'operational', 
-      weight: 2, 
+      weight: 20, 
       status: 'warning',
       description: 'Percentage of data pipeline executions that fail or timeout.',
       breakdown: ['Ingestion: 1.8%', 'Processing: 2.4%', 'Output: 2.1%'],
@@ -618,25 +541,12 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Improve pipeline reliability.'
     },
     { 
-      id: 'o17', 
-      name: 'Average Bundle Validation Time (days)', 
-      value: 2.8, 
-      target: 1.5, 
-      category: 'operational', 
-      weight: 2, 
-      status: 'warning',
-      description: 'Average time taken to validate new strategic bundles.',
-      breakdown: ['Data Collection: 1.2 days', 'Analysis: 1.1 days', 'Review: 0.5 days'],
-      lastTrend: '↓0.4 days last month',
-      actionHint: 'Accelerate validation processes.'
-    },
-    { 
-      id: 'o18', 
+      id: 'o11', 
       name: 'Number of Active Alerts', 
       value: 7, 
       target: 3, 
       category: 'operational', 
-      weight: 2, 
+      weight: 15, 
       status: 'warning',
       description: 'Current number of active system alerts requiring attention.',
       breakdown: ['High Priority: 2', 'Medium Priority: 3', 'Low Priority: 2'],
@@ -644,12 +554,12 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Address outstanding alerts.'
     },
     { 
-      id: 'o19', 
+      id: 'o12', 
       name: 'Anomalies Detected (24h)', 
       value: 3, 
       target: 1, 
       category: 'operational', 
-      weight: 1, 
+      weight: 12, 
       status: 'warning',
       description: 'Number of anomalies detected in system behavior over last 24 hours.',
       breakdown: ['Data Anomalies: 2', 'Performance Anomalies: 1', 'Security Anomalies: 0'],
@@ -657,12 +567,103 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Investigate recent anomalies.'
     },
     { 
+      id: 'o13', 
+      name: 'Entropy Score (Think Zone)', 
+      value: 23, 
+      target: 15, 
+      category: 'operational', 
+      weight: 10, 
+      status: 'warning',
+      description: 'Measure of disorder/inefficiency in Think zone processes.',
+      breakdown: ['Process Variance: 28%', 'Resource Utilization: 18%', 'Output Quality: 23%'],
+      lastTrend: '↓2 points last month',
+      actionHint: 'Optimize Think zone workflows.'
+    },
+    { 
+      id: 'o14', 
+      name: 'Entropy Score (Act Zone)', 
+      value: 19, 
+      target: 15, 
+      category: 'operational', 
+      weight: 10, 
+      status: 'warning',
+      description: 'Measure of disorder/inefficiency in Act zone processes.',
+      breakdown: ['Process Variance: 22%', 'Resource Utilization: 16%', 'Output Quality: 19%'],
+      lastTrend: '↓1 point last week',
+      actionHint: 'Streamline Act zone operations.'
+    },
+    { 
+      id: 'o15', 
+      name: 'Entropy Score (Monitor Zone)', 
+      value: 14, 
+      target: 15, 
+      category: 'operational', 
+      weight: 8, 
+      status: 'in-band',
+      description: 'Measure of disorder/inefficiency in Monitor zone processes.',
+      breakdown: ['Process Variance: 12%', 'Resource Utilization: 16%', 'Output Quality: 14%'],
+      lastTrend: '→ stable last month',
+      actionHint: 'Maintain current efficiency levels.'
+    },
+    { 
+      id: 'o16', 
+      name: 'Entropy Score (Learn Zone)', 
+      value: 17, 
+      target: 15, 
+      category: 'operational', 
+      weight: 8, 
+      status: 'warning',
+      description: 'Measure of disorder/inefficiency in Learn zone processes.',
+      breakdown: ['Process Variance: 19%', 'Resource Utilization: 15%', 'Output Quality: 17%'],
+      lastTrend: '↓3 points last month',
+      actionHint: 'Continue Learn zone optimization.'
+    },
+    { 
+      id: 'o17', 
+      name: 'Entropy Score (Innovate Zone)', 
+      value: 21, 
+      target: 15, 
+      category: 'operational', 
+      weight: 8, 
+      status: 'warning',
+      description: 'Measure of disorder/inefficiency in Innovate zone processes.',
+      breakdown: ['Process Variance: 25%', 'Resource Utilization: 17%', 'Output Quality: 21%'],
+      lastTrend: '↓1 point last week',
+      actionHint: 'Focus on Innovate zone efficiency.'
+    },
+    { 
+      id: 'o18', 
+      name: 'User Session Errors / Hour', 
+      value: 0.8, 
+      target: 0.2, 
+      category: 'operational', 
+      weight: 5, 
+      status: 'warning',
+      description: 'Average number of user-facing errors per hour across all sessions.',
+      breakdown: ['UI Errors: 0.5/h', 'API Errors: 0.2/h', 'Auth Errors: 0.1/h'],
+      lastTrend: '↓0.2/h last week',
+      actionHint: 'Continue error reduction initiatives.'
+    },
+    { 
+      id: 'o19', 
+      name: 'Average Bundle Validation Time (days)', 
+      value: 2.8, 
+      target: 1.5, 
+      category: 'operational', 
+      weight: 5, 
+      status: 'warning',
+      description: 'Average time taken to validate new strategic bundles.',
+      breakdown: ['Data Collection: 1.2 days', 'Analysis: 1.1 days', 'Review: 0.5 days'],
+      lastTrend: '↓0.4 days last month',
+      actionHint: 'Accelerate validation processes.'
+    },
+    { 
       id: 'o20', 
       name: 'Pending Playbook Triggers', 
       value: 2, 
       target: 0, 
       category: 'operational', 
-      weight: 1, 
+      weight: 3, 
       status: 'warning',
       description: 'Number of automated playbook triggers that are pending execution.',
       breakdown: ['Resource Triggers: 1', 'Performance Triggers: 1', 'Alert Triggers: 0'],
@@ -871,9 +872,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                     <feFlood floodColor="rgba(0,0,0,0.3)" />
                     <feComposite in2="offset" operator="in" />
                   </filter>
-                  <clipPath id="textClip">
-                    <rect x="0" y="0" width="100" height="100"/>
-                  </clipPath>
                 </defs>
                 
                 {layoutData.map((item, index) => {
@@ -935,14 +933,14 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                       />
 
                       {canShowLabels(item.width, item.height) ? (
-                        <g clipPath={`url(#textClip-${item.id})`}>
+                        <g>
                           <defs>
                             <clipPath id={`textClip-${item.id}`}>
                               <rect
                                 x={item.x + 0.5}
                                 y={item.y + 0.5}
-                                width={item.width - 1}
-                                height={item.height - 1}
+                                width={Math.max(0, item.width - 1)}
+                                height={Math.max(0, item.height - 1)}
                               />
                             </clipPath>
                           </defs>
@@ -950,15 +948,16 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                             x={item.x + item.width/2}
                             y={item.y + item.height/2 - 0.8}
                             textAnchor="middle"
+                            clipPath={`url(#textClip-${item.id})`}
                             className="font-semibold"
                             style={{ 
-                              fontFamily: 'Noto Sans',
+                              fontFamily: 'Noto Sans, system-ui, sans-serif',
                               textShadow: '0 1px 2px rgba(0,0,0,0.8)',
                               pointerEvents: 'none',
                               fill: '#00FFC3',
                               overflow: 'hidden',
                             }}
-                            fontSize={titleFontSize}
+                            fontSize={Math.max(titleFontSize, 1.2)}
                           >
                             {truncatedTitle}
                           </text>
@@ -966,13 +965,14 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                             x={item.x + item.width/2}
                             y={item.y + item.height/2 + 1.2}
                             textAnchor="middle"
+                            clipPath={`url(#textClip-${item.id})`}
                             style={{ 
-                              fontFamily: 'Noto Sans',
+                              fontFamily: 'Noto Sans, system-ui, sans-serif',
                               pointerEvents: 'none',
                               fill: '#E0E0E0',
                               overflow: 'hidden',
                             }}
-                            fontSize={valueFontSize}
+                            fontSize={Math.max(valueFontSize, 1.0)}
                           >
                             {item.value} / {item.target}
                           </text>
@@ -982,7 +982,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                           x={item.x + item.width/2}
                           y={item.y + item.height/2}
                           textAnchor="middle"
-                          fontSize={Math.min(item.width/4, item.height/4, 2.5)}
+                          fontSize={Math.min(item.width/4, item.height/4, 2.0)}
                           fill="#00FFC3"
                           style={{ pointerEvents: 'none' }}
                         >
@@ -1015,7 +1015,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                   background: 'rgba(20,30,50,0.95)',
                   backdropFilter: 'blur(20px)',
                   color: '#E0E0E0',
-                  fontFamily: 'Noto Sans',
+                  fontFamily: 'Noto Sans, system-ui, sans-serif',
                   boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
                   border: '1px solid rgba(255,255,255,0.15)',
                 }}
