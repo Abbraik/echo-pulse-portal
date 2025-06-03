@@ -14,6 +14,7 @@ import Think from "./pages/Think";
 import Act from "./pages/Act";
 import Learn from "./pages/Learn";
 import Innovate from "./pages/Innovate";
+import Monitor from "./pages/Monitor";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -76,6 +77,7 @@ const App = () => {
                       <Route path="/act" element={<Act />} />
                       <Route path="/learn" element={<Learn />} />
                       <Route path="/innovate" element={<Innovate />} />
+                      <Route path="/monitor" element={<Monitor />} />
                       <Route path="*" element={<NotFound />} />
                     </Route>
                   </Routes>
