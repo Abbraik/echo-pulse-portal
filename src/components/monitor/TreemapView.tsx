@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info, TrendingUp } from 'lucide-react';
@@ -62,7 +61,6 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
           fontFamily: 'Noto Sans',
         }}
       >
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200"
@@ -70,7 +68,6 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
           <X size={16} />
         </button>
 
-        {/* Content */}
         <div className="p-6 h-full flex flex-col">
           <h3 
             className="text-lg font-bold mb-4"
@@ -82,7 +79,6 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
             {data.name}
           </h3>
 
-          {/* Trend Chart Area */}
           <div className="flex-1 bg-white/5 rounded-lg p-4 mb-4">
             <div className="text-sm text-slate-400 mb-2">90-Day Trend ({chartType})</div>
             <div className="h-32 flex items-end space-x-1">
@@ -100,7 +96,6 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
             </div>
           </div>
 
-          {/* Recent Values Table */}
           <div className="mb-4">
             <div className="text-sm text-slate-400 mb-2">Recent Values</div>
             <div className="space-y-1">
@@ -114,7 +109,6 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
             </div>
           </div>
 
-          {/* Action Button */}
           <button
             className="w-full py-2 rounded-lg font-medium text-sm transition-all duration-200"
             style={{
@@ -139,9 +133,9 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const treemapData: TreemapData[] = [
-    // Strategic indicators
+    // Strategic Indicators
     { 
-      id: '1', 
+      id: 's1', 
       name: 'DEI Composite', 
       value: 78, 
       target: 80, 
@@ -159,8 +153,8 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Hover to drill into full DEI report.'
     },
     { 
-      id: '2', 
-      name: 'Network Dev Index', 
+      id: 's2', 
+      name: 'Network Development Index', 
       value: 64, 
       target: 100, 
       category: 'strategic', 
@@ -176,10 +170,10 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Click to view full CLD mapping status.'
     },
     { 
-      id: '3', 
-      name: 'Trust Recovery', 
+      id: 's3', 
+      name: 'Trust Recovery Index', 
       value: 89, 
-      target: 95, 
+      target: 100, 
       category: 'strategic', 
       weight: 4, 
       status: 'in-band',
@@ -193,12 +187,12 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Click to see detailed trust-building recommendations.'
     },
     { 
-      id: '4', 
-      name: 'Bundle Coherence', 
+      id: 's4', 
+      name: 'Bundle Coherence Score', 
       value: 72, 
       target: 90, 
       category: 'strategic', 
-      weight: 3, 
+      weight: 4, 
       status: 'warning',
       description: 'Average "loop coverage" across active strategic bundles (i.e., how many identified leverage points each bundle actually addresses).',
       breakdown: [
@@ -208,51 +202,253 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       lastTrend: '+7% this month',
       actionHint: 'Click to open strategy builder for coherence improvements.'
     },
-    // Operational indicators
     { 
-      id: '5', 
-      name: 'Open Claims', 
+      id: 's5', 
+      name: 'Population Stability Rate', 
+      value: 85, 
+      target: 90, 
+      category: 'strategic', 
+      weight: 4, 
+      status: 'in-band',
+      description: 'Measure of population growth/decline stability within optimal ranges.',
+      breakdown: ['Birth Rate: 94%', 'Migration Balance: 88%', 'Retention: 92%'],
+      lastTrend: '↑3% last quarter',
+      actionHint: 'View population dynamics analysis.'
+    },
+    { 
+      id: 's6', 
+      name: 'Age-Structure Balance Ratio', 
+      value: 76, 
+      target: 80, 
+      category: 'strategic', 
+      weight: 3, 
+      status: 'in-band',
+      description: 'Balance between working-age and dependent populations.',
+      breakdown: ['Working Age: 78%', 'Youth Dependency: 82%', 'Elder Dependency: 74%'],
+      lastTrend: '↓1% last month',
+      actionHint: 'Analyze demographic transitions.'
+    },
+    { 
+      id: 's7', 
+      name: 'Fertility Confidence Level', 
+      value: 68, 
+      target: 75, 
+      category: 'strategic', 
+      weight: 3, 
+      status: 'warning',
+      description: 'Composite measure of reproductive health and family planning confidence.',
+      breakdown: ['Health Access: 85%', 'Economic Security: 62%', 'Social Support: 77%'],
+      lastTrend: '↑2% last month',
+      actionHint: 'Review family support policies.'
+    },
+    { 
+      id: 's8', 
+      name: 'Social Cohesion Index', 
+      value: 82, 
+      target: 85, 
+      category: 'strategic', 
+      weight: 3, 
+      status: 'in-band',
+      description: 'Measurement of community bonds and social trust levels.',
+      breakdown: ['Community Trust: 88%', 'Civic Participation: 79%', 'Social Networks: 85%'],
+      lastTrend: '↑1% last week',
+      actionHint: 'Explore community strengthening initiatives.'
+    },
+    { 
+      id: 's9', 
+      name: 'Economic Output Growth (%)', 
+      value: 3.2, 
+      target: 4.0, 
+      category: 'strategic', 
+      weight: 3, 
+      status: 'warning',
+      description: 'Annual GDP growth rate and productivity measures.',
+      breakdown: ['Manufacturing: 2.8%', 'Services: 3.6%', 'Innovation: 3.1%'],
+      lastTrend: '↑0.3% last quarter',
+      actionHint: 'Review economic stimulus measures.'
+    },
+    { 
+      id: 's10', 
+      name: 'Resource Stock vs. Target', 
+      value: 74, 
+      target: 85, 
+      category: 'strategic', 
+      weight: 3, 
+      status: 'warning',
+      description: 'Current resource reserves compared to strategic targets.',
+      breakdown: ['Energy: 78%', 'Water: 71%', 'Materials: 73%'],
+      lastTrend: '↓2% last month',
+      actionHint: 'Optimize resource allocation strategies.'
+    },
+    { 
+      id: 's11', 
+      name: 'Renewal vs. Consumption Balance', 
+      value: 87, 
+      target: 90, 
+      category: 'strategic', 
+      weight: 3, 
+      status: 'in-band',
+      description: 'Ratio of renewable resource generation to consumption rates.',
+      breakdown: ['Renewable Energy: 92%', 'Water Cycle: 84%', 'Material Recycling: 85%'],
+      lastTrend: '↑2% last quarter',
+      actionHint: 'Accelerate sustainability initiatives.'
+    },
+    { 
+      id: 's12', 
+      name: 'Supply–Demand Gap', 
+      value: 7, 
+      target: 5, 
+      category: 'strategic', 
+      weight: 3, 
+      status: 'warning',
+      description: 'Percentage gap between supply and demand across key sectors.',
+      breakdown: ['Housing: 8%', 'Food: 5%', 'Energy: 9%'],
+      lastTrend: '↓1% last month',
+      actionHint: 'Balance supply chain optimization.'
+    },
+    { 
+      id: 's13', 
+      name: 'Price Stability Index', 
+      value: 94, 
+      target: 95, 
+      category: 'strategic', 
+      weight: 2, 
+      status: 'in-band',
+      description: 'Measure of price volatility across essential goods and services.',
+      breakdown: ['Food Prices: 96%', 'Energy Prices: 91%', 'Housing Costs: 95%'],
+      lastTrend: '↑1% last week',
+      actionHint: 'Monitor inflation indicators.'
+    },
+    { 
+      id: 's14', 
+      name: 'Capacity Utilization (Key Sectors)', 
+      value: 78, 
+      target: 85, 
+      category: 'strategic', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Percentage of maximum capacity being utilized in critical sectors.',
+      breakdown: ['Manufacturing: 82%', 'Healthcare: 76%', 'Education: 74%'],
+      lastTrend: '↑3% last month',
+      actionHint: 'Expand capacity in underutilized sectors.'
+    },
+    { 
+      id: 's15', 
+      name: 'Employment Rate', 
+      value: 91, 
+      target: 95, 
+      category: 'strategic', 
+      weight: 2, 
+      status: 'in-band',
+      description: 'Percentage of working-age population in employment.',
+      breakdown: ['Full-time: 85%', 'Part-time: 12%', 'Self-employed: 8%'],
+      lastTrend: '↑2% last quarter',
+      actionHint: 'Support job creation programs.'
+    },
+    { 
+      id: 's16', 
+      name: 'Education Completion Rate', 
+      value: 88, 
+      target: 92, 
+      category: 'strategic', 
+      weight: 2, 
+      status: 'in-band',
+      description: 'Percentage completing secondary and tertiary education.',
+      breakdown: ['Secondary: 94%', 'Tertiary: 67%', 'Vocational: 85%'],
+      lastTrend: '↑1% last year',
+      actionHint: 'Enhance educational pathways.'
+    },
+    { 
+      id: 's17', 
+      name: 'Health Status Index', 
+      value: 83, 
+      target: 88, 
+      category: 'strategic', 
+      weight: 2, 
+      status: 'in-band',
+      description: 'Composite health outcome measures across population.',
+      breakdown: ['Life Expectancy: 87%', 'Disease Prevention: 81%', 'Mental Health: 79%'],
+      lastTrend: '↑2% last year',
+      actionHint: 'Strengthen healthcare systems.'
+    },
+    { 
+      id: 's18', 
+      name: 'Household Revenue Level', 
+      value: 76, 
+      target: 80, 
+      category: 'strategic', 
+      weight: 2, 
+      status: 'in-band',
+      description: 'Average household income relative to living cost benchmarks.',
+      breakdown: ['Median Income: 78%', 'Income Distribution: 74%', 'Purchasing Power: 76%'],
+      lastTrend: '↑1% last quarter',
+      actionHint: 'Review income support policies.'
+    },
+    { 
+      id: 's19', 
+      name: 'Environmental Quality Index', 
+      value: 71, 
+      target: 80, 
+      category: 'strategic', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Composite environmental health and sustainability metrics.',
+      breakdown: ['Air Quality: 74%', 'Water Quality: 69%', 'Biodiversity: 70%'],
+      lastTrend: '↑3% last year',
+      actionHint: 'Accelerate environmental protection.'
+    },
+    { 
+      id: 's20', 
+      name: 'Global Influence Score', 
+      value: 65, 
+      target: 75, 
+      category: 'strategic', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Measure of international standing and diplomatic influence.',
+      breakdown: ['Trade Relations: 72%', 'Diplomatic Ties: 61%', 'Cultural Impact: 63%'],
+      lastTrend: '↑2% last quarter',
+      actionHint: 'Strengthen international partnerships.'
+    },
+
+    // Operational Indicators
+    { 
+      id: 'o1', 
+      name: 'Open Facilitator Claims', 
       value: 12, 
       target: 0, 
       category: 'operational', 
-      weight: 3, 
+      weight: 5, 
       status: 'critical',
       description: 'Number of workflow "claims" (roles/tasks) in any zone that remain unassigned or unresolved.',
-      breakdown: [
-        'Think: 4',
-        'Act: 3',
-        'Monitor: 2',
-        'Learn: 2',
-        'Innovate: 1'
-      ],
+      breakdown: ['Think: 4', 'Act: 3', 'Monitor: 2', 'Learn: 2', 'Innovate: 1'],
       lastTrend: 'Oldest: 5 days',
       actionHint: 'Click to view claim queue and assign resources.'
     },
     { 
-      id: '6', 
-      name: 'Think→Act Queue', 
+      id: 'o2', 
+      name: 'Think→Act Queue Length', 
       value: 4, 
       target: 0, 
       category: 'operational', 
-      weight: 2, 
+      weight: 4, 
       status: 'warning',
       description: 'How many analysis outputs (loop findings, simulations) are waiting for strategy translation in Act.',
       breakdown: [
         'DEI target adjustment proposal',
         '"Population Volatility vs. Resource Gap" report',
-        '"Social Cohesion Feedback" network analysis',
-        '"Economic Stability Loop" sensitivity results'
+        '"Social Cohesion Feedback" network analysis'
       ],
       lastTrend: 'Avg Wait: 2.3 days',
       actionHint: 'Click to forward to strategy builder or reassign to Act leads.'
     },
     { 
-      id: '7', 
-      name: 'Act→Monitor Queue', 
+      id: 'o3', 
+      name: 'Act→Monitor Queue Length', 
       value: 3, 
       target: 0, 
       category: 'operational', 
-      weight: 2, 
+      weight: 4, 
       status: 'warning',
       description: 'Number of planned bundles/strategies sent to Monitor for validation that haven\'t yet been evaluated on real-world data.',
       breakdown: [
@@ -264,12 +460,12 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Click to run new simulations or update real-world data feeds.'
     },
     { 
-      id: '8', 
-      name: 'System Errors', 
+      id: 'o4', 
+      name: 'System Error Count', 
       value: 5, 
       target: 0, 
       category: 'operational', 
-      weight: 1, 
+      weight: 4, 
       status: 'warning',
       description: 'Number of software/system-integrity warnings or errors in the portal over the last 24 hours.',
       breakdown: [
@@ -279,6 +475,214 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       ],
       lastTrend: 'Most Recent: Data sync failure at 03:45 UTC',
       actionHint: 'Click to view full error logs and resolve issues.'
+    },
+    { 
+      id: 'o5', 
+      name: 'DEI Stability Band %', 
+      value: 94, 
+      target: 98, 
+      category: 'operational', 
+      weight: 3, 
+      status: 'in-band',
+      description: 'Percentage of time DEI metrics remain within acceptable variance bands.',
+      breakdown: ['Within Target: 94%', 'Minor Variance: 4%', 'Major Variance: 2%'],
+      lastTrend: '↑1% last week',
+      actionHint: 'Monitor stability patterns.'
+    },
+    { 
+      id: 'o6', 
+      name: 'Bundle ROI Achievement (%)', 
+      value: 87, 
+      target: 90, 
+      category: 'operational', 
+      weight: 3, 
+      status: 'in-band',
+      description: 'Percentage of strategic bundles meeting their ROI targets.',
+      breakdown: ['Above Target: 45%', 'On Target: 42%', 'Below Target: 13%'],
+      lastTrend: '↑3% last month',
+      actionHint: 'Optimize underperforming bundles.'
+    },
+    { 
+      id: 'o7', 
+      name: 'Latency of Real-World Data Sync', 
+      value: 2.1, 
+      target: 1.0, 
+      category: 'operational', 
+      weight: 3, 
+      status: 'warning',
+      description: 'Average delay in hours between real-world events and system data updates.',
+      breakdown: ['Economic Data: 1.8h', 'Social Data: 2.4h', 'Environmental: 2.1h'],
+      lastTrend: '↓0.3h last week',
+      actionHint: 'Improve data pipeline efficiency.'
+    },
+    { 
+      id: 'o8', 
+      name: 'Claims Aging (Avg Days Open)', 
+      value: 3.2, 
+      target: 1.0, 
+      category: 'operational', 
+      weight: 3, 
+      status: 'critical',
+      description: 'Average number of days open claims have been unresolved.',
+      breakdown: ['<1 day: 25%', '1-3 days: 45%', '>3 days: 30%'],
+      lastTrend: '↑0.5 days last week',
+      actionHint: 'Expedite claim resolution processes.'
+    },
+    { 
+      id: 'o9', 
+      name: 'Workflow Handoff Delay (hrs)', 
+      value: 6.5, 
+      target: 2.0, 
+      category: 'operational', 
+      weight: 3, 
+      status: 'warning',
+      description: 'Average delay in hours for workflow transitions between zones.',
+      breakdown: ['Think→Act: 4.2h', 'Act→Monitor: 8.1h', 'Monitor→Learn: 7.2h'],
+      lastTrend: '↓1.2h last week',
+      actionHint: 'Streamline handoff procedures.'
+    },
+    { 
+      id: 'o10', 
+      name: 'Entropy Score (Think Zone)', 
+      value: 23, 
+      target: 15, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Measure of disorder/inefficiency in Think zone processes.',
+      breakdown: ['Process Variance: 28%', 'Resource Utilization: 18%', 'Output Quality: 23%'],
+      lastTrend: '↓2 points last month',
+      actionHint: 'Optimize Think zone workflows.'
+    },
+    { 
+      id: 'o11', 
+      name: 'Entropy Score (Act Zone)', 
+      value: 19, 
+      target: 15, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Measure of disorder/inefficiency in Act zone processes.',
+      breakdown: ['Process Variance: 22%', 'Resource Utilization: 16%', 'Output Quality: 19%'],
+      lastTrend: '↓1 point last week',
+      actionHint: 'Streamline Act zone operations.'
+    },
+    { 
+      id: 'o12', 
+      name: 'Entropy Score (Monitor Zone)', 
+      value: 14, 
+      target: 15, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'in-band',
+      description: 'Measure of disorder/inefficiency in Monitor zone processes.',
+      breakdown: ['Process Variance: 12%', 'Resource Utilization: 16%', 'Output Quality: 14%'],
+      lastTrend: '→ stable last month',
+      actionHint: 'Maintain current efficiency levels.'
+    },
+    { 
+      id: 'o13', 
+      name: 'Entropy Score (Learn Zone)', 
+      value: 17, 
+      target: 15, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Measure of disorder/inefficiency in Learn zone processes.',
+      breakdown: ['Process Variance: 19%', 'Resource Utilization: 15%', 'Output Quality: 17%'],
+      lastTrend: '↓3 points last month',
+      actionHint: 'Continue Learn zone optimization.'
+    },
+    { 
+      id: 'o14', 
+      name: 'Entropy Score (Innovate Zone)', 
+      value: 21, 
+      target: 15, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Measure of disorder/inefficiency in Innovate zone processes.',
+      breakdown: ['Process Variance: 25%', 'Resource Utilization: 17%', 'Output Quality: 21%'],
+      lastTrend: '↓1 point last week',
+      actionHint: 'Focus on Innovate zone efficiency.'
+    },
+    { 
+      id: 'o15', 
+      name: 'User Session Errors / Hour', 
+      value: 0.8, 
+      target: 0.2, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Average number of user-facing errors per hour across all sessions.',
+      breakdown: ['UI Errors: 0.5/h', 'API Errors: 0.2/h', 'Auth Errors: 0.1/h'],
+      lastTrend: '↓0.2/h last week',
+      actionHint: 'Continue error reduction initiatives.'
+    },
+    { 
+      id: 'o16', 
+      name: 'Data Pipeline Failure Rate (%)', 
+      value: 2.1, 
+      target: 0.5, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Percentage of data pipeline executions that fail or timeout.',
+      breakdown: ['Ingestion: 1.8%', 'Processing: 2.4%', 'Output: 2.1%'],
+      lastTrend: '↓0.3% last week',
+      actionHint: 'Improve pipeline reliability.'
+    },
+    { 
+      id: 'o17', 
+      name: 'Average Bundle Validation Time (days)', 
+      value: 2.8, 
+      target: 1.5, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Average time taken to validate new strategic bundles.',
+      breakdown: ['Data Collection: 1.2 days', 'Analysis: 1.1 days', 'Review: 0.5 days'],
+      lastTrend: '↓0.4 days last month',
+      actionHint: 'Accelerate validation processes.'
+    },
+    { 
+      id: 'o18', 
+      name: 'Number of Active Alerts', 
+      value: 7, 
+      target: 3, 
+      category: 'operational', 
+      weight: 2, 
+      status: 'warning',
+      description: 'Current number of active system alerts requiring attention.',
+      breakdown: ['High Priority: 2', 'Medium Priority: 3', 'Low Priority: 2'],
+      lastTrend: '↓2 alerts last day',
+      actionHint: 'Address outstanding alerts.'
+    },
+    { 
+      id: 'o19', 
+      name: 'Anomalies Detected (24h)', 
+      value: 3, 
+      target: 1, 
+      category: 'operational', 
+      weight: 1, 
+      status: 'warning',
+      description: 'Number of anomalies detected in system behavior over last 24 hours.',
+      breakdown: ['Data Anomalies: 2', 'Performance Anomalies: 1', 'Security Anomalies: 0'],
+      lastTrend: '↓1 anomaly last day',
+      actionHint: 'Investigate recent anomalies.'
+    },
+    { 
+      id: 'o20', 
+      name: 'Pending Playbook Triggers', 
+      value: 2, 
+      target: 0, 
+      category: 'operational', 
+      weight: 1, 
+      status: 'warning',
+      description: 'Number of automated playbook triggers that are pending execution.',
+      breakdown: ['Resource Triggers: 1', 'Performance Triggers: 1', 'Alert Triggers: 0'],
+      lastTrend: '→ stable last day',
+      actionHint: 'Execute pending triggers.'
     },
   ];
 
