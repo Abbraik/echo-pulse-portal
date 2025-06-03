@@ -7,7 +7,7 @@ interface TileDashboardViewProps {
   timeRange: string;
   domainFilter: string;
   chartType: 'bar' | 'line';
-  onFullscreen: () => void;
+  onFullscreen: (cardId: string) => void;
   isFullscreen: boolean;
 }
 
@@ -117,7 +117,7 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({
           <motion.button
             className="text-white opacity-50 hover:opacity-100"
             whileHover={{ filter: 'drop-shadow(0 0 8px #00FFC3)' }}
-            onClick={onFullscreen}
+            onClick={() => onFullscreen('main-view')}
           >
             <Maximize2 size={16} />
           </motion.button>
