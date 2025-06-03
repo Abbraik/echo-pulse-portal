@@ -688,97 +688,97 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     }
   };
 
+  // Proper treemap algorithm with squarified layout (like S&P 500)
   const calculateLayout = (data: TreemapData[]) => {
     if (data.length === 0) return [];
 
     const totalWeight = data.reduce((sum, item) => sum + item.weight, 0);
     const containerWidth = 100;
     const containerHeight = 100;
+    const totalArea = containerWidth * containerHeight;
 
-    // Sort by weight descending for better packing
+    // Sort by weight descending for better visual hierarchy
     const sortedData = [...data].sort((a, b) => b.weight - a.weight);
     
+    // Calculate normalized areas
+    const itemsWithArea = sortedData.map(item => ({
+      ...item,
+      area: (item.weight / totalWeight) * totalArea,
+      placed: false
+    }));
+
     const result: (TreemapData & { x: number; y: number; width: number; height: number })[] = [];
-    
-    // Binary tree packing algorithm for perfect fit
-    const packRectangles = (items: TreemapData[]) => {
-      if (items.length === 0) return [];
+
+    // Simple squarified-like treemap algorithm
+    let currentX = 0;
+    let currentY = 0;
+    let remainingWidth = containerWidth;
+    let remainingHeight = containerHeight;
+    let currentRowHeight = 0;
+
+    for (let i = 0; i < itemsWithArea.length; i++) {
+      const item = itemsWithArea[i];
       
-      // Calculate aspect ratios for better layout
-      const totalArea = containerWidth * containerHeight;
-      const areas = items.map(item => (item.weight / totalWeight) * totalArea);
-      
-      // Use a simple row-based packing for guaranteed fit
-      let currentY = 0;
-      let currentRowHeight = 0;
-      let currentRowWidth = 0;
-      const targetAspectRatio = containerWidth / containerHeight;
-      
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        const area = areas[i];
+      // Calculate optimal width and height for this area
+      let width = Math.sqrt(item.area * (remainingWidth / remainingHeight));
+      let height = item.area / width;
+
+      // Ensure minimum size for readability
+      const minSize = Math.min(3, Math.sqrt(item.area));
+      width = Math.max(width, minSize);
+      height = Math.max(height, minSize);
+
+      // Check if this item fits in current row
+      if (currentX + width > containerWidth) {
+        // Start new row
+        currentX = 0;
+        currentY += currentRowHeight;
+        remainingHeight -= currentRowHeight;
+        currentRowHeight = 0;
         
-        // Calculate optimal dimensions
-        let width = Math.sqrt(area * targetAspectRatio);
-        let height = area / width;
-        
-        // Ensure minimum readable size
-        const minSize = Math.min(containerWidth * 0.03, containerHeight * 0.03);
+        // Recalculate dimensions for new row
+        width = Math.sqrt(item.area * (containerWidth / remainingHeight));
+        height = item.area / width;
         width = Math.max(width, minSize);
         height = Math.max(height, minSize);
-        
-        // Check if we need a new row
-        if (currentRowWidth + width > containerWidth || i === 0) {
-          // Start new row
-          if (i > 0) {
-            currentY += currentRowHeight;
-          }
-          currentRowWidth = 0;
-          currentRowHeight = height;
-        } else {
-          // Adjust height to match row
-          height = currentRowHeight;
-        }
-        
-        // Ensure we don't exceed container boundaries
-        if (currentY + height > containerHeight) {
-          // Scale down to fit remaining space
-          const remainingHeight = containerHeight - currentY;
-          height = Math.max(remainingHeight, minSize);
-          currentRowHeight = height;
-        }
-        
-        if (currentRowWidth + width > containerWidth) {
-          // Scale down width to fit
-          width = containerWidth - currentRowWidth;
-        }
-        
-        result.push({
-          ...item,
-          x: currentRowWidth,
-          y: currentY,
-          width: width,
-          height: height
-        });
-        
-        currentRowWidth += width;
-        currentRowHeight = Math.max(currentRowHeight, height);
       }
-      
-      // Final pass to ensure everything fits perfectly
-      let maxY = Math.max(...result.map(r => r.y + r.height));
-      if (maxY > containerHeight) {
-        const scaleFactor = containerHeight / maxY;
-        result.forEach(r => {
-          r.y *= scaleFactor;
-          r.height *= scaleFactor;
-        });
-      }
-      
-      return result;
-    };
 
-    return packRectangles(sortedData);
+      // Ensure we don't exceed container bounds
+      if (currentX + width > containerWidth) {
+        width = containerWidth - currentX;
+        height = item.area / width;
+      }
+      
+      if (currentY + height > containerHeight) {
+        height = containerHeight - currentY;
+        width = item.area / height;
+      }
+
+      // Final bounds check
+      width = Math.min(width, containerWidth - currentX);
+      height = Math.min(height, containerHeight - currentY);
+
+      result.push({
+        ...item,
+        x: currentX,
+        y: currentY,
+        width: Math.max(width, minSize),
+        height: Math.max(height, minSize)
+      });
+
+      currentX += width;
+      currentRowHeight = Math.max(currentRowHeight, height);
+
+      // If we've filled the width, start a new row
+      if (currentX >= containerWidth - 0.1) {
+        currentX = 0;
+        currentY += currentRowHeight;
+        remainingHeight -= currentRowHeight;
+        currentRowHeight = 0;
+      }
+    }
+
+    return result;
   };
 
   const layoutData = calculateLayout(filteredData);
@@ -918,17 +918,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
               className="w-full h-full"
             >
               <svg width="100%" height="100%" viewBox="0 0 100 100" className="w-full h-full">
-                <defs>
-                  <filter id="innerShadow">
-                    <feFlood floodColor="rgba(0,0,0,0.3)" />
-                    <feComposite in="SourceGraphic" />
-                    <feGaussianBlur stdDeviation="0.5" />
-                    <feOffset dx="0" dy="1" result="offset" />
-                    <feFlood floodColor="rgba(0,0,0,0.3)" />
-                    <feComposite in2="offset" operator="in" />
-                  </filter>
-                </defs>
-                
                 {layoutData.map((item, index) => {
                   const percentage = getPercentage(item.value, item.target);
                   const isOperational = item.category === 'operational';
@@ -963,7 +952,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                         stroke="rgba(255,255,255,0.1)"
                         strokeWidth="0.08"
                         rx="0.8"
-                        filter="url(#innerShadow)"
                         style={{
                           cursor: 'pointer',
                         }}
