@@ -43,8 +43,7 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.4)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
@@ -52,14 +51,7 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative w-[600px] h-[400px] rounded-2xl overflow-hidden"
-        style={{
-          background: 'rgba(20,30,50,0.85)',
-          backdropFilter: 'blur(32px)',
-          boxShadow: '0 16px 32px rgba(0,0,0,0.6)',
-          color: '#E0E0E0',
-          fontFamily: 'Noto Sans',
-        }}
+        className="relative w-[600px] h-[400px] rounded-2xl overflow-hidden glass-panel-cinematic"
       >
         <button
           onClick={onClose}
@@ -68,19 +60,16 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
           <X size={16} />
         </button>
 
-        <div className="p-6 h-full flex flex-col">
+        <div className="p-6 h-full flex flex-col font-noto">
           <h3 
-            className="text-lg font-bold mb-4"
-            style={{ 
-              color: data.category === 'strategic' ? '#00B8FF' : '#00FFC3',
-              fontFamily: 'Noto Sans',
-            }}
+            className="text-xl font-bold mb-4 text-teal-400"
+            style={{ fontFamily: 'Noto Sans' }}
           >
             {data.name}
           </h3>
 
           <div className="flex-1 bg-white/5 rounded-lg p-4 mb-4">
-            <div className="text-sm text-slate-400 mb-2">90-Day Trend ({chartType})</div>
+            <div className="text-sm text-slate-400 mb-2 font-medium">90-Day Trend ({chartType})</div>
             <div className="h-32 flex items-end space-x-1">
               {Array.from({ length: 12 }, (_, i) => (
                 <div
@@ -97,25 +86,21 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
           </div>
 
           <div className="mb-4">
-            <div className="text-sm text-slate-400 mb-2">Recent Values</div>
+            <div className="text-sm text-slate-400 mb-2 font-medium">Recent Values</div>
             <div className="space-y-1">
               {recentValues.map((item, index) => (
-                <div key={index} className="flex justify-between text-sm">
-                  <span>{item.date}</span>
-                  <span>{item.value}</span>
-                  <span className="text-slate-400">{item.remark}</span>
+                <div key={index} className="flex justify-between text-sm text-slate-300">
+                  <span className="font-medium">{item.date}</span>
+                  <span className="font-semibold">{item.value}</span>
+                  <span className="text-slate-400 italic">{item.remark}</span>
                 </div>
               ))}
             </div>
           </div>
 
           <button
-            className="w-full py-2 rounded-lg font-medium text-sm transition-all duration-200"
-            style={{
-              background: '#00B8FF',
-              color: '#081226',
-              fontFamily: 'Noto Sans',
-            }}
+            className="w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-teal-500 hover:bg-teal-400 text-slate-900"
+            style={{ fontFamily: 'Noto Sans' }}
           >
             Go to Detailed View
           </button>
@@ -703,10 +688,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     }
   };
 
-  const getLabelColor = (category: string) => {
-    return '#00FFC3'; // Always neon-teal for indicator names
-  };
-
   const calculateLayout = (data: TreemapData[]) => {
     const totalWeight = data.reduce((sum, item) => sum + item.weight, 0);
     const containerWidth = 100;
@@ -764,7 +745,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   };
 
   const canShowLabels = (width: number, height: number) => {
-    return width >= 15 && height >= 8; // Adjusted for SVG viewBox scale
+    return width >= 15 && height >= 8;
   };
 
   const getPercentage = (value: number, target: number) => {
@@ -774,12 +755,10 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
 
   const getStatusFromPercentage = (percentage: number, isInverted: boolean = false) => {
     if (isInverted) {
-      // For operational metrics where lower is better (like error counts)
       if (percentage <= 25) return 'in-band';
       if (percentage <= 75) return 'warning';
       return 'critical';
     } else {
-      // For strategic metrics where higher is better
       if (percentage >= 75) return 'in-band';
       if (percentage >= 50) return 'warning';
       return 'critical';
@@ -793,46 +772,42 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
           <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-xl">
             <button
               onClick={() => setIsFullscreen(false)}
-              className="absolute top-4 right-4 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200"
-              style={{
-                background: '#00B8FF',
-                color: '#081226',
-                fontFamily: 'Noto Sans',
-              }}
+              className="absolute top-6 right-6 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-teal-500 hover:bg-teal-400 text-slate-900"
+              style={{ fontFamily: 'Noto Sans' }}
             >
               Back to Monitor
             </button>
           </div>
         )}
 
-        <div className={`${isFullscreen ? 'absolute inset-8 top-16' : 'h-full'} flex flex-col`}>
+        <div className={`${isFullscreen ? 'absolute inset-8 top-20' : 'h-full'} flex flex-col`}>
           {/* Filter Pills */}
-          <div className="flex justify-center gap-3 py-3 px-4">
+          <div className="flex justify-center gap-4 py-4 px-6">
             {(['all', 'strategic', 'operational'] as const).map((filterOption) => (
               <motion.button
                 key={filterOption}
                 onClick={() => setFilter(filterOption)}
-                className={`px-6 py-2 rounded-full text-xs font-semibold transition-all duration-200`}
+                className={`px-8 py-3 rounded-full text-sm font-semibold transition-all duration-200`}
                 style={{
                   fontFamily: 'Noto Sans',
                   ...(filter === filterOption
                     ? {
                         background: '#00FFC3',
                         color: '#081226',
-                        boxShadow: '0 0 8px rgba(0,255,195,0.6)',
+                        boxShadow: '0 0 12px rgba(0,255,195,0.6)',
                       }
                     : {
                         background: 'rgba(255,255,255,0.08)',
                         color: '#E0E0E0',
-                        border: '1px solid rgba(255,255,255,0.10)',
+                        border: '1px solid rgba(255,255,255,0.15)',
                         backdropFilter: 'blur(8px)',
                       }
                   ),
                 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {filterOption === 'all' ? 'All' : 
+                {filterOption === 'all' ? 'All Indicators' : 
                  filterOption === 'strategic' ? 'Strategic Only' : 'Operational Only'}
               </motion.button>
             ))}
@@ -840,19 +815,19 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
 
           {/* Legend (Full-screen only) */}
           {isFullscreen && (
-            <div className="flex justify-center gap-6 py-2 px-4">
+            <div className="flex justify-center gap-8 py-3 px-6">
               {[
                 { color: 'rgba(0,255,195,0.8)', label: 'In-Band' },
                 { color: 'rgba(255,193,7,0.8)', label: 'Warning' },
                 { color: 'rgba(255,110,110,0.8)', label: 'Critical' },
               ].map((item) => (
-                <div key={item.label} className="flex items-center gap-2">
+                <div key={item.label} className="flex items-center gap-3">
                   <div
-                    className="w-3 h-3 rounded-full"
+                    className="w-4 h-4 rounded-full"
                     style={{ background: item.color }}
                   />
                   <span
-                    className="text-xs"
+                    className="text-sm font-medium"
                     style={{ fontFamily: 'Noto Sans', color: '#E0E0E0' }}
                   >
                     {item.label}
@@ -863,7 +838,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
           )}
 
           {/* SVG Treemap */}
-          <div className="flex-1 p-4 relative">
+          <div className="flex-1 p-6 relative">
             <motion.div
               layout
               transition={{ duration: 0.2 }}
@@ -940,14 +915,14 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                             x={item.x + item.width/2}
                             y={item.y + item.height/2 - 1}
                             textAnchor="middle"
-                            className="font-bold"
+                            className="font-semibold"
                             style={{ 
                               fontFamily: 'Noto Sans',
                               textShadow: '0 1px 2px rgba(0,0,0,0.8)',
                               pointerEvents: 'none',
-                              fill: getLabelColor(item.category),
+                              fill: '#00FFC3',
                             }}
-                            fontSize="2"
+                            fontSize="2.2"
                           >
                             {item.name}
                           </text>
@@ -960,7 +935,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                               pointerEvents: 'none',
                               fill: '#E0E0E0',
                             }}
-                            fontSize="1.5"
+                            fontSize="1.6"
                           >
                             {item.value} / {item.target}
                           </text>
@@ -970,8 +945,8 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                           x={item.x + item.width/2}
                           y={item.y + item.height/2}
                           textAnchor="middle"
-                          fontSize="2"
-                          fill={getLabelColor(item.category)}
+                          fontSize="2.5"
+                          fill="#00FFC3"
                           style={{ pointerEvents: 'none' }}
                         >
                           ℹ️
@@ -987,45 +962,44 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
             {!isFullscreen && (
               <button
                 onClick={() => setIsFullscreen(true)}
-                className="absolute top-2 right-2 w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-teal-400 hover:bg-teal-500/10 transition-all duration-200"
+                className="absolute top-3 right-3 w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-teal-400 hover:bg-teal-500/10 transition-all duration-200"
               >
-                <span className="text-lg">⛶</span>
+                <span className="text-xl">⛶</span>
               </button>
             )}
 
             {/* Enhanced Tooltip */}
             {tooltip && (
               <div
-                className="fixed z-50 px-4 py-3 rounded-lg text-xs pointer-events-none"
+                className="fixed z-50 px-5 py-4 rounded-lg text-sm pointer-events-none max-w-xs"
                 style={{
-                  left: tooltip.x + 10,
-                  top: tooltip.y - 10,
-                  background: 'rgba(20,30,50,0.9)',
-                  backdropFilter: 'blur(16px)',
+                  left: tooltip.x + 12,
+                  top: tooltip.y - 12,
+                  background: 'rgba(20,30,50,0.95)',
+                  backdropFilter: 'blur(20px)',
                   color: '#E0E0E0',
                   fontFamily: 'Noto Sans',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  maxWidth: '300px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+                  border: '1px solid rgba(255,255,255,0.15)',
                 }}
               >
-                <div className="font-bold mb-2" style={{ color: getLabelColor(tooltip.data.category) }}>
+                <div className="font-bold mb-3 text-base" style={{ color: '#00FFC3' }}>
                   {tooltip.data.name}
                 </div>
-                <div className="mb-1">Current: {tooltip.data.value} / {tooltip.data.target}</div>
-                <div className="mb-1">Progress: {getPercentage(tooltip.data.value, tooltip.data.target)}%</div>
-                <div className="mb-2 text-xs text-slate-400">{tooltip.data.lastTrend}</div>
+                <div className="mb-2 font-medium">Current: {tooltip.data.value} / {tooltip.data.target}</div>
+                <div className="mb-2 font-medium">Progress: {getPercentage(tooltip.data.value, tooltip.data.target)}%</div>
+                <div className="mb-3 text-sm text-slate-400 font-medium">{tooltip.data.lastTrend}</div>
                 
                 {tooltip.data.breakdown && (
-                  <div className="mb-2">
-                    <div className="text-xs font-semibold mb-1">Breakdown:</div>
+                  <div className="mb-3">
+                    <div className="text-sm font-semibold mb-2 text-slate-300">Breakdown:</div>
                     {tooltip.data.breakdown.slice(0, 3).map((item, idx) => (
-                      <div key={idx} className="text-xs text-slate-300">• {item}</div>
+                      <div key={idx} className="text-sm text-slate-300 mb-1">• {item}</div>
                     ))}
                   </div>
                 )}
                 
-                <div className="text-xs text-slate-400 italic">
+                <div className="text-sm text-slate-400 italic font-medium">
                   {tooltip.data.actionHint}
                 </div>
               </div>
