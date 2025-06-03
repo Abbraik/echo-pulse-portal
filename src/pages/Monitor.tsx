@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, HelpCircle, Maximize2 } from 'lucide-react';
@@ -30,59 +31,61 @@ const Monitor: React.FC = () => {
       <div className="relative z-10">
         {/* Primary Monitor Header Bar */}
         <header 
-          className="w-full h-20 flex items-center justify-between px-8 backdrop-blur-[24px]"
+          className="w-full backdrop-blur-[24px] py-4 px-8"
           style={{
-            background: 'rgba(4,18,37,0.65)',
-            boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
-            borderBottom: '1px solid rgba(0,255,195,0.20)',
+            background: 'rgba(20, 30, 50, 0.6)',
+            borderBottom: '1px solid rgba(20, 184, 166, 0.3)',
+            boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
           }}
           role="banner"
           aria-labelledby="monitor-title"
         >
-          <div className="flex items-center space-x-4">
-            <Activity 
-              className="w-8 h-8 text-[#00FFC3]" 
-              style={{ filter: 'drop-shadow(0 0 10px rgba(0,255,195,0.5))' }}
-            />
-            <div>
-              <h1 
-                id="monitor-title"
-                className="font-bold text-[#00FFC3] text-xl leading-tight"
-                style={{ 
-                  fontFamily: 'Noto Sans',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.6)' 
-                }}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <motion.div 
+                className="p-3 rounded-2xl bg-teal-500/20 text-teal-400"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
               >
-                MONITOR ▮ : OPERATIONAL & STRATEGIC TRACKING
-              </h1>
-              <p 
-                className="text-[#E0E0E0] text-sm"
-                style={{ 
-                  fontFamily: 'Noto Sans',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.4)' 
-                }}
-              >
-                Real-time system health and performance insights
-              </p>
+                <Activity size={28} />
+              </motion.div>
+              <div>
+                <motion.h1 
+                  id="monitor-title"
+                  className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-500 font-noto-bold"
+                  style={{ letterSpacing: '0.05em' }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                >
+                  MONITOR ▮ : OPERATIONAL & STRATEGIC TRACKING
+                </motion.h1>
+                <motion.p 
+                  className="text-base text-gray-300 font-noto-medium"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                >
+                  Real-time system health and performance insights
+                </motion.p>
+              </div>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <button
-              className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200 hover:bg-[rgba(0,255,195,0.10)]"
-              style={{ filter: 'hover:drop-shadow(0 0 12px rgba(0,255,195,0.6))' }}
-              aria-label="Help"
-            >
-              <HelpCircle className="w-6 h-6" />
-            </button>
-            <button
-              className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-[#00FFC3] transition-all duration-200 hover:bg-[rgba(0,255,195,0.10)]"
-              style={{ filter: 'hover:drop-shadow(0 0 12px rgba(0,255,195,0.6))' }}
-              aria-label="Full Screen"
-              disabled={!isExpanded}
-            >
-              <Maximize2 className="w-6 h-6" />
-            </button>
+            
+            <div className="flex items-center space-x-4">
+              <button
+                className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-teal-400 transition-all duration-200 hover:bg-teal-500/10"
+                aria-label="Help"
+              >
+                <HelpCircle className="w-6 h-6" />
+              </button>
+              <button
+                className="w-11 h-11 rounded-full flex items-center justify-center text-white/60 hover:text-teal-400 transition-all duration-200 hover:bg-teal-500/10"
+                aria-label="Full Screen"
+                disabled={!isExpanded}
+              >
+                <Maximize2 className="w-6 h-6" />
+              </button>
+            </div>
           </div>
         </header>
 
