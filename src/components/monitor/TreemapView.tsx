@@ -333,7 +333,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                     }}
                     transition={{ 
                       duration: hoveredRect ? 0.2 : 0.4,
-                      ease: hoveredRect ? "easeOut" : "cubicBezier(0.68,-0.6,0.32,1.6)",
+                      ease: hoveredRect ? "easeOut" : [0.68, -0.6, 0.32, 1.6],
                       delay: hoveredRect ? 0 : index * 0.05 
                     }}
                     style={{ transformOrigin: `${item.x + item.width/2}% ${item.y + item.height/2}%` }}
