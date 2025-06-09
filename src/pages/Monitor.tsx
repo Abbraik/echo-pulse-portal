@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, HelpCircle, Maximize2 } from 'lucide-react';
+import { Activity, HelpCircle } from 'lucide-react';
 import { AnimatedPage } from '@/components/ui/motion';
+import { FullscreenButton } from '@/components/ui/fullscreen-button';
+import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import TreemapView from '@/components/monitor/TreemapView';
 import HeatmapTableView from '@/components/monitor/HeatmapTableView';
 import RadialHubView from '@/components/monitor/RadialHubView';
@@ -18,7 +20,7 @@ const Monitor: React.FC = () => {
   const [timeRange, setTimeRange] = useState('Last 30 Days');
   const [domainFilter, setDomainFilter] = useState('All Domains');
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const viewTitles = {
     treemap: 'Master Treemap: Key Monitor Indicators',
@@ -47,6 +49,27 @@ const Monitor: React.FC = () => {
         duration: 0.6,
         ease: "easeOut"
       }
+    }
+  };
+
+  const renderCurrentView = () => {
+    const viewProps = {
+      timeRange,
+      domainFilter,
+      chartType
+    };
+
+    switch (activeView) {
+      case 'treemap':
+        return <TreemapView {...viewProps} />;
+      case 'heatmap':
+        return <HeatmapTableView {...viewProps} />;
+      case 'radial':
+        return <RadialHubView {...viewProps} />;
+      case 'tile':
+        return <TileDashboardView {...viewProps} />;
+      default:
+        return <TreemapView {...viewProps} />;
     }
   };
 
@@ -163,18 +186,6 @@ const Monitor: React.FC = () => {
                 >
                   <HelpCircle className="w-6 h-6" />
                 </motion.button>
-                <motion.button 
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-teal-400 hover:bg-teal-500/10 transition-all duration-200"
-                  disabled={!isExpanded}
-                  whileHover={!isExpanded ? {} : { 
-                    scale: 1.1,
-                    backgroundColor: "rgba(20, 184, 166, 0.15)",
-                    boxShadow: "0 0 15px rgba(20, 184, 166, 0.3)"
-                  }}
-                  whileTap={!isExpanded ? {} : { scale: 0.95 }}
-                >
-                  <Maximize2 className="w-6 h-6" />
-                </motion.button>
               </div>
             </div>
           </motion.header>
@@ -254,7 +265,7 @@ const Monitor: React.FC = () => {
               }}
               transition={{ duration: 0.3 }}
             >
-              <div className="rounded-2xl backdrop-blur-xl bg-slate-800/40 border border-white/20 overflow-hidden h-[60vh] flex flex-col shadow-2xl">
+              <div className="rounded-2xl backdrop-blur-xl bg-slate-800/40 border border-white/20 overflow-hidden h-[60vh] flex flex-col shadow-2xl group">
                 {/* Card Header */}
                 <motion.div 
                   className="flex items-center justify-between p-6 border-b border-white/10"
@@ -276,22 +287,10 @@ const Monitor: React.FC = () => {
                     {viewTitles[activeView]}
                   </motion.h3>
                   <div className="flex items-center space-x-3">
-                    {['⋮', '—', '⛶'].map((symbol, index) => (
-                      <motion.button 
-                        key={symbol}
-                        className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
-                        onClick={symbol === '⛶' ? () => setIsExpanded(!isExpanded) : undefined}
-                        whileHover={{ 
-                          scale: 1.1,
-                          backgroundColor: "rgba(255, 255, 255, 0.1)",
-                          color: "rgba(255, 255, 255, 1)"
-                        }}
-                        whileTap={{ scale: 0.9 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        <span className="text-lg">{symbol}</span>
-                      </motion.button>
-                    ))}
+                    <FullscreenButton
+                      isFullscreen={isFullscreen}
+                      onToggle={() => setIsFullscreen(!isFullscreen)}
+                    />
                   </div>
                 </motion.div>
 
@@ -309,34 +308,7 @@ const Monitor: React.FC = () => {
                       }}
                       className="absolute inset-0"
                     >
-                      {activeView === 'treemap' && (
-                        <TreemapView 
-                          timeRange={timeRange}
-                          domainFilter={domainFilter}
-                          chartType={chartType}
-                        />
-                      )}
-                      {activeView === 'heatmap' && (
-                        <HeatmapTableView 
-                          timeRange={timeRange}
-                          domainFilter={domainFilter}
-                          chartType={chartType}
-                        />
-                      )}
-                      {activeView === 'radial' && (
-                        <RadialHubView 
-                          timeRange={timeRange}
-                          domainFilter={domainFilter}
-                          chartType={chartType}
-                        />
-                      )}
-                      {activeView === 'tile' && (
-                        <TileDashboardView 
-                          timeRange={timeRange}
-                          domainFilter={domainFilter}
-                          chartType={chartType}
-                        />
-                      )}
+                      {renderCurrentView()}
                     </motion.div>
                   </AnimatePresence>
                 </div>
@@ -375,6 +347,38 @@ const Monitor: React.FC = () => {
           </div>
         </motion.div>
       </AnimatedPage>
+
+      {/* Fullscreen Overlay */}
+      <FullscreenOverlay
+        isOpen={isFullscreen}
+        onClose={() => setIsFullscreen(false)}
+        title={viewTitles[activeView]}
+      >
+        <div className="h-full flex flex-col">
+          {/* Fullscreen Header */}
+          <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <h2 className="text-3xl font-bold text-white">
+              {viewTitles[activeView]}
+            </h2>
+            <div className="flex items-center space-x-4">
+              <InstrumentPanel
+                timeRange={timeRange}
+                onTimeRangeChange={setTimeRange}
+                domainFilter={domainFilter}
+                onDomainFilterChange={setDomainFilter}
+                chartType={chartType}
+                onChartTypeChange={setChartType}
+                activeView={activeView}
+              />
+            </div>
+          </div>
+          
+          {/* Fullscreen Content */}
+          <div className="flex-1 relative">
+            {renderCurrentView()}
+          </div>
+        </div>
+      </FullscreenOverlay>
     </div>
   );
 };
