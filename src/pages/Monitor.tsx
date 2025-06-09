@@ -111,11 +111,12 @@ const Monitor: React.FC = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
+          className="flex flex-col min-h-screen"
         >
-          {/* Primary Monitor Header Bar */}
+          {/* Primary Monitor Header Bar - Always Visible */}
           <motion.header 
             variants={itemVariants}
-            className="sticky top-0 z-50 w-full backdrop-blur-xl bg-slate-900/30 border-b border-white/20 py-6 px-8 mb-8"
+            className="sticky top-0 z-50 w-full backdrop-blur-xl bg-slate-900/30 border-b border-white/20 py-6 px-8"
             role="banner"
             aria-labelledby="monitor-title"
             whileHover={{ 
@@ -191,10 +192,11 @@ const Monitor: React.FC = () => {
           </motion.header>
 
           {/* Main Content Container */}
-          <div className="max-w-7xl mx-auto px-8 pb-8 relative z-10 space-y-8">
+          <div className="flex-1 flex flex-col max-w-7xl mx-auto px-8 pb-8 relative z-10 w-full">
             {/* View Toggle & Instrument Panel */}
             <motion.div
               variants={itemVariants}
+              className="mb-6"
               whileHover={{ 
                 y: -2,
                 boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)"
@@ -259,16 +261,17 @@ const Monitor: React.FC = () => {
             {/* Main Visualization Area */}
             <motion.div
               variants={itemVariants}
+              className="flex-1 mb-6"
               whileHover={{ 
                 y: -4,
                 boxShadow: "0 25px 50px rgba(0, 0, 0, 0.4)"
               }}
               transition={{ duration: 0.3 }}
             >
-              <div className="rounded-2xl backdrop-blur-xl bg-slate-800/40 border border-white/20 overflow-hidden h-[60vh] flex flex-col shadow-2xl group">
+              <div className="rounded-2xl backdrop-blur-xl bg-slate-800/40 border border-white/20 overflow-hidden h-full min-h-[60vh] flex flex-col shadow-2xl group">
                 {/* Card Header */}
                 <motion.div 
-                  className="flex items-center justify-between p-6 border-b border-white/10"
+                  className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0"
                   initial={{ opacity: 0.9 }}
                   whileHover={{ 
                     opacity: 1,
@@ -295,7 +298,7 @@ const Monitor: React.FC = () => {
                 </motion.div>
 
                 {/* View Content */}
-                <div className="flex-1 relative">
+                <div className="flex-1 relative min-h-0">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeView}
@@ -318,7 +321,7 @@ const Monitor: React.FC = () => {
             {/* Alerts & Anomaly Section */}
             <motion.div
               variants={itemVariants}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[35vh]"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[35vh] flex-shrink-0"
             >
               <motion.div 
                 className="lg:col-span-2"
@@ -356,7 +359,7 @@ const Monitor: React.FC = () => {
       >
         <div className="h-full flex flex-col">
           {/* Fullscreen Header */}
-          <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
             <h2 className="text-3xl font-bold text-white">
               {viewTitles[activeView]}
             </h2>
@@ -374,7 +377,7 @@ const Monitor: React.FC = () => {
           </div>
           
           {/* Fullscreen Content */}
-          <div className="flex-1 relative">
+          <div className="flex-1 relative min-h-0">
             {renderCurrentView()}
           </div>
         </div>
