@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, HelpCircle } from 'lucide-react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { FullscreenButton } from '@/components/ui/fullscreen-button';
-import TreemapView from '@/components/monitor/TreemapView';
 import HeatmapTableView from '@/components/monitor/HeatmapTableView';
 import RadialHubView from '@/components/monitor/RadialHubView';
 import TileDashboardView from '@/components/monitor/TileDashboardView';
@@ -12,17 +10,16 @@ import UniversalAlertHub from '@/components/monitor/UniversalAlertHub';
 import AnomalyDetector from '@/components/monitor/AnomalyDetector';
 import InstrumentPanel from '@/components/monitor/InstrumentPanel';
 
-type ViewType = 'treemap' | 'heatmap' | 'radial' | 'tile';
+type ViewType = 'heatmap' | 'radial' | 'tile';
 
 const Monitor: React.FC = () => {
-  const [activeView, setActiveView] = useState<ViewType>('treemap');
+  const [activeView, setActiveView] = useState<ViewType>('heatmap');
   const [timeRange, setTimeRange] = useState('Last 30 Days');
   const [domainFilter, setDomainFilter] = useState('All Domains');
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const viewTitles = {
-    treemap: 'Sector Treemap: Comprehensive System View',
     heatmap: 'Heatmap + Table View',
     radial: 'Radial Hub & Spokes',
     tile: 'Tile Dashboard'
@@ -59,8 +56,6 @@ const Monitor: React.FC = () => {
     };
 
     switch (activeView) {
-      case 'treemap':
-        return <TreemapView {...viewProps} />;
       case 'heatmap':
         return <HeatmapTableView {...viewProps} />;
       case 'radial':
@@ -68,7 +63,7 @@ const Monitor: React.FC = () => {
       case 'tile':
         return <TileDashboardView {...viewProps} />;
       default:
-        return <TreemapView {...viewProps} />;
+        return <HeatmapTableView {...viewProps} />;
     }
   };
 
@@ -207,7 +202,7 @@ const Monitor: React.FC = () => {
                   <div className="flex items-center justify-between">
                     {/* View Toggles */}
                     <div className="flex space-x-4" role="tablist">
-                      {(['treemap', 'heatmap', 'radial', 'tile'] as ViewType[]).map((view) => (
+                      {(['heatmap', 'radial', 'tile'] as ViewType[]).map((view) => (
                         <motion.button
                           key={view}
                           role="tab"
@@ -229,7 +224,6 @@ const Monitor: React.FC = () => {
                           whileTap={{ scale: 0.98 }}
                           transition={{ duration: 0.2 }}
                         >
-                          {view === 'treemap' && 'Sector Treemap'}
                           {view === 'heatmap' && 'Heatmap + Table View'}
                           {view === 'radial' && 'Radial Hub & Spokes'}
                           {view === 'tile' && 'Tile Dashboard'}
