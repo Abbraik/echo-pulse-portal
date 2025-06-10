@@ -47,7 +47,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
 
   // Comprehensive indicator data with updated weights
   const allIndicators: TreemapData[] = useMemo(() => [
-    // Systemic Indicators (largest weights)
     { id: '1', name: 'DEI Composite', value: 63, weight: 120, status: 'warning', category: 'Strategic', sector: 'Systemic', target: 80, trend: [68, 67, 65, 63, 62], lastUpdated: '2025-01-10', owner: 'Strategy Team', description: 'Overall diversity, equity and inclusion composite metric.' },
     { id: '2', name: 'Trust Recovery Index', value: 54, weight: 90, status: 'critical', category: 'Strategic', sector: 'Systemic', target: 75, trend: [65, 61, 58, 56, 54], lastUpdated: '2025-01-10', owner: 'Executive Leadership', description: 'Stakeholder confidence restoration metric.' },
     { id: '3', name: 'Network Dev Index', value: 52, weight: 80, status: 'critical', category: 'Strategic', sector: 'Systemic', target: 100, trend: [58, 56, 54, 52, 50], lastUpdated: '2025-01-10', owner: 'Network Team', description: 'Network development and infrastructure growth index.' },
