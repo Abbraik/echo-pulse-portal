@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info, TrendingUp, BarChart3, LineChart, Activity } from 'lucide-react';
@@ -294,15 +295,15 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const treemapData: TreemapData[] = [
-    // Strategic Indicators - SP500-style weights (few large, many small)
+    // Strategic Indicators - values reduced by 10%
     { 
       id: 's1', 
       name: 'DEI Composite', 
-      value: 78, 
+      value: 70.2, // reduced from 78
       target: 80, 
       category: 'strategic', 
       weight: 120, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Overall "Demographic-Equilibrium Index" – a weighted blend of population, age-structure, fertility balance, and social cohesion metrics.',
       breakdown: [
         'Population Stability: 99%',
@@ -316,7 +317,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's2', 
       name: 'Trust Recovery Index', 
-      value: 89, 
+      value: 80.1, // reduced from 89
       target: 100, 
       category: 'strategic', 
       weight: 90, 
@@ -333,7 +334,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's3', 
       name: 'Network Development Index', 
-      value: 64, 
+      value: 57.6, // reduced from 64
       target: 100, 
       category: 'strategic', 
       weight: 80, 
@@ -350,7 +351,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's4', 
       name: 'Bundle Coherence Score', 
-      value: 72, 
+      value: 64.8, // reduced from 72
       target: 90, 
       category: 'strategic', 
       weight: 70, 
@@ -366,11 +367,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's5', 
       name: 'Population Stability Rate', 
-      value: 85, 
+      value: 76.5, // reduced from 85
       target: 90, 
       category: 'strategic', 
       weight: 60, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Measure of population growth/decline stability within optimal ranges.',
       breakdown: ['Birth Rate: 94%', 'Migration Balance: 88%', 'Retention: 92%'],
       lastTrend: '↑3% last quarter',
@@ -379,7 +380,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's6', 
       name: 'Resource Stock vs. Target', 
-      value: 74, 
+      value: 66.6, // reduced from 74
       target: 85, 
       category: 'strategic', 
       weight: 50, 
@@ -392,7 +393,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's7', 
       name: 'Economic Output Growth (%)', 
-      value: 3.2, 
+      value: 2.88, // reduced from 3.2
       target: 4.0, 
       category: 'strategic', 
       weight: 45, 
@@ -405,11 +406,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's8', 
       name: 'Social Cohesion Index', 
-      value: 82, 
+      value: 73.8, // reduced from 82
       target: 85, 
       category: 'strategic', 
       weight: 40, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Measurement of community bonds and social trust levels.',
       breakdown: ['Community Trust: 88%', 'Civic Participation: 79%', 'Social Networks: 85%'],
       lastTrend: '↑1% last week',
@@ -418,11 +419,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's9', 
       name: 'Renewal vs. Consumption Balance', 
-      value: 87, 
+      value: 78.3, // reduced from 87
       target: 90, 
       category: 'strategic', 
       weight: 35, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Ratio of renewable resource generation to consumption rates.',
       breakdown: ['Renewable Energy: 92%', 'Water Cycle: 84%', 'Material Recycling: 85%'],
       lastTrend: '↑2% last quarter',
@@ -431,7 +432,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's10', 
       name: 'Fertility Confidence Level', 
-      value: 68, 
+      value: 61.2, // reduced from 68
       target: 75, 
       category: 'strategic', 
       weight: 30, 
@@ -444,11 +445,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's11', 
       name: 'Age-Structure Balance Ratio', 
-      value: 76, 
+      value: 68.4, // reduced from 76
       target: 80, 
       category: 'strategic', 
       weight: 25, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Balance between working-age and dependent populations.',
       breakdown: ['Working Age: 78%', 'Youth Dependency: 82%', 'Elder Dependency: 74%'],
       lastTrend: '↓1% last month',
@@ -457,7 +458,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's12', 
       name: 'Supply–Demand Gap', 
-      value: 7, 
+      value: 6.3, // reduced from 7
       target: 5, 
       category: 'strategic', 
       weight: 20, 
@@ -470,11 +471,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's13', 
       name: 'Price Stability Index', 
-      value: 94, 
+      value: 84.6, // reduced from 94
       target: 95, 
       category: 'strategic', 
       weight: 15, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Measure of price volatility across essential goods and services.',
       breakdown: ['Food Prices: 96%', 'Energy Prices: 91%', 'Housing Costs: 95%'],
       lastTrend: '↑1% last week',
@@ -483,7 +484,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's14', 
       name: 'Capacity Utilization (Key Sectors)', 
-      value: 78, 
+      value: 70.2, // reduced from 78
       target: 85, 
       category: 'strategic', 
       weight: 12, 
@@ -496,7 +497,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's15', 
       name: 'Environmental Quality Index', 
-      value: 71, 
+      value: 63.9, // reduced from 71
       target: 80, 
       category: 'strategic', 
       weight: 10, 
@@ -509,11 +510,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's16', 
       name: 'Employment Rate', 
-      value: 91, 
+      value: 81.9, // reduced from 91
       target: 95, 
       category: 'strategic', 
       weight: 8, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Percentage of working-age population in employment.',
       breakdown: ['Full-time: 85%', 'Part-time: 12%', 'Self-employed: 8%'],
       lastTrend: '↑2% last quarter',
@@ -522,11 +523,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's17', 
       name: 'Education Completion Rate', 
-      value: 88, 
+      value: 79.2, // reduced from 88
       target: 92, 
       category: 'strategic', 
       weight: 8, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Percentage completing secondary and tertiary education.',
       breakdown: ['Secondary: 94%', 'Tertiary: 67%', 'Vocational: 85%'],
       lastTrend: '↑1% last year',
@@ -535,11 +536,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's18', 
       name: 'Health Status Index', 
-      value: 83, 
+      value: 74.7, // reduced from 83
       target: 88, 
       category: 'strategic', 
       weight: 8, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Composite health outcome measures across population.',
       breakdown: ['Life Expectancy: 87%', 'Disease Prevention: 81%', 'Mental Health: 79%'],
       lastTrend: '↑2% last year',
@@ -548,11 +549,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's19', 
       name: 'Household Revenue Level', 
-      value: 76, 
+      value: 68.4, // reduced from 76
       target: 80, 
       category: 'strategic', 
       weight: 5, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Average household income relative to living cost benchmarks.',
       breakdown: ['Median Income: 78%', 'Income Distribution: 74%', 'Purchasing Power: 76%'],
       lastTrend: '↑1% last quarter',
@@ -561,7 +562,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 's20', 
       name: 'Global Influence Score', 
-      value: 65, 
+      value: 58.5, // reduced from 65
       target: 75, 
       category: 'strategic', 
       weight: 5, 
@@ -572,11 +573,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       actionHint: 'Strengthen international partnerships.'
     },
 
-    // Operational Indicators - SP500-style weights (few large, many small)
+    // Operational Indicators - values reduced by 10%
     { 
       id: 'o1', 
       name: 'Open Facilitator Claims', 
-      value: 12, 
+      value: 10.8, // reduced from 12
       target: 0, 
       category: 'operational', 
       weight: 100, 
@@ -589,7 +590,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o2', 
       name: 'System Error Count', 
-      value: 5, 
+      value: 4.5, // reduced from 5
       target: 0, 
       category: 'operational', 
       weight: 90, 
@@ -606,7 +607,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o3', 
       name: 'Think→Act Queue Length', 
-      value: 4, 
+      value: 3.6, // reduced from 4
       target: 0, 
       category: 'operational', 
       weight: 60, 
@@ -623,7 +624,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o4', 
       name: 'Act→Monitor Queue Length', 
-      value: 3, 
+      value: 2.7, // reduced from 3
       target: 0, 
       category: 'operational', 
       weight: 50, 
@@ -640,11 +641,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o5', 
       name: 'DEI Stability Band %', 
-      value: 94, 
+      value: 84.6, // reduced from 94
       target: 98, 
       category: 'operational', 
       weight: 45, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Percentage of time DEI metrics remain within acceptable variance bands.',
       breakdown: ['Within Target: 94%', 'Minor Variance: 4%', 'Major Variance: 2%'],
       lastTrend: '↑1% last week',
@@ -653,11 +654,11 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o6', 
       name: 'Bundle ROI Achievement (%)', 
-      value: 87, 
+      value: 78.3, // reduced from 87
       target: 90, 
       category: 'operational', 
       weight: 40, 
-      status: 'in-band',
+      status: 'warning', // updated based on new value
       description: 'Percentage of strategic bundles meeting their ROI targets.',
       breakdown: ['Above Target: 45%', 'On Target: 42%', 'Below Target: 13%'],
       lastTrend: '↑3% last month',
@@ -666,7 +667,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o7', 
       name: 'Latency of Real-World Data Sync', 
-      value: 2.1, 
+      value: 1.89, // reduced from 2.1
       target: 1.0, 
       category: 'operational', 
       weight: 35, 
@@ -679,7 +680,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o8', 
       name: 'Claims Aging (Avg Days Open)', 
-      value: 3.2, 
+      value: 2.88, // reduced from 3.2
       target: 1.0, 
       category: 'operational', 
       weight: 30, 
@@ -692,7 +693,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o9', 
       name: 'Workflow Handoff Delay (hrs)', 
-      value: 6.5, 
+      value: 5.85, // reduced from 6.5
       target: 2.0, 
       category: 'operational', 
       weight: 25, 
@@ -705,7 +706,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o10', 
       name: 'Data Pipeline Failure Rate (%)', 
-      value: 2.1, 
+      value: 1.89, // reduced from 2.1
       target: 0.5, 
       category: 'operational', 
       weight: 20, 
@@ -718,7 +719,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o11', 
       name: 'Number of Active Alerts', 
-      value: 7, 
+      value: 6.3, // reduced from 7
       target: 3, 
       category: 'operational', 
       weight: 15, 
@@ -731,7 +732,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o12', 
       name: 'Anomalies Detected (24h)', 
-      value: 3, 
+      value: 2.7, // reduced from 3
       target: 1, 
       category: 'operational', 
       weight: 12, 
@@ -744,7 +745,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o13', 
       name: 'Entropy Score (Think Zone)', 
-      value: 23, 
+      value: 20.7, // reduced from 23
       target: 15, 
       category: 'operational', 
       weight: 10, 
@@ -757,7 +758,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o14', 
       name: 'Entropy Score (Act Zone)', 
-      value: 19, 
+      value: 17.1, // reduced from 19
       target: 15, 
       category: 'operational', 
       weight: 10, 
@@ -770,7 +771,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o15', 
       name: 'Entropy Score (Monitor Zone)', 
-      value: 14, 
+      value: 12.6, // reduced from 14
       target: 15, 
       category: 'operational', 
       weight: 8, 
@@ -783,7 +784,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o16', 
       name: 'Entropy Score (Learn Zone)', 
-      value: 17, 
+      value: 15.3, // reduced from 17
       target: 15, 
       category: 'operational', 
       weight: 8, 
@@ -796,7 +797,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o17', 
       name: 'Entropy Score (Innovate Zone)', 
-      value: 21, 
+      value: 18.9, // reduced from 21
       target: 15, 
       category: 'operational', 
       weight: 8, 
@@ -809,7 +810,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o18', 
       name: 'User Session Errors / Hour', 
-      value: 0.8, 
+      value: 0.72, // reduced from 0.8
       target: 0.2, 
       category: 'operational', 
       weight: 5, 
@@ -822,7 +823,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o19', 
       name: 'Average Bundle Validation Time (days)', 
-      value: 2.8, 
+      value: 2.52, // reduced from 2.8
       target: 1.5, 
       category: 'operational', 
       weight: 5, 
@@ -835,7 +836,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { 
       id: 'o20', 
       name: 'Pending Playbook Triggers', 
-      value: 2, 
+      value: 1.8, // reduced from 2
       target: 0, 
       category: 'operational', 
       weight: 3, 
@@ -981,11 +982,10 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   };
 
   const canShowLabels = (width: number, height: number) => {
-    return width >= 8 && height >= 4; // Increased minimum size for better text visibility
+    return width >= 8 && height >= 4;
   };
 
   const getTextSize = (width: number, height: number, textLength: number) => {
-    // Improved text sizing calculation
     const baseSize = Math.min(width / 12, height / 6);
     const lengthAdjusted = Math.max(width / (textLength * 0.8), 0.6);
     return Math.min(baseSize, lengthAdjusted, 1.8);
@@ -1105,7 +1105,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                   
                   const titleFontSize = getTextSize(item.width, item.height, item.name.length);
                   const valueFontSize = getSecondaryTextSize(item.width, item.height);
-                  const maxTitleLength = Math.floor(item.width / 1.2); // Better length calculation
+                  const maxTitleLength = Math.floor(item.width / 1.2);
                   const truncatedTitle = truncateText(item.name, maxTitleLength);
                   
                   return (
@@ -1163,10 +1163,10 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                               />
                             </clipPath>
                           </defs>
-                          {/* Title Text - Better positioning */}
+                          {/* Title Text - Fixed positioning */}
                           <text
                             x={item.x + item.width/2}
-                            y={item.y + item.height/2 - 0.6}
+                            y={item.y + 2.0} // Fixed position from top
                             textAnchor="middle"
                             clipPath={`url(#textClip-${item.id})`}
                             className="font-bold"
@@ -1180,7 +1180,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                           >
                             {truncatedTitle}
                           </text>
-                          {/* Value Text - Better spacing */}
+                          {/* Value Text - Fixed positioning */}
                           <text
                             x={item.x + item.width/2}
                             y={item.y + item.height/2 + 0.2}
@@ -1197,10 +1197,10 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                           >
                             {item.value} / {item.target}
                           </text>
-                          {/* Percentage Text - Additional info */}
+                          {/* Percentage Text - Fixed positioning */}
                           <text
                             x={item.x + item.width/2}
-                            y={item.y + item.height/2 + 0.9}
+                            y={item.y + item.height - 1.5} // Fixed position from bottom
                             textAnchor="middle"
                             clipPath={`url(#textClip-${item.id})`}
                             className="font-medium"
