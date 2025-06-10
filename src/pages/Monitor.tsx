@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, HelpCircle } from 'lucide-react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { FullscreenButton } from '@/components/ui/fullscreen-button';
-import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import TreemapView from '@/components/monitor/TreemapView';
 import HeatmapTableView from '@/components/monitor/HeatmapTableView';
 import RadialHubView from '@/components/monitor/RadialHubView';
@@ -23,7 +22,7 @@ const Monitor: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const viewTitles = {
-    treemap: 'Master Treemap: Key Monitor Indicators',
+    treemap: 'Sector Treemap: Comprehensive System View',
     heatmap: 'Heatmap + Table View',
     radial: 'Radial Hub & Spokes',
     tile: 'Tile Dashboard'
@@ -191,7 +190,7 @@ const Monitor: React.FC = () => {
             </div>
           </motion.header>
 
-          {/* Main Content Container - Reduced padding */}
+          {/* Main Content Container */}
           <div className="flex-1 flex flex-col max-w-7xl mx-auto px-4 pb-4 relative z-10 w-full">
             {/* View Toggle & Instrument Panel */}
             <motion.div
@@ -230,7 +229,7 @@ const Monitor: React.FC = () => {
                           whileTap={{ scale: 0.98 }}
                           transition={{ duration: 0.2 }}
                         >
-                          {view === 'treemap' && 'Treemap View'}
+                          {view === 'treemap' && 'Sector Treemap'}
                           {view === 'heatmap' && 'Heatmap + Table View'}
                           {view === 'radial' && 'Radial Hub & Spokes'}
                           {view === 'tile' && 'Tile Dashboard'}
@@ -258,7 +257,7 @@ const Monitor: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Main Visualization Area - Dynamic Height */}
+            {/* Main Visualization Area */}
             <motion.div
               variants={itemVariants}
               className="flex-1 mb-4"
@@ -271,7 +270,7 @@ const Monitor: React.FC = () => {
               <div 
                 className="rounded-2xl backdrop-blur-xl bg-slate-800/40 border border-white/20 overflow-hidden flex flex-col shadow-2xl group"
                 style={{ 
-                  maxHeight: 'calc(100vh - 220px)',
+                  maxHeight: 'calc(100vh - 200px)',
                   minHeight: '600px'
                 }}
               >
@@ -311,7 +310,7 @@ const Monitor: React.FC = () => {
                     scrollbarColor: 'rgba(255,255,255,0.20) transparent'
                   }}
                 >
-                  <style jsx>{`
+                  <style>{`
                     .view-card-body::-webkit-scrollbar {
                       width: 6px;
                     }
@@ -342,7 +341,7 @@ const Monitor: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Alerts & Anomaly Section - Reduced height */}
+            {/* Alerts & Anomaly Section */}
             <motion.div
               variants={itemVariants}
               className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[30vh] flex-shrink-0"
@@ -375,7 +374,7 @@ const Monitor: React.FC = () => {
         </motion.div>
       </AnimatedPage>
 
-      {/* Fullscreen Overlay - Modified to preserve header */}
+      {/* Fullscreen Overlay */}
       <AnimatePresence>
         {isFullscreen && (
           <motion.div

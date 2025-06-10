@@ -24,26 +24,26 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({ timeRange, domainFi
 
   // Sample data with 10% reduced values
   const indicators: IndicatorData[] = useMemo(() => [
-    { id: '1', name: 'DEI Composite Score', value: 70, target: 80, category: 'Strategic', status: 'warning', trend: [75, 74, 72, 70, 69] },
-    { id: '2', name: 'Network Resilience', value: 83, target: 85, category: 'Operational', status: 'healthy', trend: [78, 80, 82, 83, 84] },
-    { id: '3', name: 'Resource Efficiency', value: 83, target: 85, category: 'Operational', status: 'healthy', trend: [85, 87, 86, 83, 84] },
-    { id: '4', name: 'Social Cohesion Index', value: 77, target: 90, category: 'Community', status: 'warning', trend: [88, 85, 80, 77, 76] },
-    { id: '5', name: 'Innovation Pipeline', value: 82, target: 85, category: 'Strategic', status: 'healthy', trend: [76, 78, 80, 82, 83] },
-    { id: '6', name: 'Trust Recovery Rate', value: 60, target: 75, category: 'Strategic', status: 'critical', trend: [72, 68, 65, 62, 60] },
-    { id: '7', name: 'Workflow Optimization', value: 60, target: 75, category: 'Operational', status: 'critical', trend: [72, 68, 64, 61, 60] },
-    { id: '8', name: 'Knowledge Transfer', value: 75, target: 80, category: 'Learning', status: 'healthy', trend: [70, 72, 74, 75, 76] },
-    { id: '9', name: 'Stakeholder Engagement', value: 79, target: 85, category: 'Community', status: 'healthy', trend: [75, 77, 78, 79, 80] },
-    { id: '10', name: 'Security Posture', value: 88, target: 90, category: 'Operational', status: 'healthy', trend: [85, 86, 87, 88, 89] },
-    { id: '11', name: 'Adaptive Capacity', value: 72, target: 80, category: 'Strategic', status: 'warning', trend: [68, 70, 71, 72, 73] },
-    { id: '12', name: 'Data Quality', value: 85, target: 90, category: 'Technical', status: 'healthy', trend: [82, 83, 84, 85, 86] },
-    { id: '13', name: 'Performance Metrics', value: 81, target: 85, category: 'Operational', status: 'healthy', trend: [78, 79, 80, 81, 82] },
-    { id: '14', name: 'Risk Mitigation', value: 74, target: 80, category: 'Strategic', status: 'warning', trend: [76, 75, 74, 73, 74] },
-    { id: '15', name: 'Team Cohesion', value: 76, target: 80, category: 'Community', status: 'healthy', trend: [74, 75, 76, 77, 76] },
-    { id: '16', name: 'Learning Velocity', value: 78, target: 85, category: 'Learning', status: 'healthy', trend: [75, 76, 77, 78, 79] },
-    { id: '17', name: 'System Reliability', value: 92, target: 95, category: 'Technical', status: 'healthy', trend: [90, 91, 92, 93, 92] },
-    { id: '18', name: 'Communication Flow', value: 73, target: 80, category: 'Operational', status: 'warning', trend: [75, 74, 73, 72, 73] },
-    { id: '19', name: 'Cultural Alignment', value: 71, target: 80, category: 'Community', status: 'warning', trend: [73, 72, 71, 70, 71] },
-    { id: '20', name: 'Technology Debt', value: 67, target: 75, category: 'Technical', status: 'critical', trend: [70, 69, 68, 67, 66] },
+    { id: '1', name: 'DEI Composite Score', value: 63, target: 80, category: 'Strategic', status: 'warning', trend: [68, 67, 65, 63, 62] },
+    { id: '2', name: 'Network Resilience', value: 75, target: 85, category: 'Operational', status: 'healthy', trend: [70, 72, 74, 75, 76] },
+    { id: '3', name: 'Resource Efficiency', value: 75, target: 85, category: 'Operational', status: 'healthy', trend: [77, 78, 77, 75, 76] },
+    { id: '4', name: 'Social Cohesion Index', value: 69, target: 90, category: 'Community', status: 'warning', trend: [79, 77, 73, 69, 68] },
+    { id: '5', name: 'Innovation Pipeline', value: 74, target: 85, category: 'Strategic', status: 'healthy', trend: [68, 70, 72, 74, 75] },
+    { id: '6', name: 'Trust Recovery Rate', value: 54, target: 75, category: 'Strategic', status: 'critical', trend: [65, 61, 58, 56, 54] },
+    { id: '7', name: 'Workflow Optimization', value: 54, target: 75, category: 'Operational', status: 'critical', trend: [65, 61, 58, 55, 54] },
+    { id: '8', name: 'Knowledge Transfer', value: 68, target: 80, category: 'Learning', status: 'healthy', trend: [63, 65, 66, 68, 69] },
+    { id: '9', name: 'Stakeholder Engagement', value: 71, target: 85, category: 'Community', status: 'healthy', trend: [68, 69, 70, 71, 72] },
+    { id: '10', name: 'Security Posture', value: 79, target: 90, category: 'Operational', status: 'healthy', trend: [77, 77, 78, 79, 80] },
+    { id: '11', name: 'Adaptive Capacity', value: 65, target: 80, category: 'Strategic', status: 'warning', trend: [61, 63, 64, 65, 66] },
+    { id: '12', name: 'Data Quality', value: 77, target: 90, category: 'Technical', status: 'healthy', trend: [74, 75, 76, 77, 78] },
+    { id: '13', name: 'Performance Metrics', value: 73, target: 85, category: 'Operational', status: 'healthy', trend: [70, 71, 72, 73, 74] },
+    { id: '14', name: 'Risk Mitigation', value: 67, target: 80, category: 'Strategic', status: 'warning', trend: [68, 68, 67, 66, 67] },
+    { id: '15', name: 'Team Cohesion', value: 68, target: 80, category: 'Community', status: 'healthy', trend: [67, 68, 68, 69, 68] },
+    { id: '16', name: 'Learning Velocity', value: 70, target: 85, category: 'Learning', status: 'healthy', trend: [68, 68, 69, 70, 71] },
+    { id: '17', name: 'System Reliability', value: 83, target: 95, category: 'Technical', status: 'healthy', trend: [81, 82, 83, 84, 83] },
+    { id: '18', name: 'Communication Flow', value: 66, target: 80, category: 'Operational', status: 'warning', trend: [68, 67, 66, 65, 66] },
+    { id: '19', name: 'Cultural Alignment', value: 64, target: 80, category: 'Community', status: 'warning', trend: [66, 65, 64, 63, 64] },
+    { id: '20', name: 'Technology Debt', value: 60, target: 75, category: 'Technical', status: 'critical', trend: [63, 62, 61, 60, 59] },
   ], []);
 
   const getStatusColor = (status: string) => {
@@ -141,7 +141,7 @@ const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({ timeRange, domainFi
             scrollbarColor: 'rgba(255,255,255,0.20) transparent'
           }}
         >
-          <style jsx>{`
+          <style>{`
             .overflow-y-auto::-webkit-scrollbar {
               width: 6px;
             }

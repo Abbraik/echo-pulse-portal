@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -21,18 +20,18 @@ interface TileData {
 
 const TileDashboardView: React.FC<TileDashboardViewProps> = ({ timeRange, domainFilter, chartType }) => {
   const [tiles, setTiles] = useState<TileData[]>([
-    { id: '1', title: 'DEI Composite', subtitle: 'Strategic Indicator', value: 70, target: 80, status: 'warning', size: '2x1', trend: [75, 74, 72, 70, 69] },
-    { id: '2', title: 'Resource Efficiency', subtitle: 'Operational', value: 83, target: 85, status: 'healthy', size: '1x1', trend: [85, 87, 86, 83, 84] },
-    { id: '3', title: 'Social Cohesion', subtitle: 'Community Health', value: 77, target: 90, status: 'warning', size: '1x1', trend: [88, 86, 80, 77, 76] },
-    { id: '4', title: 'Workflow Health', subtitle: 'Process Efficiency', value: 60, target: 75, status: 'critical', size: '1x2', trend: [72, 68, 64, 61, 60] },
-    { id: '5', title: 'Population Growth', subtitle: 'Demographic Trends', value: 79, target: 85, status: 'healthy', size: '1x1', trend: [83, 84, 86, 87, 79] },
-    { id: '6', title: 'Infrastructure Load', subtitle: 'System Capacity', value: 41, target: 70, status: 'critical', size: '2x1', trend: [55, 52, 48, 46, 41] },
-    { id: '7', title: 'Innovation Index', subtitle: 'R&D Performance', value: 82, target: 85, status: 'healthy', size: '1x1', trend: [86, 87, 89, 90, 82] },
-    { id: '8', title: 'System Stability', subtitle: 'Platform Health', value: 74, target: 80, status: 'warning', size: '1x1', trend: [79, 80, 81, 81, 74] },
-    { id: '9', title: 'Security Posture', subtitle: 'Cyber Defense', value: 88, target: 90, status: 'healthy', size: '1x1', trend: [85, 86, 87, 88, 89] },
-    { id: '10', title: 'Learning Velocity', subtitle: 'Knowledge Growth', value: 78, target: 85, status: 'healthy', size: '1x1', trend: [75, 76, 77, 78, 79] },
-    { id: '11', title: 'Trust Recovery', subtitle: 'Stakeholder Confidence', value: 60, target: 75, status: 'critical', size: '2x1', trend: [72, 68, 65, 62, 60] },
-    { id: '12', title: 'Communication Flow', subtitle: 'Information Exchange', value: 73, target: 80, status: 'warning', size: '1x1', trend: [75, 74, 73, 72, 73] },
+    { id: '1', title: 'DEI Composite', subtitle: 'Strategic Indicator', value: 63, target: 80, status: 'warning', size: '2x1', trend: [68, 67, 65, 63, 62] },
+    { id: '2', title: 'Resource Efficiency', subtitle: 'Operational', value: 75, target: 85, status: 'healthy', size: '1x1', trend: [77, 78, 77, 75, 76] },
+    { id: '3', title: 'Social Cohesion', subtitle: 'Community Health', value: 69, target: 90, status: 'warning', size: '1x1', trend: [79, 77, 73, 69, 68] },
+    { id: '4', title: 'Workflow Health', subtitle: 'Process Efficiency', value: 54, target: 75, status: 'critical', size: '1x2', trend: [65, 61, 58, 55, 54] },
+    { id: '5', title: 'Population Growth', subtitle: 'Demographic Trends', value: 71, target: 85, status: 'healthy', size: '1x1', trend: [75, 76, 77, 78, 71] },
+    { id: '6', title: 'Infrastructure Load', subtitle: 'System Capacity', value: 37, target: 70, status: 'critical', size: '2x1', trend: [50, 47, 43, 41, 37] },
+    { id: '7', title: 'Innovation Index', subtitle: 'R&D Performance', value: 74, target: 85, status: 'healthy', size: '1x1', trend: [77, 78, 80, 81, 74] },
+    { id: '8', title: 'System Stability', subtitle: 'Platform Health', value: 67, target: 80, status: 'warning', size: '1x1', trend: [71, 72, 73, 73, 67] },
+    { id: '9', title: 'Security Posture', subtitle: 'Cyber Defense', value: 79, target: 90, status: 'healthy', size: '1x1', trend: [77, 77, 78, 79, 80] },
+    { id: '10', title: 'Learning Velocity', subtitle: 'Knowledge Growth', value: 70, target: 85, status: 'healthy', size: '1x1', trend: [68, 68, 69, 70, 71] },
+    { id: '11', title: 'Trust Recovery', subtitle: 'Stakeholder Confidence', value: 54, target: 75, status: 'critical', size: '2x1', trend: [65, 61, 59, 56, 54] },
+    { id: '12', title: 'Communication Flow', subtitle: 'Information Exchange', value: 66, target: 80, status: 'warning', size: '1x1', trend: [68, 67, 66, 65, 66] },
   ]);
 
   const [draggedTile, setDraggedTile] = useState<string | null>(null);
@@ -72,7 +71,7 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({ timeRange, domain
           scrollbarColor: 'rgba(255,255,255,0.20) transparent',
         }}
       >
-        <style jsx>{`
+        <style>{`
           .h-full::-webkit-scrollbar {
             width: 6px;
           }
