@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Sector } from './types';
 
 interface SectorTreemapProps {
@@ -19,9 +19,19 @@ interface PositionedIndicator {
   target: number;
 }
 
+interface TooltipState {
+  indicator: PositionedIndicator;
+  x: number;
+  y: number;
+}
+
 const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
   const W = 800; // SVG width
   const H = 600; // SVG height
+  
+  // State for interactions
+  const [hoveredIndicatorId, setHoveredIndicatorId] = useState<string | null>(null);
+  const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   
   // Step 1: Flatten data and compute areas
   const indicators = sectors.flatMap(s => s.indicators);
@@ -104,6 +114,55 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     return 'status-critical';
   };
 
+  // Event handlers
+  const handleTileMouseEnter = (indicator: PositionedIndicator, event: React.MouseEvent) => {
+    setHoveredIndicatorId(indicator.id);
+    const rect = event.currentTarget.getBoundingClientRect();
+    const svgRect = event.currentTarget.closest('svg')?.getBoundingClientRect();
+    if (svgRect) {
+      setTooltip({
+        indicator,
+        x: event.clientX - svgRect.left + 10,
+        y: event.clientY - svgRect.top - 10
+      });
+    }
+  };
+
+  const handleTileMouseLeave = () => {
+    setHoveredIndicatorId(null);
+    setTooltip(null);
+  };
+
+  const handleTileClick = (indicatorId: string) => {
+    console.log(`Clicked indicator: ${indicatorId}`);
+  };
+
+  const handleTileKeyDown = (event: React.KeyboardEvent, indicator: PositionedIndicator) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleTileClick(indicator.id);
+    }
+  };
+
+  const handleTileFocus = (indicator: PositionedIndicator) => {
+    setHoveredIndicatorId(indicator.id);
+  };
+
+  const handleTileBlur = () => {
+    setHoveredIndicatorId(null);
+    setTooltip(null);
+  };
+
+  const getTileClasses = (indicator: PositionedIndicator): string => {
+    const classes = [];
+    if (hoveredIndicatorId === indicator.id) {
+      classes.push('tile-hovered');
+    } else if (hoveredIndicatorId && hoveredIndicatorId !== indicator.id) {
+      classes.push('tile-dimmed');
+    }
+    return classes.join(' ');
+  };
+
   return (
     <div className="h-full w-full p-4">
       {/* Glassmorphic Card Frame */}
@@ -114,7 +173,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
         </div>
         
         {/* SVG Container */}
-        <div className="p-4">
+        <div className="p-4 relative">
           <svg width={W} height={H} className="w-full">
             {/* Define filters and effects */}
             <defs>
@@ -127,6 +186,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
             {positionedIndicators.map((indicator) => {
               const sectorClass = getSectorClass(indicator.sector);
               const statusClass = getStatusClass(indicator.value, indicator.target);
+              const tileClasses = getTileClasses(indicator);
               
               return (
                 <g key={indicator.id}>
@@ -136,10 +196,18 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                     y={indicator.y}
                     width={indicator.width}
                     height={indicator.height}
-                    className={sectorClass}
+                    className={`${sectorClass} ${tileClasses}`}
                     stroke="rgba(255,255,255,0.10)"
                     strokeWidth="1"
                     filter="url(#innerShadow)"
+                    style={{ cursor: 'pointer' }}
+                    tabIndex={0}
+                    onMouseEnter={(e) => handleTileMouseEnter(indicator, e)}
+                    onMouseLeave={handleTileMouseLeave}
+                    onClick={() => handleTileClick(indicator.id)}
+                    onKeyDown={(e) => handleTileKeyDown(e, indicator)}
+                    onFocus={() => handleTileFocus(indicator)}
+                    onBlur={handleTileBlur}
                   />
                   {/* Status overlay */}
                   <rect
@@ -174,6 +242,23 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
               );
             })}
           </svg>
+
+          {/* Tooltip */}
+          {tooltip && (
+            <div 
+              className="tooltip"
+              style={{
+                position: 'absolute',
+                left: tooltip.x,
+                top: tooltip.y,
+                pointerEvents: 'none',
+                zIndex: 1000
+              }}
+            >
+              <strong>{tooltip.indicator.name}</strong><br/>
+              {tooltip.indicator.value} / {tooltip.indicator.target} ({Math.round((tooltip.indicator.value / tooltip.indicator.target) * 100)}%)
+            </div>
+          )}
         </div>
         
         {/* Debug info */}
@@ -182,6 +267,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           <p>Total Weight: {totalWeight.toFixed(2)}</p>
           <p>SVG Dimensions: {W} x {H}</p>
           <p>Row Height: {rowHeight.toFixed(2)}</p>
+          {hoveredIndicatorId && <p>Hovered: {hoveredIndicatorId}</p>}
         </div>
       </div>
 
@@ -253,6 +339,18 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           fill: rgba(255,110,110,0.12);
         }
 
+        /* Hover Effects */
+        .tile-hovered {
+          transform: scale(1.05);
+          filter: url(#innerShadow) drop-shadow(0 0 12px rgba(0,255,195,0.5));
+          transition: transform 200ms ease-out, filter 200ms ease-out;
+        }
+
+        .tile-dimmed {
+          opacity: 0.8;
+          transition: opacity 200ms ease-out;
+        }
+
         /* Sector Labels */
         .sector-label {
           font-family: 'Noto Sans', sans-serif;
@@ -260,6 +358,25 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           font-size: 10px;
           fill: #E0E0E0;
           text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Tooltip */
+        .tooltip {
+          background: rgba(20,30,50,0.9);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(0,255,195,0.3);
+          border-radius: 8px;
+          padding: 8px 12px;
+          color: #E0E0E0;
+          font: 12px 'Noto Sans', sans-serif;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+          white-space: nowrap;
+        }
+
+        /* Focus styles for accessibility */
+        rect:focus {
+          outline: 2px solid rgba(0,255,195,0.8);
+          outline-offset: 2px;
         }
       `}</style>
     </div>
