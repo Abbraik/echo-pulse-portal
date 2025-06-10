@@ -6,6 +6,7 @@ import { StickyFooter } from './StickyFooter';
 import { ControlsPanel } from './ControlsPanel';
 import { BreadcrumbNav } from './BreadcrumbNav';
 import { Legend } from './Legend';
+import { TreemapLayoutEngine, TreemapNode } from './TreemapLayout';
 import { usePanelCompact } from '@/hooks/use-panel-compact';
 
 interface SectorTreemapProps {
@@ -63,7 +64,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [drillDownPath, setDrillDownPath] = useState<string[]>([]);
 
-  const W = 800;
+  const W = 1000;
   const H = 600;
 
   // Debounce hover events
@@ -123,52 +124,12 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     }));
   }, [filteredIndicators, groupBy, currentLevel]);
 
-  // Calculate positioned indicators
+  // Calculate positioned indicators using new layout engine
   const positionedIndicators = useMemo(() => {
-    const totalWeight = groupedIndicators.reduce((sum, i) => sum + i.weight, 0);
-    if (totalWeight === 0) return [];
+    if (groupedIndicators.length === 0) return [];
     
-    const svgArea = W * H;
-    const indicatorsWithArea = groupedIndicators.map(i => ({
-      ...i,
-      area: (i.weight / totalWeight) * svgArea
-    }));
-
-    // Responsive grid configuration
-    const getGridConfig = () => {
-      const width = window.innerWidth;
-      if (width >= 1024) return { cols: 4, rows: Math.ceil(indicatorsWithArea.length / 4) };
-      if (width >= 768) return { cols: 2, rows: Math.ceil(indicatorsWithArea.length / 2) };
-      return { cols: 1, rows: indicatorsWithArea.length };
-    };
-
-    const { cols, rows } = getGridConfig();
-    const cellWidth = W / cols;
-    const cellHeight = H / rows;
-    
-    const positioned: PositionedIndicator[] = [];
-    
-    indicatorsWithArea.forEach((indicator, index) => {
-      const row = Math.floor(index / cols);
-      const col = index % cols;
-      
-      positioned.push({
-        id: indicator.id,
-        name: indicator.name,
-        sector: indicator.sector,
-        x: col * cellWidth,
-        y: row * cellHeight,
-        width: cellWidth,
-        height: cellHeight,
-        weight: indicator.weight,
-        value: indicator.value,
-        target: indicator.target,
-        level: indicator.level
-      });
-    });
-    
-    return positioned;
-  }, [groupedIndicators, W, H]);
+    return TreemapLayoutEngine.layout(groupedIndicators, W, H, groupBy);
+  }, [groupedIndicators, W, H, groupBy]);
 
   // Helper function to get group value
   function getGroupValue(indicator: any, groupBy: string): string {
@@ -214,6 +175,19 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
       'Governance': 'sector-governance'
     };
     return sectorMap[sector] || 'sector-systemic';
+  };
+
+  const getPerformanceClass = (value: number, target: number): string => {
+    const performance = (value / target) * 100;
+    if (performance >= 90) return 'performance-excellent';
+    if (performance >= 75) return 'performance-good';
+    return 'performance-poor';
+  };
+
+  const formatPercentage = (value: number, target: number): string => {
+    const percentage = ((value / target) * 100).toFixed(1);
+    const isPositive = value >= target;
+    return `${isPositive ? '+' : ''}${percentage}%`;
   };
 
   const getStatusClass = (value: number, target: number): string => {
@@ -382,7 +356,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
       <div className="treemap-card" id="treemap-content">
         {/* Header Strip */}
         <div className="treemap-header">
-          <h2>Sector Treemap: Comprehensive System View</h2>
+          <h2>Sector Performance Treemap</h2>
         </div>
         
         {/* SVG Container */}
@@ -396,80 +370,124 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           >
             {/* Define filters and effects */}
             <defs>
-              <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="rgba(0,0,0,0.3)" floodOpacity="1"/>
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
               </filter>
             </defs>
             
-            {/* Render rectangles for each indicator */}
-            {positionedIndicators.map((indicator) => {
-              const sectorClass = getSectorClass(indicator.sector);
-              const statusClass = getStatusClass(indicator.value, indicator.target);
-              const tileClasses = getTileClasses(indicator);
+            {/* Render treemap tiles */}
+            {positionedIndicators.map((node) => {
+              const sectorClass = getSectorClass(node.sector);
+              const performanceClass = getPerformanceClass(node.value, node.target);
+              const isHovered = hoveredIndicatorId === node.id;
+              const percentage = formatPercentage(node.value, node.target);
               
               return (
-                <g key={indicator.id}>
-                  {/* Base sector tint */}
+                <g key={node.id}>
+                  {/* Base tile */}
                   <rect
-                    x={indicator.x}
-                    y={indicator.y}
-                    width={indicator.width}
-                    height={indicator.height}
-                    className={`tile-base ${sectorClass} ${tileClasses} transition-transform duration-200 ease-in-out`}
-                    stroke="rgba(255,255,255,0.10)"
+                    x={node.x}
+                    y={node.y}
+                    width={node.width}
+                    height={node.height}
+                    className={`treemap-tile ${sectorClass} ${performanceClass} ${isHovered ? 'tile-hovered' : ''}`}
+                    stroke="rgba(255,255,255,0.2)"
                     strokeWidth="1"
-                    filter="url(#innerShadow)"
                     style={{ cursor: 'pointer' }}
                     tabIndex={0}
                     role="gridcell"
-                    aria-label={`${indicator.name}: ${indicator.value}/${indicator.target} (${Math.round((indicator.value / indicator.target) * 100)}%). Click to ${currentLevel < hierarchyDepth - 1 ? 'drill down' : 'view details'}`}
-                    onMouseEnter={(e) => handleTileMouseEnter(indicator, e)}
+                    aria-label={`${node.name}: ${percentage}. Click to ${currentLevel < hierarchyDepth - 1 ? 'drill down' : 'view details'}`}
+                    onMouseEnter={(e) => handleTileMouseEnter(node, e)}
                     onMouseLeave={handleTileMouseLeave}
-                    onClick={() => handleTileClick(indicator)}
-                    onKeyDown={(e) => handleTileKeyDown(e, indicator)}
-                    onFocus={() => setHoveredIndicatorId(indicator.id)}
+                    onClick={() => handleTileClick(node)}
+                    onKeyDown={(e) => handleTileKeyDown(e, node)}
+                    onFocus={() => setHoveredIndicatorId(node.id)}
                     onBlur={() => {
                       setHoveredIndicatorId(null);
                       setTooltip(null);
                     }}
                   />
-                  {/* Status overlay */}
-                  <rect
-                    x={indicator.x}
-                    y={indicator.y}
-                    width={indicator.width}
-                    height={indicator.height}
-                    className={statusClass}
-                    stroke="none"
-                    pointerEvents="none"
-                  />
+                  
+                  {/* Stock symbol (name) */}
+                  {node.width > 60 && node.height > 40 && (
+                    <text
+                      x={node.x + node.width / 2}
+                      y={node.y + node.height / 2 - 8}
+                      className="tile-symbol"
+                      textAnchor="middle"
+                      pointerEvents="none"
+                    >
+                      {node.name.length > 8 ? node.name.substring(0, 8) : node.name}
+                    </text>
+                  )}
+                  
+                  {/* Percentage */}
+                  {node.width > 60 && node.height > 40 && (
+                    <text
+                      x={node.x + node.width / 2}
+                      y={node.y + node.height / 2 + 8}
+                      className="tile-percentage"
+                      textAnchor="middle"
+                      pointerEvents="none"
+                    >
+                      {percentage}
+                    </text>
+                  )}
+                  
+                  {/* Small tiles - show abbreviated text */}
+                  {(node.width <= 60 || node.height <= 40) && node.width > 30 && node.height > 20 && (
+                    <text
+                      x={node.x + node.width / 2}
+                      y={node.y + node.height / 2}
+                      className="tile-small"
+                      textAnchor="middle"
+                      pointerEvents="none"
+                    >
+                      {node.name.substring(0, 3)}
+                    </text>
+                  )}
                 </g>
               );
             })}
             
-            {/* Render sector labels */}
-            {Array.from(new Map<string, PositionedIndicator[]>(positionedIndicators.reduce((acc, indicator) => {
-              const sectorName = indicator.sector;
-              if (!acc.has(sectorName)) {
-                acc.set(sectorName, []);
-              }
-              acc.get(sectorName)!.push(indicator);
-              return acc;
-            }, new Map<string, PositionedIndicator[]>()).entries())).map(([sectorName, indicators]) => {
-              // Find the first (leftmost) indicator in this sector
-              const firstIndicator = indicators.reduce((leftmost, current) => 
-                current.x < leftmost.x ? current : leftmost
-              );
+            {/* Sector dividers */}
+            {Array.from(new Set(positionedIndicators.map(n => n.sector))).map(sector => {
+              const sectorNodes = positionedIndicators.filter(n => n.sector === sector);
+              if (sectorNodes.length === 0) return null;
+              
+              const minX = Math.min(...sectorNodes.map(n => n.x));
+              const minY = Math.min(...sectorNodes.map(n => n.y));
+              const maxX = Math.max(...sectorNodes.map(n => n.x + n.width));
+              const maxY = Math.max(...sectorNodes.map(n => n.y + n.height));
               
               return (
-                <text
-                  key={sectorName}
-                  x={firstIndicator.x + 4}
-                  y={firstIndicator.y + 12}
-                  className="sector-label"
-                >
-                  {sectorName}
-                </text>
+                <g key={`sector-${sector}`}>
+                  {/* Sector boundary */}
+                  <rect
+                    x={minX}
+                    y={minY}
+                    width={maxX - minX}
+                    height={maxY - minY}
+                    fill="none"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="2"
+                    pointerEvents="none"
+                  />
+                  
+                  {/* Sector label */}
+                  <text
+                    x={minX + 8}
+                    y={minY + 16}
+                    className="sector-label-header"
+                    pointerEvents="none"
+                  >
+                    {sector.toUpperCase()}
+                  </text>
+                </g>
               );
             })}
           </svg>
@@ -1205,9 +1223,110 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
             border-width: 2px;
           }
         }
+
+        /* Enhanced Treemap Styles */
+        .treemap-tile {
+          transition: all 0.2s ease;
+        }
+
+        .tile-hovered {
+          stroke: rgba(255,255,255,0.8) !important;
+          stroke-width: 3 !important;
+          filter: url(#glow);
+        }
+
+        /* Sector-based colors (mimicking stock treemap) */
+        .sector-systemic {
+          fill: #dc2626; /* Red for negative/critical */
+        }
+        
+        .sector-population {
+          fill: #16a34a; /* Green for positive */
+        }
+        
+        .sector-resources {
+          fill: #ea580c; /* Orange */
+        }
+        
+        .sector-goods {
+          fill: #0891b2; /* Blue */
+        }
+        
+        .sector-social {
+          fill: #059669; /* Emerald */
+        }
+        
+        .sector-governance {
+          fill: #7c3aed; /* Purple */
+        }
+
+        /* Performance overlays */
+        .performance-excellent {
+          fill-opacity: 0.9;
+        }
+        
+        .performance-good {
+          fill-opacity: 0.7;
+        }
+        
+        .performance-poor {
+          fill-opacity: 0.5;
+        }
+
+        /* Text styling */
+        .tile-symbol {
+          font-family: 'Inter', sans-serif;
+          font-weight: 700;
+          font-size: 12px;
+          fill: white;
+          text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .tile-percentage {
+          font-family: 'Inter', sans-serif;
+          font-weight: 500;
+          font-size: 10px;
+          fill: white;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .tile-small {
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+          font-size: 8px;
+          fill: white;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .sector-label-header {
+          font-family: 'Inter', sans-serif;
+          font-weight: 700;
+          font-size: 11px;
+          fill: rgba(255,255,255,0.9);
+          text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          .treemap-svg {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 5/3;
+          }
+          
+          .tile-symbol {
+            font-size: 10px;
+          }
+          
+          .tile-percentage {
+            font-size: 8px;
+          }
+        }
       `}</style>
     </div>
   );
 };
 
 export default SectorTreemap;
+
+</initial_code>
