@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, HelpCircle } from 'lucide-react';
@@ -437,5 +438,3 @@ const Monitor: React.FC = () => {
 };
 
 export default Monitor;
-
-}
