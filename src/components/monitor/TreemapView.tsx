@@ -1,7 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { X, TrendingUp } from 'lucide-react';
 
 interface TreemapData {
@@ -10,12 +9,9 @@ interface TreemapData {
   value: number;
   weight: number;
   status: 'healthy' | 'warning' | 'critical';
-  category: string;
   sector: string;
   target: number;
   trend: number[];
-  lastUpdated: string;
-  owner: string;
   description: string;
 }
 
@@ -23,12 +19,6 @@ interface TreemapViewProps {
   timeRange: string;
   domainFilter: string;
   chartType: 'bar' | 'line';
-}
-
-interface Sector {
-  name: string;
-  color: string;
-  indicators: TreemapData[];
 }
 
 interface TileRect {
@@ -41,307 +31,327 @@ interface TileRect {
 
 const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, chartType }) => {
   const [selectedIndicator, setSelectedIndicator] = useState<TreemapData | null>(null);
-  const [filter, setFilter] = useState<'all' | 'strategic' | 'operational'>('all');
+  const [hoveredTile, setHoveredTile] = useState<string | null>(null);
 
-  // Define comprehensive indicator data with sectors
-  const allIndicators: TreemapData[] = useMemo(() => [
-    // Systemic Indicators
-    { id: '1', name: 'DEI Composite', value: 63, weight: 15, status: 'warning', category: 'Strategic', sector: 'Systemic', target: 80, trend: [68, 67, 65, 63, 62], lastUpdated: '2025-01-10', owner: 'Strategy Team', description: 'Overall diversity, equity and inclusion composite metric.' },
-    { id: '2', name: 'Trust Recovery Index', value: 54, weight: 12, status: 'critical', category: 'Strategic', sector: 'Systemic', target: 75, trend: [65, 61, 58, 56, 54], lastUpdated: '2025-01-10', owner: 'Executive Leadership', description: 'Stakeholder confidence restoration metric.' },
-    { id: '3', name: 'Network Dev Index', value: 52, weight: 10, status: 'critical', category: 'Strategic', sector: 'Systemic', target: 100, trend: [58, 56, 54, 52, 50], lastUpdated: '2025-01-10', owner: 'Network Team', description: 'Network development and infrastructure growth index.' },
-    { id: '4', name: 'Bundle Coherence', value: 59, weight: 8, status: 'critical', category: 'Strategic', sector: 'Systemic', target: 100, trend: [65, 63, 61, 59, 57], lastUpdated: '2025-01-10', owner: 'Integration Team', description: 'System bundle integration and coherence measurement.' },
+  // Define indicators with revised weights for dynamic sizing
+  const indicators: TreemapData[] = useMemo(() => [
+    // Systemic
+    { id: '1', name: 'DEI Composite', value: 63, weight: 120, status: 'warning', sector: 'Systemic', target: 80, trend: [68, 67, 65, 63, 62], description: 'Overall diversity, equity and inclusion composite metric.' },
+    { id: '2', name: 'Trust Recovery', value: 54, weight: 90, status: 'critical', sector: 'Systemic', target: 75, trend: [65, 61, 58, 56, 54], description: 'Stakeholder confidence restoration metric.' },
+    { id: '3', name: 'Network Dev Index', value: 52, weight: 80, status: 'critical', sector: 'Systemic', target: 100, trend: [58, 56, 54, 52, 50], description: 'Network development and infrastructure growth.' },
+    { id: '4', name: 'Bundle Coherence', value: 59, weight: 70, status: 'critical', sector: 'Systemic', target: 100, trend: [65, 63, 61, 59, 57], description: 'System bundle integration coherence.' },
 
     // Population
-    { id: '5', name: 'Population Stability', value: 71, weight: 9, status: 'warning', category: 'Community', sector: 'Population', target: 85, trend: [79, 77, 74, 71, 69], lastUpdated: '2025-01-10', owner: 'Demographics Team', description: 'Population growth and stability indicators.' },
-    { id: '6', name: 'Age Structure Balance', value: 68, weight: 7, status: 'warning', category: 'Community', sector: 'Population', target: 80, trend: [72, 70, 69, 68, 67], lastUpdated: '2025-01-10', owner: 'Demographics Team', description: 'Age distribution balance across population segments.' },
-    { id: '7', name: 'Fertility Confidence', value: 58, weight: 6, status: 'critical', category: 'Community', sector: 'Population', target: 75, trend: [64, 62, 60, 58, 56], lastUpdated: '2025-01-10', owner: 'Social Policy', description: 'Fertility rates and family planning confidence metrics.' },
-    { id: '8', name: 'Migration Flow', value: 73, weight: 5, status: 'warning', category: 'Community', sector: 'Population', target: 85, trend: [76, 75, 74, 73, 72], lastUpdated: '2025-01-10', owner: 'Immigration Services', description: 'Migration patterns and integration success rates.' },
+    { id: '5', name: 'Population Stability', value: 71, weight: 85, status: 'warning', sector: 'Population', target: 85, trend: [79, 77, 74, 71, 69], description: 'Population growth and stability indicators.' },
+    { id: '6', name: 'Age Structure Balance', value: 68, weight: 75, status: 'warning', sector: 'Population', target: 80, trend: [72, 70, 69, 68, 67], description: 'Age distribution balance across segments.' },
+    { id: '7', name: 'Fertility Confidence', value: 58, weight: 65, status: 'critical', sector: 'Population', target: 75, trend: [64, 62, 60, 58, 56], description: 'Fertility rates and family planning confidence.' },
+    { id: '8', name: 'Migration Flow', value: 73, weight: 55, status: 'warning', sector: 'Population', target: 85, trend: [76, 75, 74, 73, 72], description: 'Migration patterns and integration success.' },
 
     // Resource Market
-    { id: '9', name: 'Resource Stock vs Target', value: 45, weight: 11, status: 'critical', category: 'Operational', sector: 'Resource Market', target: 70, trend: [50, 48, 47, 45, 43], lastUpdated: '2025-01-10', owner: 'Resource Management', description: 'Resource availability against strategic targets.' },
-    { id: '10', name: 'Renewal vs Consumption', value: 62, weight: 9, status: 'warning', category: 'Sustainability', sector: 'Resource Market', target: 80, trend: [66, 64, 63, 62, 61], lastUpdated: '2025-01-10', owner: 'Sustainability Team', description: 'Resource renewal rates compared to consumption.' },
-    { id: '11', name: 'Extraction Pressure', value: 41, weight: 8, status: 'critical', category: 'Environmental', sector: 'Resource Market', target: 60, trend: [46, 44, 42, 41, 39], lastUpdated: '2025-01-10', owner: 'Environmental Team', description: 'Environmental pressure from resource extraction activities.' },
-    { id: '12', name: 'Resource Price Smoothed', value: 67, weight: 6, status: 'warning', category: 'Financial', sector: 'Resource Market', target: 75, trend: [70, 69, 68, 67, 66], lastUpdated: '2025-01-10', owner: 'Finance Team', description: 'Smoothed resource pricing trends and volatility.' },
+    { id: '9', name: 'Resource Stock vs Target', value: 45, weight: 110, status: 'critical', sector: 'Resource Market', target: 70, trend: [50, 48, 47, 45, 43], description: 'Resource availability against targets.' },
+    { id: '10', name: 'Renewal vs Consumption', value: 62, weight: 95, status: 'warning', sector: 'Resource Market', target: 80, trend: [66, 64, 63, 62, 61], description: 'Resource renewal vs consumption rates.' },
+    { id: '11', name: 'Extraction Pressure', value: 41, weight: 85, status: 'critical', sector: 'Resource Market', target: 60, trend: [46, 44, 42, 41, 39], description: 'Environmental pressure from extraction.' },
+    { id: '12', name: 'Resource Price Smoothed', value: 67, weight: 60, status: 'warning', sector: 'Resource Market', target: 75, trend: [70, 69, 68, 67, 66], description: 'Smoothed resource pricing trends.' },
 
-    // Goods & Services Market
-    { id: '13', name: 'Supply-Demand Gap', value: 74, weight: 10, status: 'warning', category: 'Operational', sector: 'Goods & Services', target: 85, trend: [77, 76, 75, 74, 73], lastUpdated: '2025-01-10', owner: 'Market Analysis', description: 'Gap between supply and demand in key markets.' },
-    { id: '14', name: 'Price Deviation', value: 69, weight: 8, status: 'warning', category: 'Financial', sector: 'Goods & Services', target: 80, trend: [72, 71, 70, 69, 68], lastUpdated: '2025-01-10', owner: 'Pricing Team', description: 'Price deviation from optimal market equilibrium.' },
-    { id: '15', name: 'Capacity Utilization', value: 81, weight: 7, status: 'healthy', category: 'Operational', sector: 'Goods & Services', target: 85, trend: [78, 79, 80, 81, 82], lastUpdated: '2025-01-10', owner: 'Operations', description: 'Production and service capacity utilization rates.' },
-    { id: '16', name: 'Market Stability', value: 76, weight: 6, status: 'healthy', category: 'Strategic', sector: 'Goods & Services', target: 80, trend: [74, 75, 76, 77, 76], lastUpdated: '2025-01-10', owner: 'Market Strategy', description: 'Overall market stability and predictability index.' },
+    // Goods & Services
+    { id: '13', name: 'Supply-Demand Gap', value: 74, weight: 100, status: 'warning', sector: 'Goods & Services', target: 85, trend: [77, 76, 75, 74, 73], description: 'Gap between supply and demand.' },
+    { id: '14', name: 'Price Deviation', value: 69, weight: 80, status: 'warning', sector: 'Goods & Services', target: 80, trend: [72, 71, 70, 69, 68], description: 'Price deviation from optimal equilibrium.' },
+    { id: '15', name: 'Capacity Utilization', value: 81, weight: 75, status: 'healthy', sector: 'Goods & Services', target: 85, trend: [78, 79, 80, 81, 82], description: 'Production capacity utilization rates.' },
+    { id: '16', name: 'Market Stability', value: 76, weight: 65, status: 'healthy', sector: 'Goods & Services', target: 80, trend: [74, 75, 76, 77, 76], description: 'Overall market stability index.' },
 
     // Social Outcomes
-    { id: '17', name: 'Social Cohesion', value: 69, weight: 9, status: 'warning', category: 'Community', sector: 'Social Outcomes', target: 90, trend: [79, 76, 72, 69, 68], lastUpdated: '2025-01-10', owner: 'Community Relations', description: 'Social cohesion and community integration measures.' },
-    { id: '18', name: 'Education Completion', value: 82, weight: 8, status: 'healthy', category: 'Learning', sector: 'Social Outcomes', target: 90, trend: [80, 81, 82, 83, 82], lastUpdated: '2025-01-10', owner: 'Education Ministry', description: 'Education completion rates across all levels.' },
-    { id: '19', name: 'Health Status Index', value: 78, weight: 7, status: 'healthy', category: 'Community', sector: 'Social Outcomes', target: 85, trend: [76, 77, 78, 79, 78], lastUpdated: '2025-01-10', owner: 'Health Ministry', description: 'Population health indicators and healthcare access.' },
-    { id: '20', name: 'Household Revenue', value: 71, weight: 6, status: 'warning', category: 'Financial', sector: 'Social Outcomes', target: 80, trend: [74, 73, 72, 71, 70], lastUpdated: '2025-01-10', owner: 'Economic Policy', description: 'Average household income and financial stability.' },
+    { id: '17', name: 'Social Cohesion', value: 69, weight: 90, status: 'warning', sector: 'Social Outcomes', target: 90, trend: [79, 76, 72, 69, 68], description: 'Social cohesion and integration.' },
+    { id: '18', name: 'Education Completion', value: 82, weight: 80, status: 'healthy', sector: 'Social Outcomes', target: 90, trend: [80, 81, 82, 83, 82], description: 'Education completion rates.' },
+    { id: '19', name: 'Health Status Index', value: 78, weight: 75, status: 'healthy', sector: 'Social Outcomes', target: 85, trend: [76, 77, 78, 79, 78], description: 'Population health indicators.' },
+    { id: '20', name: 'Household Revenue', value: 71, weight: 70, status: 'warning', sector: 'Social Outcomes', target: 80, trend: [74, 73, 72, 71, 70], description: 'Average household income stability.' },
 
     // Governance
-    { id: '21', name: 'Open Claims', value: 10, weight: 5, status: 'critical', category: 'Operational', sector: 'Governance', target: 5, trend: [12, 11, 10, 9, 10], lastUpdated: '2025-01-10', owner: 'Claims Processing', description: 'Number of open facilitator claims requiring resolution.' },
-    { id: '22', name: 'Think→Act Queue', value: 4, weight: 4, status: 'warning', category: 'Operational', sector: 'Governance', target: 3, trend: [5, 4, 4, 3, 4], lastUpdated: '2025-01-10', owner: 'Process Management', description: 'Queue length for think-to-act transitions.' },
-    { id: '23', name: 'Act→Monitor Queue', value: 3, weight: 3, status: 'healthy', category: 'Operational', sector: 'Governance', target: 2, trend: [4, 3, 3, 2, 3], lastUpdated: '2025-01-10', owner: 'Process Management', description: 'Queue length for act-to-monitor transitions.' },
-    { id: '24', name: 'System Error Count', value: 5, weight: 3, status: 'critical', category: 'Technical', sector: 'Governance', target: 1, trend: [6, 5, 5, 4, 5], lastUpdated: '2025-01-10', owner: 'System Administration', description: 'Critical system errors requiring immediate attention.' }
+    { id: '21', name: 'Open Claims', value: 10, weight: 100, status: 'critical', sector: 'Governance', target: 5, trend: [12, 11, 10, 9, 10], description: 'Open facilitator claims requiring resolution.' },
+    { id: '22', name: 'System Errors', value: 5, weight: 90, status: 'critical', sector: 'Governance', target: 1, trend: [6, 5, 5, 4, 5], description: 'Critical system errors requiring attention.' },
+    { id: '23', name: 'Think→Act Queue', value: 4, weight: 60, status: 'warning', sector: 'Governance', target: 3, trend: [5, 4, 4, 3, 4], description: 'Queue length for think-to-act transitions.' },
+    { id: '24', name: 'Act→Monitor Queue', value: 3, weight: 50, status: 'healthy', sector: 'Governance', target: 2, trend: [4, 3, 3, 2, 3], description: 'Queue length for act-to-monitor transitions.' }
   ], []);
 
-  // Filter indicators based on current filter
-  const filteredIndicators = useMemo(() => {
-    if (filter === 'all') return allIndicators;
-    if (filter === 'strategic') return allIndicators.filter(ind => ind.category === 'Strategic');
-    if (filter === 'operational') return allIndicators.filter(ind => ind.category === 'Operational');
-    return allIndicators;
-  }, [allIndicators, filter]);
-
   // Group indicators by sector
-  const sectors: Sector[] = useMemo(() => {
-    const sectorNames = ['Systemic', 'Population', 'Resource Market', 'Goods & Services', 'Social Outcomes', 'Governance'];
-    const sectorColors = [
-      'rgba(0,184,255,0.08)', // Blue for Systemic
-      'rgba(0,255,195,0.08)', // Teal for Population  
-      'rgba(255,193,7,0.08)', // Yellow for Resource Market
-      'rgba(156,39,176,0.08)', // Purple for Goods & Services
-      'rgba(76,175,80,0.08)', // Green for Social Outcomes
-      'rgba(255,87,34,0.08)'  // Orange for Governance
-    ];
+  const sectors = useMemo(() => [
+    { name: 'Systemic', color: 'rgba(0,184,255,0.08)', indicators: indicators.filter(i => i.sector === 'Systemic') },
+    { name: 'Population', color: 'rgba(0,255,195,0.08)', indicators: indicators.filter(i => i.sector === 'Population') },
+    { name: 'Resource Market', color: 'rgba(255,193,7,0.08)', indicators: indicators.filter(i => i.sector === 'Resource Market') },
+    { name: 'Goods & Services', color: 'rgba(123,104,238,0.08)', indicators: indicators.filter(i => i.sector === 'Goods & Services') },
+    { name: 'Social Outcomes', color: 'rgba(60,179,113,0.08)', indicators: indicators.filter(i => i.sector === 'Social Outcomes') },
+    { name: 'Governance', color: 'rgba(199,21,133,0.08)', indicators: indicators.filter(i => i.sector === 'Governance') }
+  ], [indicators]);
 
-    return sectorNames.map((name, index) => ({
-      name,
-      color: sectorColors[index],
-      indicators: filteredIndicators.filter(ind => ind.sector === name)
-    })).filter(sector => sector.indicators.length > 0);
-  }, [filteredIndicators]);
-
-  // Simple sector-based treemap layout
-  const createSectorTreemap = (sectors: Sector[], containerWidth: number, containerHeight: number): TileRect[] => {
+  // Calculate treemap layout
+  const createTreemapLayout = (width: number, height: number): TileRect[] => {
+    const totalWeight = indicators.reduce((sum, ind) => sum + ind.weight, 0);
     const rects: TileRect[] = [];
-    const headerHeight = 24;
-    const padding = 4;
     
-    // Arrange sectors in a 2x3 grid
-    const cols = 2;
-    const rows = 3;
-    const sectorWidth = (containerWidth - padding * (cols + 1)) / cols;
-    const sectorHeight = (containerHeight - padding * (rows + 1)) / rows;
+    // Calculate sector areas
+    const sectorAreas = sectors.map(sector => ({
+      ...sector,
+      area: sector.indicators.reduce((sum, ind) => sum + ind.weight, 0) / totalWeight * (width * height)
+    }));
 
-    sectors.forEach((sector, sectorIndex) => {
-      const sectorRow = Math.floor(sectorIndex / cols);
-      const sectorCol = sectorIndex % cols;
-      const sectorX = padding + sectorCol * (sectorWidth + padding);
-      const sectorY = padding + sectorRow * (sectorHeight + padding);
+    // Layout sectors in 3x2 grid
+    let currentY = 0;
+    for (let row = 0; row < 2; row++) {
+      let currentX = 0;
+      const rowHeight = height / 2;
       
-      // Calculate available space for tiles (excluding header)
-      const availableHeight = sectorHeight - headerHeight;
-      const sectorTotalWeight = sector.indicators.reduce((sum, ind) => sum + ind.weight, 0);
-      
-      // Simple layout within sector
-      let currentY = sectorY + headerHeight;
-      let currentX = sectorX;
-      let rowHeight = 0;
-      
-      sector.indicators.forEach((indicator) => {
-        const area = (indicator.weight / sectorTotalWeight) * (sectorWidth * availableHeight);
-        const tileWidth = Math.max(60, Math.min(sectorWidth - (currentX - sectorX), Math.sqrt(area * 1.5)));
-        const tileHeight = Math.max(40, area / tileWidth);
+      for (let col = 0; col < 3; col++) {
+        const sectorIndex = row * 3 + col;
+        if (sectorIndex >= sectors.length) break;
         
-        // Check if tile fits in current row
-        if (currentX + tileWidth > sectorX + sectorWidth) {
-          currentY += rowHeight + 2;
-          currentX = sectorX;
-          rowHeight = 0;
-        }
+        const sector = sectors[sectorIndex];
+        const sectorWidth = width / 3;
         
-        rects.push({
-          x: currentX,
-          y: currentY,
-          width: Math.min(tileWidth, sectorX + sectorWidth - currentX),
-          height: Math.min(tileHeight, sectorY + sectorHeight - currentY),
-          data: indicator
+        // Layout tiles within sector using simple row-based algorithm
+        let tileY = currentY + 20; // Leave space for sector label
+        let tileX = currentX;
+        let rowMaxHeight = 0;
+        
+        sector.indicators.forEach(indicator => {
+          const tileArea = (indicator.weight / totalWeight) * (width * height);
+          const aspectRatio = 1.6; // Preferred aspect ratio
+          let tileWidth = Math.sqrt(tileArea * aspectRatio);
+          let tileHeight = tileArea / tileWidth;
+          
+          // Ensure minimum size
+          tileWidth = Math.max(tileWidth, 80);
+          tileHeight = Math.max(tileHeight, 50);
+          
+          // Check if tile fits in current row
+          if (tileX + tileWidth > currentX + sectorWidth && tileX > currentX) {
+            tileY += rowMaxHeight + 2;
+            tileX = currentX;
+            rowMaxHeight = 0;
+          }
+          
+          // Ensure tile fits within sector bounds
+          tileWidth = Math.min(tileWidth, currentX + sectorWidth - tileX);
+          tileHeight = Math.min(tileHeight, currentY + rowHeight - tileY);
+          
+          rects.push({
+            x: tileX,
+            y: tileY,
+            width: tileWidth,
+            height: tileHeight,
+            data: indicator
+          });
+          
+          tileX += tileWidth + 2;
+          rowMaxHeight = Math.max(rowMaxHeight, tileHeight);
         });
         
-        currentX += tileWidth + 2;
-        rowHeight = Math.max(rowHeight, tileHeight);
-      });
-    });
+        currentX += sectorWidth;
+      }
+      currentY += rowHeight;
+    }
     
     return rects;
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'healthy': return '#00FFC3';
-      case 'warning': return '#FFC107';
-      case 'critical': return '#FF6E6E';
-      default: return '#00FFC3';
-    }
+  const getStatusOverlay = (value: number, target: number) => {
+    const ratio = value / target;
+    if (ratio >= 0.75) return 'rgba(0,255,195,0.12)';
+    if (ratio >= 0.5) return 'rgba(255,193,7,0.12)';
+    return 'rgba(255,110,110,0.12)';
   };
 
   const getSectorColor = (sectorName: string) => {
-    const colorMap: Record<string, string> = {
-      'Systemic': 'rgba(0,184,255,0.08)',
-      'Population': 'rgba(0,255,195,0.08)',
-      'Resource Market': 'rgba(255,193,7,0.08)',
-      'Goods & Services': 'rgba(156,39,176,0.08)',
-      'Social Outcomes': 'rgba(76,175,80,0.08)',
-      'Governance': 'rgba(255,87,34,0.08)'
-    };
-    return colorMap[sectorName] || 'rgba(255,255,255,0.05)';
+    const sector = sectors.find(s => s.name === sectorName);
+    return sector?.color || 'rgba(255,255,255,0.05)';
   };
 
-  const tileRects = createSectorTreemap(sectors, 800, 500);
+  const tiles = createTreemapLayout(800, 500);
 
   return (
-    <div className="h-full flex flex-col p-4">
-      {/* Filter Pills */}
-      <div className="flex space-x-2 mb-4">
-        {(['all', 'strategic', 'operational'] as const).map((filterOption) => (
-          <button
-            key={filterOption}
-            onClick={() => setFilter(filterOption)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              filter === filterOption
-                ? 'bg-gradient-to-r from-teal-500 to-blue-500 text-white'
-                : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
-            }`}
-          >
-            {filterOption === 'all' ? 'All Indicators' : 
-             filterOption === 'strategic' ? 'Strategic Only' : 'Operational Only'}
-          </button>
-        ))}
-      </div>
-
-      {/* Treemap Container */}
-      <div className="flex-1">
+    <div className="h-full p-4">
+      <div 
+        className="w-full h-full rounded-2xl overflow-hidden relative"
+        style={{
+          background: 'rgba(10,20,40,0.45)',
+          backdropFilter: 'blur(24px)',
+          border: '1px solid rgba(0,255,195,0.15)',
+          boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
+          maxHeight: 'calc(100vh - 240px)',
+          minHeight: '600px'
+        }}
+      >
+        {/* Header Strip */}
         <div 
-          className="w-full h-full rounded-2xl border border-teal-400/15 overflow-hidden relative"
+          className="h-10 flex items-center px-4"
           style={{
-            background: 'rgba(10,20,40,0.45)',
-            backdropFilter: 'blur(24px)',
-            minHeight: '500px'
+            background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
+            borderRadius: '1rem 1rem 0 0'
           }}
         >
-          {/* Header Strip */}
-          <div 
-            className="h-10 flex items-center px-4"
-            style={{
-              background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
+          <h3 
+            className="text-white font-bold text-base"
+            style={{ 
+              fontFamily: 'Noto Sans',
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)' 
             }}
           >
-            <h3 className="text-white font-bold text-sm" style={{ fontFamily: 'Noto Sans' }}>
-              Sector Treemap
-            </h3>
-          </div>
+            Sector Treemap: Comprehensive System View
+          </h3>
+        </div>
 
-          {/* SVG Content */}
-          <div className="absolute inset-x-4 bottom-4 top-14">
-            <svg width="100%" height="100%" viewBox="0 0 800 500" className="w-full h-full">
-              {/* Sector Headers */}
-              {sectors.map((sector, sectorIndex) => {
-                const sectorRow = Math.floor(sectorIndex / 2);
-                const sectorCol = sectorIndex % 2;
-                const sectorX = 4 + sectorCol * 398;
-                const sectorY = 4 + sectorRow * 164;
-                
-                return (
-                  <text
-                    key={`header-${sector.name}`}
-                    x={sectorX + 8}
-                    y={sectorY + 16}
-                    className="text-xs font-bold fill-slate-300"
-                    style={{ 
-                      fontFamily: 'Noto Sans',
-                      textShadow: '0 1px 2px rgba(0,0,0,0.5)' 
+        {/* SVG Container */}
+        <div 
+          className="absolute overflow-y-auto"
+          style={{
+            top: '40px',
+            bottom: '16px',
+            left: '16px',
+            right: '16px',
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(255,255,255,0.20) transparent'
+          }}
+        >
+          <style>{`
+            .overflow-y-auto::-webkit-scrollbar {
+              width: 6px;
+            }
+            .overflow-y-auto::-webkit-scrollbar-thumb {
+              background: rgba(255,255,255,0.20);
+              border-radius: 3px;
+            }
+            .overflow-y-auto::-webkit-scrollbar-track {
+              background: transparent;
+            }
+          `}</style>
+          
+          <svg width="100%" height="100%" viewBox="0 0 800 500" className="w-full h-full">
+            {/* Sector Labels */}
+            {sectors.map((sector, index) => {
+              const row = Math.floor(index / 3);
+              const col = index % 3;
+              const x = col * (800 / 3) + 8;
+              const y = row * (500 / 2) + 16;
+              
+              return (
+                <text
+                  key={`label-${sector.name}`}
+                  x={x}
+                  y={y}
+                  className="text-xs font-bold fill-slate-300"
+                  style={{ 
+                    fontFamily: 'Noto Sans',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.5)' 
+                  }}
+                >
+                  {sector.name}
+                </text>
+              );
+            })}
+
+            {/* Tiles */}
+            {tiles.map((tile) => {
+              const canShowText = tile.width >= 100 && tile.height >= 60;
+              const sectorColor = getSectorColor(tile.data.sector);
+              const statusOverlay = getStatusOverlay(tile.data.value, tile.data.target);
+              const isHovered = hoveredTile === tile.data.id;
+              
+              return (
+                <g 
+                  key={tile.data.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${tile.data.name}: ${tile.data.value}/${tile.data.target}`}
+                  onMouseEnter={() => setHoveredTile(tile.data.id)}
+                  onMouseLeave={() => setHoveredTile(null)}
+                  onClick={() => setSelectedIndicator(tile.data)}
+                  className="cursor-pointer"
+                  style={{
+                    transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+                    transformOrigin: `${tile.x + tile.width/2}px ${tile.y + tile.height/2}px`,
+                    transition: 'transform 200ms ease-out'
+                  }}
+                >
+                  {/* Base tile */}
+                  <rect
+                    x={tile.x}
+                    y={tile.y}
+                    width={tile.width}
+                    height={tile.height}
+                    fill={sectorColor}
+                    stroke="rgba(255,255,255,0.10)"
+                    strokeWidth="1"
+                    style={{
+                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+                      ...(isHovered && { 
+                        boxShadow: '0 0 12px rgba(0,255,195,0.5)',
+                        filter: 'drop-shadow(0 0 12px rgba(0,255,195,0.5))'
+                      })
                     }}
-                  >
-                    {sector.name}
-                  </text>
-                );
-              })}
+                  />
+                  
+                  {/* Status overlay */}
+                  <rect
+                    x={tile.x}
+                    y={tile.y}
+                    width={tile.width}
+                    height={tile.height}
+                    fill={statusOverlay}
+                    stroke="none"
+                  />
 
-              {/* Tiles */}
-              {tileRects.map((rect) => {
-                const canShowText = rect.width > 80 && rect.height > 50;
-                const sectorColor = getSectorColor(rect.data.sector);
-                const statusColor = getStatusColor(rect.data.status);
-                
-                return (
-                  <g key={rect.data.id}>
-                    <rect
-                      x={rect.x}
-                      y={rect.y}
-                      width={rect.width}
-                      height={rect.height}
-                      fill={sectorColor}
-                      stroke="rgba(255,255,255,0.10)"
-                      strokeWidth="1"
-                      className="cursor-pointer hover:opacity-80 transition-all duration-200"
-                      onClick={() => setSelectedIndicator(rect.data)}
-                      style={{
-                        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-                      }}
-                    />
-                    
-                    {/* Status indicator dot */}
-                    <circle
-                      cx={rect.x + rect.width - 8}
-                      cy={rect.y + 8}
-                      r="3"
-                      fill={statusColor}
-                      className="cursor-pointer"
-                      onClick={() => setSelectedIndicator(rect.data)}
-                    />
-
-                    {canShowText ? (
-                      <>
-                        {/* Title */}
-                        <text
-                          x={rect.x + rect.width / 2}
-                          y={rect.y + 16}
-                          textAnchor="middle"
-                          className="text-xs font-bold fill-white cursor-pointer"
-                          onClick={() => setSelectedIndicator(rect.data)}
-                          style={{ fontFamily: 'Noto Sans' }}
-                        >
-                          {rect.data.name.length > 14 ? rect.data.name.substring(0, 14) + '...' : rect.data.name}
-                        </text>
-                        
-                        {/* Value */}
-                        <text
-                          x={rect.x + rect.width / 2}
-                          y={rect.y + rect.height - 8}
-                          textAnchor="middle"
-                          className="text-sm font-bold cursor-pointer"
-                          fill={statusColor}
-                          onClick={() => setSelectedIndicator(rect.data)}
-                          style={{ fontFamily: 'Noto Sans' }}
-                        >
-                          {rect.data.value}%
-                        </text>
-                      </>
-                    ) : (
-                      <>
-                        {/* Info icon for small tiles */}
-                        <circle
-                          cx={rect.x + rect.width / 2}
-                          cy={rect.y + rect.height / 2}
-                          r="8"
-                          fill="#00FFC3"
-                          className="cursor-pointer"
-                          onClick={() => setSelectedIndicator(rect.data)}
-                        />
-                        <text
-                          x={rect.x + rect.width / 2}
-                          y={rect.y + rect.height / 2 + 3}
-                          textAnchor="middle"
-                          className="text-xs font-bold fill-black cursor-pointer"
-                          onClick={() => setSelectedIndicator(rect.data)}
-                        >
-                          i
-                        </text>
-                      </>
-                    )}
-                  </g>
-                );
-              })}
-            </svg>
-          </div>
+                  {canShowText ? (
+                    <>
+                      {/* Title */}
+                      <text
+                        x={tile.x + tile.width / 2}
+                        y={tile.y + 20}
+                        textAnchor="middle"
+                        className="text-xs font-bold"
+                        fill="#00B8FF"
+                        style={{ 
+                          fontFamily: 'Noto Sans',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.5)' 
+                        }}
+                      >
+                        {tile.data.name.length > 16 ? 
+                          tile.data.name.substring(0, 16) + '...' : 
+                          tile.data.name}
+                      </text>
+                      
+                      {/* Value */}
+                      <text
+                        x={tile.x + tile.width / 2}
+                        y={tile.y + tile.height - 8}
+                        textAnchor="middle"
+                        className="text-sm font-normal"
+                        fill="#E0E0E0"
+                        style={{ fontFamily: 'Noto Sans' }}
+                      >
+                        {tile.data.value}
+                      </text>
+                    </>
+                  ) : (
+                    <>
+                      {/* Info icon for small tiles */}
+                      <circle
+                        cx={tile.x + tile.width / 2}
+                        cy={tile.y + tile.height / 2}
+                        r="8"
+                        fill="#00FFC3"
+                      />
+                      <text
+                        x={tile.x + tile.width / 2}
+                        y={tile.y + tile.height / 2 + 3}
+                        textAnchor="middle"
+                        className="text-xs font-bold fill-black"
+                      >
+                        ℹ
+                      </text>
+                    </>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
         </div>
       </div>
 
@@ -359,21 +369,23 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800/95 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden shadow-2xl w-full max-w-2xl max-h-[600px] flex flex-col"
+              className="w-[600px] h-[400px] rounded-2xl overflow-hidden relative"
+              style={{
+                background: 'rgba(20,30,50,0.85)',
+                backdropFilter: 'blur(32px)',
+                border: '1px solid rgba(0,255,195,0.2)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.8)'
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between p-6 border-b border-white/10">
-                <div className="flex items-center space-x-4">
-                  <div 
-                    className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: getStatusColor(selectedIndicator.status) }}
-                  />
-                  <div>
-                    <h2 className="text-xl font-bold text-white">{selectedIndicator.name}</h2>
-                    <p className="text-slate-300">{selectedIndicator.sector} • {selectedIndicator.category}</p>
-                  </div>
-                </div>
+                <h2 
+                  className="text-lg font-bold text-[#00FFC3]"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  {selectedIndicator.name}
+                </h2>
                 <button
                   onClick={() => setSelectedIndicator(null)}
                   className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -383,75 +395,83 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
               </div>
 
               {/* Modal Content */}
-              <div className="flex-1 overflow-y-auto p-6">
-                {/* Key Metrics */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                    <div className="text-xl font-bold text-teal-400">{selectedIndicator.value}%</div>
-                    <div className="text-xs text-slate-300">Current</div>
+              <div className="p-6 space-y-4">
+                {/* Stats */}
+                <div className="flex items-center space-x-8">
+                  <div>
+                    <span className="text-slate-400 text-sm">Current</span>
+                    <div className="text-2xl font-bold text-[#00FFC3]">{selectedIndicator.value}</div>
                   </div>
-                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                    <div className="text-xl font-bold text-blue-400">{selectedIndicator.target}%</div>
-                    <div className="text-xs text-slate-300">Target</div>
+                  <div>
+                    <span className="text-slate-400 text-sm">Target</span>
+                    <div className="text-2xl font-bold text-blue-400">{selectedIndicator.target}</div>
                   </div>
-                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                    <div className="text-xl font-bold text-purple-400">{selectedIndicator.weight}</div>
-                    <div className="text-xs text-slate-300">Weight</div>
+                  <div>
+                    <span className="text-slate-400 text-sm">Performance</span>
+                    <div className="text-2xl font-bold text-purple-400">
+                      {((selectedIndicator.value / selectedIndicator.target) * 100).toFixed(0)}%
+                    </div>
                   </div>
                 </div>
 
                 {/* Description */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold text-white mb-2">Description</h3>
-                  <p className="text-slate-300 text-sm">{selectedIndicator.description}</p>
-                </div>
+                <p className="text-slate-300 text-sm">{selectedIndicator.description}</p>
 
                 {/* Trend Chart */}
-                <div className="bg-slate-700/30 rounded-lg p-4">
-                  <h4 className="text-md font-bold text-white mb-3 flex items-center">
+                <div 
+                  className="rounded-lg p-4"
+                  style={{ 
+                    background: 'rgba(10,15,25,0.5)',
+                    height: '40%'
+                  }}
+                >
+                  <h4 className="text-white font-bold mb-3 flex items-center">
                     <TrendingUp size={16} className="mr-2" />
-                    5-Period Trend
+                    90-Day Trend
                   </h4>
-                  <div className="h-40">
-                    <ResponsiveContainer width="100%" height="100%">
-                      {chartType === 'line' ? (
-                        <LineChart data={selectedIndicator.trend.map((value, index) => ({ period: index + 1, value }))}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                          <XAxis dataKey="period" stroke="#94A3B8" />
-                          <YAxis stroke="#94A3B8" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: 'rgba(30, 41, 59, 0.9)', 
-                              border: '1px solid rgba(255,255,255,0.2)',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Line 
-                            type="monotone" 
-                            dataKey="value" 
-                            stroke="#00FFC3" 
-                            strokeWidth={2}
-                            dot={{ fill: '#00FFC3', strokeWidth: 2, r: 4 }}
-                          />
-                        </LineChart>
-                      ) : (
-                        <BarChart data={selectedIndicator.trend.map((value, index) => ({ period: index + 1, value }))}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                          <XAxis dataKey="period" stroke="#94A3B8" />
-                          <YAxis stroke="#94A3B8" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: 'rgba(30, 41, 59, 0.9)', 
-                              border: '1px solid rgba(255,255,255,0.2)',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Bar dataKey="value" fill="#00FFC3" />
-                        </BarChart>
-                      )}
-                    </ResponsiveContainer>
-                  </div>
+                  <svg width="100%" height="120" viewBox="0 0 400 120">
+                    {chartType === 'line' ? (
+                      <polyline
+                        points={selectedIndicator.trend.map((value, i) => 
+                          `${(i / (selectedIndicator.trend.length - 1)) * 380 + 10},${120 - (value / Math.max(...selectedIndicator.trend)) * 100 - 10}`
+                        ).join(' ')}
+                        fill="none"
+                        stroke="#00FFC3"
+                        strokeWidth="3"
+                      />
+                    ) : (
+                      selectedIndicator.trend.map((value, i) => (
+                        <rect
+                          key={i}
+                          x={i * 70 + 20}
+                          y={120 - (value / Math.max(...selectedIndicator.trend)) * 100 - 10}
+                          width="50"
+                          height={(value / Math.max(...selectedIndicator.trend)) * 100}
+                          fill="#00FFC3"
+                          opacity="0.8"
+                        />
+                      ))
+                    )}
+                  </svg>
                 </div>
+
+                {/* Action Button */}
+                <button
+                  className="w-full py-3 rounded-lg text-sm font-medium transition-all duration-200"
+                  style={{
+                    background: '#00B8FF',
+                    color: '#081226',
+                    fontFamily: 'Noto Sans'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#00CCFF';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = '#00B8FF';
+                  }}
+                >
+                  Goto Detailed View
+                </button>
               </div>
             </motion.div>
           </motion.div>
