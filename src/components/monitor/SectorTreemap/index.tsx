@@ -15,6 +15,8 @@ interface PositionedIndicator {
   width: number;
   height: number;
   weight: number;
+  value: number;
+  target: number;
 }
 
 const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
@@ -61,7 +63,9 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
       y: y,
       width: width,
       height: rowHeight,
-      weight: indicator.weight
+      weight: indicator.weight,
+      value: indicator.value,
+      target: indicator.target
     });
     
     // Log computed values for verification
@@ -80,63 +84,184 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     sectorGroups.get(indicator.sector)!.push(indicator);
   });
 
+  // Helper functions for styling
+  const getSectorClass = (sector: string): string => {
+    const sectorMap: Record<string, string> = {
+      'Systemic': 'sector-systemic',
+      'Population': 'sector-population', 
+      'ResourceMarket': 'sector-resources',
+      'GoodsServices': 'sector-goods',
+      'SocialOutcomes': 'sector-social',
+      'Governance': 'sector-governance'
+    };
+    return sectorMap[sector] || 'sector-systemic';
+  };
+
+  const getStatusClass = (value: number, target: number): string => {
+    const performance = value / target;
+    if (performance >= 0.9) return 'status-inband';
+    if (performance >= 0.75) return 'status-warning';
+    return 'status-critical';
+  };
+
   return (
-    <div 
-      className="sector-treemap-card h-full w-full p-4"
-      style={{ 
-        background: 'rgba(10, 20, 40, 0.3)', 
-        borderRadius: '1rem' 
-      }}
-    >
-      <div className="text-white">
-        <h3 className="text-xl font-semibold mb-4">Sector Treemap</h3>
+    <div className="h-full w-full p-4">
+      {/* Glassmorphic Card Frame */}
+      <div className="treemap-card">
+        {/* Header Strip */}
+        <div className="treemap-header">
+          <h2>Sector Treemap: Comprehensive System View</h2>
+        </div>
         
-        {/* Step 3: Render SVG with rectangles */}
-        <svg width={W} height={H} className="border border-gray-500">
-          {/* Render rectangles for each indicator */}
-          {positionedIndicators.map((indicator) => (
-            <rect
-              key={indicator.id}
-              x={indicator.x}
-              y={indicator.y}
-              width={indicator.width}
-              height={indicator.height}
-              fill="none"
-              stroke="black"
-              strokeWidth="1"
-            />
-          ))}
-          
-          {/* Step 4: Render sector labels */}
-          {Array.from(sectorGroups.entries()).map(([sectorName, indicators]) => {
-            // Find the first (leftmost) indicator in this sector
-            const firstIndicator = indicators.reduce((leftmost, current) => 
-              current.x < leftmost.x ? current : leftmost
-            );
+        {/* SVG Container */}
+        <div className="p-4">
+          <svg width={W} height={H} className="w-full">
+            {/* Define filters and effects */}
+            <defs>
+              <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="rgba(0,0,0,0.3)" floodOpacity="1"/>
+              </filter>
+            </defs>
             
-            return (
-              <text
-                key={sectorName}
-                x={firstIndicator.x}
-                y={firstIndicator.y - 4}
-                fill="#000"
-                fontSize="12"
-                fontFamily="Arial, sans-serif"
-              >
-                {sectorName}
-              </text>
-            );
-          })}
-        </svg>
+            {/* Render rectangles for each indicator */}
+            {positionedIndicators.map((indicator) => {
+              const sectorClass = getSectorClass(indicator.sector);
+              const statusClass = getStatusClass(indicator.value, indicator.target);
+              
+              return (
+                <g key={indicator.id}>
+                  {/* Base sector tint */}
+                  <rect
+                    x={indicator.x}
+                    y={indicator.y}
+                    width={indicator.width}
+                    height={indicator.height}
+                    className={sectorClass}
+                    stroke="rgba(255,255,255,0.10)"
+                    strokeWidth="1"
+                    filter="url(#innerShadow)"
+                  />
+                  {/* Status overlay */}
+                  <rect
+                    x={indicator.x}
+                    y={indicator.y}
+                    width={indicator.width}
+                    height={indicator.height}
+                    className={statusClass}
+                    stroke="none"
+                    pointerEvents="none"
+                  />
+                </g>
+              );
+            })}
+            
+            {/* Render sector labels */}
+            {Array.from(sectorGroups.entries()).map(([sectorName, indicators]) => {
+              // Find the first (leftmost) indicator in this sector
+              const firstIndicator = indicators.reduce((leftmost, current) => 
+                current.x < leftmost.x ? current : leftmost
+              );
+              
+              return (
+                <text
+                  key={sectorName}
+                  x={firstIndicator.x + 4}
+                  y={firstIndicator.y + 12}
+                  className="sector-label"
+                >
+                  {sectorName}
+                </text>
+              );
+            })}
+          </svg>
+        </div>
         
         {/* Debug info */}
-        <div className="mt-4 text-sm text-gray-300">
+        <div className="mt-4 px-4 pb-4 text-sm text-gray-300">
           <p>Total Indicators: {indicators.length}</p>
           <p>Total Weight: {totalWeight.toFixed(2)}</p>
           <p>SVG Dimensions: {W} x {H}</p>
           <p>Row Height: {rowHeight.toFixed(2)}</p>
         </div>
       </div>
+
+      <style jsx>{`
+        .treemap-card {
+          background: rgba(10,20,40,0.45);
+          backdrop-filter: blur(24px);
+          border: 1px solid rgba(0,255,195,0.15);
+          border-radius: 1.5rem;
+          box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+          position: relative;
+          overflow: hidden;
+          height: 100%;
+        }
+
+        .treemap-header {
+          background: linear-gradient(90deg,#00FFC3 0%,#00B8FF 100%);
+          height: 40px;
+          display: flex;
+          align-items: center;
+          padding: 0 16px;
+          border-radius: 1.5rem 1.5rem 0 0;
+        }
+
+        .treemap-header h2 {
+          font-family: 'Noto Sans', sans-serif;
+          font-weight: 700;
+          font-size: 16px;
+          color: #FFFFFF;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+          margin: 0;
+        }
+
+        /* Sector Tinting - 20% opacity tints */
+        .sector-systemic {
+          fill: rgba(0,184,255,0.08);
+        }
+        
+        .sector-population {
+          fill: rgba(0,255,195,0.08);
+        }
+        
+        .sector-resources {
+          fill: rgba(255,193,7,0.08);
+        }
+        
+        .sector-goods {
+          fill: rgba(123,104,238,0.08);
+        }
+        
+        .sector-social {
+          fill: rgba(60,179,113,0.08);
+        }
+        
+        .sector-governance {
+          fill: rgba(199,21,133,0.08);
+        }
+
+        /* Status Overlays */
+        .status-inband {
+          fill: rgba(0,255,195,0.12);
+        }
+        
+        .status-warning {
+          fill: rgba(255,193,7,0.12);
+        }
+        
+        .status-critical {
+          fill: rgba(255,110,110,0.12);
+        }
+
+        /* Sector Labels */
+        .sector-label {
+          font-family: 'Noto Sans', sans-serif;
+          font-weight: 700;
+          font-size: 10px;
+          fill: #E0E0E0;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+      `}</style>
     </div>
   );
 };
