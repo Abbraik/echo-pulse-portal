@@ -1328,5 +1328,3 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
 };
 
 export default SectorTreemap;
-
-</initial_code>
