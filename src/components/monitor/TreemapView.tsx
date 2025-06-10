@@ -108,11 +108,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     const padding = 3;
     const headerHeight = 20;
     
-    // Calculate total weight
-    const totalWeight = sectors.reduce((sum, sector) => 
-      sum + sector.indicators.reduce((sectorSum, ind) => sectorSum + ind.weight, 0), 0
-    );
-
     // Arrange sectors in a 2x3 grid
     const cols = 2;
     const rows = 3;
@@ -136,7 +131,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       let currentY = sectorY + headerHeight + padding;
       let currentX = sectorX + padding;
       let rowHeight = 0;
-      let currentRowWidth = 0;
       
       sortedIndicators.forEach((indicator) => {
         const area = (indicator.weight / sectorTotalWeight) * sectorArea;
@@ -154,7 +148,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
           currentY += rowHeight + padding;
           currentX = sectorX + padding;
           rowHeight = 0;
-          currentRowWidth = 0;
         }
         
         // Ensure tile fits within sector bounds
@@ -174,7 +167,6 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
         
         currentX += finalWidth + padding;
         rowHeight = Math.max(rowHeight, finalHeight);
-        currentRowWidth += finalWidth + padding;
       });
     });
     
