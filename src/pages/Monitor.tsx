@@ -116,7 +116,7 @@ const Monitor: React.FC = () => {
           {/* Primary Monitor Header Bar - Always Visible */}
           <motion.header 
             variants={itemVariants}
-            className="sticky top-0 z-50 w-full backdrop-blur-xl bg-slate-900/30 border-b border-white/20 py-6 px-8"
+            className="sticky top-0 z-50 w-full backdrop-blur-xl bg-slate-900/30 border-b border-white/20 py-6 px-4"
             role="banner"
             aria-labelledby="monitor-title"
             whileHover={{ 
@@ -191,12 +191,12 @@ const Monitor: React.FC = () => {
             </div>
           </motion.header>
 
-          {/* Main Content Container */}
-          <div className="flex-1 flex flex-col max-w-7xl mx-auto px-8 pb-8 relative z-10 w-full">
+          {/* Main Content Container - Reduced padding */}
+          <div className="flex-1 flex flex-col max-w-7xl mx-auto px-4 pb-4 relative z-10 w-full">
             {/* View Toggle & Instrument Panel */}
             <motion.div
               variants={itemVariants}
-              className="mb-6"
+              className="mb-4"
               whileHover={{ 
                 y: -2,
                 boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)"
@@ -204,7 +204,7 @@ const Monitor: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               <div className="rounded-2xl backdrop-blur-xl bg-slate-800/40 border border-white/20 overflow-hidden shadow-2xl">
-                <div className="p-6">
+                <div className="p-4">
                   <div className="flex items-center justify-between">
                     {/* View Toggles */}
                     <div className="flex space-x-4" role="tablist">
@@ -258,20 +258,26 @@ const Monitor: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Main Visualization Area */}
+            {/* Main Visualization Area - Dynamic Height */}
             <motion.div
               variants={itemVariants}
-              className="flex-1 mb-6"
+              className="flex-1 mb-4"
               whileHover={{ 
                 y: -4,
                 boxShadow: "0 25px 50px rgba(0, 0, 0, 0.4)"
               }}
               transition={{ duration: 0.3 }}
             >
-              <div className="rounded-2xl backdrop-blur-xl bg-slate-800/40 border border-white/20 overflow-hidden h-full min-h-[60vh] flex flex-col shadow-2xl group">
+              <div 
+                className="rounded-2xl backdrop-blur-xl bg-slate-800/40 border border-white/20 overflow-hidden flex flex-col shadow-2xl group"
+                style={{ 
+                  maxHeight: 'calc(100vh - 220px)',
+                  minHeight: '600px'
+                }}
+              >
                 {/* Card Header */}
                 <motion.div 
-                  className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0"
+                  className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0"
                   initial={{ opacity: 0.9 }}
                   whileHover={{ 
                     opacity: 1,
@@ -297,8 +303,26 @@ const Monitor: React.FC = () => {
                   </div>
                 </motion.div>
 
-                {/* View Content */}
-                <div className="flex-1 relative min-h-0">
+                {/* View Content - Scrollable */}
+                <div 
+                  className="flex-1 relative min-h-0 overflow-y-auto view-card-body"
+                  style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: 'rgba(255,255,255,0.20) transparent'
+                  }}
+                >
+                  <style jsx>{`
+                    .view-card-body::-webkit-scrollbar {
+                      width: 6px;
+                    }
+                    .view-card-body::-webkit-scrollbar-thumb {
+                      background: rgba(255,255,255,0.20);
+                      border-radius: 3px;
+                    }
+                    .view-card-body::-webkit-scrollbar-track {
+                      background: transparent;
+                    }
+                  `}</style>
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeView}
@@ -309,7 +333,7 @@ const Monitor: React.FC = () => {
                         duration: 0.4,
                         ease: "easeInOut"
                       }}
-                      className="absolute inset-0"
+                      className="h-full"
                     >
                       {renderCurrentView()}
                     </motion.div>
@@ -318,10 +342,10 @@ const Monitor: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Alerts & Anomaly Section */}
+            {/* Alerts & Anomaly Section - Reduced height */}
             <motion.div
               variants={itemVariants}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[35vh] flex-shrink-0"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[30vh] flex-shrink-0"
             >
               <motion.div 
                 className="lg:col-span-2"
