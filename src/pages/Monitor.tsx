@@ -351,37 +351,64 @@ const Monitor: React.FC = () => {
         </motion.div>
       </AnimatedPage>
 
-      {/* Fullscreen Overlay */}
-      <FullscreenOverlay
-        isOpen={isFullscreen}
-        onClose={() => setIsFullscreen(false)}
-        title={viewTitles[activeView]}
-      >
-        <div className="h-full flex flex-col">
-          {/* Fullscreen Header */}
-          <div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
-            <h2 className="text-3xl font-bold text-white">
-              {viewTitles[activeView]}
-            </h2>
-            <div className="flex items-center space-x-4">
-              <InstrumentPanel
-                timeRange={timeRange}
-                onTimeRangeChange={setTimeRange}
-                domainFilter={domainFilter}
-                onDomainFilterChange={setDomainFilter}
-                chartType={chartType}
-                onChartTypeChange={setChartType}
-                activeView={activeView}
-              />
+      {/* Fullscreen Overlay - Modified to preserve header */}
+      <AnimatePresence>
+        {isFullscreen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            role="dialog"
+            aria-modal="true"
+            aria-label={viewTitles[activeView]}
+          >
+            {/* Fullscreen content positioned below header */}
+            <div className="absolute inset-0 top-[112px] p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.25 }}
+                className="h-full bg-slate-800/95 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden relative"
+              >
+                {/* Fullscreen Header */}
+                <div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
+                  <h2 className="text-3xl font-bold text-white">
+                    {viewTitles[activeView]}
+                  </h2>
+                  <div className="flex items-center space-x-4">
+                    <InstrumentPanel
+                      timeRange={timeRange}
+                      onTimeRangeChange={setTimeRange}
+                      domainFilter={domainFilter}
+                      onDomainFilterChange={setDomainFilter}
+                      chartType={chartType}
+                      onChartTypeChange={setChartType}
+                      activeView={activeView}
+                    />
+                    <button
+                      onClick={() => setIsFullscreen(false)}
+                      className="text-white hover:text-gray-300 p-2 rounded-lg hover:bg-white/10 transition-colors"
+                      aria-label="Exit fullscreen"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Fullscreen Content */}
+                <div className="flex-1 relative min-h-0 h-[calc(100%-88px)]">
+                  {renderCurrentView()}
+                </div>
+              </motion.div>
             </div>
-          </div>
-          
-          {/* Fullscreen Content */}
-          <div className="flex-1 relative min-h-0">
-            {renderCurrentView()}
-          </div>
-        </div>
-      </FullscreenOverlay>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
