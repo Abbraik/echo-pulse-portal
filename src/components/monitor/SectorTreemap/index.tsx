@@ -185,7 +185,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .treemap-card {
           background: rgba(10,20,40,0.45);
           backdrop-filter: blur(24px);
