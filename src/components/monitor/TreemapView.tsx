@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
@@ -53,32 +52,22 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
     { id: '2', name: 'Trust Recovery Index', value: 54, weight: 90, status: 'critical', category: 'Strategic', sector: 'Systemic', target: 75, trend: [65, 61, 58, 56, 54], lastUpdated: '2025-01-10', owner: 'Executive Leadership', description: 'Stakeholder confidence restoration metric.' },
     { id: '3', name: 'Network Dev Index', value: 52, weight: 80, status: 'critical', category: 'Strategic', sector: 'Systemic', target: 100, trend: [58, 56, 54, 52, 50], lastUpdated: '2025-01-10', owner: 'Network Team', description: 'Network development and infrastructure growth index.' },
     { id: '4', name: 'Bundle Coherence', value: 59, weight: 70, status: 'critical', category: 'Strategic', sector: 'Systemic', target: 100, trend: [65, 63, 61, 59, 57], lastUpdated: '2025-01-10', owner: 'Integration Team', description: 'System bundle integration and coherence measurement.' },
-
-    // Population
     { id: '5', name: 'Population Stability', value: 71, weight: 60, status: 'warning', category: 'Community', sector: 'Population', target: 85, trend: [79, 77, 74, 71, 69], lastUpdated: '2025-01-10', owner: 'Demographics Team', description: 'Population growth and stability indicators.' },
     { id: '6', name: 'Age Structure Balance', value: 68, weight: 50, status: 'warning', category: 'Community', sector: 'Population', target: 80, trend: [72, 70, 69, 68, 67], lastUpdated: '2025-01-10', owner: 'Demographics Team', description: 'Age distribution balance across population segments.' },
     { id: '7', name: 'Fertility Confidence', value: 58, weight: 45, status: 'critical', category: 'Community', sector: 'Population', target: 75, trend: [64, 62, 60, 58, 56], lastUpdated: '2025-01-10', owner: 'Social Policy', description: 'Fertility rates and family planning confidence metrics.' },
     { id: '8', name: 'Migration Flow', value: 73, weight: 40, status: 'warning', category: 'Community', sector: 'Population', target: 85, trend: [76, 75, 74, 73, 72], lastUpdated: '2025-01-10', owner: 'Immigration Services', description: 'Migration patterns and integration success rates.' },
-
-    // Resource Market
     { id: '9', name: 'Resource Stock vs Target', value: 45, weight: 85, status: 'critical', category: 'Operational', sector: 'Resource Market', target: 70, trend: [50, 48, 47, 45, 43], lastUpdated: '2025-01-10', owner: 'Resource Management', description: 'Resource availability against strategic targets.' },
     { id: '10', name: 'Renewal vs Consumption', value: 62, weight: 65, status: 'warning', category: 'Sustainability', sector: 'Resource Market', target: 80, trend: [66, 64, 63, 62, 61], lastUpdated: '2025-01-10', owner: 'Sustainability Team', description: 'Resource renewal rates compared to consumption.' },
     { id: '11', name: 'Extraction Pressure', value: 41, weight: 55, status: 'critical', category: 'Environmental', sector: 'Resource Market', target: 60, trend: [46, 44, 42, 41, 39], lastUpdated: '2025-01-10', owner: 'Environmental Team', description: 'Environmental pressure from resource extraction activities.' },
     { id: '12', name: 'Resource Price Smoothed', value: 67, weight: 35, status: 'warning', category: 'Financial', sector: 'Resource Market', target: 75, trend: [70, 69, 68, 67, 66], lastUpdated: '2025-01-10', owner: 'Finance Team', description: 'Smoothed resource pricing trends and volatility.' },
-
-    // Goods & Services Market
     { id: '13', name: 'Supply-Demand Gap', value: 74, weight: 75, status: 'warning', category: 'Operational', sector: 'Goods & Services', target: 85, trend: [77, 76, 75, 74, 73], lastUpdated: '2025-01-10', owner: 'Market Analysis', description: 'Gap between supply and demand in key markets.' },
     { id: '14', name: 'Price Deviation', value: 69, weight: 55, status: 'warning', category: 'Financial', sector: 'Goods & Services', target: 80, trend: [72, 71, 70, 69, 68], lastUpdated: '2025-01-10', owner: 'Pricing Team', description: 'Price deviation from optimal market equilibrium.' },
     { id: '15', name: 'Capacity Utilization', value: 81, weight: 45, status: 'healthy', category: 'Operational', sector: 'Goods & Services', target: 85, trend: [78, 79, 80, 81, 82], lastUpdated: '2025-01-10', owner: 'Operations', description: 'Production and service capacity utilization rates.' },
     { id: '16', name: 'Market Stability', value: 76, weight: 35, status: 'healthy', category: 'Strategic', sector: 'Goods & Services', target: 80, trend: [74, 75, 76, 77, 76], lastUpdated: '2025-01-10', owner: 'Market Strategy', description: 'Overall market stability and predictability index.' },
-
-    // Social Outcomes
     { id: '17', name: 'Social Cohesion', value: 69, weight: 80, status: 'warning', category: 'Community', sector: 'Social Outcomes', target: 90, trend: [79, 76, 72, 69, 68], lastUpdated: '2025-01-10', owner: 'Community Relations', description: 'Social cohesion and community integration measures.' },
     { id: '18', name: 'Education Completion', value: 82, weight: 60, status: 'healthy', category: 'Learning', sector: 'Social Outcomes', target: 90, trend: [80, 81, 82, 83, 82], lastUpdated: '2025-01-10', owner: 'Education Ministry', description: 'Education completion rates across all levels.' },
     { id: '19', name: 'Health Status Index', value: 78, weight: 50, status: 'healthy', category: 'Community', sector: 'Social Outcomes', target: 85, trend: [76, 77, 78, 79, 78], lastUpdated: '2025-01-10', owner: 'Health Ministry', description: 'Population health indicators and healthcare access.' },
     { id: '20', name: 'Household Revenue', value: 71, weight: 40, status: 'warning', category: 'Financial', sector: 'Social Outcomes', target: 80, trend: [74, 73, 72, 71, 70], lastUpdated: '2025-01-10', owner: 'Economic Policy', description: 'Average household income and financial stability.' },
-
-    // Governance (largest operational weights)
     { id: '21', name: 'Open Claims', value: 35, weight: 100, status: 'critical', category: 'Operational', sector: 'Governance', target: 5, trend: [12, 11, 10, 9, 10], lastUpdated: '2025-01-10', owner: 'Claims Processing', description: 'Number of open facilitator claims requiring resolution.' },
     { id: '22', name: 'System Error Count', value: 25, weight: 90, status: 'critical', category: 'Technical', sector: 'Governance', target: 1, trend: [6, 5, 5, 4, 5], lastUpdated: '2025-01-10', owner: 'System Administration', description: 'Critical system errors requiring immediate attention.' },
     { id: '23', name: 'Think→Act Queue', value: 65, weight: 60, status: 'warning', category: 'Operational', sector: 'Governance', target: 3, trend: [5, 4, 4, 3, 4], lastUpdated: '2025-01-10', owner: 'Process Management', description: 'Queue length for think-to-act transitions.' },
