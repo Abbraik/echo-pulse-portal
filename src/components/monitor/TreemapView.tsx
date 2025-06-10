@@ -107,12 +107,12 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   // Define sectors with their colors and tints
   const sectors: Sector[] = useMemo(() => {
     const sectorConfig = [
-      { name: 'Systemic', color: '#00B8FF', tint: 'rgba(0,184,255,0.20)' },
-      { name: 'Population', color: '#00FFC3', tint: 'rgba(0,255,195,0.20)' },
-      { name: 'Resource Market', color: '#FFC107', tint: 'rgba(255,193,7,0.20)' },
-      { name: 'Goods & Services', color: '#7B68EE', tint: 'rgba(123,104,238,0.20)' },
-      { name: 'Social Outcomes', color: '#3CB371', tint: 'rgba(60,179,113,0.20)' },
-      { name: 'Governance', color: '#C71585', tint: 'rgba(199,21,133,0.20)' }
+      { name: 'Systemic', color: '#00B8FF', tint: 'rgba(0,184,255,0.08)' },
+      { name: 'Population', color: '#00FFC3', tint: 'rgba(0,255,195,0.08)' },
+      { name: 'Resource Market', color: '#FFC107', tint: 'rgba(255,193,7,0.08)' },
+      { name: 'Goods & Services', color: '#7B68EE', tint: 'rgba(123,104,238,0.08)' },
+      { name: 'Social Outcomes', color: '#3CB371', tint: 'rgba(60,179,113,0.08)' },
+      { name: 'Governance', color: '#C71585', tint: 'rgba(199,21,133,0.08)' }
     ];
 
     return sectorConfig.map(config => ({
@@ -124,16 +124,16 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   // Advanced treemap layout with proper weight-based sizing
   const createSectorTreemap = useCallback((sectors: Sector[], containerWidth: number, containerHeight: number): TileRect[] => {
     const rects: TileRect[] = [];
-    const padding = 3;
-    const headerHeight = 20;
+    const padding = 4;
+    const headerHeight = 24;
     
     // Calculate total weight for normalization
     const totalWeight = allIndicators.reduce((sum, ind) => sum + ind.weight, 0);
-    const availableArea = containerWidth * containerHeight * 0.85; // 85% for tiles, 15% for padding/headers
+    const availableArea = containerWidth * containerHeight * 0.9; // 90% for tiles, 10% for padding/headers
     
-    // Arrange sectors in a 2x3 grid
-    const cols = 2;
-    const rows = 3;
+    // Arrange sectors in a 3x2 grid for better space utilization
+    const cols = 3;
+    const rows = 2;
     const sectorWidth = (containerWidth - padding * (cols + 1)) / cols;
     const sectorHeight = (containerHeight - padding * (rows + 1)) / rows;
 
@@ -147,10 +147,10 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
       const sectorTotalWeight = sector.indicators.reduce((sum, ind) => sum + ind.weight, 0);
       const sectorArea = sectorWidth * sectorAvailableHeight;
       
-      // Sort indicators by weight (largest first)
+      // Sort indicators by weight (largest first) for better visual hierarchy
       const sortedIndicators = [...sector.indicators].sort((a, b) => b.weight - a.weight);
       
-      // Create tiles with weight-based sizing
+      // Create tiles with weight-proportional sizing
       let currentY = sectorY + headerHeight + padding;
       let currentX = sectorX + padding;
       let rowHeight = 0;
@@ -161,14 +161,14 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
         const tileArea = weightRatio * sectorArea;
         
         // Calculate dimensions with preferred aspect ratio
-        const aspectRatio = 1.6;
+        const aspectRatio = 1.4;
         let tileWidth = Math.sqrt(tileArea * aspectRatio);
         let tileHeight = tileArea / tileWidth;
         
         // Ensure minimum size based on weight
-        const minSize = Math.max(40, Math.sqrt(indicator.weight / totalWeight * availableArea * 0.8));
+        const minSize = Math.max(40, Math.sqrt(indicator.weight / totalWeight * availableArea * 0.6));
         tileWidth = Math.max(tileWidth, minSize);
-        tileHeight = Math.max(tileHeight, minSize * 0.6);
+        tileHeight = Math.max(tileHeight, minSize * 0.7);
         
         // Check if tile fits in current row
         if (currentX + tileWidth > sectorX + sectorWidth - padding) {
@@ -181,7 +181,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
         const finalWidth = Math.min(tileWidth, sectorX + sectorWidth - currentX - padding);
         const finalHeight = Math.min(tileHeight, sectorY + sectorHeight - currentY - padding);
         
-        if (finalHeight >= 20 && finalWidth >= 30) { // Only add if there's sufficient space
+        if (finalHeight >= 30 && finalWidth >= 40) { // Only add if there's sufficient space
           rects.push({
             x: currentX,
             y: currentY,
@@ -203,13 +203,13 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   // Status color calculation
   const getStatusColor = useCallback((value: number, target: number) => {
     const percentage = (value / target) * 100;
-    if (percentage >= 75) return '#00FFC3'; // Neon teal
-    if (percentage >= 50) return '#FFC107'; // Amber
-    return '#FF6E6E'; // Coral
+    if (percentage >= 75) return 'rgba(0,255,195,0.12)'; // green glow
+    if (percentage >= 50) return 'rgba(255,193,7,0.12)'; // amber glow
+    return 'rgba(255,110,110,0.12)'; // coral glow
   }, []);
 
   // Generate tile rectangles
-  const tileRects = useMemo(() => createSectorTreemap(sectors, 800, 600), [sectors, createSectorTreemap]);
+  const tileRects = useMemo(() => createSectorTreemap(sectors, 900, 500), [sectors, createSectorTreemap]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -231,89 +231,100 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   }, [selectedIndicator, focusedTileIndex, tileRects]);
 
   return (
-    <div 
-      className={`h-full ${isFullscreen ? 'fixed inset-0 z-50 p-4' : ''}`}
-      style={{ maxHeight: 'calc(100vh - 200px)' }}
-    >
+    <div className="h-full w-full">
       <div 
-        className="w-full h-full relative overflow-hidden"
+        className="treemap-card w-full h-full relative overflow-hidden"
         style={{
           background: 'rgba(10,20,40,0.45)',
           backdropFilter: 'blur(24px)',
           border: '1px solid rgba(0,255,195,0.15)',
           borderRadius: '1.5rem',
           boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
-          padding: '16px'
+          paddingTop: '56px',
+          paddingBottom: '16px',
+          paddingLeft: '16px',
+          paddingRight: '16px',
+          maxHeight: 'calc(100vh - 200px)'
         }}
         onKeyDown={handleKeyDown}
         tabIndex={0}
       >
         {/* Header Strip */}
         <div 
-          className="h-10 flex items-center justify-between px-4 rounded-t-lg"
+          className="treemap-header absolute top-0 left-0 right-0 h-10 flex items-center px-4"
           style={{
             background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
+            borderRadius: '1.5rem 1.5rem 0 0'
           }}
         >
-          <h3 className="text-white font-bold text-base" style={{ fontFamily: 'Noto Sans' }}>
-            Sector Treemap: Comprehensive System View
-          </h3>
-          <button
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            className="text-white hover:text-gray-200 p-1 rounded transition-colors"
-            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          <h2 
+            className="text-white font-bold text-base"
+            style={{ 
+              fontFamily: 'Noto Sans',
+              textShadow: '0 2px 4px rgba(0,0,0,0.6)'
+            }}
           >
-            {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
-          </button>
-        </div>
-
-        {/* Legend Bar (only in fullscreen) */}
-        {isFullscreen && (
-          <div className="flex items-center justify-center space-x-6 py-2 text-sm">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded-full bg-teal-400"></div>
-              <span className="text-white">In-Band (≥75%)</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-              <span className="text-white">Warning (50-75%)</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded-full bg-red-400"></div>
-              <span className="text-white">Critical (<50%)</span>
-            </div>
+            Sector Treemap: Comprehensive System View
+          </h2>
+          <div className="ml-auto">
+            <button
+              onClick={() => setIsFullscreen(!isFullscreen)}
+              className="text-white hover:text-gray-200 p-1 rounded transition-colors"
+              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            >
+              {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+            </button>
           </div>
-        )}
+        </div>
 
         {/* SVG Content */}
         <div 
-          className="absolute overflow-y-auto"
+          className="treemap-svg absolute overflow-y-auto"
           style={{
-            top: isFullscreen ? '96px' : '56px',
-            bottom: '16px',
+            top: '56px',
             left: '16px',
             right: '16px',
+            bottom: '16px',
             scrollbarWidth: 'thin',
             scrollbarColor: 'rgba(255,255,255,0.20) transparent'
           }}
         >
-          <svg width="100%" height="100%" viewBox="0 0 800 600" className="w-full h-full">
+          <svg width="100%" height="100%" viewBox="0 0 900 500" className="w-full h-full">
+            {/* Inner shadow filter definition */}
+            <defs>
+              <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                <feOffset dx="0" dy="2" result="offset"/>
+                <feFlood floodColor="rgba(0,0,0,0.3)"/>
+                <feComposite in2="offset" operator="in"/>
+                <feMerge> 
+                  <feMergeNode/>
+                  <feMergeNode in="SourceGraphic"/> 
+                </feMerge>
+              </filter>
+            </defs>
+
             {/* Sector Headers */}
             {sectors.map((sector, sectorIndex) => {
-              const sectorRow = Math.floor(sectorIndex / 2);
-              const sectorCol = sectorIndex % 2;
-              const sectorX = 3 + sectorCol * 399;
-              const sectorY = 3 + sectorRow * 199;
+              const cols = 3;
+              const sectorRow = Math.floor(sectorIndex / cols);
+              const sectorCol = sectorIndex % cols;
+              const sectorWidth = (900 - 4 * (cols + 1)) / cols;
+              const sectorHeight = (500 - 4 * 3) / 2;
+              const sectorX = 4 + sectorCol * (sectorWidth + 4);
+              const sectorY = 4 + sectorRow * (sectorHeight + 4);
               
               return (
                 <text
                   key={`header-${sector.name}`}
+                  className="sector-label"
                   x={sectorX + 8}
-                  y={sectorY + 16}
-                  className="text-xs font-bold"
-                  fill="#E0E0E0"
+                  y={sectorY + 18}
                   style={{ 
                     fontFamily: 'Noto Sans',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    fill: '#E0E0E0',
                     textShadow: '0 1px 2px rgba(0,0,0,0.5)' 
                   }}
                 >
@@ -341,14 +352,18 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                     scale: isHovered ? 1.1 : isAdjacent ? 0.9 : 1,
                     opacity: isAdjacent ? 0.8 : 1
                   }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  transition={{ 
+                    duration: 0.2, 
+                    ease: 'easeOut',
+                    scale: { type: "spring", stiffness: 300, damping: 30 }
+                  }}
                   onMouseEnter={() => setHoveredTile(rect.data.id)}
                   onMouseLeave={() => setHoveredTile(null)}
                   onClick={() => setSelectedIndicator(rect.data)}
                   onFocus={() => setFocusedTileIndex(index)}
                   style={{ cursor: 'pointer' }}
                 >
-                  {/* Tile background with sector tint */}
+                  {/* Base sector tint */}
                   <rect
                     x={rect.x}
                     y={rect.y}
@@ -357,11 +372,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                     fill={sector.tint}
                     stroke="rgba(255,255,255,0.10)"
                     strokeWidth="1"
-                    style={{
-                      filter: isHovered 
-                        ? `drop-shadow(0 0 12px ${statusColor}66) drop-shadow(0 2px 4px rgba(0,0,0,0.3))`
-                        : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-                    }}
+                    filter="url(#innerShadow)"
                   />
                   
                   {/* Status overlay */}
@@ -371,9 +382,22 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                     width={rect.width}
                     height={rect.height}
                     fill={statusColor}
-                    opacity="0.12"
                     stroke="none"
                   />
+
+                  {/* Hover glow */}
+                  {isHovered && (
+                    <rect
+                      x={rect.x - 1}
+                      y={rect.y - 1}
+                      width={rect.width + 2}
+                      height={rect.height + 2}
+                      fill="none"
+                      stroke="rgba(0,255,195,0.5)"
+                      strokeWidth="2"
+                      filter="drop-shadow(0 0 12px rgba(0,255,195,0.5))"
+                    />
+                  )}
 
                   {/* Focus indicator */}
                   {isFocused && (
@@ -396,14 +420,14 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                         x={rect.x + rect.width / 2}
                         y={rect.y + 20}
                         textAnchor="middle"
-                        className="font-bold"
-                        fill={sector.color}
                         style={{ 
                           fontFamily: 'Noto Sans',
-                          fontSize: '12px'
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          fill: sector.color
                         }}
                       >
-                        {rect.data.name.length > 18 ? rect.data.name.substring(0, 18) + '...' : rect.data.name}
+                        {rect.data.name.length > 16 ? rect.data.name.substring(0, 16) + '...' : rect.data.name}
                       </text>
                       
                       {/* Value percentage */}
@@ -411,10 +435,10 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                         x={rect.x + rect.width / 2}
                         y={rect.y + rect.height - 8}
                         textAnchor="middle"
-                        fill="#E0E0E0"
                         style={{ 
                           fontFamily: 'Noto Sans',
-                          fontSize: '10px'
+                          fontSize: '10px',
+                          fill: '#E0E0E0'
                         }}
                       >
                         {rect.data.value}%
@@ -429,15 +453,12 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                         r="8"
                         fill="#00FFC3"
                       />
-                      <text
-                        x={rect.x + rect.width / 2}
-                        y={rect.y + rect.height / 2 + 3}
-                        textAnchor="middle"
-                        className="text-xs font-bold"
-                        fill="#000"
-                      >
-                        i
-                      </text>
+                      <Info
+                        size={12}
+                        x={rect.x + rect.width / 2 - 6}
+                        y={rect.y + rect.height / 2 - 6}
+                        style={{ fill: '#000' }}
+                      />
                     </>
                   )}
                 </motion.g>
@@ -447,93 +468,76 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Detail Modal */}
       <AnimatePresence>
         {selectedIndicator && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
             onClick={() => setSelectedIndicator(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-2xl max-h-[600px] flex flex-col"
+              className="w-full max-w-2xl max-h-96 flex flex-col"
               style={{
-                background: 'rgba(10,20,40,0.95)',
-                backdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.20)',
+                background: 'rgba(20,30,50,0.85)',
+                backdropFilter: 'blur(32px)',
                 borderRadius: '1rem',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.8)'
+                boxShadow: '0 16px 32px rgba(0,0,0,0.6)',
+                color: '#E0E0E0',
+                fontFamily: 'Noto Sans',
+                fontSize: '12px',
+                padding: '24px'
               }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-white/10">
-                <div className="flex items-center space-x-4">
-                  <div 
-                    className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: getStatusColor(selectedIndicator.value, selectedIndicator.target) }}
-                  />
-                  <div>
-                    <h2 className="text-xl font-bold text-white">{selectedIndicator.name}</h2>
-                    <p className="text-slate-300">{selectedIndicator.sector} • {selectedIndicator.category}</p>
-                  </div>
-                </div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 
+                  className="text-xl font-bold"
+                  style={{ color: '#00FFC3', fontFamily: 'Noto Sans', fontSize: '18px' }}
+                >
+                  {selectedIndicator.name}
+                </h2>
                 <button
                   onClick={() => setSelectedIndicator(null)}
-                  className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  className="text-white hover:text-gray-300 p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  style={{ fontSize: '24px' }}
                 >
-                  <X size={20} />
+                  <X size={24} />
                 </button>
               </div>
 
               {/* Modal Content */}
-              <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex-1 overflow-y-auto">
                 {/* Key Metrics */}
                 <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div 
-                    className="rounded-lg p-4 text-center"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
-                  >
+                  <div className="rounded-lg p-4 text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
                     <div className="text-xl font-bold text-teal-400">{selectedIndicator.value}%</div>
                     <div className="text-xs text-slate-300">Current</div>
                   </div>
-                  <div 
-                    className="rounded-lg p-4 text-center"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
-                  >
+                  <div className="rounded-lg p-4 text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
                     <div className="text-xl font-bold text-blue-400">{selectedIndicator.target}%</div>
                     <div className="text-xs text-slate-300">Target</div>
                   </div>
-                  <div 
-                    className="rounded-lg p-4 text-center"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
-                  >
+                  <div className="rounded-lg p-4 text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
                     <div className="text-xl font-bold text-purple-400">{selectedIndicator.weight}</div>
                     <div className="text-xs text-slate-300">Weight</div>
                   </div>
                 </div>
 
-                {/* Description */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold text-white mb-2">Description</h3>
-                  <p className="text-slate-300 text-sm">{selectedIndicator.description}</p>
-                </div>
-
                 {/* 90-day Chart */}
-                <div 
-                  className="rounded-lg p-4"
-                  style={{ background: 'rgba(255,255,255,0.03)' }}
-                >
+                <div className="rounded-lg p-4" style={{ background: 'rgba(255,255,255,0.03)' }}>
                   <h4 className="text-md font-bold text-white mb-3 flex items-center">
                     <TrendingUp size={16} className="mr-2" />
                     90-Day Trend
                   </h4>
-                  <div className="h-40">
+                  <div className="h-32">
                     <ResponsiveContainer width="100%" height="100%">
                       {chartType === 'line' ? (
                         <LineChart data={selectedIndicator.trend.map((value, index) => ({ period: index + 1, value }))}>
@@ -574,20 +578,23 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                   </div>
                 </div>
 
-                {/* Go to Details Button */}
+                {/* Action Button */}
                 <div className="mt-6 flex justify-center">
                   <button
                     className="px-6 py-3 rounded-lg text-white font-semibold transition-all duration-200"
                     style={{
-                      background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
-                      boxShadow: '0 4px 16px rgba(0,255,195,0.3)'
+                      background: '#00B8FF',
+                      fontFamily: 'Noto Sans',
+                      fontSize: '14px',
+                      fontWeight: 'medium',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 8px rgba(0,184,255,0.4)'
                     }}
                     onClick={() => {
-                      // Navigate to details page
                       setSelectedIndicator(null);
                     }}
                   >
-                    Go to Details
+                    Go to Detailed View ▶
                   </button>
                 </div>
               </div>
