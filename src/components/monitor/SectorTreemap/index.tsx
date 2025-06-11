@@ -207,8 +207,9 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     return classes.join(' ');
   };
 
-  // Enhanced event handlers
-  const handleTileMouseEnter = (indicator: PositionedIndicator, event: React.MouseEvent) => {
+  // Enhanced event handlers - convert TreemapNode to PositionedIndicator
+  const handleTileMouseEnter = (node: TreemapNode, event: React.MouseEvent) => {
+    const indicator: PositionedIndicator = { ...node, parentId: undefined };
     debouncedHover(indicator.id);
     const rect = event.currentTarget.getBoundingClientRect();
     const svgRect = event.currentTarget.closest('svg')?.getBoundingClientRect();
@@ -226,7 +227,8 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     setTooltip(null);
   };
 
-  const handleTileClick = (indicator: PositionedIndicator) => {
+  const handleTileClick = (node: TreemapNode) => {
+    const indicator: PositionedIndicator = { ...node, parentId: undefined };
     // Drill-down functionality
     if (currentLevel < hierarchyDepth - 1) {
       const newBreadcrumb = {
@@ -244,10 +246,11 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     }
   };
 
-  const handleTileKeyDown = (event: React.KeyboardEvent, indicator: PositionedIndicator) => {
+  const handleTileKeyDown = (event: React.KeyboardEvent, node: TreemapNode) => {
+    const indicator: PositionedIndicator = { ...node, parentId: undefined };
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      handleTileClick(indicator);
+      handleTileClick(node);
     } else if (event.key === 'Escape') {
       if (currentLevel > 0) {
         handleBreadcrumbNavigate(currentLevel - 1);

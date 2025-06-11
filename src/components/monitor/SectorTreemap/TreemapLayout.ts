@@ -5,6 +5,8 @@ export interface TreemapNode {
   value: number;
   weight: number;
   sector: string;
+  target: number;
+  level: number;
   x: number;
   y: number;
   width: number;
@@ -193,6 +195,8 @@ export class TreemapLayoutEngine {
         value: s.weight,
         weight: s.weight,
         sector: s.sector,
+        target: s.weight, // Add target property
+        level: 0, // Add level property
         x: 0,
         y: 0,
         width: 0,
@@ -224,6 +228,8 @@ export class TreemapLayoutEngine {
             value: item.value,
             weight: item.weight,
             sector: item.sector,
+            target: item.target, // Add target property
+            level: 1, // Add level property
             x: 0,
             y: 0,
             width: 0,
