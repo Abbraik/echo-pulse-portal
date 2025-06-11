@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Sector } from './types';
 import { IndicatorModal } from './IndicatorModal';
 import { SearchAndFilters } from './SearchAndFilters';
@@ -42,6 +42,8 @@ interface BreadcrumbItem {
 
 const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
   const { isCompact, containerRef } = usePanelCompact({ compactThreshold: 30 });
+  const svgContainerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   
   // Existing state
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,8 +66,22 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [drillDownPath, setDrillDownPath] = useState<string[]>([]);
 
-  const W = 1000;
-  const H = 600;
+  // Update dimensions when container size changes
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (svgContainerRef.current) {
+        const rect = svgContainerRef.current.getBoundingClientRect();
+        setDimensions({
+          width: Math.max(400, rect.width - 40), // Account for padding
+          height: Math.max(300, rect.height - 40)
+        });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
 
   // Debounce hover events
   const debouncedHover = useCallback(
@@ -128,8 +144,8 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
   const positionedIndicators = useMemo(() => {
     if (groupedIndicators.length === 0) return [];
     
-    return TreemapLayoutEngine.layout(groupedIndicators, W, H, groupBy);
-  }, [groupedIndicators, W, H, groupBy]);
+    return TreemapLayoutEngine.layout(groupedIndicators, dimensions.width, dimensions.height, groupBy);
+  }, [groupedIndicators, dimensions.width, dimensions.height, groupBy]);
 
   // Helper function to get group value
   function getGroupValue(indicator: any, groupBy: string): string {
@@ -165,46 +181,49 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     };
   }
 
-  const getSectorClass = (sector: string): string => {
-    const sectorMap: Record<string, string> = {
-      'Systemic': 'sector-systemic',
-      'Population': 'sector-population', 
-      'ResourceMarket': 'sector-resources',
-      'GoodsServices': 'sector-goods',
-      'SocialOutcomes': 'sector-social',
-      'Governance': 'sector-governance'
+  // Color mapping functions that match the legend
+  const getSectorColor = (sector: string): string => {
+    const colorMap: Record<string, string> = {
+      'Systemic': 'rgba(0,184,255,0.7)',
+      'Population': 'rgba(0,255,195,0.7)', 
+      'Resource Market': 'rgba(255,193,7,0.7)',
+      'Goods & Services': 'rgba(123,104,238,0.7)',
+      'Social Outcomes': 'rgba(60,179,113,0.7)',
+      'Governance': 'rgba(199,21,133,0.7)'
     };
-    return sectorMap[sector] || 'sector-systemic';
+    return colorMap[sector] || 'rgba(0,184,255,0.7)';
   };
 
-  const getPerformanceClass = (value: number, target: number): string => {
+  const getPerformanceColor = (value: number, target: number): string => {
     const performance = (value / target) * 100;
-    if (performance >= 90) return 'performance-excellent';
-    if (performance >= 75) return 'performance-good';
-    return 'performance-poor';
+    if (performance >= 90) return 'rgba(0,255,195,0.7)'; // Excellent - Green
+    if (performance >= 75) return 'rgba(255,193,7,0.7)'; // Good - Yellow
+    return 'rgba(255,110,110,0.7)'; // Needs Attention - Red
+  };
+
+  const getWeightColor = (weight: number): string => {
+    if (weight >= 8) return 'rgba(255,255,255,0.8)'; // High Weight
+    if (weight >= 5) return 'rgba(255,255,255,0.5)'; // Medium Weight
+    return 'rgba(255,255,255,0.3)'; // Low Weight
+  };
+
+  const getTileColor = (node: TreemapNode): string => {
+    switch (groupBy) {
+      case 'sector':
+        return getSectorColor(node.sector);
+      case 'performance':
+        return getPerformanceColor(node.value, node.target);
+      case 'weight':
+        return getWeightColor(node.weight);
+      default:
+        return getSectorColor(node.sector);
+    }
   };
 
   const formatPercentage = (value: number, target: number): string => {
     const percentage = ((value / target) * 100).toFixed(1);
     const isPositive = value >= target;
     return `${isPositive ? '+' : ''}${percentage}%`;
-  };
-
-  const getStatusClass = (value: number, target: number): string => {
-    const performance = value / target;
-    if (performance >= 0.9) return 'status-inband';
-    if (performance >= 0.75) return 'status-warning';
-    return 'status-critical';
-  };
-
-  const getTileClasses = (indicator: PositionedIndicator): string => {
-    const classes = [];
-    if (hoveredIndicatorId === indicator.id) {
-      classes.push('tile-hovered');
-    } else if (hoveredIndicatorId && hoveredIndicatorId !== indicator.id) {
-      classes.push('tile-dimmed');
-    }
-    return classes.join(' ');
   };
 
   // Enhanced event handlers - convert TreemapNode to PositionedIndicator
@@ -261,7 +280,6 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     }
   };
 
-  // New event handlers
   const handleBreadcrumbNavigate = (level: number) => {
     setCurrentLevel(level);
     setBreadcrumbs(prev => prev.slice(0, level + 1));
@@ -363,13 +381,19 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
         </div>
         
         {/* SVG Container */}
-        <div className="treemap-svg-container">
+        <div 
+          ref={svgContainerRef}
+          className="treemap-svg-container"
+          style={{ minHeight: '500px', height: 'calc(100vh - 300px)' }}
+        >
           <svg 
-            width={W} 
-            height={H} 
+            width="100%" 
+            height="100%" 
+            viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
             className="treemap-svg"
             role="grid"
             aria-label="Interactive sector treemap showing system indicators"
+            preserveAspectRatio="xMidYMid meet"
           >
             {/* Define filters and effects */}
             <defs>
@@ -384,10 +408,9 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
             
             {/* Render treemap tiles */}
             {positionedIndicators.map((node) => {
-              const sectorClass = getSectorClass(node.sector);
-              const performanceClass = getPerformanceClass(node.value, node.target);
               const isHovered = hoveredIndicatorId === node.id;
               const percentage = formatPercentage(node.value, node.target);
+              const tileColor = getTileColor(node);
               
               return (
                 <g key={node.id}>
@@ -397,10 +420,16 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                     y={node.y}
                     width={node.width}
                     height={node.height}
-                    className={`treemap-tile ${sectorClass} ${performanceClass} ${isHovered ? 'tile-hovered' : ''}`}
-                    stroke="rgba(255,255,255,0.2)"
-                    strokeWidth="1"
-                    style={{ cursor: 'pointer' }}
+                    fill={tileColor}
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth={isHovered ? "2" : "1"}
+                    style={{ 
+                      cursor: 'pointer',
+                      filter: isHovered ? 'url(#glow)' : 'none',
+                      transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+                      transformOrigin: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
                     tabIndex={0}
                     role="gridcell"
                     aria-label={`${node.name}: ${percentage}. Click to ${currentLevel < hierarchyDepth - 1 ? 'drill down' : 'view details'}`}
@@ -423,6 +452,10 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                       className="tile-symbol"
                       textAnchor="middle"
                       pointerEvents="none"
+                      fill="white"
+                      fontSize="12"
+                      fontWeight="bold"
+                      textShadow="0 1px 3px rgba(0,0,0,0.8)"
                     >
                       {node.name.length > 8 ? node.name.substring(0, 8) : node.name}
                     </text>
@@ -436,6 +469,10 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                       className="tile-percentage"
                       textAnchor="middle"
                       pointerEvents="none"
+                      fill="white"
+                      fontSize="10"
+                      fontWeight="500"
+                      textShadow="0 1px 2px rgba(0,0,0,0.8)"
                     >
                       {percentage}
                     </text>
@@ -449,47 +486,14 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                       className="tile-small"
                       textAnchor="middle"
                       pointerEvents="none"
+                      fill="white"
+                      fontSize="8"
+                      fontWeight="600"
+                      textShadow="0 1px 2px rgba(0,0,0,0.8)"
                     >
                       {node.name.substring(0, 3)}
                     </text>
                   )}
-                </g>
-              );
-            })}
-            
-            {/* Sector dividers */}
-            {Array.from(new Set(positionedIndicators.map(n => n.sector))).map(sector => {
-              const sectorNodes = positionedIndicators.filter(n => n.sector === sector);
-              if (sectorNodes.length === 0) return null;
-              
-              const minX = Math.min(...sectorNodes.map(n => n.x));
-              const minY = Math.min(...sectorNodes.map(n => n.y));
-              const maxX = Math.max(...sectorNodes.map(n => n.x + n.width));
-              const maxY = Math.max(...sectorNodes.map(n => n.y + n.height));
-              
-              return (
-                <g key={`sector-${sector}`}>
-                  {/* Sector boundary */}
-                  <rect
-                    x={minX}
-                    y={minY}
-                    width={maxX - minX}
-                    height={maxY - minY}
-                    fill="none"
-                    stroke="rgba(255,255,255,0.3)"
-                    strokeWidth="2"
-                    pointerEvents="none"
-                  />
-                  
-                  {/* Sector label */}
-                  <text
-                    x={minX + 8}
-                    y={minY + 16}
-                    className="sector-label-header"
-                    pointerEvents="none"
-                  >
-                    {sector.toUpperCase()}
-                  </text>
                 </g>
               );
             })}
@@ -579,7 +583,20 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           margin: 0;
         }
 
-        /* New Enhanced Styles */
+        .treemap-svg-container {
+          position: relative;
+          flex: 1;
+          overflow: hidden;
+          padding: 1rem;
+          width: 100%;
+          height: 100%;
+        }
+
+        .treemap-svg {
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
         
         /* Controls Panel */
         .controls-panel {
@@ -818,69 +835,31 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           }
         }
 
-        /* Sector Tinting - 20% opacity tints */
-        .sector-systemic {
-          fill: rgba(0,184,255,0.08);
-        }
-        
-        .sector-population {
-          fill: rgba(0,255,195,0.08);
-        }
-        
-        .sector-resources {
-          fill: rgba(255,193,7,0.08);
-        }
-        
-        .sector-goods {
-          fill: rgba(123,104,238,0.08);
-        }
-        
-        .sector-social {
-          fill: rgba(60,179,113,0.08);
-        }
-        
-        .sector-governance {
-          fill: rgba(199,21,133,0.08);
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+          .tile-base,
+          .glass-button,
+          .search-input,
+          .sector-pill,
+          .controls-panel {
+            transition: none;
+          }
+          
+          .tile-hovered {
+            transform: none;
+          }
         }
 
-        /* Status Overlays */
-        .status-inband {
-          fill: rgba(0,255,195,0.12);
-        }
-        
-        .status-warning {
-          fill: rgba(255,193,7,0.12);
-        }
-        
-        .status-critical {
-          fill: rgba(255,110,110,0.12);
-        }
-
-        /* Hover Effects */
-        .tile-hovered {
-          transform: scale(1.05);
-          filter: url(#innerShadow) drop-shadow(0 0 12px rgba(0,255,195,0.5));
-          transition: transform 200ms ease-out, filter 200ms ease-out;
-        }
-
-        .tile-dimmed {
-          opacity: 0.8;
-          transition: opacity 200ms ease-out;
-        }
-
-        /* Sector Labels */
-        .sector-label {
-          font-family: 'Noto Sans', sans-serif;
-          font-weight: 700;
-          font-size: 10px;
-          fill: #E0E0E0;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-
-        /* Focus styles for accessibility */
-        rect:focus {
-          outline: 2px solid rgba(0,255,195,0.8);
-          outline-offset: 2px;
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+          .tile-base {
+            stroke-width: 2;
+          }
+          
+          .sector-pill,
+          .glass-button {
+            border-width: 2px;
+          }
         }
 
         /* Existing interactive styles */
@@ -920,410 +899,10 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           padding: 0.5rem;
         }
 
-        .search-filters-panel {
-          max-width: 1200px;
-          margin: 0 auto;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        }
-
-        .search-filters-panel.compact {
-          gap: 0.5rem;
-        }
-
-        .search-container {
-          position: relative;
-        }
-
-        .search-input {
-          width: 100%;
-          height: 48px;
-          background: rgba(30, 41, 59, 0.8);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 12px;
-          padding: 0 48px 0 48px;
-          color: #fff;
-          font-size: 16px;
-          transition: all 0.2s ease;
-        }
-
-        .search-input:focus {
-          outline: none;
-          border-color: rgba(0, 255, 195, 0.5);
-          box-shadow: 0 0 0 3px rgba(0, 255, 195, 0.1);
-        }
-
-        .search-icon {
-          position: absolute;
-          left: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 20px;
-          height: 20px;
-          color: #9ca3af;
-        }
-
-        .clear-search {
-          position: absolute;
-          right: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: none;
-          border: none;
-          color: #9ca3af;
-          cursor: pointer;
-          padding: 4px;
-          border-radius: 4px;
-          transition: color 0.2s ease;
-        }
-
-        .clear-search:hover {
-          color: #fff;
-        }
-
-        .input-error {
-          color: #f87171;
-          font-size: 14px;
-          margin-top: 4px;
-        }
-
-        .filter-toggle {
-          background: rgba(30, 41, 59, 0.8);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          color: #fff;
-          padding: 8px 16px;
-          border-radius: 8px;
-          transition: all 0.2s ease;
-        }
-
-        .filter-toggle:hover {
-          background: rgba(30, 41, 59, 1);
-          border-color: rgba(0, 255, 195, 0.3);
-        }
-
-        .sector-filters {
-          overflow: hidden;
-          transition: all 0.3s ease;
-        }
-
-        .filter-label {
-          display: block;
-          color: #e2e8f0;
-          font-size: 14px;
-          font-weight: 600;
-          margin-bottom: 8px;
-        }
-
-        .sector-pills {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .sector-pill {
-          background: rgba(30, 41, 59, 0.8);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          color: #e2e8f0;
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-        }
-
-        .sector-pill:hover {
-          background: rgba(30, 41, 59, 1);
-          border-color: rgba(0, 255, 195, 0.3);
-        }
-
-        .sector-pill.selected {
-          background: rgba(0, 255, 195, 0.2);
-          border-color: rgba(0, 255, 195, 0.5);
-          color: #00ffc3;
-        }
-
-        .reset-button {
-          background: rgba(239, 68, 68, 0.2);
-          border: 1px solid rgba(239, 68, 68, 0.3);
-          color: #fca5a5;
-          padding: 8px 16px;
-          border-radius: 8px;
-          transition: all 0.2s ease;
-        }
-
-        .reset-button:hover {
-          background: rgba(239, 68, 68, 0.3);
-          border-color: rgba(239, 68, 68, 0.5);
-        }
-
-        .treemap-svg-container {
-          position: relative;
-          flex: 1;
-          overflow: hidden;
-          padding: 1rem;
-        }
-
-        .treemap-svg {
-          width: 100%;
-          height: 100%;
-          max-width: 800px;
-          max-height: 600px;
-          margin: 0 auto;
-          display: block;
-        }
-
-        .tile-base {
-          transition: transform 200ms ease-out, filter 200ms ease-out;
-        }
-
-        .tile-hovered {
-          transform: scale(1.05);
-          filter: url(#innerShadow) drop-shadow(0 0 12px rgba(0,255,195,0.5)) !important;
-        }
-
-        .tile-dimmed {
-          opacity: 0.6;
-        }
-
         .results-info {
           padding: 0.5rem 1rem;
           text-align: center;
           border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Modal Styles */
-        .modal-content {
-          background: rgba(15, 23, 42, 0.95);
-          backdrop-filter: blur(24px);
-          border: 1px solid rgba(0, 255, 195, 0.3);
-          border-radius: 16px;
-          color: #fff;
-          max-width: 500px;
-        }
-
-        .indicator-stat {
-          background: rgba(30, 41, 59, 0.5);
-          padding: 12px;
-          border-radius: 8px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .glass-button {
-          background: rgba(0, 255, 195, 0.2);
-          border: 1px solid rgba(0, 255, 195, 0.3);
-          color: #00ffc3;
-          padding: 8px 16px;
-          border-radius: 8px;
-          transition: all 0.2s ease;
-        }
-
-        .glass-button:hover {
-          background: rgba(0, 255, 195, 0.3);
-          border-color: rgba(0, 255, 195, 0.5);
-          transform: translateY(-1px);
-        }
-
-        .glass-button-danger {
-          background: rgba(239, 68, 68, 0.2);
-          border: 1px solid rgba(239, 68, 68, 0.3);
-          color: #fca5a5;
-          padding: 8px 16px;
-          border-radius: 8px;
-          transition: all 0.2s ease;
-        }
-
-        .glass-button-danger:hover {
-          background: rgba(239, 68, 68, 0.3);
-          border-color: rgba(239, 68, 68, 0.5);
-          transform: translateY(-1px);
-        }
-
-        .glass-button-outline {
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          color: #e2e8f0;
-          padding: 8px 16px;
-          border-radius: 8px;
-          transition: all 0.2s ease;
-        }
-
-        .glass-button-outline:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 255, 255, 0.5);
-          transform: translateY(-1px);
-        }
-
-        /* Sticky Footer */
-        .sticky-footer {
-          position: sticky;
-          bottom: 0;
-          background: rgba(15, 23, 42, 0.9);
-          backdrop-filter: blur(16px);
-          border-top: 1px solid rgba(255, 255, 255, 0.2);
-          padding: 1rem;
-          z-index: 100;
-        }
-
-        .footer-content {
-          max-width: 1200px;
-          margin: 0 auto;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-
-        .footer-actions {
-          display: flex;
-          gap: 0.5rem;
-        }
-
-        .footer-links {
-          display: flex;
-          gap: 1rem;
-        }
-
-        .footer-link {
-          color: #9ca3af;
-          text-decoration: none;
-          font-size: 14px;
-          display: flex;
-          align-items: center;
-          transition: color 0.2s ease;
-        }
-
-        .footer-link:hover {
-          color: #00ffc3;
-        }
-
-        /* Accessibility improvements */
-        @media (prefers-reduced-motion: reduce) {
-          .tile-base,
-          .glass-button,
-          .search-input,
-          .sector-pill,
-          .controls-panel {
-            transition: none;
-          }
-          
-          .tile-hovered {
-            transform: none;
-          }
-        }
-
-        /* High contrast mode support */
-        @media (prefers-contrast: high) {
-          .tile-base {
-            stroke-width: 2;
-          }
-          
-          .sector-pill,
-          .glass-button {
-            border-width: 2px;
-          }
-        }
-
-        /* Enhanced Treemap Styles */
-        .treemap-tile {
-          transition: all 0.2s ease;
-        }
-
-        .tile-hovered {
-          stroke: rgba(255,255,255,0.8) !important;
-          stroke-width: 3 !important;
-          filter: url(#glow);
-        }
-
-        /* Sector-based colors (mimicking stock treemap) */
-        .sector-systemic {
-          fill: #dc2626; /* Red for negative/critical */
-        }
-        
-        .sector-population {
-          fill: #16a34a; /* Green for positive */
-        }
-        
-        .sector-resources {
-          fill: #ea580c; /* Orange */
-        }
-        
-        .sector-goods {
-          fill: #0891b2; /* Blue */
-        }
-        
-        .sector-social {
-          fill: #059669; /* Emerald */
-        }
-        
-        .sector-governance {
-          fill: #7c3aed; /* Purple */
-        }
-
-        /* Performance overlays */
-        .performance-excellent {
-          fill-opacity: 0.9;
-        }
-        
-        .performance-good {
-          fill-opacity: 0.7;
-        }
-        
-        .performance-poor {
-          fill-opacity: 0.5;
-        }
-
-        /* Text styling */
-        .tile-symbol {
-          font-family: 'Inter', sans-serif;
-          font-weight: 700;
-          font-size: 12px;
-          fill: white;
-          text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
-
-        .tile-percentage {
-          font-family: 'Inter', sans-serif;
-          font-weight: 500;
-          font-size: 10px;
-          fill: white;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-        }
-
-        .tile-small {
-          font-family: 'Inter', sans-serif;
-          font-weight: 600;
-          font-size: 8px;
-          fill: white;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-        }
-
-        .sector-label-header {
-          font-family: 'Inter', sans-serif;
-          font-weight: 700;
-          font-size: 11px;
-          fill: rgba(255,255,255,0.9);
-          text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-          .treemap-svg {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 5/3;
-          }
-          
-          .tile-symbol {
-            font-size: 10px;
-          }
-          
-          .tile-percentage {
-            font-size: 8px;
-          }
         }
       `}</style>
     </div>
