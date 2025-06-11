@@ -5,9 +5,9 @@ import { SearchAndFilters } from './SearchAndFilters';
 import { StickyFooter } from './StickyFooter';
 import { ControlsPanel } from './ControlsPanel';
 import { BreadcrumbNav } from './BreadcrumbNav';
+import { Legend } from './Legend';
 import { TreemapLayoutEngine, TreemapNode } from './TreemapLayout';
 import { usePanelCompact } from '@/hooks/use-panel-compact';
-import SparklineChart from '@/components/think/components/SparklineChart';
 
 interface SectorTreemapProps {
   sectors: Sector[];
@@ -72,8 +72,8 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
       if (svgContainerRef.current) {
         const rect = svgContainerRef.current.getBoundingClientRect();
         setDimensions({
-          width: Math.max(400, rect.width - 24), // Account for padding
-          height: Math.max(300, rect.height - 24)
+          width: Math.max(400, rect.width - 40), // Account for padding
+          height: Math.max(300, rect.height - 40)
         });
       }
     };
@@ -87,7 +87,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
   const debouncedHover = useCallback(
     debounce((indicatorId: string | null) => {
       setHoveredIndicatorId(indicatorId);
-    }, 50),
+    }, 200),
     []
   );
 
@@ -153,7 +153,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
       case 'sector':
         return indicator.sector;
       case 'type':
-        return 'Standard';
+        return 'Standard'; // Could be extended with more types
       case 'performance':
         const performance = (indicator.value / indicator.target) * 100;
         if (performance >= 90) return 'excellent';
@@ -181,38 +181,52 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     };
   }
 
-  // S&P 500 style color mapping
+  // Color mapping functions that match the legend
   const getSectorColor = (sector: string): string => {
     const colorMap: Record<string, string> = {
-      'Systemic': '#0080FF',
-      'Population': '#00C080', 
-      'Resource Market': '#FFC000',
-      'Goods & Services': '#8040FF',
-      'Social Outcomes': '#40C040',
-      'Governance': '#C04080'
+      'Systemic': 'rgba(0,184,255,0.7)',
+      'Population': 'rgba(0,255,195,0.7)', 
+      'Resource Market': 'rgba(255,193,7,0.7)',
+      'Goods & Services': 'rgba(123,104,238,0.7)',
+      'Social Outcomes': 'rgba(60,179,113,0.7)',
+      'Governance': 'rgba(199,21,133,0.7)'
     };
-    return colorMap[sector] || '#0080FF';
+    return colorMap[sector] || 'rgba(0,184,255,0.7)';
   };
 
-  // Calculate opacity based on performance
-  const getPerformanceOpacity = (value: number, target: number): number => {
+  const getPerformanceColor = (value: number, target: number): string => {
     const performance = (value / target) * 100;
-    if (performance >= 75) return 1.0;
-    if (performance >= 50) return 0.8;
-    return 0.6;
+    if (performance >= 90) return 'rgba(0,255,195,0.7)'; // Excellent - Green
+    if (performance >= 75) return 'rgba(255,193,7,0.7)'; // Good - Yellow
+    return 'rgba(255,110,110,0.7)'; // Needs Attention - Red
+  };
+
+  const getWeightColor = (weight: number): string => {
+    if (weight >= 8) return 'rgba(255,255,255,0.8)'; // High Weight
+    if (weight >= 5) return 'rgba(255,255,255,0.5)'; // Medium Weight
+    return 'rgba(255,255,255,0.3)'; // Low Weight
+  };
+
+  const getTileColor = (node: TreemapNode): string => {
+    switch (groupBy) {
+      case 'sector':
+        return getSectorColor(node.sector);
+      case 'performance':
+        return getPerformanceColor(node.value, node.target);
+      case 'weight':
+        return getWeightColor(node.weight);
+      default:
+        return getSectorColor(node.sector);
+    }
   };
 
   const formatPercentage = (value: number, target: number): string => {
-    const percentage = ((value / target) * 100).toFixed(0);
-    return `${percentage}%`;
+    const percentage = ((value / target) * 100).toFixed(1);
+    const isPositive = value >= target;
+    return `${isPositive ? '+' : ''}${percentage}%`;
   };
 
-  // Generate mock sparkline data
-  const generateSparklineData = (): number[] => {
-    return Array.from({ length: 30 }, () => Math.random() * 100 + 50);
-  };
-
-  // Enhanced event handlers
+  // Enhanced event handlers - convert TreemapNode to PositionedIndicator
   const handleTileMouseEnter = (node: TreemapNode, event: React.MouseEvent) => {
     const indicator: PositionedIndicator = { ...node, parentId: undefined };
     debouncedHover(indicator.id);
@@ -221,8 +235,8 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     if (svgRect) {
       setTooltip({
         indicator,
-        x: Math.min(event.clientX - svgRect.left + 10, dimensions.width - 220),
-        y: Math.max(event.clientY - svgRect.top - 10, 10)
+        x: event.clientX - svgRect.left + 10,
+        y: event.clientY - svgRect.top - 10
       });
     }
   };
@@ -234,8 +248,21 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
 
   const handleTileClick = (node: TreemapNode) => {
     const indicator: PositionedIndicator = { ...node, parentId: undefined };
-    setSelectedIndicator(indicator);
-    setIsModalOpen(true);
+    // Drill-down functionality
+    if (currentLevel < hierarchyDepth - 1) {
+      const newBreadcrumb = {
+        id: indicator.id,
+        name: indicator.name,
+        level: currentLevel + 1
+      };
+      setBreadcrumbs(prev => [...prev, newBreadcrumb]);
+      setCurrentLevel(prev => prev + 1);
+      setDrillDownPath(prev => [...prev, indicator.id]);
+    } else {
+      // Open modal at max depth
+      setSelectedIndicator(indicator);
+      setIsModalOpen(true);
+    }
   };
 
   const handleTileKeyDown = (event: React.KeyboardEvent, node: TreemapNode) => {
@@ -305,19 +332,6 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [controlsOpen]);
 
-  // Group sectors for better layout
-  const sectorGroups = useMemo(() => {
-    const groups = new Map<string, TreemapNode[]>();
-    positionedIndicators.forEach(node => {
-      const sector = node.sector;
-      if (!groups.has(sector)) {
-        groups.set(sector, []);
-      }
-      groups.get(sector)!.push(node);
-    });
-    return groups;
-  }, [positionedIndicators]);
-
   return (
     <div ref={containerRef} className="treemap-container" role="main">
       {/* Skip to content link */}
@@ -359,34 +373,54 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
         onLegendToggle={() => setShowLegend(!showLegend)}
       />
 
-      {/* S&P 500 Style Treemap Card */}
-      <div className="sp500-treemap-card" id="treemap-content">
+      {/* Glassmorphic Card Frame */}
+      <div className="treemap-card" id="treemap-content">
         {/* Header Strip */}
-        <div className="sp500-header">
-          <h2>Sector Treemap: Comprehensive System View</h2>
+        <div className="treemap-header">
+          <h2>Sector Performance Treemap</h2>
         </div>
         
         {/* SVG Container */}
         <div 
           ref={svgContainerRef}
-          className="sp500-svg-container"
+          className="treemap-svg-container"
           style={{ minHeight: '500px', height: 'calc(100vh - 300px)' }}
         >
           <svg 
             width="100%" 
             height="100%" 
             viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-            className="sp500-svg"
+            className="treemap-svg"
             role="grid"
-            aria-label="S&P 500 style sector treemap"
+            aria-label="Interactive sector treemap showing system indicators"
             preserveAspectRatio="xMidYMid meet"
           >
+            {/* Define filters and effects */}
+            <defs>
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              <filter id="textShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                <feOffset dx="1" dy="1" result="offset"/>
+                <feFlood floodColor="#000000" floodOpacity="0.8"/>
+                <feComposite in2="offset" operator="in"/>
+                <feMerge>
+                  <feMergeNode/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            
             {/* Render treemap tiles */}
             {positionedIndicators.map((node) => {
               const isHovered = hoveredIndicatorId === node.id;
               const percentage = formatPercentage(node.value, node.target);
-              const sectorColor = getSectorColor(node.sector);
-              const opacity = getPerformanceOpacity(node.value, node.target);
+              const tileColor = getTileColor(node);
               
               return (
                 <g key={node.id}>
@@ -396,17 +430,19 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                     y={node.y}
                     width={node.width}
                     height={node.height}
-                    fill={sectorColor}
-                    fillOpacity={opacity}
-                    stroke={isHovered ? "#FFFFFF" : "rgba(255,255,255,0.2)"}
+                    fill={tileColor}
+                    stroke="rgba(255,255,255,0.3)"
                     strokeWidth={isHovered ? "2" : "1"}
                     style={{ 
                       cursor: 'pointer',
-                      transition: 'stroke 150ms ease'
+                      filter: isHovered ? 'url(#glow)' : 'none',
+                      transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+                      transformOrigin: 'center',
+                      transition: 'all 0.2s ease'
                     }}
                     tabIndex={0}
                     role="gridcell"
-                    aria-label={`${node.name}: ${percentage}. Click to view details`}
+                    aria-label={`${node.name}: ${percentage}. Click to ${currentLevel < hierarchyDepth - 1 ? 'drill down' : 'view details'}`}
                     onMouseEnter={(e) => handleTileMouseEnter(node, e)}
                     onMouseLeave={handleTileMouseLeave}
                     onClick={() => handleTileClick(node)}
@@ -418,52 +454,52 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                     }}
                   />
                   
-                  {/* Indicator name */}
-                  {node.width > 50 && node.height > 30 && (
+                  {/* Stock symbol (name) */}
+                  {node.width > 60 && node.height > 40 && (
                     <text
                       x={node.x + node.width / 2}
-                      y={node.y + node.height / 2 - 6}
-                      className="sp500-tile-name"
+                      y={node.y + node.height / 2 - 8}
+                      className="tile-symbol"
                       textAnchor="middle"
                       pointerEvents="none"
                       fill="white"
                       fontSize="12"
                       fontWeight="bold"
-                      fontFamily="Noto Sans"
+                      filter="url(#textShadow)"
                     >
-                      {node.name.length > 12 ? `${node.name.substring(0, 9)}...` : node.name}
+                      {node.name.length > 8 ? node.name.substring(0, 8) : node.name}
                     </text>
                   )}
                   
                   {/* Percentage */}
-                  {node.width > 50 && node.height > 30 && (
+                  {node.width > 60 && node.height > 40 && (
                     <text
                       x={node.x + node.width / 2}
                       y={node.y + node.height / 2 + 8}
-                      className="sp500-tile-percentage"
+                      className="tile-percentage"
                       textAnchor="middle"
                       pointerEvents="none"
                       fill="white"
                       fontSize="10"
-                      fontWeight="400"
-                      fontFamily="Noto Sans"
+                      fontWeight="500"
+                      filter="url(#textShadow)"
                     >
                       {percentage}
                     </text>
                   )}
                   
-                  {/* Small tiles - abbreviated name only */}
-                  {(node.width <= 50 || node.height <= 30) && node.width > 25 && node.height > 15 && (
+                  {/* Small tiles - show abbreviated text */}
+                  {(node.width <= 60 || node.height <= 40) && node.width > 30 && node.height > 20 && (
                     <text
                       x={node.x + node.width / 2}
                       y={node.y + node.height / 2}
-                      className="sp500-tile-small"
+                      className="tile-small"
                       textAnchor="middle"
                       pointerEvents="none"
                       fill="white"
                       fontSize="8"
                       fontWeight="600"
-                      fontFamily="Noto Sans"
+                      filter="url(#textShadow)"
                     >
                       {node.name.substring(0, 3)}
                     </text>
@@ -471,37 +507,12 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                 </g>
               );
             })}
-
-            {/* Sector labels */}
-            {Array.from(sectorGroups.entries()).map(([sector, nodes]) => {
-              if (nodes.length === 0) return null;
-              
-              // Find the top-left position of the sector
-              const minX = Math.min(...nodes.map(n => n.x));
-              const minY = Math.min(...nodes.map(n => n.y));
-              
-              return (
-                <text
-                  key={`sector-${sector}`}
-                  x={minX + 4}
-                  y={minY + 12}
-                  className="sp500-sector-label"
-                  fill="white"
-                  fontSize="10"
-                  fontWeight="500"
-                  fontFamily="Noto Sans"
-                  pointerEvents="none"
-                >
-                  {sector}
-                </text>
-              );
-            })}
           </svg>
 
-          {/* S&P 500 Style Tooltip */}
+          {/* Enhanced Tooltip */}
           {tooltip && (
             <div 
-              className="sp500-tooltip"
+              className="enhanced-tooltip"
               style={{
                 position: 'absolute',
                 left: tooltip.x,
@@ -511,52 +522,24 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
               }}
               role="tooltip"
             >
-              <div className="sp500-tooltip-header">
-                {tooltip.indicator.name}
+              <div className="tooltip-header">
+                <strong>{tooltip.indicator.name}</strong>
               </div>
-              <div className="sp500-tooltip-content">
-                <div>Current: {tooltip.indicator.value} / Target: {tooltip.indicator.target} ({Math.round((tooltip.indicator.value / tooltip.indicator.target) * 100)}%)</div>
-                <div style={{ marginTop: '8px' }}>
-                  <div style={{ marginBottom: '4px', fontSize: '9px', opacity: 0.8 }}>Last 30 days:</div>
-                  <SparklineChart 
-                    data={generateSparklineData()} 
-                    width={160} 
-                    height={20} 
-                    color="#00C080" 
-                  />
-                </div>
+              <div className="tooltip-content">
+                <div>Value: {tooltip.indicator.value}</div>
+                <div>Target: {tooltip.indicator.target}</div>
+                <div>Performance: {Math.round((tooltip.indicator.value / tooltip.indicator.target) * 100)}%</div>
+                <div>Weight: {tooltip.indicator.weight}</div>
               </div>
             </div>
           )}
 
-          {/* Fixed Legend */}
-          {showLegend && (
-            <div className="sp500-legend">
-              <div className="sp500-legend-title">Sectors</div>
-              <div className="sp500-legend-items">
-                {[
-                  { sector: 'Systemic', color: '#0080FF' },
-                  { sector: 'Population', color: '#00C080' },
-                  { sector: 'Resource Market', color: '#FFC000' },
-                  { sector: 'Goods & Services', color: '#8040FF' },
-                  { sector: 'Social Outcomes', color: '#40C040' },
-                  { sector: 'Governance', color: '#C04080' }
-                ].map(({ sector, color }) => (
-                  <div key={sector} className="sp500-legend-item">
-                    <div 
-                      className="sp500-legend-color"
-                      style={{ backgroundColor: color }}
-                    />
-                    <span className="sp500-legend-label">{sector}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Legend */}
+          <Legend visible={showLegend} groupBy={groupBy} />
         </div>
         
         {/* Results count */}
-        <div className="sp500-results-info">
+        <div className="results-info">
           <p className="text-sm text-gray-300">
             Showing {positionedIndicators.length} of {sectors.flatMap(s => s.indicators).length} indicators
             {currentLevel > 0 && ` (Level ${currentLevel})`}
@@ -581,152 +564,315 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
       />
 
       <style>{`
-        /* S&P 500 Style Treemap */
-        .sp500-treemap-card {
-          background: #0B122A;
-          border-radius: 6px;
+        .treemap-card {
+          background: rgba(10,20,40,0.45);
+          backdrop-filter: blur(24px);
+          border: 1px solid rgba(0,255,195,0.15);
+          border-radius: 1.5rem;
+          box-shadow: 0 12px 32px rgba(0,0,0,0.6);
           position: relative;
           overflow: hidden;
           height: 100%;
-          box-shadow: none;
-          border: none;
         }
 
-        .sp500-header {
-          background: #081226;
-          height: 32px;
+        .treemap-header {
+          background: linear-gradient(90deg,#00FFC3 0%,#00B8FF 100%);
+          height: 40px;
           display: flex;
           align-items: center;
-          padding: 0 12px;
-          border-radius: 6px 6px 0 0;
+          padding: 0 16px;
+          border-radius: 1.5rem 1.5rem 0 0;
         }
 
-        .sp500-header h2 {
+        .treemap-header h2 {
           font-family: 'Noto Sans', sans-serif;
           font-weight: 700;
           font-size: 16px;
           color: #FFFFFF;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.6);
           margin: 0;
         }
 
-        .sp500-svg-container {
+        .treemap-svg-container {
           position: relative;
           flex: 1;
           overflow: hidden;
-          padding: 12px;
+          padding: 1rem;
           width: 100%;
           height: 100%;
-          background: #0B122A;
         }
 
-        .sp500-svg {
+        .treemap-svg {
           width: 100%;
           height: 100%;
           display: block;
         }
 
-        .sp500-sector-label {
-          text-transform: uppercase;
+        /* Controls Panel */
+        .controls-panel {
+          position: fixed;
+          top: 0;
+          right: 0;
+          width: 320px;
+          height: 100vh;
+          background: rgba(15, 23, 42, 0.95);
+          backdrop-filter: blur(24px);
+          border-left: 1px solid rgba(0, 255, 195, 0.3);
+          transform: translateX(100%);
+          transition: transform 0.3s ease;
+          z-index: 100;
+          overflow-y: auto;
         }
 
-        /* S&P 500 Style Tooltip */
-        .sp500-tooltip {
-          background: rgba(0, 0, 0, 0.9);
-          border-radius: 4px;
-          min-width: 200px;
-          max-width: 220px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+        .controls-panel.open {
+          transform: translateX(0);
         }
 
-        .sp500-tooltip-header {
-          padding: 8px 12px;
+        .controls-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
           border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          color: #FFFFFF;
-          font-size: 12px;
+        }
+
+        .controls-header h3 {
+          color: #fff;
+          font-size: 18px;
           font-weight: 600;
-          font-family: 'Noto Sans', sans-serif;
+          margin: 0;
         }
 
-        .sp500-tooltip-content {
+        .controls-content {
+          padding: 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .control-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .control-label {
+          color: #e2e8f0;
+          font-size: 14px;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .control-input, .control-select {
+          background: rgba(30, 41, 59, 0.8);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 8px;
           padding: 8px 12px;
-          color: #FFFFFF;
-          font-size: 10px;
-          line-height: 1.4;
-          font-family: 'Noto Sans', sans-serif;
+          color: #fff;
+          font-size: 14px;
         }
 
-        .sp500-tooltip-content div {
-          margin: 2px 0;
+        .control-input:focus, .control-select:focus {
+          outline: none;
+          border-color: rgba(0, 255, 195, 0.5);
         }
 
-        /* Fixed Legend */
-        .sp500-legend {
+        .control-checkbox {
+          width: 16px;
+          height: 16px;
+          accent-color: #00ffc3;
+        }
+
+        .depth-slider {
+          margin: 8px 0;
+        }
+
+        /* Breadcrumb Navigation */
+        .breadcrumb-nav {
+          padding: 0.5rem 1rem;
+          background: rgba(15, 23, 42, 0.8);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .breadcrumb-list {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .breadcrumb-item {
+          display: flex;
+          align-items: center;
+        }
+
+        .breadcrumb-button {
+          color: #9ca3af;
+          font-size: 14px;
+          padding: 4px 8px;
+          transition: color 0.2s ease;
+        }
+
+        .breadcrumb-button:hover {
+          color: #00ffc3;
+        }
+
+        .breadcrumb-button[aria-current="page"] {
+          color: #fff;
+          font-weight: 500;
+        }
+
+        .breadcrumb-separator {
+          width: 16px;
+          height: 16px;
+          color: #6b7280;
+          margin: 0 4px;
+        }
+
+        /* Legend */
+        .legend-panel {
           position: absolute;
           bottom: 20px;
           left: 20px;
-          background: rgba(0, 0, 0, 0.8);
-          border-radius: 4px;
+          background: rgba(15, 23, 42, 0.9);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 8px;
           padding: 12px;
-          min-width: 160px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          min-width: 200px;
         }
 
-        .sp500-legend-title {
-          color: #FFFFFF;
-          font-size: 12px;
+        .legend-title {
+          color: #fff;
+          font-size: 14px;
           font-weight: 600;
           margin: 0 0 8px 0;
-          font-family: 'Noto Sans', sans-serif;
         }
 
-        .sp500-legend-items {
+        .legend-items {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 6px;
         }
 
-        .sp500-legend-item {
+        .legend-item {
           display: flex;
           align-items: center;
           gap: 8px;
         }
 
-        .sp500-legend-color {
-          width: 12px;
-          height: 12px;
-          border-radius: 2px;
+        .legend-color {
+          width: 16px;
+          height: 16px;
+          border-radius: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .sp500-legend-label {
-          color: #FFFFFF;
-          font-size: 10px;
-          font-family: 'Noto Sans', sans-serif;
+        .legend-label {
+          color: #e2e8f0;
+          font-size: 12px;
         }
 
-        .sp500-results-info {
+        /* Enhanced Tooltip */
+        .enhanced-tooltip {
+          background: rgba(15, 23, 42, 0.95);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(0, 255, 195, 0.3);
+          border-radius: 8px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+          min-width: 200px;
+        }
+
+        .tooltip-header {
+          background: rgba(0, 255, 195, 0.1);
           padding: 8px 12px;
-          text-align: center;
-          background: #081226;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px 8px 0 0;
         }
 
-        /* Responsive Design */
+        .tooltip-header strong {
+          color: #00ffc3;
+          font-size: 14px;
+        }
+
+        .tooltip-content {
+          padding: 8px 12px;
+          color: #e2e8f0;
+          font-size: 12px;
+          line-height: 1.4;
+        }
+
+        .tooltip-content div {
+          margin: 2px 0;
+        }
+
+        /* Responsive Design for Controls */
         @media (max-width: 768px) {
-          .sp500-legend {
+          .controls-panel {
+            width: 100%;
+            height: auto;
+            max-height: 60vh;
+            top: auto;
+            bottom: 0;
+            transform: translateY(100%);
+            border-left: none;
+            border-top: 1px solid rgba(0, 255, 195, 0.3);
+            border-radius: 16px 16px 0 0;
+          }
+
+          .controls-panel.open {
+            transform: translateY(0);
+          }
+
+          .breadcrumb-nav {
+            overflow-x: auto;
+          }
+
+          .breadcrumb-list {
+            white-space: nowrap;
+          }
+
+          .legend-panel {
             position: relative;
             bottom: auto;
             left: auto;
-            margin-top: 12px;
-            margin-bottom: 12px;
-          }
-          
-          .sp500-svg-container {
-            padding: 8px;
+            margin-top: 1rem;
           }
         }
 
-        /* Existing styles for other components */
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+          .tile-base,
+          .glass-button,
+          .search-input,
+          .sector-pill,
+          .controls-panel {
+            transition: none;
+          }
+          
+          .tile-hovered {
+            transform: none;
+          }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+          .tile-base {
+            stroke-width: 2;
+          }
+          
+          .sector-pill,
+          .glass-button {
+            border-width: 2px;
+          }
+        }
+
+        /* Existing interactive styles */
         .treemap-container {
           height: 100vh;
           display: flex;
