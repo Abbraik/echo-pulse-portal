@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,13 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const { t, language, setLanguage, isRTL } = useTranslation();
   const [notifications] = useState(3); // Mock notification count
   const [isHovering, setIsHovering] = useState<string | null>(null);
+
+  // Gooey navigation state
+  const containerRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLUListElement>(null);
+  const filterRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [activeNavIndex, setActiveNavIndex] = useState<number>(0);
 
   // Listen for scroll events
   useEffect(() => {
@@ -64,6 +71,34 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showSearch]);
 
+  // Update active nav index based on current path
+  useEffect(() => {
+    const currentIndex = navLinks.findIndex(link => link.path === location.pathname);
+    if (currentIndex !== -1) {
+      setActiveNavIndex(currentIndex);
+    }
+  }, [location.pathname]);
+
+  // Update gooey effect position when active index changes
+  useEffect(() => {
+    if (!navRef.current || !containerRef.current) return;
+    const activeLi = navRef.current.querySelectorAll("li")[activeNavIndex] as HTMLElement;
+    if (activeLi) {
+      updateEffectPosition(activeLi);
+      textRef.current?.classList.add("active");
+    }
+    
+    const resizeObserver = new ResizeObserver(() => {
+      const currentActiveLi = navRef.current?.querySelectorAll("li")[activeNavIndex] as HTMLElement;
+      if (currentActiveLi) {
+        updateEffectPosition(currentActiveLi);
+      }
+    });
+    
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, [activeNavIndex]);
+
   const navLinks = [
     { name: 'HOME', path: '/' },
     { name: 'THINK', path: '/think' },
@@ -73,6 +108,102 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
     { name: 'INNOVATE', path: '/innovate' },
   ];
 
+  // Gooey navigation helper functions
+  const noise = (n = 1) => n / 2 - Math.random() * n;
+  const getXY = (distance: number, pointIndex: number, totalPoints: number): [number, number] => {
+    const angle = ((360 + noise(8)) / totalPoints) * pointIndex * (Math.PI / 180);
+    return [distance * Math.cos(angle), distance * Math.sin(angle)];
+  };
+
+  const createParticle = (i: number, t: number, d: [number, number], r: number) => {
+    let rotate = noise(r / 10);
+    return {
+      start: getXY(d[0], 15 - i, 15),
+      end: getXY(d[1] + noise(7), 15 - i, 15),
+      time: t,
+      scale: 1 + noise(0.2),
+      color: Math.floor(Math.random() * 4) + 1,
+      rotate: rotate > 0 ? (rotate + r / 20) * 10 : (rotate - r / 20) * 10,
+    };
+  };
+
+  const makeParticles = (element: HTMLElement) => {
+    const d: [number, number] = [90, 10];
+    const r = 100;
+    const bubbleTime = 600 * 2 + 300;
+    element.style.setProperty("--time", `${bubbleTime}ms`);
+    
+    for (let i = 0; i < 15; i++) {
+      const t = 600 * 2 + noise(300 * 2);
+      const p = createParticle(i, t, d, r);
+      element.classList.remove("active");
+      
+      setTimeout(() => {
+        const particle = document.createElement("span");
+        const point = document.createElement("span");
+        particle.classList.add("particle");
+        particle.style.setProperty("--start-x", `${p.start[0]}px`);
+        particle.style.setProperty("--start-y", `${p.start[1]}px`);
+        particle.style.setProperty("--end-x", `${p.end[0]}px`);
+        particle.style.setProperty("--end-y", `${p.end[1]}px`);
+        particle.style.setProperty("--time", `${p.time}ms`);
+        particle.style.setProperty("--scale", `${p.scale}`);
+        particle.style.setProperty("--color", `var(--color-${p.color}, white)`);
+        particle.style.setProperty("--rotate", `${p.rotate}deg`);
+        point.classList.add("point");
+        particle.appendChild(point);
+        element.appendChild(particle);
+        
+        requestAnimationFrame(() => {
+          element.classList.add("active");
+        });
+        
+        setTimeout(() => {
+          try {
+            element.removeChild(particle);
+          } catch {}
+        }, t);
+      }, 30);
+    }
+  };
+
+  const updateEffectPosition = (element: HTMLElement) => {
+    if (!containerRef.current || !filterRef.current || !textRef.current) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const pos = element.getBoundingClientRect();
+    const styles = {
+      left: `${pos.x - containerRect.x}px`,
+      top: `${pos.y - containerRect.y}px`,
+      width: `${pos.width}px`,
+      height: `${pos.height}px`,
+    };
+    Object.assign(filterRef.current.style, styles);
+    Object.assign(textRef.current.style, styles);
+    textRef.current.innerText = element.innerText;
+  };
+
+  const handleNavClick = (e: React.MouseEvent<HTMLLIElement>, index: number) => {
+    const liEl = e.currentTarget;
+    if (activeNavIndex === index) return;
+    setActiveNavIndex(index);
+    updateEffectPosition(liEl);
+    
+    if (filterRef.current) {
+      const particles = filterRef.current.querySelectorAll(".particle");
+      particles.forEach((p) => filterRef.current!.removeChild(p));
+    }
+    
+    if (textRef.current) {
+      textRef.current.classList.remove("active");
+      void textRef.current.offsetWidth;
+      textRef.current.classList.add("active");
+    }
+    
+    if (filterRef.current) {
+      makeParticles(filterRef.current);
+    }
+  };
+
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'ar' : 'en');
   };
@@ -80,11 +211,150 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
-    // Handle search logic here
   };
 
   return (
     <AnimatePresence>
+      <style>
+        {`
+          :root {
+            --color-1: #14b8a6;
+            --color-2: #3b82f6;
+            --color-3: #8b5cf6;
+            --color-4: #f59e0b;
+          }
+          .gooey-effect {
+            position: absolute;
+            opacity: 1;
+            pointer-events: none;
+            display: grid;
+            place-items: center;
+            z-index: 1;
+          }
+          .gooey-effect.text {
+            color: white;
+            transition: color 0.3s ease;
+          }
+          .gooey-effect.text.active {
+            color: #0f172a;
+          }
+          .gooey-effect.filter {
+            filter: blur(7px) contrast(100) blur(0);
+            mix-blend-mode: lighten;
+          }
+          .gooey-effect.filter::before {
+            content: "";
+            position: absolute;
+            inset: -75px;
+            z-index: -2;
+            background: #0f172a;
+          }
+          .gooey-effect.filter::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, #14b8a6, #3b82f6);
+            transform: scale(0);
+            opacity: 0;
+            z-index: -1;
+            border-radius: 9999px;
+          }
+          .gooey-effect.active::after {
+            animation: pill 0.3s ease both;
+          }
+          @keyframes pill {
+            to {
+              transform: scale(1);
+              opacity: 1;
+            }
+          }
+          .particle, .point {
+            display: block;
+            opacity: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 9999px;
+            transform-origin: center;
+          }
+          .particle {
+            --time: 5s;
+            position: absolute;
+            top: calc(50% - 8px);
+            left: calc(50% - 8px);
+            animation: particle calc(var(--time)) ease 1 -350ms;
+          }
+          .point {
+            background: var(--color);
+            opacity: 1;
+            animation: point calc(var(--time)) ease 1 -350ms;
+          }
+          @keyframes particle {
+            0% {
+              transform: rotate(0deg) translate(calc(var(--start-x)), calc(var(--start-y)));
+              opacity: 1;
+              animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+            }
+            70% {
+              transform: rotate(calc(var(--rotate) * 0.5)) translate(calc(var(--end-x) * 1.2), calc(var(--end-y) * 1.2));
+              opacity: 1;
+              animation-timing-function: ease;
+            }
+            85% {
+              transform: rotate(calc(var(--rotate) * 0.66)) translate(calc(var(--end-x)), calc(var(--end-y)));
+              opacity: 1;
+            }
+            100% {
+              transform: rotate(calc(var(--rotate) * 1.2)) translate(calc(var(--end-x) * 0.5), calc(var(--end-y) * 0.5));
+              opacity: 1;
+            }
+          }
+          @keyframes point {
+            0% {
+              transform: scale(0);
+              opacity: 0;
+              animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+            }
+            25% {
+              transform: scale(calc(var(--scale) * 0.25));
+            }
+            38% {
+              opacity: 1;
+            }
+            65% {
+              transform: scale(var(--scale));
+              opacity: 1;
+              animation-timing-function: ease;
+            }
+            85% {
+              transform: scale(var(--scale));
+              opacity: 1;
+            }
+            100% {
+              transform: scale(0);
+              opacity: 0;
+            }
+          }
+          .nav-item.active {
+            color: #0f172a;
+            text-shadow: none;
+          }
+          .nav-item.active::after {
+            opacity: 1;
+            transform: scale(1);
+          }
+          .nav-item::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #14b8a6, #3b82f6);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+            z-index: -1;
+          }
+        `}
+      </style>
       <motion.nav
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
           scrolled
@@ -112,47 +382,37 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
               </NavLink>
             </div>
 
-            {/* Navigation Links */}
-            <div className={`hidden md:flex items-center justify-center flex-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <div className={`flex ${isRTL ? 'flex-row-reverse space-x-reverse' : ''} space-x-8`}>
-                {navLinks.map((link) => (
-                  <NavLink
-                    key={link.path}
-                    to={link.path}
-                    className={({ isActive }) =>
-                      `group relative px-3 py-2 text-sm font-bold transition-all duration-300 ${
-                        isActive
-                          ? 'text-teal-600 dark:text-teal-400'
-                          : resolvedTheme === 'dark'
-                            ? 'text-gray-300 hover:text-white'
-                            : 'text-gray-700 hover:text-gray-900'
-                      }`
-                    }
-                    onMouseEnter={() => setIsHovering(link.path)}
-                    onMouseLeave={() => setIsHovering(null)}
-                  >
-                    {link.name}
-                    {/* Active state underline */}
-                    <NavLink
-                      to={link.path}
-                      className={({ isActive }) =>
-                        isActive ? 'absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-teal-500 to-blue-600' : 'hidden'
-                      }
-                    />
-                    {/* Hover underline */}
-                    {isHovering === link.path && (
-                      <motion.span
-                        layoutId="nav-hover"
-                        className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-teal-500/60 to-blue-600/60"
-                        initial={{ opacity: 0, scaleX: 0 }}
-                        animate={{ opacity: 1, scaleX: 1 }}
-                        exit={{ opacity: 0, scaleX: 0 }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    )}
-                  </NavLink>
-                ))}
-              </div>
+            {/* Gooey Navigation Links */}
+            <div className={`hidden md:flex items-center justify-center flex-1 ${isRTL ? 'flex-row-reverse' : ''}`} ref={containerRef}>
+              <nav className="flex relative" style={{ transform: "translate3d(0,0,0.01px)" }}>
+                <ul
+                  ref={navRef}
+                  className="flex gap-8 list-none p-0 px-4 m-0 relative z-[3]"
+                  style={{
+                    color: "white",
+                    textShadow: "0 1px 1px hsl(205deg 30% 10% / 0.2)",
+                  }}
+                >
+                  {navLinks.map((link, index) => (
+                    <li
+                      key={link.path}
+                      className={`nav-item py-[0.6em] px-[1em] rounded-full relative cursor-pointer transition-[background-color_color_box-shadow] duration-300 ease shadow-[0_0_0.5px_1.5px_transparent] text-white ${
+                        activeNavIndex === index ? "active" : ""
+                      }`}
+                      onClick={(e) => handleNavClick(e, index)}
+                    >
+                      <NavLink
+                        to={link.path}
+                        className="outline-none"
+                      >
+                        {link.name}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+              <span className="gooey-effect filter" ref={filterRef} />
+              <span className="gooey-effect text" ref={textRef} />
             </div>
 
             {/* Utility Icons */}
