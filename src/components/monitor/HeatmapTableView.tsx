@@ -1,6 +1,7 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Search, Download, TrendingUp, Eye } from 'lucide-react';
 
 interface HeatmapTableViewProps {
   timeRange: string;
@@ -8,237 +9,404 @@ interface HeatmapTableViewProps {
   chartType: 'bar' | 'line';
 }
 
-interface IndicatorData {
+interface HeatmapCell {
+  domain: string;
+  category: 'strategic' | 'operational';
+  value: number;
+  status: 'healthy' | 'warning' | 'critical';
+}
+
+interface Indicator {
   id: string;
   name: string;
-  value: number;
-  target: number;
-  category: string;
-  status: 'healthy' | 'warning' | 'critical';
+  category: 'strategic' | 'operational';
+  domain: string;
+  currentValue: number | string;
+  target: number | string;
+  deviation: number;
   trend: number[];
 }
 
 const HeatmapTableView: React.FC<HeatmapTableViewProps> = ({ timeRange, domainFilter, chartType }) => {
-  const [sortBy, setSortBy] = useState<'name' | 'value' | 'category' | 'status'>('value');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedCell, setSelectedCell] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'strategic' | 'operational'>('all');
 
-  // Sample data with 10% reduced values
-  const indicators: IndicatorData[] = useMemo(() => [
-    { id: '1', name: 'DEI Composite Score', value: 63, target: 80, category: 'Strategic', status: 'warning', trend: [68, 67, 65, 63, 62] },
-    { id: '2', name: 'Network Resilience', value: 75, target: 85, category: 'Operational', status: 'healthy', trend: [70, 72, 74, 75, 76] },
-    { id: '3', name: 'Resource Efficiency', value: 75, target: 85, category: 'Operational', status: 'healthy', trend: [77, 78, 77, 75, 76] },
-    { id: '4', name: 'Social Cohesion Index', value: 69, target: 90, category: 'Community', status: 'warning', trend: [79, 77, 73, 69, 68] },
-    { id: '5', name: 'Innovation Pipeline', value: 74, target: 85, category: 'Strategic', status: 'healthy', trend: [68, 70, 72, 74, 75] },
-    { id: '6', name: 'Trust Recovery Rate', value: 54, target: 75, category: 'Strategic', status: 'critical', trend: [65, 61, 58, 56, 54] },
-    { id: '7', name: 'Workflow Optimization', value: 54, target: 75, category: 'Operational', status: 'critical', trend: [65, 61, 58, 55, 54] },
-    { id: '8', name: 'Knowledge Transfer', value: 68, target: 80, category: 'Learning', status: 'healthy', trend: [63, 65, 66, 68, 69] },
-    { id: '9', name: 'Stakeholder Engagement', value: 71, target: 85, category: 'Community', status: 'healthy', trend: [68, 69, 70, 71, 72] },
-    { id: '10', name: 'Security Posture', value: 79, target: 90, category: 'Operational', status: 'healthy', trend: [77, 77, 78, 79, 80] },
-    { id: '11', name: 'Adaptive Capacity', value: 65, target: 80, category: 'Strategic', status: 'warning', trend: [61, 63, 64, 65, 66] },
-    { id: '12', name: 'Data Quality', value: 77, target: 90, category: 'Technical', status: 'healthy', trend: [74, 75, 76, 77, 78] },
-    { id: '13', name: 'Performance Metrics', value: 73, target: 85, category: 'Operational', status: 'healthy', trend: [70, 71, 72, 73, 74] },
-    { id: '14', name: 'Risk Mitigation', value: 67, target: 80, category: 'Strategic', status: 'warning', trend: [68, 68, 67, 66, 67] },
-    { id: '15', name: 'Team Cohesion', value: 68, target: 80, category: 'Community', status: 'healthy', trend: [67, 68, 68, 69, 68] },
-    { id: '16', name: 'Learning Velocity', value: 70, target: 85, category: 'Learning', status: 'healthy', trend: [68, 68, 69, 70, 71] },
-    { id: '17', name: 'System Reliability', value: 83, target: 95, category: 'Technical', status: 'healthy', trend: [81, 82, 83, 84, 83] },
-    { id: '18', name: 'Communication Flow', value: 66, target: 80, category: 'Operational', status: 'warning', trend: [68, 67, 66, 65, 66] },
-    { id: '19', name: 'Cultural Alignment', value: 64, target: 80, category: 'Community', status: 'warning', trend: [66, 65, 64, 63, 64] },
-    { id: '20', name: 'Technology Debt', value: 60, target: 75, category: 'Technical', status: 'critical', trend: [63, 62, 61, 60, 59] },
-  ], []);
+  const heatmapData: HeatmapCell[] = [
+    { domain: 'Population', category: 'strategic', value: 78, status: 'warning' },
+    { domain: 'Resources', category: 'strategic', value: 85, status: 'healthy' },
+    { domain: 'Social', category: 'strategic', value: 92, status: 'healthy' },
+    { domain: 'Workflow', category: 'strategic', value: 67, status: 'critical' },
+    { domain: 'Population', category: 'operational', value: 88, status: 'healthy' },
+    { domain: 'Resources', category: 'operational', value: 45, status: 'critical' },
+    { domain: 'Social', category: 'operational', value: 91, status: 'healthy' },
+    { domain: 'Workflow', category: 'operational', value: 82, status: 'healthy' },
+  ];
+
+  const indicators: Indicator[] = [
+    { id: '1', name: 'DEI Composite', category: 'strategic', domain: 'Population', currentValue: 78, target: 80, deviation: -2.5, trend: [75, 76, 78, 77, 78] },
+    { id: '2', name: 'Resource Efficiency', category: 'operational', domain: 'Resources', currentValue: 92, target: 85, deviation: 8.2, trend: [85, 87, 89, 90, 92] },
+    { id: '3', name: 'Social Cohesion', category: 'strategic', domain: 'Social', currentValue: 85, target: 90, deviation: -5.6, trend: [88, 86, 85, 84, 85] },
+    { id: '4', name: 'Workflow Health', category: 'operational', domain: 'Workflow', currentValue: 67, target: 75, deviation: -10.7, trend: [72, 70, 68, 66, 67] },
+    { id: '5', name: 'Population Growth', category: 'strategic', domain: 'Population', currentValue: 88, target: 85, deviation: 3.5, trend: [83, 84, 86, 87, 88] },
+    { id: '6', name: 'Infrastructure Load', category: 'operational', domain: 'Resources', currentValue: 45, target: 70, deviation: -35.7, trend: [55, 52, 48, 46, 45] },
+    { id: '7', name: 'Innovation Index', category: 'strategic', domain: 'Social', currentValue: 91, target: 85, deviation: 7.1, trend: [86, 87, 89, 90, 91] },
+    { id: '8', name: 'System Stability', category: 'operational', domain: 'Workflow', currentValue: 82, target: 80, deviation: 2.5, trend: [79, 80, 81, 81, 82] },
+  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return '#00FFC3';
-      case 'warning': return '#FFC107';
-      case 'critical': return '#FF6E6E';
-      default: return '#00FFC3';
+      case 'healthy': return 'rgba(0,255,195,0.25)';
+      case 'warning': return 'rgba(255,193,7,0.25)';
+      case 'critical': return 'rgba(255,110,110,0.25)';
+      default: return 'rgba(0,255,195,0.25)';
     }
   };
 
-  const getPerformanceColor = (value: number, target: number) => {
-    const ratio = value / target;
-    if (ratio >= 0.9) return '#00FFC3';
-    if (ratio >= 0.7) return '#FFC107';
-    return '#FF6E6E';
+  const getDeviationColor = (deviation: number) => {
+    if (deviation > 5) return 'text-green-400';
+    if (deviation >= -5 && deviation <= 5) return 'text-amber-400';
+    return 'text-red-400';
   };
 
-  const sortedIndicators = useMemo(() => {
-    const sorted = [...indicators].sort((a, b) => {
-      let aVal: any = a[sortBy];
-      let bVal: any = b[sortBy];
-      
-      if (typeof aVal === 'string') {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-      
-      if (sortOrder === 'asc') {
-        return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-      } else {
-        return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
-      }
-    });
-    return sorted;
-  }, [indicators, sortBy, sortOrder]);
-
-  const handleSort = (column: 'name' | 'value' | 'category' | 'status') => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortOrder('desc');
-    }
+  const handleCellClick = (domain: string, category: string) => {
+    const cellKey = `${domain}-${category}`;
+    setSelectedCell(selectedCell === cellKey ? null : cellKey);
   };
+
+  const filteredIndicators = indicators.filter(indicator => {
+    const matchesSearch = indicator.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === 'all' || indicator.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const domains = ['Population', 'Resources', 'Social', 'Workflow'];
 
   return (
-    <div className="h-full flex flex-col p-4 space-y-4">
-      {/* Heatmap Section - 40% height */}
-      <div className="h-2/5 bg-slate-800/40 backdrop-blur-xl border border-white/20 rounded-xl p-4">
-        <h3 className="text-lg font-bold text-white mb-3">Performance Heatmap</h3>
-        <div className="grid grid-cols-10 gap-1 h-full">
-          {indicators.slice(0, 20).map((indicator, index) => (
-            <motion.div
-              key={indicator.id}
-              className="rounded-lg flex items-center justify-center cursor-pointer relative group"
-              style={{
-                backgroundColor: `${getPerformanceColor(indicator.value, indicator.target)}20`,
-                border: `1px solid ${getPerformanceColor(indicator.value, indicator.target)}`,
-              }}
-              whileHover={{ 
-                scale: 1.05,
-                backgroundColor: `${getPerformanceColor(indicator.value, indicator.target)}40`,
-              }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2, delay: index * 0.02 }}
-            >
-              <span 
-                className="text-xs font-bold"
-                style={{ color: getPerformanceColor(indicator.value, indicator.target) }}
-              >
-                {indicator.value}
-              </span>
-              
-              {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/90 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                {indicator.name}: {indicator.value}%
+    <div className="h-full flex flex-col">
+      {/* Heatmap Section */}
+      <div 
+        className="h-1/2 m-3 mb-1 rounded-2xl p-3"
+        style={{
+          background: 'rgba(20,30,50,0.6)',
+          backdropFilter: 'blur(32px)',
+        }}
+      >
+        <div className="h-full grid grid-rows-3 grid-cols-4 gap-3">
+          {/* Column Headers */}
+          <div className="col-span-4 grid grid-cols-4 gap-3 items-center">
+            {domains.map(domain => (
+              <div key={domain} className="text-center">
+                <span 
+                  className="text-sm font-medium text-[#E0E0E0]"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  {domain}
+                </span>
               </div>
-            </motion.div>
-          ))}
+            ))}
+          </div>
+
+          {/* Strategic Row */}
+          <div className="col-span-4 grid grid-cols-4 gap-3">
+            {domains.map(domain => {
+              const cellData = heatmapData.find(cell => 
+                cell.domain === domain && cell.category === 'strategic'
+              );
+              const cellKey = `${domain}-strategic`;
+              const isSelected = selectedCell === cellKey;
+              
+              return (
+                <motion.div
+                  key={cellKey}
+                  className="aspect-square rounded-lg cursor-pointer flex flex-col items-center justify-center relative"
+                  style={{
+                    background: getStatusColor(cellData?.status || 'healthy'),
+                    border: isSelected ? '2px solid #00FFC3' : '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: isSelected ? '0 0 12px rgba(0,255,195,0.5)' : 'inset 0 2px 4px rgba(0,0,0,0.3)',
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => handleCellClick(domain, 'strategic')}
+                  role="button"
+                  aria-label={`${domain} (Strategic): ${cellData?.value}% ${cellData?.status}`}
+                >
+                  <span 
+                    className="text-xs font-medium text-[#00FFC3] mb-1"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    Strategic
+                  </span>
+                  <span 
+                    className="text-lg font-bold text-[#00FFC3]"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {cellData?.value}%
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Operational Row */}
+          <div className="col-span-4 grid grid-cols-4 gap-3">
+            {domains.map(domain => {
+              const cellData = heatmapData.find(cell => 
+                cell.domain === domain && cell.category === 'operational'
+              );
+              const cellKey = `${domain}-operational`;
+              const isSelected = selectedCell === cellKey;
+              
+              return (
+                <motion.div
+                  key={cellKey}
+                  className="aspect-square rounded-lg cursor-pointer flex flex-col items-center justify-center relative"
+                  style={{
+                    background: getStatusColor(cellData?.status || 'healthy'),
+                    border: isSelected ? '2px solid #00FFC3' : '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: isSelected ? '0 0 12px rgba(0,255,195,0.5)' : 'inset 0 2px 4px rgba(0,0,0,0.3)',
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => handleCellClick(domain, 'operational')}
+                  role="button"
+                  aria-label={`${domain} (Operational): ${cellData?.value}% ${cellData?.status}`}
+                >
+                  <span 
+                    className="text-xs font-medium text-[#00FFC3] mb-1"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    Operational
+                  </span>
+                  <span 
+                    className="text-lg font-bold text-[#00FFC3]"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {cellData?.value}%
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Table Section - 60% height */}
-      <div className="flex-1 bg-slate-800/40 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden">
-        <div className="p-4 border-b border-white/10">
-          <h3 className="text-lg font-bold text-white">Detailed Indicators</h3>
-        </div>
-        
+      {/* Table Section */}
+      <div 
+        className="h-1/2 m-3 mt-1 rounded-2xl flex flex-col"
+        style={{
+          background: 'rgba(20,30,50,0.6)',
+          backdropFilter: 'blur(32px)',
+        }}
+      >
+        {/* Table Header */}
         <div 
-          className="overflow-y-auto h-full"
+          className="h-8 flex items-center justify-between px-4 rounded-t-2xl flex-shrink-0"
           style={{
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(255,255,255,0.20) transparent'
+            background: 'linear-gradient(90deg, #00FFC3 0%, #00B8FF 100%)',
           }}
         >
-          <style>{`
-            .overflow-y-auto::-webkit-scrollbar {
-              width: 6px;
-            }
-            .overflow-y-auto::-webkit-scrollbar-thumb {
-              background: rgba(255,255,255,0.20);
-              border-radius: 3px;
-            }
-            .overflow-y-auto::-webkit-scrollbar-track {
-              background: transparent;
-            }
-          `}</style>
-          
+          <h3 
+            className="font-bold text-white text-sm"
+            style={{ fontFamily: 'Noto Sans' }}
+          >
+            All Indicators
+          </h3>
+          <div className="flex items-center space-x-2">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-[#E0E0E0]" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-6 pr-2 py-1 text-xs rounded border-0 outline-none"
+                style={{
+                  background: 'rgba(20,30,50,0.6)',
+                  color: '#E0E0E0',
+                  fontFamily: 'Noto Sans',
+                  border: '1px solid rgba(255,255,255,0.20)',
+                  width: '100px',
+                }}
+              />
+            </div>
+            
+            {/* Category Filter */}
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value as any)}
+              className="px-2 py-1 text-xs rounded border-0 outline-none"
+              style={{
+                background: 'rgba(20,30,50,0.6)',
+                color: '#E0E0E0',
+                fontFamily: 'Noto Sans',
+                border: '1px solid rgba(255,255,255,0.20)',
+              }}
+            >
+              <option value="all">All Categories</option>
+              <option value="strategic">Strategic</option>
+              <option value="operational">Operational</option>
+            </select>
+            
+            <button 
+              className="w-6 h-6 flex items-center justify-center text-white/50 hover:text-[#00FFC3] transition-colors"
+              aria-label="Export CSV"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+            <button 
+              className="w-6 h-6 flex items-center justify-center text-white/50 hover:text-[#00FFC3] transition-colors"
+              aria-label="Full Trend Chart"
+            >
+              <TrendingUp className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="flex-1 overflow-auto">
           <table className="w-full">
-            <thead className="sticky top-0 bg-slate-700/50 backdrop-blur-sm">
-              <tr>
+            <thead>
+              <tr 
+                className="h-6"
+                style={{
+                  background: 'linear-gradient(90deg, rgba(0,255,195,0.2) 0%, rgba(0,184,255,0.2) 100%)',
+                }}
+              >
                 <th 
-                  className="text-left p-3 text-sm font-semibold text-slate-300 cursor-pointer hover:text-white transition-colors"
-                  onClick={() => handleSort('name')}
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
                 >
-                  Indicator {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  Indicator
                 </th>
                 <th 
-                  className="text-center p-3 text-sm font-semibold text-slate-300 cursor-pointer hover:text-white transition-colors"
-                  onClick={() => handleSort('value')}
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
                 >
-                  Score {sortBy === 'value' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="text-center p-3 text-sm font-semibold text-slate-300">Target</th>
-                <th 
-                  className="text-center p-3 text-sm font-semibold text-slate-300 cursor-pointer hover:text-white transition-colors"
-                  onClick={() => handleSort('category')}
-                >
-                  Category {sortBy === 'category' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  Category
                 </th>
                 <th 
-                  className="text-center p-3 text-sm font-semibold text-slate-300 cursor-pointer hover:text-white transition-colors"
-                  onClick={() => handleSort('status')}
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
                 >
-                  Status {sortBy === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  Domain
                 </th>
-                <th className="text-center p-3 text-sm font-semibold text-slate-300">Trend</th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Current
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Target
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Deviation %
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Trend
+                </th>
+                <th 
+                  className="text-left px-2 font-bold text-white text-xs"
+                  style={{ fontFamily: 'Noto Sans' }}
+                >
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              {sortedIndicators.map((indicator, index) => (
+              {filteredIndicators.slice(0, 8).map((indicator, index) => (
                 <motion.tr
                   key={indicator.id}
-                  className="border-b border-white/10 hover:bg-white/5 transition-colors"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.2, delay: index * 0.03 }}
-                  style={{ height: '32px' }}
+                  className={`h-10 cursor-pointer transition-all duration-200 ${
+                    index % 2 === 0 ? 'bg-white/2' : 'bg-transparent'
+                  } hover:bg-[rgba(0,255,195,0.10)]`}
+                  whileHover={{
+                    y: -2,
+                    boxShadow: '0 0 12px rgba(0,255,195,0.4)',
+                  }}
                 >
-                  <td className="p-2 text-sm text-white">{indicator.name}</td>
-                  <td className="p-2 text-center">
+                  <td 
+                    className="px-2 font-medium text-[#00FFC3] text-xs"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {indicator.name}
+                  </td>
+                  <td className="px-2">
                     <span 
-                      className="text-sm font-bold"
-                      style={{ color: getPerformanceColor(indicator.value, indicator.target) }}
+                      className={`px-2 py-1 rounded-full font-medium text-xs ${
+                        indicator.category === 'strategic' 
+                          ? 'bg-[#00FFC3] text-[#081226]' 
+                          : 'bg-[#00B8FF] text-[#081226]'
+                      }`}
+                      style={{ fontFamily: 'Noto Sans' }}
                     >
-                      {indicator.value}%
+                      {indicator.category === 'strategic' ? 'Strategic' : 'Operational'}
                     </span>
                   </td>
-                  <td className="p-2 text-center text-sm text-slate-300">{indicator.target}%</td>
-                  <td className="p-2 text-center">
-                    <span className="px-2 py-1 rounded-full text-xs bg-slate-600/50 text-slate-200">
-                      {indicator.category}
-                    </span>
+                  <td 
+                    className="px-2 text-[#E0E0E0] text-xs"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {indicator.domain}
                   </td>
-                  <td className="p-2 text-center">
-                    <div 
-                      className="w-3 h-3 rounded-full mx-auto"
-                      style={{ backgroundColor: getStatusColor(indicator.status) }}
-                    />
+                  <td 
+                    className="px-2 text-[#E0E0E0] text-xs"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {indicator.currentValue}
                   </td>
-                  <td className="p-2 text-center">
-                    <svg width="50" height="20" viewBox="0 0 50 20" className="mx-auto">
+                  <td 
+                    className="px-2 text-[#E0E0E0] text-xs"
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {indicator.target}
+                  </td>
+                  <td 
+                    className={`px-2 font-medium text-xs ${getDeviationColor(indicator.deviation)}`}
+                    style={{ fontFamily: 'Noto Sans' }}
+                  >
+                    {indicator.deviation > 0 ? '+' : ''}{indicator.deviation}%
+                  </td>
+                  <td className="px-2">
+                    <svg width="60" height="20" viewBox="0 0 60 20">
                       {chartType === 'line' ? (
                         <polyline
-                          points={indicator.trend.map((value, i) => `${i * 12.5},${20 - (value / Math.max(...indicator.trend)) * 15}`).join(' ')}
+                          points={indicator.trend.map((value, i) => `${i * 15},${20 - (value / Math.max(...indicator.trend)) * 15}`).join(' ')}
                           fill="none"
-                          stroke={getStatusColor(indicator.status)}
-                          strokeWidth="1.5"
+                          stroke="#00FFC3"
+                          strokeWidth="1"
                         />
                       ) : (
                         indicator.trend.map((value, i) => (
                           <rect
                             key={i}
-                            x={i * 10}
+                            x={i * 12}
                             y={20 - (value / Math.max(...indicator.trend)) * 15}
                             width="8"
                             height={(value / Math.max(...indicator.trend)) * 15}
-                            fill={getStatusColor(indicator.status)}
-                            opacity="0.8"
+                            fill="#00FFC3"
                           />
                         ))
                       )}
                     </svg>
+                  </td>
+                  <td className="px-2">
+                    <button 
+                      className="w-5 h-5 rounded-full bg-[#00FFC3] flex items-center justify-center hover:shadow-lg transition-all duration-200"
+                      style={{ boxShadow: '0 0 8px rgba(0,255,195,0.4)' }}
+                      aria-label={`Drill down into ${indicator.name}`}
+                    >
+                      <Eye className="w-3 h-3 text-[#081226]" />
+                    </button>
                   </td>
                 </motion.tr>
               ))}

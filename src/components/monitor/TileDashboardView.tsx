@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -20,18 +21,14 @@ interface TileData {
 
 const TileDashboardView: React.FC<TileDashboardViewProps> = ({ timeRange, domainFilter, chartType }) => {
   const [tiles, setTiles] = useState<TileData[]>([
-    { id: '1', title: 'DEI Composite', subtitle: 'Strategic Indicator', value: 63, target: 80, status: 'warning', size: '2x1', trend: [68, 67, 65, 63, 62] },
-    { id: '2', title: 'Resource Efficiency', subtitle: 'Operational', value: 75, target: 85, status: 'healthy', size: '1x1', trend: [77, 78, 77, 75, 76] },
-    { id: '3', title: 'Social Cohesion', subtitle: 'Community Health', value: 69, target: 90, status: 'warning', size: '1x1', trend: [79, 77, 73, 69, 68] },
-    { id: '4', title: 'Workflow Health', subtitle: 'Process Efficiency', value: 54, target: 75, status: 'critical', size: '1x2', trend: [65, 61, 58, 55, 54] },
-    { id: '5', title: 'Population Growth', subtitle: 'Demographic Trends', value: 71, target: 85, status: 'healthy', size: '1x1', trend: [75, 76, 77, 78, 71] },
-    { id: '6', title: 'Infrastructure Load', subtitle: 'System Capacity', value: 37, target: 70, status: 'critical', size: '2x1', trend: [50, 47, 43, 41, 37] },
-    { id: '7', title: 'Innovation Index', subtitle: 'R&D Performance', value: 74, target: 85, status: 'healthy', size: '1x1', trend: [77, 78, 80, 81, 74] },
-    { id: '8', title: 'System Stability', subtitle: 'Platform Health', value: 67, target: 80, status: 'warning', size: '1x1', trend: [71, 72, 73, 73, 67] },
-    { id: '9', title: 'Security Posture', subtitle: 'Cyber Defense', value: 79, target: 90, status: 'healthy', size: '1x1', trend: [77, 77, 78, 79, 80] },
-    { id: '10', title: 'Learning Velocity', subtitle: 'Knowledge Growth', value: 70, target: 85, status: 'healthy', size: '1x1', trend: [68, 68, 69, 70, 71] },
-    { id: '11', title: 'Trust Recovery', subtitle: 'Stakeholder Confidence', value: 54, target: 75, status: 'critical', size: '2x1', trend: [65, 61, 59, 56, 54] },
-    { id: '12', title: 'Communication Flow', subtitle: 'Information Exchange', value: 66, target: 80, status: 'warning', size: '1x1', trend: [68, 67, 66, 65, 66] },
+    { id: '1', title: 'DEI Composite', subtitle: 'Strategic Indicator', value: 78, target: 80, status: 'warning', size: '2x1', trend: [75, 76, 78, 77, 78] },
+    { id: '2', title: 'Resource Efficiency', subtitle: 'Operational', value: 92, target: 85, status: 'healthy', size: '1x1', trend: [85, 87, 89, 90, 92] },
+    { id: '3', title: 'Social Cohesion', subtitle: 'Community Health', value: 85, target: 90, status: 'warning', size: '1x1', trend: [88, 86, 85, 84, 85] },
+    { id: '4', title: 'Workflow Health', subtitle: 'Process Efficiency', value: 67, target: 75, status: 'critical', size: '1x2', trend: [72, 70, 68, 66, 67] },
+    { id: '5', title: 'Population Growth', subtitle: 'Demographic Trends', value: 88, target: 85, status: 'healthy', size: '1x1', trend: [83, 84, 86, 87, 88] },
+    { id: '6', title: 'Infrastructure Load', subtitle: 'System Capacity', value: 45, target: 70, status: 'critical', size: '2x1', trend: [55, 52, 48, 46, 45] },
+    { id: '7', title: 'Innovation Index', subtitle: 'R&D Performance', value: 91, target: 85, status: 'healthy', size: '1x1', trend: [86, 87, 89, 90, 91] },
+    { id: '8', title: 'System Stability', subtitle: 'Platform Health', value: 82, target: 80, status: 'healthy', size: '1x1', trend: [79, 80, 81, 81, 82] },
   ]);
 
   const [draggedTile, setDraggedTile] = useState<string | null>(null);
@@ -63,27 +60,12 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({ timeRange, domain
   return (
     <div className="h-full p-4">
       <div 
-        className="h-full grid gap-3 overflow-auto"
+        className="h-full grid grid-cols-4 auto-rows-fr gap-4 overflow-auto"
         style={{
-          gridTemplateColumns: 'repeat(6, minmax(80px, 1fr))',
-          gridAutoRows: 'minmax(80px, 120px)',
           scrollbarWidth: 'thin',
           scrollbarColor: 'rgba(255,255,255,0.20) transparent',
         }}
       >
-        <style>{`
-          .h-full::-webkit-scrollbar {
-            width: 6px;
-          }
-          .h-full::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.20);
-            border-radius: 3px;
-          }
-          .h-full::-webkit-scrollbar-track {
-            background: transparent;
-          }
-        `}</style>
-        
         {tiles.map((tile, index) => (
           <motion.div
             key={tile.id}
@@ -93,8 +75,6 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({ timeRange, domain
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(255,255,255,0.10)',
               boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-              minWidth: '80px',
-              minHeight: '80px',
             }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -135,7 +115,7 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({ timeRange, domain
             <div className="h-full flex flex-col justify-between">
               <div>
                 <h4 
-                  className="font-bold text-[#00FFC3] text-sm mb-1 leading-tight"
+                  className="font-bold text-[#00FFC3] text-sm mb-1"
                   style={{ 
                     fontFamily: 'Noto Sans',
                     textShadow: '0 1px 2px rgba(0,0,0,0.5)' 
@@ -144,14 +124,14 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({ timeRange, domain
                   {tile.title}
                 </h4>
                 <p 
-                  className="text-[#E0E0E0] text-xs mb-2 leading-tight"
+                  className="text-[#E0E0E0] text-xs mb-2"
                   style={{ fontFamily: 'Noto Sans' }}
                 >
                   {tile.subtitle}
                 </p>
                 <div className="flex items-baseline gap-2">
                   <span 
-                    className="text-xl font-bold text-[#00FFC3]"
+                    className="text-2xl font-bold text-[#00FFC3]"
                     style={{ fontFamily: 'Noto Sans' }}
                   >
                     {tile.value}
@@ -167,10 +147,10 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({ timeRange, domain
 
               {/* Sparkline Chart */}
               <div className="mt-2">
-                <svg width="100%" height="32" viewBox="0 0 100 32" className="w-full">
+                <svg width="100%" height="40" viewBox="0 0 100 40" className="w-full">
                   {chartType === 'line' ? (
                     <polyline
-                      points={tile.trend.map((value, i) => `${i * 25},${32 - (value / Math.max(...tile.trend)) * 24}`).join(' ')}
+                      points={tile.trend.map((value, i) => `${i * 25},${40 - (value / Math.max(...tile.trend)) * 30}`).join(' ')}
                       fill="none"
                       stroke="#00FFC3"
                       strokeWidth="2"
@@ -180,9 +160,9 @@ const TileDashboardView: React.FC<TileDashboardViewProps> = ({ timeRange, domain
                       <rect
                         key={i}
                         x={i * 20}
-                        y={32 - (value / Math.max(...tile.trend)) * 24}
+                        y={40 - (value / Math.max(...tile.trend)) * 30}
                         width="15"
-                        height={(value / Math.max(...tile.trend)) * 24}
+                        height={(value / Math.max(...tile.trend)) * 30}
                         fill="#00FFC3"
                         opacity="0.8"
                       />
