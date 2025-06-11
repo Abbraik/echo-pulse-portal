@@ -404,6 +404,16 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                   <feMergeNode in="SourceGraphic"/>
                 </feMerge>
               </filter>
+              <filter id="textShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                <feOffset dx="1" dy="1" result="offset"/>
+                <feFlood floodColor="#000000" floodOpacity="0.8"/>
+                <feComposite in2="offset" operator="in"/>
+                <feMerge>
+                  <feMergeNode/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
             </defs>
             
             {/* Render treemap tiles */}
@@ -455,7 +465,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                       fill="white"
                       fontSize="12"
                       fontWeight="bold"
-                      textShadow="0 1px 3px rgba(0,0,0,0.8)"
+                      filter="url(#textShadow)"
                     >
                       {node.name.length > 8 ? node.name.substring(0, 8) : node.name}
                     </text>
@@ -472,7 +482,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                       fill="white"
                       fontSize="10"
                       fontWeight="500"
-                      textShadow="0 1px 2px rgba(0,0,0,0.8)"
+                      filter="url(#textShadow)"
                     >
                       {percentage}
                     </text>
@@ -489,7 +499,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                       fill="white"
                       fontSize="8"
                       fontWeight="600"
-                      textShadow="0 1px 2px rgba(0,0,0,0.8)"
+                      filter="url(#textShadow)"
                     >
                       {node.name.substring(0, 3)}
                     </text>
@@ -597,7 +607,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           height: 100%;
           display: block;
         }
-        
+
         /* Controls Panel */
         .controls-panel {
           position: fixed;
