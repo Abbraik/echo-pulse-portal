@@ -214,7 +214,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   };
 
   return (
-    <AnimatePresence>
+    <>
       <style>
         {`
           :root {
@@ -474,7 +474,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                 <AnimatePresence mode="wait">
                   {resolvedTheme === 'dark' ? (
                     <motion.div
-                      key="moon"
+                      key="theme-moon"
                       initial={{ rotate: -90, opacity: 0 }}
                       animate={{ rotate: 0, opacity: 1 }}
                       exit={{ rotate: 90, opacity: 0 }}
@@ -484,7 +484,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                     </motion.div>
                   ) : (
                     <motion.div
-                      key="sun"
+                      key="theme-sun"
                       initial={{ rotate: -90, opacity: 0 }}
                       animate={{ rotate: 0, opacity: 1 }}
                       exit={{ rotate: 90, opacity: 0 }}
@@ -594,7 +594,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
           )}
         </AnimatePresence>
       </motion.nav>
-    </AnimatePresence>
+    </>
   );
 };
 
