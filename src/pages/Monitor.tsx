@@ -4,19 +4,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, HelpCircle } from 'lucide-react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { FullscreenButton } from '@/components/ui/fullscreen-button';
+import TreemapView from '@/components/monitor/TreemapView';
 import HeatmapTableView from '@/components/monitor/HeatmapTableView';
 import RadialHubView from '@/components/monitor/RadialHubView';
 import TileDashboardView from '@/components/monitor/TileDashboardView';
 import UniversalAlertHub from '@/components/monitor/UniversalAlertHub';
 import AnomalyDetector from '@/components/monitor/AnomalyDetector';
 import InstrumentPanel from '@/components/monitor/InstrumentPanel';
-import SectorTreemap from '@/components/monitor/SectorTreemap';
-import { mockSectors } from '@/components/monitor/SectorTreemap/mockData';
 
 type ViewType = 'treemap' | 'heatmap' | 'radial' | 'tile';
 
 const Monitor: React.FC = () => {
-  const [activeView, setActiveView] = useState<ViewType>('heatmap');
+  const [activeView, setActiveView] = useState<ViewType>('treemap');
   const [timeRange, setTimeRange] = useState('Last 30 Days');
   const [domainFilter, setDomainFilter] = useState('All Domains');
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
@@ -61,7 +60,7 @@ const Monitor: React.FC = () => {
 
     switch (activeView) {
       case 'treemap':
-        return <SectorTreemap sectors={mockSectors} />;
+        return <TreemapView {...viewProps} />;
       case 'heatmap':
         return <HeatmapTableView {...viewProps} />;
       case 'radial':
@@ -69,7 +68,7 @@ const Monitor: React.FC = () => {
       case 'tile':
         return <TileDashboardView {...viewProps} />;
       default:
-        return <HeatmapTableView {...viewProps} />;
+        return <TreemapView {...viewProps} />;
     }
   };
 
