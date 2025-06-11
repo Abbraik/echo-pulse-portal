@@ -490,7 +490,6 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
                   fontSize="10"
                   fontWeight="500"
                   fontFamily="Noto Sans"
-                  textTransform="uppercase"
                   pointerEvents="none"
                 >
                   {sector}
@@ -626,6 +625,10 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           display: block;
         }
 
+        .sp500-sector-label {
+          text-transform: uppercase;
+        }
+
         /* S&P 500 Style Tooltip */
         .sp500-tooltip {
           background: rgba(0, 0, 0, 0.9);
@@ -724,43 +727,6 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
         }
 
         /* Existing styles for other components */
-        .treemap-container {
-          height: 100vh;
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-        }
-
-        .skip-link {
-          position: absolute;
-          top: -40px;
-          left: 6px;
-          background: rgba(0, 255, 195, 0.9);
-          color: #000;
-          padding: 8px;
-          border-radius: 4px;
-          text-decoration: none;
-          z-index: 1000;
-          transition: top 0.3s;
-        }
-
-        .skip-link:focus {
-          top: 6px;
-        }
-
-        .filters-section {
-          padding: 1rem;
-          background: rgba(15, 23, 42, 0.8);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          transition: all 0.3s ease;
-        }
-
-        .filters-section.compact {
-          padding: 0.5rem;
-        }
-
-        /* Existing interactive styles */
         .treemap-container {
           height: 100vh;
           display: flex;
