@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Info, TrendingUp } from 'lucide-react';
+import { X, Info, TrendingUp, BarChart3, LineChart, Activity } from 'lucide-react';
 
 interface TreemapViewProps {
   timeRange: string;
@@ -30,11 +30,24 @@ interface DrillDownModalProps {
 }
 
 const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, chartType }) => {
-  const recentValues = [
-    { date: '2025-06-01', value: data.value, remark: 'Current' },
-    { date: '2025-05-31', value: data.value - 2, remark: 'Stable' },
-    { date: '2025-05-30', value: data.value - 1, remark: 'Improving' },
-  ];
+  const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'breakdown' | 'actions'>('overview');
+  
+  const recentValues = Array.from({ length: 30 }, (_, i) => ({
+    date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    value: data.value + (Math.random() - 0.5) * 10,
+    remark: i === 29 ? 'Current' : ['Stable', 'Improving', 'Declining', 'Volatile'][Math.floor(Math.random() * 4)]
+  }));
+
+  const generateChartData = () => {
+    return Array.from({ length: 12 }, (_, i) => ({
+      month: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i],
+      value: 60 + Math.random() * 40,
+      target: data.target,
+      performance: Math.random() > 0.5 ? 'above' : 'below'
+    }));
+  };
+
+  const chartData = generateChartData();
 
   if (!isOpen) return null;
 
@@ -43,7 +56,7 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
@@ -51,59 +64,222 @@ const DrillDownModal: React.FC<DrillDownModalProps> = ({ data, isOpen, onClose, 
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative w-[600px] h-[400px] rounded-2xl overflow-hidden glass-panel-cinematic"
+        className="relative w-[900px] h-[700px] rounded-2xl overflow-hidden glass-panel-cinematic"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200"
+          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200"
         >
-          <X size={16} />
+          <X size={20} />
         </button>
 
-        <div className="p-6 h-full flex flex-col font-noto">
-          <h3 
-            className="text-xl font-bold mb-4 text-teal-400"
-            style={{ fontFamily: 'Noto Sans' }}
-          >
-            {data.name}
-          </h3>
-
-          <div className="flex-1 bg-white/5 rounded-lg p-4 mb-4">
-            <div className="text-sm text-slate-400 mb-2 font-medium">90-Day Trend ({chartType})</div>
-            <div className="h-32 flex items-end space-x-1">
-              {Array.from({ length: 12 }, (_, i) => (
-                <div
-                  key={i}
-                  className="flex-1 rounded-t"
-                  style={{
-                    height: `${60 + Math.random() * 40}%`,
-                    background: data.category === 'strategic' ? '#00B8FF' : '#00FFC3',
-                    opacity: 0.6 + Math.random() * 0.4,
-                  }}
-                />
-              ))}
+        <div className="p-8 h-full flex flex-col font-noto">
+          <div className="flex items-center gap-4 mb-6">
+            <div className={`w-4 h-4 rounded-full ${
+              data.status === 'in-band' ? 'bg-emerald-500' :
+              data.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
+            }`} />
+            <h3 className="text-2xl font-bold text-teal-400" style={{ fontFamily: 'Noto Sans' }}>
+              {data.name}
+            </h3>
+            <div className="text-lg text-slate-300">
+              {data.value} / {data.target}
             </div>
           </div>
 
-          <div className="mb-4">
-            <div className="text-sm text-slate-400 mb-2 font-medium">Recent Values</div>
-            <div className="space-y-1">
-              {recentValues.map((item, index) => (
-                <div key={index} className="flex justify-between text-sm text-slate-300">
-                  <span className="font-medium">{item.date}</span>
-                  <span className="font-semibold">{item.value}</span>
-                  <span className="text-slate-400 italic">{item.remark}</span>
+          {/* Tab Navigation */}
+          <div className="flex gap-2 mb-6">
+            {(['overview', 'trends', 'breakdown', 'actions'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  activeTab === tab
+                    ? 'bg-teal-500 text-slate-900'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
+                }`}
+                style={{ fontFamily: 'Noto Sans' }}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className="flex-1 overflow-hidden">
+            {activeTab === 'overview' && (
+              <div className="h-full space-y-6">
+                <div className="bg-white/5 rounded-lg p-4">
+                  <h4 className="text-lg font-semibold mb-3 text-teal-400">Description</h4>
+                  <p className="text-slate-300 leading-relaxed">{data.description}</p>
                 </div>
-              ))}
-            </div>
-          </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 rounded-lg p-4">
+                    <h4 className="text-lg font-semibold mb-2 text-teal-400">Current Status</h4>
+                    <div className="text-2xl font-bold text-white">{data.value}</div>
+                    <div className="text-sm text-slate-400">Target: {data.target}</div>
+                    <div className="text-sm text-slate-400 mt-2">{data.lastTrend}</div>
+                  </div>
+                  
+                  <div className="bg-white/5 rounded-lg p-4">
+                    <h4 className="text-lg font-semibold mb-2 text-teal-400">Performance</h4>
+                    <div className="text-lg font-medium text-white">
+                      {Math.round((data.value / data.target) * 100)}%
+                    </div>
+                    <div className={`text-sm mt-1 ${
+                      data.status === 'in-band' ? 'text-emerald-400' :
+                      data.status === 'warning' ? 'text-yellow-400' : 'text-red-400'
+                    }`}>
+                      {data.status.toUpperCase()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-          <button
-            className="w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-teal-500 hover:bg-teal-400 text-slate-900"
-            style={{ fontFamily: 'Noto Sans' }}
-          >
-            Go to Detailed View
-          </button>
+            {activeTab === 'trends' && (
+              <div className="h-full space-y-4">
+                <div className="bg-white/5 rounded-lg p-4 flex-1">
+                  <div className="flex items-center gap-2 mb-4">
+                    {chartType === 'bar' ? <BarChart3 size={20} /> : <LineChart size={20} />}
+                    <h4 className="text-lg font-semibold text-teal-400">12-Month Trend ({chartType})</h4>
+                  </div>
+                  <div className="h-48 flex items-end space-x-2">
+                    {chartData.map((item, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center">
+                        <div className="text-xs text-slate-400 mb-1">{item.value.toFixed(0)}</div>
+                        {chartType === 'bar' ? (
+                          <div
+                            className="w-full rounded-t transition-all duration-500"
+                            style={{
+                              height: `${(item.value / 100) * 160}px`,
+                              background: item.performance === 'above' ? 
+                                'linear-gradient(to top, #10b981, #34d399)' : 
+                                'linear-gradient(to top, #f59e0b, #fbbf24)',
+                            }}
+                          />
+                        ) : (
+                          <div className="relative w-full h-40">
+                            <div 
+                              className="absolute bottom-0 w-2 h-2 rounded-full bg-teal-400"
+                              style={{ left: '50%', transform: 'translateX(-50%)', bottom: `${(item.value / 100) * 160}px` }}
+                            />
+                            {i > 0 && (
+                              <svg className="absolute inset-0 w-full h-full">
+                                <line
+                                  x1="0%"
+                                  y1={`${100 - (chartData[i-1].value / 100) * 100}%`}
+                                  x2="100%"
+                                  y2={`${100 - (item.value / 100) * 100}%`}
+                                  stroke="#14b8a6"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                        )}
+                        <div className="text-xs text-slate-500 mt-1">{item.month}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white/5 rounded-lg p-4">
+                  <h4 className="text-lg font-semibold mb-3 text-teal-400">Recent Values</h4>
+                  <div className="max-h-32 overflow-y-auto space-y-1">
+                    {recentValues.slice(-7).map((item, index) => (
+                      <div key={index} className="flex justify-between text-sm">
+                        <span className="text-slate-400">{item.date}</span>
+                        <span className="text-white font-medium">{item.value.toFixed(1)}</span>
+                        <span className="text-slate-500 italic">{item.remark}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'breakdown' && (
+              <div className="h-full space-y-4">
+                <div className="bg-white/5 rounded-lg p-4">
+                  <h4 className="text-lg font-semibold mb-4 text-teal-400">Component Breakdown</h4>
+                  {data.breakdown && data.breakdown.length > 0 ? (
+                    <div className="space-y-3">
+                      {data.breakdown.map((item, index) => {
+                        const match = item.match(/(\d+)%?/);
+                        const percentage = match ? parseInt(match[1]) : Math.floor(Math.random() * 100);
+                        return (
+                          <div key={index} className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-300">{item}</span>
+                              <span className="text-white font-medium">{percentage}%</span>
+                            </div>
+                            <div className="w-full bg-slate-700 rounded-full h-2">
+                              <div
+                                className="h-2 rounded-full transition-all duration-500"
+                                style={{
+                                  width: `${percentage}%`,
+                                  background: percentage >= 80 ? '#10b981' : percentage >= 60 ? '#f59e0b' : '#ef4444'
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-slate-400 italic">No breakdown data available</div>
+                  )}
+                </div>
+
+                <div className="bg-white/5 rounded-lg p-4 flex-1">
+                  <h4 className="text-lg font-semibold mb-4 text-teal-400">Contributing Factors</h4>
+                  <div className="space-y-2">
+                    {['Primary Factor', 'Secondary Factor', 'Tertiary Factor'].map((factor, index) => (
+                      <div key={index} className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-teal-400" />
+                        <span className="text-slate-300">{factor}: Impact {(90 - index * 15)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'actions' && (
+              <div className="h-full space-y-4">
+                <div className="bg-white/5 rounded-lg p-4">
+                  <h4 className="text-lg font-semibold mb-3 text-teal-400">Recommended Actions</h4>
+                  <p className="text-slate-300 mb-4">{data.actionHint}</p>
+                  
+                  <div className="space-y-3">
+                    {['Immediate Action', 'Short-term Strategy', 'Long-term Plan'].map((action, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                        <Activity size={16} className="text-teal-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-white">{action}</div>
+                          <div className="text-sm text-slate-400 mt-1">
+                            Priority: {['High', 'Medium', 'Low'][index]} | 
+                            Timeline: {['1-7 days', '1-4 weeks', '1-6 months'][index]}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button className="flex-1 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-teal-500 hover:bg-teal-400 text-slate-900">
+                    Go to Detailed View
+                  </button>
+                  <button className="flex-1 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-blue-500 hover:bg-blue-400 text-white">
+                    Create Action Plan
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </motion.div>
     </motion.div>
@@ -805,18 +981,19 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
   };
 
   const canShowLabels = (width: number, height: number) => {
-    return width >= 6 && height >= 3;
+    return width >= 8 && height >= 4; // Increased minimum size for better text visibility
   };
 
   const getTextSize = (width: number, height: number, textLength: number) => {
-    const maxFontSize = Math.min(width / 8, height / 3);
-    const textBasedSize = Math.max(width / (textLength * 0.7), 0.8);
-    return Math.min(maxFontSize, textBasedSize, 2.2);
+    // Improved text sizing calculation
+    const baseSize = Math.min(width / 12, height / 6);
+    const lengthAdjusted = Math.max(width / (textLength * 0.8), 0.6);
+    return Math.min(baseSize, lengthAdjusted, 1.8);
   };
 
   const getSecondaryTextSize = (width: number, height: number) => {
-    const maxSize = Math.min(width / 10, height / 4);
-    return Math.min(maxSize, 1.4);
+    const maxSize = Math.min(width / 15, height / 8);
+    return Math.min(maxSize, 1.2);
   };
 
   const truncateText = (text: string, maxLength: number) => {
@@ -928,7 +1105,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                   
                   const titleFontSize = getTextSize(item.width, item.height, item.name.length);
                   const valueFontSize = getSecondaryTextSize(item.width, item.height);
-                  const maxTitleLength = Math.floor(item.width / 1.0);
+                  const maxTitleLength = Math.floor(item.width / 1.2); // Better length calculation
                   const truncatedTitle = truncateText(item.name, maxTitleLength);
                   
                   return (
@@ -979,16 +1156,17 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                           <defs>
                             <clipPath id={`textClip-${item.id}`}>
                               <rect
-                                x={item.x + 0.2}
-                                y={item.y + 0.2}
-                                width={Math.max(0, item.width - 0.4)}
-                                height={Math.max(0, item.height - 0.4)}
+                                x={item.x + 0.3}
+                                y={item.y + 0.3}
+                                width={Math.max(0, item.width - 0.6)}
+                                height={Math.max(0, item.height - 0.6)}
                               />
                             </clipPath>
                           </defs>
+                          {/* Title Text - Better positioning */}
                           <text
                             x={item.x + item.width/2}
-                            y={item.y + item.height/2 - 0.3}
+                            y={item.y + item.height/2 - 0.6}
                             textAnchor="middle"
                             clipPath={`url(#textClip-${item.id})`}
                             className="font-bold"
@@ -998,13 +1176,14 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                               fill: '#FFFFFF',
                               overflow: 'hidden',
                             }}
-                            fontSize={Math.max(titleFontSize, 0.8)}
+                            fontSize={Math.max(titleFontSize, 0.7)}
                           >
                             {truncatedTitle}
                           </text>
+                          {/* Value Text - Better spacing */}
                           <text
                             x={item.x + item.width/2}
-                            y={item.y + item.height/2 + 0.5}
+                            y={item.y + item.height/2 + 0.2}
                             textAnchor="middle"
                             clipPath={`url(#textClip-${item.id})`}
                             className="font-medium"
@@ -1014,9 +1193,26 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                               fill: '#E0E0E0',
                               overflow: 'hidden',
                             }}
-                            fontSize={Math.max(valueFontSize, 0.6)}
+                            fontSize={Math.max(valueFontSize, 0.5)}
                           >
                             {item.value} / {item.target}
+                          </text>
+                          {/* Percentage Text - Additional info */}
+                          <text
+                            x={item.x + item.width/2}
+                            y={item.y + item.height/2 + 0.9}
+                            textAnchor="middle"
+                            clipPath={`url(#textClip-${item.id})`}
+                            className="font-medium"
+                            style={{ 
+                              fontFamily: 'Noto Sans, system-ui, sans-serif',
+                              pointerEvents: 'none',
+                              fill: '#94A3B8',
+                              overflow: 'hidden',
+                            }}
+                            fontSize={Math.max(valueFontSize * 0.8, 0.4)}
+                          >
+                            ({percentage}%)
                           </text>
                         </g>
                       ) : (
@@ -1024,7 +1220,7 @@ const TreemapView: React.FC<TreemapViewProps> = ({ timeRange, domainFilter, char
                           x={item.x + item.width/2}
                           y={item.y + item.height/2}
                           textAnchor="middle"
-                          fontSize={Math.min(item.width/4, item.height/4, 1.2)}
+                          fontSize={Math.min(item.width/3, item.height/3, 1.5)}
                           fill="#FFFFFF"
                           style={{ pointerEvents: 'none' }}
                         >
