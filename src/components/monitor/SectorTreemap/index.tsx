@@ -1,80 +1,48 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Sector } from './types';
 import { IndicatorModal } from './IndicatorModal';
-import { SearchAndFilters } from './SearchAndFilters';
-import { StickyFooter } from './StickyFooter';
-import { ControlsPanel } from './ControlsPanel';
-import { BreadcrumbNav } from './BreadcrumbNav';
-import { Legend } from './Legend';
-import { TreemapLayoutEngine, TreemapNode } from './TreemapLayout';
-import { usePanelCompact } from '@/hooks/use-panel-compact';
 import SparklineChart from '@/components/think/components/SparklineChart';
 
 interface SectorTreemapProps {
   sectors: Sector[];
 }
 
-interface PositionedIndicator {
+interface TreemapTile {
   id: string;
   name: string;
   sector: string;
+  value: number;
+  target: number;
+  weight: number;
   x: number;
   y: number;
   width: number;
   height: number;
-  weight: number;
-  value: number;
-  target: number;
-  level: number;
-  parentId?: string;
 }
 
 interface TooltipState {
-  indicator: PositionedIndicator;
+  tile: TreemapTile;
   x: number;
   y: number;
 }
 
-interface BreadcrumbItem {
-  id: string;
-  name: string;
-  level: number;
-}
-
 const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
-  const { isCompact, containerRef } = usePanelCompact({ compactThreshold: 30 });
-  const svgContainerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-  
-  // Existing state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [selectedIndicator, setSelectedIndicator] = useState<PositionedIndicator | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [hoveredIndicatorId, setHoveredIndicatorId] = useState<string | null>(null);
+  const [hoveredTile, setHoveredTile] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const [selectedIndicator, setSelectedIndicator] = useState<TreemapTile | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // New state for enhanced features
-  const [controlsOpen, setControlsOpen] = useState(false);
-  const [hierarchyDepth, setHierarchyDepth] = useState(3);
-  const [groupBy, setGroupBy] = useState('sector');
-  const [controlsSearchQuery, setControlsSearchQuery] = useState('');
-  const [showLegend, setShowLegend] = useState(true);
-  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
-    { id: 'root', name: 'All Indicators', level: 0 }
-  ]);
-  const [currentLevel, setCurrentLevel] = useState(0);
-  const [drillDownPath, setDrillDownPath] = useState<string[]>([]);
-
-  // Update dimensions when container size changes
+  // Update dimensions when container resizes
   useEffect(() => {
     const updateDimensions = () => {
-      if (svgContainerRef.current) {
-        const rect = svgContainerRef.current.getBoundingClientRect();
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
         setDimensions({
-          width: Math.max(400, rect.width),
-          height: Math.max(300, rect.height - 40) // Account for header
+          width: Math.max(400, rect.width - 32), // Account for padding
+          height: Math.max(300, rect.height - 56) // Account for header and padding
         });
       }
     };
@@ -84,118 +52,17 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  // Debounce hover events
-  const debouncedHover = useCallback(
-    debounce((indicatorId: string | null) => {
-      setHoveredIndicatorId(indicatorId);
-    }, 100),
-    []
-  );
-
-  // Filter indicators based on search and sector selection
-  const filteredIndicators = useMemo(() => {
-    let indicators = sectors.flatMap(s => s.indicators);
-    
-    // Apply existing filters
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      indicators = indicators.filter(i => 
-        i.name.toLowerCase().includes(query) ||
-        i.sector.toLowerCase().includes(query)
-      );
-    }
-    
-    if (selectedSectors.length > 0) {
-      indicators = indicators.filter(i => selectedSectors.includes(i.sector));
-    }
-
-    // Apply controls search
-    if (controlsSearchQuery.trim()) {
-      const query = controlsSearchQuery.toLowerCase();
-      indicators = indicators.filter(i => 
-        i.name.toLowerCase().includes(query) ||
-        i.sector.toLowerCase().includes(query)
-      );
-    }
-
-    // Apply hierarchy depth filter
-    indicators = indicators.filter((_, index) => {
-      const level = Math.floor(index / Math.max(1, indicators.length / hierarchyDepth));
-      return level < hierarchyDepth;
-    });
-    
-    return indicators;
-  }, [sectors, searchQuery, selectedSectors, controlsSearchQuery, hierarchyDepth]);
-
-  // Get available sectors for filter
-  const availableSectors = useMemo(() => {
-    return [...new Set(sectors.flatMap(s => s.indicators.map(i => i.sector)))];
-  }, [sectors]);
-
-  // Group indicators based on groupBy selection
-  const groupedIndicators = useMemo(() => {
-    return filteredIndicators.map((indicator, index) => ({
-      ...indicator,
-      level: currentLevel,
-      groupValue: getGroupValue(indicator, groupBy)
-    }));
-  }, [filteredIndicators, groupBy, currentLevel]);
-
-  // Calculate positioned indicators using new layout engine
-  const positionedIndicators = useMemo(() => {
-    if (groupedIndicators.length === 0) return [];
-    
-    return TreemapLayoutEngine.layout(groupedIndicators, dimensions.width, dimensions.height, groupBy);
-  }, [groupedIndicators, dimensions.width, dimensions.height, groupBy]);
-
-  // Helper function to get group value
-  function getGroupValue(indicator: any, groupBy: string): string {
-    switch (groupBy) {
-      case 'sector':
-        return indicator.sector;
-      case 'type':
-        return 'Standard';
-      case 'performance':
-        const performance = (indicator.value / indicator.target) * 100;
-        if (performance >= 90) return 'excellent';
-        if (performance >= 75) return 'good';
-        return 'needs-attention';
-      case 'weight':
-        if (indicator.weight >= 8) return 'high';
-        if (indicator.weight >= 5) return 'medium';
-        return 'low';
-      default:
-        return indicator.sector;
-    }
-  }
-
-  // Helper function for debouncing
-  function debounce(func: Function, wait: number) {
-    let timeout: NodeJS.Timeout;
-    return function executedFunction(...args: any[]) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-
-  // S&P 500 sector color mapping
-  const getSectorColor = (sector: string): string => {
-    const colorMap: Record<string, string> = {
-      'Systemic': '#0080FF',
-      'Population': '#00C080', 
-      'Resource Market': '#FFC000',
-      'Goods & Services': '#8040FF',
-      'Social Outcomes': '#40C040',
-      'Governance': '#C04080'
-    };
-    return colorMap[sector] || '#0080FF';
+  // Sector colors mapping
+  const sectorColors: Record<string, string> = {
+    'Systemic': '#0080FF',
+    'Population': '#00C080',
+    'Resource Market': '#FFC000',
+    'Goods & Services': '#8040FF',
+    'Social Outcomes': '#40C040',
+    'Governance': '#C04080'
   };
 
-  // Performance-based opacity
+  // Calculate opacity based on performance
   const getPerformanceOpacity = (value: number, target: number): number => {
     const performance = (value / target) * 100;
     if (performance >= 75) return 1.0;
@@ -203,84 +70,121 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     return 0.6;
   };
 
-  const formatPercentage = (value: number, target: number): string => {
-    const percentage = ((value / target) * 100).toFixed(1);
-    return `${percentage}%`;
+  // Simple treemap layout algorithm
+  const calculateLayout = (): TreemapTile[] => {
+    const allIndicators = sectors.flatMap(s => s.indicators);
+    const totalWeight = allIndicators.reduce((sum, i) => sum + i.weight, 0);
+    
+    // Group by sector
+    const sectorGroups = new Map<string, typeof allIndicators>();
+    allIndicators.forEach(indicator => {
+      if (!sectorGroups.has(indicator.sector)) {
+        sectorGroups.set(indicator.sector, []);
+      }
+      sectorGroups.get(indicator.sector)!.push(indicator);
+    });
+
+    // Calculate sector areas
+    const sectorAreas = new Map<string, number>();
+    sectorGroups.forEach((indicators, sector) => {
+      const sectorWeight = indicators.reduce((sum, i) => sum + i.weight, 0);
+      sectorAreas.set(sector, (sectorWeight / totalWeight) * (dimensions.width * dimensions.height));
+    });
+
+    // Simple layout: arrange sectors in a 2x3 grid
+    const sectorsArray = Array.from(sectorGroups.keys());
+    const sectorRects = new Map<string, { x: number, y: number, width: number, height: number }>();
+    
+    const cols = 3;
+    const rows = 2;
+    sectorsArray.forEach((sector, index) => {
+      const col = index % cols;
+      const row = Math.floor(index / cols);
+      sectorRects.set(sector, {
+        x: (col * dimensions.width) / cols,
+        y: (row * dimensions.height) / rows,
+        width: dimensions.width / cols,
+        height: dimensions.height / rows
+      });
+    });
+
+    // Layout tiles within each sector
+    const tiles: TreemapTile[] = [];
+    sectorGroups.forEach((indicators, sector) => {
+      const sectorRect = sectorRects.get(sector)!;
+      const sectorWeight = indicators.reduce((sum, i) => sum + i.weight, 0);
+      
+      // Simple squarified layout within sector
+      let currentX = sectorRect.x + 2; // 2px padding for borders
+      let currentY = sectorRect.y + 12; // 12px for sector label
+      let rowHeight = 0;
+      const availableWidth = sectorRect.width - 4;
+      const availableHeight = sectorRect.height - 14;
+      
+      indicators.forEach((indicator, index) => {
+        const tileArea = (indicator.weight / sectorWeight) * (availableWidth * availableHeight);
+        const tileWidth = Math.min(availableWidth / 4, Math.sqrt(tileArea * 1.5));
+        const tileHeight = tileArea / tileWidth;
+        
+        // Check if we need to wrap to next row
+        if (currentX + tileWidth > sectorRect.x + sectorRect.width - 2) {
+          currentX = sectorRect.x + 2;
+          currentY += rowHeight + 2;
+          rowHeight = 0;
+        }
+        
+        tiles.push({
+          id: indicator.id,
+          name: indicator.name,
+          sector: indicator.sector,
+          value: indicator.value,
+          target: indicator.target,
+          weight: indicator.weight,
+          x: currentX,
+          y: currentY,
+          width: Math.max(40, tileWidth),
+          height: Math.max(30, tileHeight)
+        });
+        
+        currentX += tileWidth + 2;
+        rowHeight = Math.max(rowHeight, tileHeight);
+      });
+    });
+
+    return tiles;
   };
 
-  // Enhanced event handlers
-  const handleTileMouseEnter = (node: TreemapNode, event: React.MouseEvent) => {
-    const indicator: PositionedIndicator = { ...node, parentId: undefined };
-    debouncedHover(indicator.id);
-    
+  const tiles = useMemo(calculateLayout, [sectors, dimensions]);
+
+  const handleTileHover = (tile: TreemapTile, event: React.MouseEvent) => {
+    setHoveredTile(tile.id);
     const rect = event.currentTarget.getBoundingClientRect();
-    const svgRect = event.currentTarget.closest('svg')?.getBoundingClientRect();
-    if (svgRect) {
+    const containerRect = containerRef.current?.getBoundingClientRect();
+    if (containerRect) {
       setTooltip({
-        indicator,
-        x: event.clientX - svgRect.left + 10,
-        y: event.clientY - svgRect.top - 60
+        tile,
+        x: event.clientX - containerRect.left,
+        y: event.clientY - containerRect.top - 60
       });
     }
   };
 
-  const handleTileMouseLeave = () => {
-    debouncedHover(null);
+  const handleTileLeave = () => {
+    setHoveredTile(null);
     setTooltip(null);
   };
 
-  const handleTileClick = (node: TreemapNode) => {
-    const indicator: PositionedIndicator = { ...node, parentId: undefined };
-    setSelectedIndicator(indicator);
+  const handleTileClick = (tile: TreemapTile) => {
+    setSelectedIndicator(tile);
     setIsModalOpen(true);
-  };
-
-  const handleTileKeyDown = (event: React.KeyboardEvent, node: TreemapNode) => {
-    const indicator: PositionedIndicator = { ...node, parentId: undefined };
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleTileClick(node);
-    }
-  };
-
-  const handleBreadcrumbNavigate = (level: number) => {
-    setCurrentLevel(level);
-    setBreadcrumbs(prev => prev.slice(0, level + 1));
-    setDrillDownPath(prev => prev.slice(0, level));
-  };
-
-  const handleControlsReset = () => {
-    setHierarchyDepth(3);
-    setGroupBy('sector');
-    setControlsSearchQuery('');
-    setCurrentLevel(0);
-    setBreadcrumbs([{ id: 'root', name: 'All Indicators', level: 0 }]);
-    setDrillDownPath([]);
   };
 
   const handleEdit = (id: string) => {
     console.log(`Editing indicator: ${id}`);
-    setHasChanges(true);
   };
 
   const handleDelete = (id: string) => {
     console.log(`Deleting indicator: ${id}`);
-    setHasChanges(true);
-  };
-
-  const handleReset = () => {
-    setSearchQuery('');
-    setSelectedSectors([]);
-  };
-
-  const handleSaveChanges = () => {
-    console.log('Saving all changes...');
-    setHasChanges(false);
-  };
-
-  const handleCancelChanges = () => {
-    console.log('Canceling all changes...');
-    setHasChanges(false);
   };
 
   // Generate mock sparkline data
@@ -288,275 +192,193 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     return Array.from({ length: 30 }, () => Math.random() * 100 + 50);
   };
 
-  // Group indicators by sector for sector boundaries
-  const sectorGroups = useMemo(() => {
-    const groups = new Map<string, TreemapNode[]>();
-    positionedIndicators.forEach(node => {
-      if (!groups.has(node.sector)) {
-        groups.set(node.sector, []);
-      }
-      groups.get(node.sector)!.push(node);
-    });
-    return groups;
-  }, [positionedIndicators]);
-
-  // Calculate sector boundaries
+  // Calculate sector boundaries for borders
   const sectorBounds = useMemo(() => {
     const bounds = new Map<string, { minX: number, minY: number, maxX: number, maxY: number }>();
     
-    sectorGroups.forEach((nodes, sector) => {
-      if (nodes.length === 0) return;
-      
-      const minX = Math.min(...nodes.map(n => n.x));
-      const minY = Math.min(...nodes.map(n => n.y));
-      const maxX = Math.max(...nodes.map(n => n.x + n.width));
-      const maxY = Math.max(...nodes.map(n => n.y + n.height));
-      
-      bounds.set(sector, { minX, minY, maxX, maxY });
+    tiles.forEach(tile => {
+      if (!bounds.has(tile.sector)) {
+        bounds.set(tile.sector, {
+          minX: tile.x,
+          minY: tile.y,
+          maxX: tile.x + tile.width,
+          maxY: tile.y + tile.height
+        });
+      } else {
+        const current = bounds.get(tile.sector)!;
+        bounds.set(tile.sector, {
+          minX: Math.min(current.minX, tile.x),
+          minY: Math.min(current.minY, tile.y),
+          maxX: Math.max(current.maxX, tile.x + tile.width),
+          maxY: Math.max(current.maxY, tile.y + tile.height)
+        });
+      }
     });
     
     return bounds;
-  }, [sectorGroups]);
+  }, [tiles]);
 
   return (
-    <div ref={containerRef} className="treemap-container" role="main">
-      {/* Skip to content link */}
-      <a href="#treemap-content" className="skip-link">
-        Skip to content
-      </a>
-
-      {/* Breadcrumb Navigation */}
-      <BreadcrumbNav
-        breadcrumbs={breadcrumbs}
-        onNavigate={handleBreadcrumbNavigate}
-      />
-
-      {/* Search and Filters */}
-      <div className={`filters-section ${isCompact ? 'compact' : ''}`}>
-        <SearchAndFilters
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          selectedSectors={selectedSectors}
-          onSectorChange={setSelectedSectors}
-          onReset={handleReset}
-          availableSectors={availableSectors}
-          isCompact={isCompact}
-        />
+    <div className="treemap-container" ref={containerRef}>
+      {/* Header */}
+      <div className="treemap-header">
+        <h2>Sector Treemap: Comprehensive System View</h2>
       </div>
-
-      {/* Controls Panel */}
-      <ControlsPanel
-        isOpen={controlsOpen}
-        onToggle={() => setControlsOpen(!controlsOpen)}
-        depth={hierarchyDepth}
-        onDepthChange={setHierarchyDepth}
-        groupBy={groupBy}
-        onGroupByChange={setGroupBy}
-        searchQuery={controlsSearchQuery}
-        onSearchChange={setControlsSearchQuery}
-        onReset={handleControlsReset}
-        showLegend={showLegend}
-        onLegendToggle={() => setShowLegend(!showLegend)}
-      />
-
-      {/* S&P 500 Style Container */}
-      <div className="sp500-treemap-container" id="treemap-content">
-        {/* Header Strip */}
-        <div className="sp500-header">
-          <h2>Sector Treemap: Comprehensive System View</h2>
-        </div>
-        
-        {/* SVG Container */}
-        <div 
-          ref={svgContainerRef}
-          className="sp500-svg-container"
+      
+      {/* SVG Treemap */}
+      <div className="treemap-svg-container">
+        <svg 
+          className="treemap-svg"
+          width="100%" 
+          height="100%" 
+          viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
+          preserveAspectRatio="xMidYMid meet"
         >
-          <svg 
-            width="100%" 
-            height="100%" 
-            viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-            className="sp500-svg"
-            role="grid"
-            aria-label="S&P 500 style sector treemap"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            {/* Sector boundary lines */}
-            {Array.from(sectorBounds.entries()).map(([sector, bounds]) => (
-              <g key={`sector-${sector}`}>
-                {/* Sector boundary rectangle */}
+          {/* Sector boundaries and labels */}
+          {Array.from(sectorBounds.entries()).map(([sector, bounds]) => (
+            <g key={sector}>
+              {/* Sector boundary */}
+              <rect
+                x={bounds.minX - 2}
+                y={bounds.minY - 12}
+                width={bounds.maxX - bounds.minX + 4}
+                height={bounds.maxY - bounds.minY + 14}
+                fill="none"
+                stroke="#FFFFFF"
+                strokeWidth="2"
+                opacity="0.3"
+              />
+              
+              {/* Sector label */}
+              <text
+                x={bounds.minX}
+                y={bounds.minY - 2}
+                className="sector-label"
+                fill="#FFFFFF"
+                fontSize="10"
+                fontWeight="700"
+                fontFamily="Noto Sans, sans-serif"
+              >
+                {sector.toUpperCase()}
+              </text>
+            </g>
+          ))}
+          
+          {/* Tiles */}
+          {tiles.map(tile => {
+            const isHovered = hoveredTile === tile.id;
+            const performance = (tile.value / tile.target) * 100;
+            const opacity = getPerformanceOpacity(tile.value, tile.target);
+            const color = sectorColors[tile.sector] || '#0080FF';
+            
+            return (
+              <g key={tile.id}>
+                {/* Tile rectangle */}
                 <rect
-                  x={bounds.minX}
-                  y={bounds.minY}
-                  width={bounds.maxX - bounds.minX}
-                  height={bounds.maxY - bounds.minY}
-                  fill="none"
-                  stroke="#FFFFFF"
-                  strokeWidth="2"
-                  opacity="0.3"
+                  x={tile.x}
+                  y={tile.y}
+                  width={tile.width}
+                  height={tile.height}
+                  fill={color}
+                  opacity={opacity}
+                  stroke={isHovered ? "#FFFFFF" : "transparent"}
+                  strokeWidth={isHovered ? "2" : "0"}
+                  style={{ cursor: 'pointer' }}
+                  onMouseEnter={(e) => handleTileHover(tile, e)}
+                  onMouseLeave={handleTileLeave}
+                  onClick={() => handleTileClick(tile)}
                 />
                 
-                {/* Sector label */}
-                <text
-                  x={bounds.minX + 4}
-                  y={bounds.minY + 14}
-                  className="sector-label"
-                  fill="#FFFFFF"
-                  fontSize="10"
-                  fontWeight="700"
-                  fontFamily="Noto Sans, sans-serif"
-                >
-                  {sector.toUpperCase()}
-                </text>
+                {/* Tile name */}
+                {tile.width > 60 && tile.height > 30 && (
+                  <text
+                    x={tile.x + tile.width / 2}
+                    y={tile.y + tile.height / 2 - 4}
+                    className="tile-text"
+                    textAnchor="middle"
+                    fill="#FFFFFF"
+                    fontSize="12"
+                    fontWeight="700"
+                    fontFamily="Noto Sans, sans-serif"
+                    pointerEvents="none"
+                  >
+                    {tile.name.length > 12 ? `${tile.name.substring(0, 12)}...` : tile.name}
+                  </text>
+                )}
+                
+                {/* Performance percentage */}
+                {tile.width > 60 && tile.height > 30 && (
+                  <text
+                    x={tile.x + tile.width / 2}
+                    y={tile.y + tile.height / 2 + 10}
+                    className="tile-subtext"
+                    textAnchor="middle"
+                    fill="#FFFFFF"
+                    fontSize="10"
+                    fontFamily="Noto Sans, sans-serif"
+                    pointerEvents="none"
+                  >
+                    {Math.round(performance)}%
+                  </text>
+                )}
+                
+                {/* Small tiles - abbreviated text */}
+                {(tile.width <= 60 || tile.height <= 30) && tile.width > 30 && tile.height > 20 && (
+                  <text
+                    x={tile.x + tile.width / 2}
+                    y={tile.y + tile.height / 2 + 2}
+                    textAnchor="middle"
+                    fill="#FFFFFF"
+                    fontSize="8"
+                    fontWeight="600"
+                    fontFamily="Noto Sans, sans-serif"
+                    pointerEvents="none"
+                  >
+                    {tile.name.substring(0, 3)}
+                  </text>
+                )}
               </g>
-            ))}
-            
-            {/* Render treemap tiles */}
-            {positionedIndicators.map((node) => {
-              const isHovered = hoveredIndicatorId === node.id;
-              const percentage = formatPercentage(node.value, node.target);
-              const tileColor = getSectorColor(node.sector);
-              const opacity = getPerformanceOpacity(node.value, node.target);
-              
-              return (
-                <g key={node.id}>
-                  {/* Base tile */}
-                  <rect
-                    x={node.x}
-                    y={node.y}
-                    width={node.width}
-                    height={node.height}
-                    fill={tileColor}
-                    opacity={opacity}
-                    stroke={isHovered ? "#FFFFFF" : "transparent"}
-                    strokeWidth={isHovered ? "2" : "0"}
-                    style={{ 
-                      cursor: 'pointer',
-                      transition: 'stroke 150ms ease'
-                    }}
-                    tabIndex={0}
-                    role="gridcell"
-                    aria-label={`${node.name}: ${percentage}. Click for details`}
-                    onMouseEnter={(e) => handleTileMouseEnter(node, e)}
-                    onMouseLeave={handleTileMouseLeave}
-                    onClick={() => handleTileClick(node)}
-                    onKeyDown={(e) => handleTileKeyDown(e, node)}
-                    onFocus={() => setHoveredIndicatorId(node.id)}
-                    onBlur={() => {
-                      setHoveredIndicatorId(null);
-                      setTooltip(null);
-                    }}
-                  />
-                  
-                  {/* Tile name */}
-                  {node.width > 60 && node.height > 30 && (
-                    <text
-                      x={node.x + node.width / 2}
-                      y={node.y + node.height / 2 - 4}
-                      className="tile-text"
-                      textAnchor="middle"
-                      pointerEvents="none"
-                      fill="#FFFFFF"
-                      fontSize="12"
-                      fontWeight="700"
-                      fontFamily="Noto Sans, sans-serif"
-                    >
-                      {node.name.length > 12 ? `${node.name.substring(0, 12)}...` : node.name}
-                    </text>
-                  )}
-                  
-                  {/* Percentage */}
-                  {node.width > 60 && node.height > 30 && (
-                    <text
-                      x={node.x + node.width / 2}
-                      y={node.y + node.height / 2 + 10}
-                      className="tile-subtext"
-                      textAnchor="middle"
-                      pointerEvents="none"
-                      fill="#FFFFFF"
-                      fontSize="10"
-                      fontFamily="Noto Sans, sans-serif"
-                    >
-                      {percentage}
-                    </text>
-                  )}
-                  
-                  {/* Small tiles - abbreviated text */}
-                  {(node.width <= 60 || node.height <= 30) && node.width > 30 && node.height > 20 && (
-                    <text
-                      x={node.x + node.width / 2}
-                      y={node.y + node.height / 2 + 2}
-                      className="tile-small"
-                      textAnchor="middle"
-                      pointerEvents="none"
-                      fill="#FFFFFF"
-                      fontSize="8"
-                      fontWeight="600"
-                      fontFamily="Noto Sans, sans-serif"
-                    >
-                      {node.name.substring(0, 3)}
-                    </text>
-                  )}
-                </g>
-              );
-            })}
-          </svg>
+            );
+          })}
+        </svg>
 
-          {/* S&P 500 Style Tooltip */}
-          {tooltip && (
-            <div 
-              className="sp500-tooltip"
-              style={{
-                position: 'absolute',
-                left: tooltip.x,
-                top: tooltip.y,
-                pointerEvents: 'none',
-                zIndex: 1000
-              }}
-              role="tooltip"
-            >
-              <div>{tooltip.indicator.name}</div>
-              <div>Current: {tooltip.indicator.value} / Target: {tooltip.indicator.target} ({Math.round((tooltip.indicator.value / tooltip.indicator.target) * 100)}%)</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                Last 30 days: 
-                <SparklineChart 
-                  data={generateSparklineData()} 
-                  width={40} 
-                  height={12} 
-                  color="#FFFFFF" 
-                />
-              </div>
+        {/* Tooltip */}
+        {tooltip && (
+          <div 
+            className="tooltip"
+            style={{
+              position: 'absolute',
+              left: tooltip.x,
+              top: tooltip.y,
+              pointerEvents: 'none',
+              zIndex: 1000
+            }}
+          >
+            <div>{tooltip.tile.name}</div>
+            <div>Current: {tooltip.tile.value} / Target: {tooltip.tile.target} ({Math.round((tooltip.tile.value / tooltip.tile.target) * 100)}%)</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              Last 30 days: 
+              <SparklineChart 
+                data={generateSparklineData()} 
+                width={40} 
+                height={12} 
+                color="#FFFFFF" 
+              />
             </div>
-          )}
+          </div>
+        )}
 
-          {/* S&P 500 Style Legend */}
-          {showLegend && (
-            <div className="sp500-legend">
-              {[
-                { sector: 'Systemic', color: '#0080FF' },
-                { sector: 'Population', color: '#00C080' },
-                { sector: 'Resource Market', color: '#FFC000' },
-                { sector: 'Goods & Services', color: '#8040FF' },
-                { sector: 'Social Outcomes', color: '#40C040' },
-                { sector: 'Governance', color: '#C04080' }
-              ].map(({ sector, color }) => (
-                <div key={sector} className="legend-item">
-                  <div 
-                    className="legend-color"
-                    style={{ backgroundColor: color }}
-                  />
-                  <span>{sector}</span>
-                </div>
-              ))}
+        {/* Legend */}
+        <div className="legend">
+          {Object.entries(sectorColors).map(([sector, color]) => (
+            <div key={sector} className="legend-item">
+              <div 
+                className="legend-color"
+                style={{ backgroundColor: color }}
+              />
+              <span>{sector}</span>
             </div>
-          )}
-        </div>
-        
-        {/* Results count */}
-        <div className="results-info">
-          <p>
-            Showing {positionedIndicators.length} of {sectors.flatMap(s => s.indicators).length} indicators
-            {currentLevel > 0 && ` (Level ${currentLevel})`}
-          </p>
+          ))}
         </div>
       </div>
 
@@ -569,16 +391,8 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
         onDelete={handleDelete}
       />
 
-      {/* Sticky Footer */}
-      <StickyFooter
-        hasChanges={hasChanges}
-        onSave={handleSaveChanges}
-        onCancel={handleCancelChanges}
-      />
-
       <style>{`
-        /* S&P 500 Style Container */
-        .sp500-treemap-container {
+        .treemap-container {
           background: #0B122A;
           border-radius: 8px;
           padding: 16px;
@@ -588,7 +402,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           min-height: 500px;
         }
 
-        .sp500-header {
+        .treemap-header {
           background: #081226;
           color: #FFFFFF;
           font: 16px "Noto Sans", sans-serif;
@@ -600,7 +414,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           height: 40px;
         }
 
-        .sp500-svg-container {
+        .treemap-svg-container {
           position: relative;
           width: 100%;
           height: calc(100% - 40px);
@@ -608,14 +422,31 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           margin-top: 0;
         }
 
-        .sp500-svg {
+        .treemap-svg {
           width: 100%;
           height: 100%;
           display: block;
         }
 
-        /* S&P 500 Style Tooltip */
-        .sp500-tooltip {
+        .sector-label {
+          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .tile-text {
+          font: 12px "Noto Sans", sans-serif;
+          font-weight: 700;
+          fill: #FFFFFF;
+          pointer-events: none;
+        }
+
+        .tile-subtext {
+          font: 10px "Noto Sans", sans-serif;
+          fill: #FFFFFF;
+          text-anchor: middle;
+          pointer-events: none;
+        }
+
+        .tooltip {
           background: rgba(0,0,0,0.7);
           color: #FFFFFF;
           font: 10px "Noto Sans", sans-serif;
@@ -626,8 +457,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           line-height: 1.3;
         }
 
-        /* S&P 500 Style Legend */
-        .sp500-legend {
+        .legend {
           position: absolute;
           bottom: 16px;
           left: 16px;
@@ -651,60 +481,9 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           border-radius: 2px;
         }
 
-        /* Sector Labels */
-        .sector-label {
-          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-
-        /* Results Info */
-        .results-info {
-          position: absolute;
-          bottom: 16px;
-          right: 16px;
-          font: 10px "Noto Sans", sans-serif;
-          color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* Existing styles for other components */
-        .treemap-container {
-          height: 100vh;
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-        }
-
-        .skip-link {
-          position: absolute;
-          top: -40px;
-          left: 6px;
-          background: rgba(0, 255, 195, 0.9);
-          color: #000;
-          padding: 8px;
-          border-radius: 4px;
-          text-decoration: none;
-          z-index: 1000;
-          transition: top 0.3s;
-        }
-
-        .skip-link:focus {
-          top: 6px;
-        }
-
-        .filters-section {
-          padding: 1rem;
-          background: rgba(15, 23, 42, 0.8);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          transition: all 0.3s ease;
-        }
-
-        .filters-section.compact {
-          padding: 0.5rem;
-        }
-
         /* Mobile responsive adjustments */
         @media (max-width: 768px) {
-          .sp500-legend {
+          .legend {
             position: relative;
             bottom: auto;
             left: auto;
@@ -712,30 +491,8 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
             justify-content: center;
           }
 
-          .results-info {
-            position: relative;
-            bottom: auto;
-            right: auto;
-            text-align: center;
-            margin-top: 8px;
-          }
-
-          .sp500-treemap-container {
+          .treemap-container {
             min-height: 400px;
-          }
-        }
-
-        /* High contrast mode support */
-        @media (prefers-contrast: high) {
-          .sp500-svg rect {
-            stroke-width: 2px;
-          }
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          .sp500-svg rect {
-            transition: none;
           }
         }
       `}</style>
