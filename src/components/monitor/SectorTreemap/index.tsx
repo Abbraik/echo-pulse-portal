@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Sector } from './types';
 import { TreemapEngine, TreemapSector, TreemapTile } from './TreemapEngine';
@@ -501,7 +500,7 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
           </div>
         )}
 
-        {/* Legend Panel */}
+        {/* Legend Panel - positioned outside the SVG container */}
         <div className="treemap-legend">
           {Object.entries(sectorColors).map(([sector, { base }]) => (
             <div key={sector} className="legend-item">
@@ -613,8 +612,8 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
 
         .treemap-legend {
           position: absolute;
-          bottom: 24px;
-          left: 24px;
+          bottom: 12px;
+          left: 12px;
           background: rgba(10,20,40,0.6);
           backdrop-filter: blur(16px);
           border-radius: 8px;
