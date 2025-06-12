@@ -1,24 +1,12 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Sector } from './types';
-import { IndicatorModal } from './IndicatorModal';
+import { TreemapEngine, TreemapSector, TreemapTile } from './TreemapEngine';
+import { DetailModal } from './DetailModal';
 import SparklineChart from '@/components/think/components/SparklineChart';
 
 interface SectorTreemapProps {
   sectors: Sector[];
-}
-
-interface TreemapTile {
-  id: string;
-  name: string;
-  sector: string;
-  value: number;
-  target: number;
-  weight: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
 }
 
 interface TooltipState {
@@ -32,147 +20,76 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [hoveredTile, setHoveredTile] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
-  const [selectedIndicator, setSelectedIndicator] = useState<TreemapTile | null>(null);
+  const [selectedTile, setSelectedTile] = useState<TreemapTile | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [showMobileModal, setShowMobileModal] = useState(false);
+
+  // Check for mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Update dimensions when container resizes
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        // Account for padding (24px * 2) and header (56px) and legend margin (60px)
         setDimensions({
-          width: Math.max(400, rect.width - 48),
-          height: Math.max(300, rect.height - 140)
+          width: Math.max(400, rect.width - 48), // Account for padding
+          height: Math.max(300, rect.height - 120) // Account for header and legend
         });
       }
     };
 
     updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
   }, []);
 
-  // Sector colors with glassmorphic tints
+  // Sector colors mapping
   const sectorColors: Record<string, { base: string; tint: string }> = {
-    'Systemic': { base: '#0080FF', tint: 'rgba(0,184,255,0.08)' },
-    'Population': { base: '#00C080', tint: 'rgba(0,255,195,0.08)' },
-    'Resource Market': { base: '#FFC000', tint: 'rgba(255,193,7,0.08)' },
-    'Goods & Services': { base: '#8040FF', tint: 'rgba(123,104,238,0.08)' },
-    'Social Outcomes': { base: '#40C040', tint: 'rgba(60,179,113,0.08)' },
-    'Governance': { base: '#C04080', tint: 'rgba(199,21,133,0.08)' }
+    'Systemic': { base: '#00B8FF', tint: 'rgba(0,184,255,0.08)' },
+    'Population': { base: '#00FFC3', tint: 'rgba(0,255,195,0.08)' },
+    'ResourceMarket': { base: '#FFC107', tint: 'rgba(255,193,7,0.08)' },
+    'GoodsServices': { base: '#7B68EE', tint: 'rgba(123,104,238,0.08)' },
+    'SocialOutcomes': { base: '#3CB371', tint: 'rgba(60,179,113,0.08)' },
+    'Governance': { base: '#C71585', tint: 'rgba(199,21,133,0.08)' }
   };
 
-  // Calculate performance-based opacity and status overlay
+  // Get performance data
   const getPerformanceData = (value: number, target: number) => {
     const performance = (value / target) * 100;
-    let opacity = 1.0;
-    let statusOverlay = '';
+    let statusColor = '';
     
     if (performance >= 75) {
-      opacity = 1.0;
-      statusOverlay = 'rgba(60,179,113,0.12)'; // green glow
+      statusColor = 'rgba(0,255,195,0.12)'; // neon-teal
     } else if (performance >= 50) {
-      opacity = 0.8;
-      statusOverlay = 'rgba(255,193,7,0.12)'; // amber glow
+      statusColor = 'rgba(255,193,7,0.12)'; // amber
     } else {
-      opacity = 0.6;
-      statusOverlay = 'rgba(255,110,110,0.12)'; // coral glow
+      statusColor = 'rgba(255,110,110,0.12)'; // coral
     }
     
-    return { opacity, statusOverlay, performance };
+    return { performance, statusColor };
   };
 
-  // Simple treemap layout algorithm with proper spacing
-  const calculateLayout = (): TreemapTile[] => {
+  // Generate treemap layout
+  const sectorLayouts = useMemo(() => {
     const allIndicators = sectors.flatMap(s => s.indicators);
-    const totalWeight = allIndicators.reduce((sum, i) => sum + i.weight, 0);
-    
-    // Group by sector
-    const sectorGroups = new Map<string, typeof allIndicators>();
-    allIndicators.forEach(indicator => {
-      if (!sectorGroups.has(indicator.sector)) {
-        sectorGroups.set(indicator.sector, []);
-      }
-      sectorGroups.get(indicator.sector)!.push(indicator);
-    });
+    return TreemapEngine.generateLayout(allIndicators, dimensions.width, dimensions.height);
+  }, [sectors, dimensions]);
 
-    // Layout sectors in a 2x3 grid with 4px gutters
-    const sectorsArray = Array.from(sectorGroups.keys());
-    const cols = 3;
-    const rows = 2;
-    const gutterSize = 4;
-    
-    const sectorWidth = (dimensions.width - (cols - 1) * gutterSize) / cols;
-    const sectorHeight = (dimensions.height - (rows - 1) * gutterSize) / rows;
-    
-    const sectorRects = new Map<string, { x: number, y: number, width: number, height: number }>();
-    
-    sectorsArray.forEach((sector, index) => {
-      const col = index % cols;
-      const row = Math.floor(index / cols);
-      sectorRects.set(sector, {
-        x: col * (sectorWidth + gutterSize),
-        y: row * (sectorHeight + gutterSize),
-        width: sectorWidth,
-        height: sectorHeight
-      });
-    });
-
-    // Layout tiles within each sector
-    const tiles: TreemapTile[] = [];
-    sectorGroups.forEach((indicators, sector) => {
-      const sectorRect = sectorRects.get(sector)!;
-      const sectorWeight = indicators.reduce((sum, i) => sum + i.weight, 0);
-      
-      // Simple grid layout within sector with 2px tile gutters
-      let currentX = sectorRect.x + 8; // 8px sector label margin
-      let currentY = sectorRect.y + 20; // 20px for sector label
-      let rowHeight = 0;
-      const tileGutter = 2;
-      const availableWidth = sectorRect.width - 16;
-      const availableHeight = sectorRect.height - 28;
-      
-      indicators.forEach((indicator, index) => {
-        const tileArea = (indicator.weight / sectorWeight) * (availableWidth * availableHeight);
-        let tileWidth = Math.max(60, Math.min(availableWidth / 3, Math.sqrt(tileArea * 1.5)));
-        let tileHeight = Math.max(40, Math.min(tileArea / tileWidth, availableHeight / 2));
-        
-        // Check if we need to wrap to next row
-        if (currentX + tileWidth > sectorRect.x + sectorRect.width - 8) {
-          currentX = sectorRect.x + 8;
-          currentY += rowHeight + tileGutter;
-          rowHeight = 0;
-        }
-        
-        // Ensure we don't exceed sector bounds
-        if (currentY + tileHeight > sectorRect.y + sectorRect.height - 8) {
-          tileHeight = Math.max(40, sectorRect.y + sectorRect.height - 8 - currentY);
-        }
-        
-        tiles.push({
-          id: indicator.id,
-          name: indicator.name,
-          sector: indicator.sector,
-          value: indicator.value,
-          target: indicator.target,
-          weight: indicator.weight,
-          x: currentX,
-          y: currentY,
-          width: tileWidth,
-          height: tileHeight
-        });
-        
-        currentX += tileWidth + tileGutter;
-        rowHeight = Math.max(rowHeight, tileHeight);
-      });
-    });
-
-    return tiles;
-  };
-
-  const tiles = useMemo(calculateLayout, [sectors, dimensions]);
-
+  // Handle tile interactions
   const handleTileHover = (tile: TreemapTile, event: React.MouseEvent) => {
     setHoveredTile(tile.id);
     const rect = event.currentTarget.getBoundingClientRect();
@@ -192,16 +109,8 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
   };
 
   const handleTileClick = (tile: TreemapTile) => {
-    setSelectedIndicator(tile);
+    setSelectedTile(tile);
     setIsModalOpen(true);
-  };
-
-  const handleEdit = (id: string) => {
-    console.log(`Editing indicator: ${id}`);
-  };
-
-  const handleDelete = (id: string) => {
-    console.log(`Deleting indicator: ${id}`);
   };
 
   // Generate mock sparkline data
@@ -209,199 +118,353 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     return Array.from({ length: 30 }, () => Math.random() * 100 + 50);
   };
 
-  // Calculate sector boundaries for labels
-  const sectorBounds = useMemo(() => {
-    const bounds = new Map<string, { minX: number, minY: number, maxX: number, maxY: number }>();
-    
-    tiles.forEach(tile => {
-      if (!bounds.has(tile.sector)) {
-        bounds.set(tile.sector, {
-          minX: tile.x - 8,
-          minY: tile.y - 20,
-          maxX: tile.x + tile.width + 8,
-          maxY: tile.y + tile.height + 8
-        });
-      } else {
-        const current = bounds.get(tile.sector)!;
-        bounds.set(tile.sector, {
-          minX: Math.min(current.minX, tile.x - 8),
-          minY: Math.min(current.minY, tile.y - 20),
-          maxX: Math.max(current.maxX, tile.x + tile.width + 8),
-          maxY: Math.max(current.maxY, tile.y + tile.height + 8)
-        });
-      }
-    });
-    
-    return bounds;
-  }, [tiles]);
+  // Mobile button click
+  const handleMobileClick = () => {
+    setShowMobileModal(true);
+  };
+
+  if (isMobile) {
+    return (
+      <>
+        <div className="mobile-treemap-button" onClick={handleMobileClick}>
+          <span>Treemap ▶</span>
+        </div>
+        
+        {showMobileModal && (
+          <div className="mobile-modal-overlay" onClick={() => setShowMobileModal(false)}>
+            <div className="mobile-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="mobile-modal-header">
+                <h3>Sector Treemap</h3>
+                <button onClick={() => setShowMobileModal(false)}>×</button>
+              </div>
+              <div className="mobile-treemap-container">
+                {/* Render full treemap in mobile modal */}
+                <SectorTreemapContent
+                  sectorLayouts={sectorLayouts}
+                  sectorColors={sectorColors}
+                  hoveredTile={hoveredTile}
+                  tooltip={tooltip}
+                  onTileHover={handleTileHover}
+                  onTileLeave={handleTileLeave}
+                  onTileClick={handleTileClick}
+                  getPerformanceData={getPerformanceData}
+                  generateSparklineData={generateSparklineData}
+                  containerRef={containerRef}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <DetailModal
+          tile={selectedTile}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+        
+        <style jsx>{`
+          .mobile-treemap-button {
+            background: rgba(10,20,40,0.45);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(0,255,195,0.15);
+            border-radius: 1rem;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+
+          .mobile-treemap-button:hover {
+            background: rgba(10,20,40,0.6);
+            border-color: rgba(0,255,195,0.3);
+          }
+
+          .mobile-treemap-button span {
+            font: 16px "Noto Sans", sans-serif;
+            font-weight: 700;
+            color: #FFFFFF;
+          }
+
+          .mobile-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+          }
+
+          .mobile-modal-content {
+            background: rgba(10,20,40,0.95);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(0,255,195,0.2);
+            border-radius: 1rem;
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .mobile-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+          }
+
+          .mobile-modal-header h3 {
+            font: 18px "Noto Sans", sans-serif;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin: 0;
+          }
+
+          .mobile-modal-header button {
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .mobile-treemap-container {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+          }
+        `}</style>
+      </>
+    );
+  }
 
   return (
     <div className="treemap-card" ref={containerRef}>
-      {/* Glassmorphic Header */}
+      <SectorTreemapContent
+        sectorLayouts={sectorLayouts}
+        sectorColors={sectorColors}
+        hoveredTile={hoveredTile}
+        tooltip={tooltip}
+        onTileHover={handleTileHover}
+        onTileLeave={handleTileLeave}
+        onTileClick={handleTileClick}
+        getPerformanceData={getPerformanceData}
+        generateSparklineData={generateSparklineData}
+        containerRef={containerRef}
+      />
+      
+      <DetailModal
+        tile={selectedTile}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </div>
+  );
+};
+
+// Separate component for the treemap content
+interface SectorTreemapContentProps {
+  sectorLayouts: TreemapSector[];
+  sectorColors: Record<string, { base: string; tint: string }>;
+  hoveredTile: string | null;
+  tooltip: TooltipState | null;
+  onTileHover: (tile: TreemapTile, event: React.MouseEvent) => void;
+  onTileLeave: () => void;
+  onTileClick: (tile: TreemapTile) => void;
+  getPerformanceData: (value: number, target: number) => { performance: number; statusColor: string };
+  generateSparklineData: () => number[];
+  containerRef: React.RefObject<HTMLDivElement>;
+}
+
+const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
+  sectorLayouts,
+  sectorColors,
+  hoveredTile,
+  tooltip,
+  onTileHover,
+  onTileLeave,
+  onTileClick,
+  getPerformanceData,
+  generateSparklineData,
+  containerRef
+}) => {
+  const svgWidth = sectorLayouts.length > 0 ? 
+    Math.max(...sectorLayouts.map(s => s.x + s.width)) : 800;
+  const svgHeight = sectorLayouts.length > 0 ? 
+    Math.max(...sectorLayouts.map(s => s.y + s.height)) : 600;
+
+  return (
+    <>
+      {/* Header */}
       <div className="treemap-header">
         <h2>Sector Treemap: Comprehensive System View</h2>
       </div>
-      
-      {/* SVG Treemap */}
+
+      {/* SVG Container */}
       <div className="treemap-svg-container">
         <svg 
           className="treemap-svg"
           width="100%" 
           height="100%" 
-          viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
+          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
           preserveAspectRatio="xMidYMid meet"
         >
-          {/* Define filters for inner shadow */}
+          {/* Filters */}
           <defs>
             <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
               <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#000" floodOpacity="0.3" />
             </filter>
           </defs>
           
-          {/* Sector backgrounds with glassmorphic tints */}
-          {Array.from(sectorBounds.entries()).map(([sector, bounds]) => (
-            <g key={`sector-bg-${sector}`}>
+          {/* Sector backgrounds and tiles */}
+          {sectorLayouts.map((sector) => (
+            <g key={`sector-${sector.name}`}>
+              {/* Sector background */}
               <rect
-                x={bounds.minX}
-                y={bounds.minY}
-                width={bounds.maxX - bounds.minX}
-                height={bounds.maxY - bounds.minY}
-                fill={sectorColors[sector]?.tint || 'rgba(255,255,255,0.05)'}
+                x={sector.x}
+                y={sector.y}
+                width={sector.width}
+                height={sector.height}
+                fill={sectorColors[sector.name]?.tint || 'rgba(255,255,255,0.05)'}
                 stroke="rgba(255,255,255,0.10)"
                 strokeWidth="1"
                 rx="8"
               />
+              
+              {/* Sector label */}
+              <text
+                x={sector.x + 8}
+                y={sector.y + 16}
+                className="sector-label"
+                fill="#E0E0E0"
+                fontSize="10"
+                fontWeight="700"
+                fontFamily="Noto Sans, sans-serif"
+              >
+                {sector.name.toUpperCase()}
+              </text>
+              
+              {/* Tiles */}
+              {sector.tiles.map(tile => {
+                const isHovered = hoveredTile === tile.id;
+                const { performance, statusColor } = getPerformanceData(tile.value, tile.target);
+                const color = sectorColors[tile.sector]?.base || '#0080FF';
+                
+                return (
+                  <g key={tile.id}>
+                    {/* Base tile */}
+                    <rect
+                      x={tile.x}
+                      y={tile.y}
+                      width={tile.width}
+                      height={tile.height}
+                      fill={color}
+                      stroke="rgba(255,255,255,0.10)"
+                      strokeWidth="1"
+                      filter="url(#innerShadow)"
+                      rx="4"
+                      style={{ cursor: 'pointer' }}
+                      onMouseEnter={(e) => onTileHover(tile, e)}
+                      onMouseLeave={onTileLeave}
+                      onClick={() => onTileClick(tile)}
+                    />
+                    
+                    {/* Performance overlay */}
+                    <rect
+                      x={tile.x}
+                      y={tile.y}
+                      width={tile.width}
+                      height={tile.height}
+                      fill={statusColor}
+                      rx="4"
+                      pointerEvents="none"
+                    />
+                    
+                    {/* Hover stroke */}
+                    {isHovered && (
+                      <rect
+                        x={tile.x}
+                        y={tile.y}
+                        width={tile.width}
+                        height={tile.height}
+                        fill="none"
+                        stroke="#FFFFFF"
+                        strokeWidth="2"
+                        rx="4"
+                        pointerEvents="none"
+                      />
+                    )}
+                    
+                    {/* Tile text */}
+                    {tile.width > 60 && tile.height > 30 && (
+                      <>
+                        <text
+                          x={tile.x + tile.width / 2}
+                          y={tile.y + tile.height / 2 - 4}
+                          textAnchor="middle"
+                          fill="#FFFFFF"
+                          fontSize="12"
+                          fontWeight="700"
+                          fontFamily="Noto Sans, sans-serif"
+                          pointerEvents="none"
+                          style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                        >
+                          {tile.name.length > 12 ? `${tile.name.substring(0, 12)}...` : tile.name}
+                        </text>
+                        <text
+                          x={tile.x + tile.width / 2}
+                          y={tile.y + tile.height / 2 + 10}
+                          textAnchor="middle"
+                          fill="#FFFFFF"
+                          fontSize="10"
+                          fontFamily="Noto Sans, sans-serif"
+                          pointerEvents="none"
+                          style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                        >
+                          {Math.round(performance)}%
+                        </text>
+                      </>
+                    )}
+                    
+                    {/* Small tiles - abbreviated */}
+                    {(tile.width <= 60 || tile.height <= 30) && tile.width > 30 && tile.height > 20 && (
+                      <text
+                        x={tile.x + tile.width / 2}
+                        y={tile.y + tile.height / 2 + 2}
+                        textAnchor="middle"
+                        fill="#FFFFFF"
+                        fontSize="8"
+                        fontWeight="600"
+                        fontFamily="Noto Sans, sans-serif"
+                        pointerEvents="none"
+                        style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                      >
+                        {tile.name.substring(0, 3)}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
             </g>
           ))}
-          
-          {/* Sector labels */}
-          {Array.from(sectorBounds.entries()).map(([sector, bounds]) => (
-            <text
-              key={`sector-label-${sector}`}
-              x={bounds.minX + 8}
-              y={bounds.minY + 16}
-              className="sector-label"
-              fill="#E0E0E0"
-              fontSize="10"
-              fontWeight="700"
-              fontFamily="Noto Sans, sans-serif"
-            >
-              {sector.toUpperCase()}
-            </text>
-          ))}
-          
-          {/* Tiles */}
-          {tiles.map(tile => {
-            const isHovered = hoveredTile === tile.id;
-            const { opacity, statusOverlay, performance } = getPerformanceData(tile.value, tile.target);
-            const color = sectorColors[tile.sector]?.base || '#0080FF';
-            
-            return (
-              <g key={tile.id}>
-                {/* Base tile */}
-                <rect
-                  x={tile.x}
-                  y={tile.y}
-                  width={tile.width}
-                  height={tile.height}
-                  fill={color}
-                  opacity={opacity}
-                  stroke="rgba(255,255,255,0.10)"
-                  strokeWidth="1"
-                  filter="url(#innerShadow)"
-                  rx="4"
-                  style={{ cursor: 'pointer' }}
-                  onMouseEnter={(e) => handleTileHover(tile, e)}
-                  onMouseLeave={handleTileLeave}
-                  onClick={() => handleTileClick(tile)}
-                />
-                
-                {/* Status overlay */}
-                <rect
-                  x={tile.x}
-                  y={tile.y}
-                  width={tile.width}
-                  height={tile.height}
-                  fill={statusOverlay}
-                  rx="4"
-                  pointerEvents="none"
-                />
-                
-                {/* Hover stroke */}
-                {isHovered && (
-                  <rect
-                    x={tile.x}
-                    y={tile.y}
-                    width={tile.width}
-                    height={tile.height}
-                    fill="none"
-                    stroke="#FFFFFF"
-                    strokeWidth="2"
-                    rx="4"
-                    pointerEvents="none"
-                  />
-                )}
-                
-                {/* Tile name - show if sufficient space */}
-                {tile.width > 60 && tile.height > 30 && (
-                  <text
-                    x={tile.x + tile.width / 2}
-                    y={tile.y + tile.height / 2 - 4}
-                    className="tile-text"
-                    textAnchor="middle"
-                    fill="#FFFFFF"
-                    fontSize="12"
-                    fontWeight="700"
-                    fontFamily="Noto Sans, sans-serif"
-                    pointerEvents="none"
-                    style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                  >
-                    {tile.name.length > 12 ? `${tile.name.substring(0, 12)}...` : tile.name}
-                  </text>
-                )}
-                
-                {/* Performance percentage */}
-                {tile.width > 60 && tile.height > 30 && (
-                  <text
-                    x={tile.x + tile.width / 2}
-                    y={tile.y + tile.height / 2 + 10}
-                    className="tile-subtext"
-                    textAnchor="middle"
-                    fill="#FFFFFF"
-                    fontSize="10"
-                    fontFamily="Noto Sans, sans-serif"
-                    pointerEvents="none"
-                    style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                  >
-                    {Math.round(performance)}%
-                  </text>
-                )}
-                
-                {/* Small tiles - abbreviated text */}
-                {(tile.width <= 60 || tile.height <= 30) && tile.width > 30 && tile.height > 20 && (
-                  <text
-                    x={tile.x + tile.width / 2}
-                    y={tile.y + tile.height / 2 + 2}
-                    textAnchor="middle"
-                    fill="#FFFFFF"
-                    fontSize="8"
-                    fontWeight="600"
-                    fontFamily="Noto Sans, sans-serif"
-                    pointerEvents="none"
-                    style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                  >
-                    {tile.name.substring(0, 3)}
-                  </text>
-                )}
-              </g>
-            );
-          })}
         </svg>
 
         {/* Tooltip */}
         {tooltip && (
           <div 
-            className="tooltip"
+            className="treemap-tooltip"
             style={{
               position: 'absolute',
               left: tooltip.x,
@@ -410,26 +473,32 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
               zIndex: 1000
             }}
           >
-            <div>{tooltip.tile.name}</div>
-            <div>Current: {tooltip.tile.value} / Target: {tooltip.tile.target} ({Math.round((tooltip.tile.value / tooltip.tile.target) * 100)}%)</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Last 30 days: 
-              <SparklineChart 
-                data={generateSparklineData()} 
-                width={40} 
-                height={12} 
-                color="#FFFFFF" 
-              />
+            <div className="tooltip-content">
+              <div className="tooltip-title">{tooltip.tile.name}</div>
+              <div className="tooltip-metrics">
+                <span>Current: {tooltip.tile.value}</span>
+                <span>Target: {tooltip.tile.target}</span>
+                <span>Performance: {Math.round((tooltip.tile.value / tooltip.tile.target) * 100)}%</span>
+              </div>
+              <div className="tooltip-sparkline">
+                <span>Last 30 days:</span>
+                <SparklineChart 
+                  data={generateSparklineData()} 
+                  width={60} 
+                  height={16} 
+                  color="#00FFC3" 
+                />
+              </div>
             </div>
           </div>
         )}
 
-        {/* Glassmorphic Legend */}
-        <div className="legend">
+        {/* Legend Panel */}
+        <div className="treemap-legend">
           {Object.entries(sectorColors).map(([sector, { base }]) => (
             <div key={sector} className="legend-item">
               <div 
-                className="legend-color"
+                className="legend-swatch"
                 style={{ backgroundColor: base }}
               />
               <span>{sector}</span>
@@ -438,23 +507,20 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
         </div>
       </div>
 
-      {/* Detail Modal */}
-      <IndicatorModal
-        indicator={selectedIndicator}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <style jsx>{`
+        :root {
+          --container-padding: 24px;
+          --sector-gutter: 4px;
+          --tile-gutter: 2px;
+        }
 
-      <style>{`
         .treemap-card {
           background: rgba(10,20,40,0.45);
           backdrop-filter: blur(24px);
           border: 1px solid rgba(0,255,195,0.15);
           border-radius: 1.5rem;
           box-shadow: 0 12px 32px rgba(0,0,0,0.6);
-          padding: 16px;
+          padding: var(--container-padding);
           position: relative;
           overflow: hidden;
           height: 100%;
@@ -468,10 +534,10 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           padding: 0 16px;
           border-radius: 1.5rem 1.5rem 0 0;
           font: 16px "Noto Sans", sans-serif;
+          font-weight: 700;
           color: #FFFFFF;
           text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-          margin: -16px -16px 0 -16px;
-          font-weight: 700;
+          margin: calc(-1 * var(--container-padding)) calc(-1 * var(--container-padding)) 0 calc(-1 * var(--container-padding));
         }
 
         .treemap-header h2 {
@@ -486,12 +552,11 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           height: calc(100% - 40px);
           min-height: 400px;
           margin-top: 16px;
-          padding: 24px;
         }
 
         .treemap-svg {
           width: 100%;
-          height: calc(100% - 60px); /* Reserve 60px for legend */
+          height: calc(100% - 60px);
           display: block;
         }
 
@@ -499,46 +564,55 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
-        .tile-text {
-          font: 12px "Noto Sans", sans-serif;
-          font-weight: 700;
-          fill: #FFFFFF;
-          pointer-events: none;
-        }
-
-        .tile-subtext {
-          font: 10px "Noto Sans", sans-serif;
-          fill: #FFFFFF;
-          text-anchor: middle;
-          pointer-events: none;
-        }
-
-        .tooltip {
-          background: rgba(0,0,0,0.7);
-          color: #FFFFFF;
-          font: 10px "Noto Sans", sans-serif;
-          padding: 6px;
-          border-radius: 4px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-          white-space: nowrap;
-          line-height: 1.3;
+        .treemap-tooltip {
+          background: rgba(0,0,0,0.9);
           backdrop-filter: blur(16px);
-          border: 1px solid rgba(255,255,255,0.1);
+          border: 1px solid rgba(0,255,195,0.3);
+          border-radius: 8px;
+          padding: 12px;
+          max-width: 250px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        .legend {
+        .tooltip-content {
+          color: #FFFFFF;
+          font: 12px "Noto Sans", sans-serif;
+        }
+
+        .tooltip-title {
+          font-weight: 700;
+          color: #00FFC3;
+          margin-bottom: 8px;
+        }
+
+        .tooltip-metrics {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+        }
+
+        .tooltip-sparkline {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 10px;
+          color: #B0B0B0;
+        }
+
+        .treemap-legend {
           position: absolute;
           bottom: 24px;
           left: 24px;
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
-          font: 10px "Noto Sans", sans-serif;
-          color: #FFFFFF;
           background: rgba(10,20,40,0.6);
           backdrop-filter: blur(16px);
-          padding: 8px 12px;
           border-radius: 8px;
+          padding: 8px 12px;
+          display: flex;
+          gap: 12px;
+          align-items: center;
+          font: 10px "Noto Sans", sans-serif;
+          color: #FFFFFF;
           border: 1px solid rgba(255,255,255,0.1);
           z-index: 10;
         }
@@ -549,14 +623,13 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           gap: 4px;
         }
 
-        .legend-color {
+        .legend-swatch {
           width: 12px;
           height: 12px;
           border-radius: 2px;
           border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* Mobile responsive adjustments */
         @media (max-width: 768px) {
           .treemap-card {
             min-height: 400px;
@@ -567,11 +640,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
             border-radius: 1rem 1rem 0 0;
           }
 
-          .treemap-svg-container {
-            padding: 16px;
-          }
-
-          .legend {
+          .treemap-legend {
             position: relative;
             bottom: auto;
             left: auto;
@@ -580,7 +649,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           }
         }
       `}</style>
-    </div>
+    </>
   );
 };
 
