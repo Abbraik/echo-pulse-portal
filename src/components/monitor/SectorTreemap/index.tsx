@@ -499,19 +499,6 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
             </div>
           </div>
         )}
-
-        {/* Legend Panel - positioned outside the SVG container */}
-        <div className="treemap-legend">
-          {Object.entries(sectorColors).map(([sector, { base }]) => (
-            <div key={sector} className="legend-item">
-              <div 
-                className="legend-swatch"
-                style={{ backgroundColor: base }}
-              />
-              <span>{sector}</span>
-            </div>
-          ))}
-        </div>
       </div>
 
       <style>{`
@@ -610,36 +597,6 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
           color: #B0B0B0;
         }
 
-        .treemap-legend {
-          position: absolute;
-          bottom: 12px;
-          left: 12px;
-          background: rgba(10,20,40,0.6);
-          backdrop-filter: blur(16px);
-          border-radius: 8px;
-          padding: 8px 12px;
-          display: flex;
-          gap: 12px;
-          align-items: center;
-          font: 10px "Noto Sans", sans-serif;
-          color: #FFFFFF;
-          border: 1px solid rgba(255,255,255,0.1);
-          z-index: 10;
-        }
-
-        .legend-item {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .legend-swatch {
-          width: 12px;
-          height: 12px;
-          border-radius: 2px;
-          border: 1px solid rgba(255,255,255,0.2);
-        }
-
         @media (max-width: 768px) {
           .treemap-card {
             min-height: 400px;
@@ -648,14 +605,6 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
           
           .treemap-header {
             border-radius: 1rem 1rem 0 0;
-          }
-
-          .treemap-legend {
-            position: relative;
-            bottom: auto;
-            left: auto;
-            margin-top: 12px;
-            justify-content: center;
           }
         }
       `}</style>
