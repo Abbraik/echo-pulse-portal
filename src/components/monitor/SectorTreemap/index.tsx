@@ -162,7 +162,7 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
           onClose={() => setIsModalOpen(false)}
         />
         
-        <style jsx>{`
+        <style>{`
           .mobile-treemap-button {
             background: rgba(10,20,40,0.45);
             backdrop-filter: blur(24px);
@@ -507,7 +507,7 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         :root {
           --container-padding: 24px;
           --sector-gutter: 4px;

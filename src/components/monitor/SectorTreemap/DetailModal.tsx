@@ -124,7 +124,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
           </div>
         </div>
 
-        <style jsx>{`
+        <style>{`
           .detail-modal {
             background: rgba(20,30,50,0.85);
             backdrop-filter: blur(32px);
