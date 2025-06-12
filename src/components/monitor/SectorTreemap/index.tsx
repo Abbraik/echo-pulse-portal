@@ -41,9 +41,10 @@ const SectorTreemap: React.FC<SectorTreemapProps> = ({ sectors }) => {
     const updateDimensions = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
+        // Account for card padding (24px on each side) and header height (40px)
         setDimensions({
-          width: Math.max(400, rect.width - 48), // Account for padding
-          height: Math.max(300, rect.height - 120) // Account for header and legend
+          width: Math.max(400, rect.width - 48), // 24px padding on each side
+          height: Math.max(300, rect.height - 88) // 40px header + 24px top/bottom padding
         });
       }
     };
@@ -300,11 +301,6 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
   generateSparklineData,
   containerRef
 }) => {
-  const svgWidth = sectorLayouts.length > 0 ? 
-    Math.max(...sectorLayouts.map(s => s.x + s.width)) : 800;
-  const svgHeight = sectorLayouts.length > 0 ? 
-    Math.max(...sectorLayouts.map(s => s.y + s.height)) : 600;
-
   return (
     <>
       {/* Header */}
@@ -318,7 +314,6 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
           className="treemap-svg"
           width="100%" 
           height="100%" 
-          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
           preserveAspectRatio="xMidYMid meet"
         >
           {/* Filters */}
@@ -392,19 +387,32 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
                       pointerEvents="none"
                     />
                     
-                    {/* Hover stroke */}
+                    {/* Hover effect - double glass overlay */}
                     {isHovered && (
-                      <rect
-                        x={tile.x}
-                        y={tile.y}
-                        width={tile.width}
-                        height={tile.height}
-                        fill="none"
-                        stroke="#FFFFFF"
-                        strokeWidth="2"
-                        rx="4"
-                        pointerEvents="none"
-                      />
+                      <>
+                        {/* Additional neon-teal highlight for double-glass effect */}
+                        <rect
+                          x={tile.x}
+                          y={tile.y}
+                          width={tile.width}
+                          height={tile.height}
+                          fill="rgba(0,255,195,0.20)"
+                          rx="4"
+                          pointerEvents="none"
+                        />
+                        {/* Neon-white stroke */}
+                        <rect
+                          x={tile.x}
+                          y={tile.y}
+                          width={tile.width}
+                          height={tile.height}
+                          fill="none"
+                          stroke="#FFFFFF"
+                          strokeWidth="2"
+                          rx="4"
+                          pointerEvents="none"
+                        />
+                      </>
                     )}
                     
                     {/* Tile text */}
@@ -525,6 +533,8 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
           overflow: hidden;
           height: 100%;
           min-height: 500px;
+          display: grid;
+          grid-template-rows: 40px 1fr;
         }
 
         .treemap-header {
@@ -538,6 +548,7 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
           color: #FFFFFF;
           text-shadow: 0 2px 4px rgba(0,0,0,0.6);
           margin: calc(-1 * var(--container-padding)) calc(-1 * var(--container-padding)) 0 calc(-1 * var(--container-padding));
+          grid-row: 1;
         }
 
         .treemap-header h2 {
@@ -549,14 +560,14 @@ const SectorTreemapContent: React.FC<SectorTreemapContentProps> = ({
         .treemap-svg-container {
           position: relative;
           width: 100%;
-          height: calc(100% - 40px);
-          min-height: 400px;
-          margin-top: 16px;
+          height: 100%;
+          grid-row: 2;
+          overflow: hidden;
         }
 
         .treemap-svg {
           width: 100%;
-          height: calc(100% - 60px);
+          height: 100%;
           display: block;
         }
 
