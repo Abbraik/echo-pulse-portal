@@ -9,6 +9,429 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      anomalies: {
+        Row: {
+          acknowledged: boolean | null
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          details: string | null
+          detected_at: string | null
+          id: string
+          metric_id: string | null
+          resolved: boolean | null
+          resolved_at: string | null
+          severity: Database["public"]["Enums"]["severity_level"]
+        }
+        Insert: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          details?: string | null
+          detected_at?: string | null
+          id?: string
+          metric_id?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: Database["public"]["Enums"]["severity_level"]
+        }
+        Update: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          details?: string | null
+          detected_at?: string | null
+          id?: string
+          metric_id?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: Database["public"]["Enums"]["severity_level"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anomalies_metric_id_fkey"
+            columns: ["metric_id"]
+            isOneToOne: false
+            referencedRelation: "health_metrics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approvals: {
+        Row: {
+          assigned_to: string[]
+          context_snapshot: Json | null
+          created_at: string | null
+          created_by: string
+          due_at: string | null
+          id: string
+          revision_notes: string | null
+          status: Database["public"]["Enums"]["approval_status"]
+          title: string
+          type: Database["public"]["Enums"]["approval_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string[]
+          context_snapshot?: Json | null
+          created_at?: string | null
+          created_by: string
+          due_at?: string | null
+          id?: string
+          revision_notes?: string | null
+          status?: Database["public"]["Enums"]["approval_status"]
+          title: string
+          type: Database["public"]["Enums"]["approval_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string[]
+          context_snapshot?: Json | null
+          created_at?: string | null
+          created_by?: string
+          due_at?: string | null
+          id?: string
+          revision_notes?: string | null
+          status?: Database["public"]["Enums"]["approval_status"]
+          title?: string
+          type?: Database["public"]["Enums"]["approval_type"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      bundles: {
+        Row: {
+          coherence: number | null
+          created_at: string | null
+          created_by: string
+          geography: string[] | null
+          id: string
+          is_approved: boolean | null
+          leverage_points: Json | null
+          name: string
+          ndi_impact: number | null
+          objectives: string[] | null
+          pillars: string[] | null
+          status: Database["public"]["Enums"]["bundle_status"]
+          summary: string | null
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          coherence?: number | null
+          created_at?: string | null
+          created_by: string
+          geography?: string[] | null
+          id?: string
+          is_approved?: boolean | null
+          leverage_points?: Json | null
+          name: string
+          ndi_impact?: number | null
+          objectives?: string[] | null
+          pillars?: string[] | null
+          status?: Database["public"]["Enums"]["bundle_status"]
+          summary?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          coherence?: number | null
+          created_at?: string | null
+          created_by?: string
+          geography?: string[] | null
+          id?: string
+          is_approved?: boolean | null
+          leverage_points?: Json | null
+          name?: string
+          ndi_impact?: number | null
+          objectives?: string[] | null
+          pillars?: string[] | null
+          status?: Database["public"]["Enums"]["bundle_status"]
+          summary?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      claims: {
+        Row: {
+          claimed_by: string | null
+          closed_at: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          opened_at: string | null
+          status: Database["public"]["Enums"]["claim_status"]
+          task_id: string
+          zone: Database["public"]["Enums"]["zone_name"]
+        }
+        Insert: {
+          claimed_by?: string | null
+          closed_at?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          status?: Database["public"]["Enums"]["claim_status"]
+          task_id: string
+          zone: Database["public"]["Enums"]["zone_name"]
+        }
+        Update: {
+          claimed_by?: string | null
+          closed_at?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          status?: Database["public"]["Enums"]["claim_status"]
+          task_id?: string
+          zone?: Database["public"]["Enums"]["zone_name"]
+        }
+        Relationships: []
+      }
+      cld_edges: {
+        Row: {
+          created_at: string | null
+          id: string
+          polarity: number
+          scenario_id: string | null
+          source_id: string | null
+          strength: number | null
+          target_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          polarity: number
+          scenario_id?: string | null
+          source_id?: string | null
+          strength?: number | null
+          target_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          polarity?: number
+          scenario_id?: string | null
+          source_id?: string | null
+          strength?: number | null
+          target_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cld_edges_scenario_id_fkey"
+            columns: ["scenario_id"]
+            isOneToOne: false
+            referencedRelation: "scenarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cld_edges_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "cld_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cld_edges_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "cld_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cld_nodes: {
+        Row: {
+          created_at: string | null
+          id: string
+          label: string
+          node_type: string | null
+          position_x: number
+          position_y: number
+          scenario_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          label: string
+          node_type?: string | null
+          position_x?: number
+          position_y?: number
+          scenario_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          label?: string
+          node_type?: string | null
+          position_x?: number
+          position_y?: number
+          scenario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cld_nodes_scenario_id_fkey"
+            columns: ["scenario_id"]
+            isOneToOne: false
+            referencedRelation: "scenarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      file_attachments: {
+        Row: {
+          content_type: string | null
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          file_key: string
+          file_size: number | null
+          id: string
+          original_name: string
+          uploaded_by: string
+          url: string | null
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          file_key: string
+          file_size?: number | null
+          id?: string
+          original_name: string
+          uploaded_by: string
+          url?: string | null
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          file_key?: string
+          file_size?: number | null
+          id?: string
+          original_name?: string
+          uploaded_by?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      health_metrics: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          target: number | null
+          timestamp: string | null
+          value: number
+          zone: Database["public"]["Enums"]["zone_name"]
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          target?: number | null
+          timestamp?: string | null
+          value: number
+          zone: Database["public"]["Enums"]["zone_name"]
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          target?: number | null
+          timestamp?: string | null
+          value?: number
+          zone?: Database["public"]["Enums"]["zone_name"]
+        }
+        Relationships: []
+      }
+      kpis: {
+        Row: {
+          bundle_id: string | null
+          created_at: string | null
+          current_value: number
+          id: string
+          name: string
+          target_value: number
+          unit: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          bundle_id?: string | null
+          created_at?: string | null
+          current_value?: number
+          id?: string
+          name: string
+          target_value: number
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          bundle_id?: string | null
+          created_at?: string | null
+          current_value?: number
+          id?: string
+          name?: string
+          target_value?: number
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpis_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          archived_at: string | null
+          content: string
+          created_at: string | null
+          created_by: string
+          id: string
+          source_bundle_id: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          content: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          source_bundle_id?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          source_bundle_id?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_source_bundle_id_fkey"
+            columns: ["source_bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -51,6 +474,42 @@ export type Database = {
         }
         Relationships: []
       }
+      scenarios: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          id: string
+          is_baseline: boolean | null
+          name: string
+          parameters: Json | null
+          results: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          id?: string
+          is_baseline?: boolean | null
+          name: string
+          parameters?: Json | null
+          results?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_baseline?: boolean | null
+          name?: string
+          parameters?: Json | null
+          results?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -66,7 +525,13 @@ export type Database = {
       }
     }
     Enums: {
+      approval_status: "pending" | "approved" | "rejected" | "revisionRequested"
+      approval_type: "strategy" | "bundle" | "redesign" | "externalDirective"
+      bundle_status: "draft" | "active" | "pilot" | "completed"
+      claim_status: "open" | "assigned" | "closed"
+      severity_level: "low" | "medium" | "high"
       user_role: "director_general"
+      zone_name: "THINK" | "ACT" | "LEARN" | "INNOVATE" | "MONITOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -182,7 +647,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      approval_status: ["pending", "approved", "rejected", "revisionRequested"],
+      approval_type: ["strategy", "bundle", "redesign", "externalDirective"],
+      bundle_status: ["draft", "active", "pilot", "completed"],
+      claim_status: ["open", "assigned", "closed"],
+      severity_level: ["low", "medium", "high"],
       user_role: ["director_general"],
+      zone_name: ["THINK", "ACT", "LEARN", "INNOVATE", "MONITOR"],
     },
   },
 } as const
