@@ -64,16 +64,24 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   };
 
   const handleCreateBundle = () => {
+    console.log('Create bundle clicked');
     setEditingBundle(null);
     setIsModalOpen(true);
   };
 
   const handleEditBundle = (bundle: Bundle) => {
+    console.log('Edit bundle clicked:', bundle.id);
     setEditingBundle(bundle);
     setIsModalOpen(true);
   };
 
+  const handleBundleClick = (bundle: Bundle) => {
+    console.log('Bundle selected:', bundle.id, bundle.name);
+    onBundleSelect(bundle);
+  };
+
   const handleSaveBundle = (bundleData: BundleFormData) => {
+    console.log('Saving bundle:', bundleData);
     if (editingBundle) {
       updateBundle.mutateAsync({
         bundleId: editingBundle.id,
@@ -87,8 +95,18 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           pillars: bundleData.pillars || [],
           geography: bundleData.geography || []
         }
+      }).then(() => {
+        toast({
+          title: "Bundle Updated",
+          description: "Bundle has been successfully updated.",
+        });
       }).catch(error => {
         console.error('Error updating bundle:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update bundle.",
+          variant: "destructive",
+        });
       });
     } else {
       createBundle.mutateAsync({
@@ -117,16 +135,36 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           isApproved: newBundle.is_approved || false
         };
         onBundleSelect(uiBundle);
+        toast({
+          title: "Bundle Created",
+          description: "Bundle has been successfully created.",
+        });
       }).catch(error => {
         console.error('Error creating bundle:', error);
+        toast({
+          title: "Error",
+          description: "Failed to create bundle.",
+          variant: "destructive",
+        });
       });
     }
     setIsModalOpen(false);
   };
 
   const handleApproveBundle = (bundleId: string) => {
-    approveBundle.mutateAsync(bundleId).catch(error => {
+    console.log('Approve bundle clicked:', bundleId);
+    approveBundle.mutateAsync(bundleId).then(() => {
+      toast({
+        title: "Bundle Approved",
+        description: "Bundle has been approved and activated.",
+      });
+    }).catch(error => {
       console.error('Error approving bundle:', error);
+      toast({
+        title: "Error",
+        description: "Failed to approve bundle.",
+        variant: "destructive",
+      });
     });
   };
 
@@ -144,7 +182,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
 
   return (
     <>
-      <div className={`w-80 glass-morphism border-r border-white/10 flex flex-col h-full ${isRTL ? 'border-l border-r-0' : ''}`}>
+      <div className="flex flex-col h-full">
         {/* Header */}
         <div className="p-4 border-b border-white/10 space-y-4 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -218,10 +256,10 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                           ? 'border-teal-500/50 bg-teal-500/10'
                           : 'border-white/20 hover:border-white/30 hover:bg-white/5'
                       }`}
-                      onClick={() => onBundleSelect(bundle)}
+                      onClick={() => handleBundleClick(bundle)}
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-white text-sm line-clamp-1 flex-1 pr-2">
+                        <h3 className="font-semibold text-white text-sm flex-1 pr-2 break-words">
                           {bundle.name}
                         </h3>
                         <Button
@@ -237,7 +275,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                         </Button>
                       </div>
 
-                      <p className="text-xs text-gray-400 mb-3 line-clamp-2">
+                      <p className="text-xs text-gray-400 mb-3 break-words">
                         {bundle.summary || t('noSummary')}
                       </p>
 

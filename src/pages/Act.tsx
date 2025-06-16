@@ -39,8 +39,11 @@ const Act: React.FC = () => {
 
   // Handle command bar actions
   const handleCommandAction = (action: DetailView) => {
-    // If no bundle is selected, don't proceed
+    console.log('Command action triggered:', action, 'Selected bundle:', selectedBundle?.id);
+    
+    // If no bundle is selected, don't proceed with bundle-specific actions
     if (!selectedBundle && action !== 'default') {
+      console.log('No bundle selected, showing toast');
       toast({
         title: t('noSelectedBundle', { defaultValue: 'No Bundle Selected' }),
         description: t('pleaseSelectBundle', { defaultValue: 'Please select a bundle before performing this action.' }),
@@ -65,6 +68,7 @@ const Act: React.FC = () => {
 
   // Handle bundle selection - fix parameter type
   const handleBundleSelect = (bundle: Bundle | null) => {
+    console.log('Bundle selected:', bundle?.id, bundle?.name);
     setSelectedBundle(bundle);
     setDetailView('default'); // Reset the view to default to show the bundle view
   };
@@ -213,14 +217,14 @@ const Act: React.FC = () => {
               transition={{ delay: 0.3, duration: 0.6 }}
             >
               <div 
-                className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
+                className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative h-[600px]"
                 style={{
                   background: 'rgba(20, 30, 50, 0.6)',
                   boxShadow: 'inset 0 0 30px rgba(59, 130, 246, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
                 }}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-purple-500/5 rounded-2xl"></div>
-                <div className="relative">
+                <div className="relative h-full">
                   <BundlesRail 
                     selectedBundle={selectedBundle} 
                     onBundleSelect={handleBundleSelect}
@@ -237,14 +241,14 @@ const Act: React.FC = () => {
               transition={{ delay: 0.4, duration: 0.6 }}
             >
               <div 
-                className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative"
+                className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative h-[600px]"
                 style={{
                   background: 'rgba(20, 30, 50, 0.6)',
                   boxShadow: 'inset 0 0 30px rgba(59, 130, 246, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
                 }}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/5 rounded-2xl"></div>
-                <div className="relative">
+                <div className="relative h-full">
                   <DetailCanvas 
                     view={detailView} 
                     selectedBundle={selectedBundle ? selectedBundle.id : null}

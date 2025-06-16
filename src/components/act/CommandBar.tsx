@@ -16,6 +16,8 @@ const CommandBar: React.FC<CommandBarProps> = ({ onAction }) => {
   const [ripple, setRipple] = useState<{ x: number; y: number; id: string } | null>(null);
   
   const handleButtonClick = (action: DetailView, e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log('Command bar action clicked:', action);
+    
     // Create ripple effect
     const button = e.currentTarget;
     const rect = button.getBoundingClientRect();

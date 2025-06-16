@@ -19,8 +19,12 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
   const { t, isRTL } = useTranslation();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   
+  console.log('DetailCanvas - selectedBundle:', selectedBundle, 'view:', view);
+  
   // Fetch bundle data if selectedBundle exists
-  const { data: bundleData, isLoading: bundleLoading } = useBundle(selectedBundle || '');
+  const { data: bundleData, isLoading: bundleLoading, error: bundleError } = useBundle(selectedBundle || '');
+  
+  console.log('DetailCanvas - bundleData:', bundleData, 'loading:', bundleLoading, 'error:', bundleError);
   
   // Steps for assign leverage flow
   const steps = [
@@ -32,12 +36,14 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
   
   // Handle closing the bundle view
   const handleCloseBundleView = () => {
+    console.log('Close bundle view called');
     // Note: This would typically clear the selected bundle in the parent component
     // For now, we'll handle it in the view logic below
   };
 
   // If a bundle is selected and the view is 'default', show the bundle view
   if (selectedBundle && view === 'default') {
+    console.log('Rendering bundle view for:', selectedBundle);
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
@@ -56,6 +62,9 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
             <div className="text-center">
               <Info className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>Bundle not found</p>
+              {bundleError && (
+                <p className="text-xs mt-2 text-red-400">Error: {bundleError.message}</p>
+              )}
             </div>
           </div>
         )}
@@ -67,6 +76,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
   const getContent = () => {
     switch (view) {
       case 'assign-leverage':
+        console.log('Rendering assign-leverage view');
         return (
           <div className="h-full flex flex-col p-6">
             {/* Show bundle context if available */}
@@ -77,6 +87,10 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                 {bundleData.summary && (
                   <p className="text-gray-300 text-sm mt-1">{bundleData.summary}</p>
                 )}
+                <div className="mt-2 flex items-center space-x-4 text-sm text-gray-400">
+                  <span>Status: {bundleData.status}</span>
+                  {bundleData.coherence && <span>Coherence: {bundleData.coherence}%</span>}
+                </div>
               </div>
             )}
 
@@ -86,7 +100,12 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                 <React.Fragment key={step.id}>
                   <motion.div 
                     className={`flex flex-col items-center ${index <= currentStepIndex ? 'cursor-pointer' : ''}`}
-                    onClick={() => index <= currentStepIndex && setCurrentStepIndex(index)}
+                    onClick={() => {
+                      if (index <= currentStepIndex) {
+                        console.log('Step clicked:', index);
+                        setCurrentStepIndex(index);
+                      }
+                    }}
                     whileHover={index <= currentStepIndex ? { scale: 1.05 } : {}}
                     whileTap={index <= currentStepIndex ? { scale: 0.95 } : {}}
                   >
@@ -192,7 +211,10 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
               <Button
                 variant="outline"
                 className="backdrop-blur-sm bg-white/5 border-white/20 hover:bg-white/10 transition-all duration-300 font-noto-medium"
-                onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
+                onClick={() => {
+                  console.log('Previous step clicked');
+                  setCurrentStepIndex(Math.max(0, currentStepIndex - 1));
+                }}
                 disabled={currentStepIndex === 0}
               >
                 {t('previous')}
@@ -204,10 +226,12 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                 <Button
                   className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 transition-all duration-300 font-noto-medium shadow-lg shadow-teal-500/25"
                   onClick={() => {
+                    console.log('Next/Complete step clicked');
                     if (currentStepIndex < steps.length - 1) {
                       setCurrentStepIndex(currentStepIndex + 1);
                     } else {
                       // Handle completion
+                      console.log('Flow completed');
                     }
                   }}
                 >
@@ -222,6 +246,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
         );
         
       case 're-optimize':
+        console.log('Rendering re-optimize view');
         return (
           <div className="h-full p-6">
             {/* Show bundle context if available */}
@@ -270,6 +295,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                       max={100}
                       step={1}
                       className="transition-all duration-300"
+                      onValueChange={(value) => console.log(`${band} slider changed:`, value)}
                     />
                   </div>
                 </motion.div>
@@ -321,6 +347,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                   <Button 
                     size="lg" 
                     className="px-12 py-3 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 font-noto-bold text-lg shadow-lg shadow-teal-500/25 transition-all duration-300"
+                    onClick={() => console.log('Compute optimization clicked')}
                   >
                     {t('compute')}
                   </Button>
@@ -331,6 +358,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
         );
         
       case 'launch-delivery':
+        console.log('Rendering launch-delivery view');
         return (
           <div className="h-full flex flex-col items-center justify-center text-center py-12 p-6">
             {/* Show bundle context if available */}
@@ -387,6 +415,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
         );
         
       default:
+        console.log('Rendering default view');
         return (
           <div className="h-full flex flex-col items-center justify-center text-center py-12 p-6">
             <motion.div
