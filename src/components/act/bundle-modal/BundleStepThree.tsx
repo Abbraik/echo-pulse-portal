@@ -36,7 +36,7 @@ const BundleStepThree: React.FC<BundleStepThreeProps> = ({ formData }) => {
             <div className="space-y-3">
               <h4 className="text-sm text-gray-400 uppercase tracking-wider">{t('objectives')}</h4>
               <ul className="space-y-2">
-                {formData.objectives.map((objective, index) => (
+                {formData.objectives?.map((objective, index) => (
                   objective.trim() ? (
                     <li key={index} className="flex items-center gap-2">
                       <div className="bg-teal-500/20 text-teal-400 h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0">
@@ -55,7 +55,7 @@ const BundleStepThree: React.FC<BundleStepThreeProps> = ({ formData }) => {
               <div className="space-y-2">
                 <h4 className="text-sm text-gray-400 uppercase tracking-wider">{t('pillars')}</h4>
                 <div className="flex flex-wrap gap-1">
-                  {formData.pillars.map(pillar => (
+                  {formData.pillars?.map(pillar => (
                     <div 
                       key={pillar} 
                       className={`
@@ -78,15 +78,15 @@ const BundleStepThree: React.FC<BundleStepThreeProps> = ({ formData }) => {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-gray-400" />
                   <span className="text-sm">
-                    {formData.geography.includes('All Emirates') ? 
+                    {formData.geography?.includes('All Emirates') ? 
                       t('allEmirates') : 
-                      formData.geography.join(', ')}
+                      formData.geography?.join(', ')}
                   </span>
                 </div>
               </div>
               
               {/* Tags */}
-              {formData.tags.length > 0 && (
+              {formData.tags && formData.tags.length > 0 && (
                 <div className="space-y-2">
                   <h4 className="text-sm text-gray-400 uppercase tracking-wider">{t('tags')}</h4>
                   <div className="flex flex-wrap gap-1">
@@ -95,7 +95,7 @@ const BundleStepThree: React.FC<BundleStepThreeProps> = ({ formData }) => {
                         key={index}
                         className="px-2.5 py-1 rounded-full text-xs bg-white/10"
                       >
-                        {tag}
+                        {typeof tag === 'string' ? tag : tag.name}
                       </div>
                     ))}
                   </div>
