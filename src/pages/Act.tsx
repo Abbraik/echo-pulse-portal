@@ -10,12 +10,10 @@ import { Button } from '@/components/ui/button';
 import { ArrowUpCircle, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
+import { Bundle } from '@/components/act/types/act-types';
 
 // View states for the main detail canvas
 export type DetailView = 'assign-leverage' | 're-optimize' | 'launch-delivery' | 'default';
-
-// Define the type for Bundle
-type Bundle = string;
 
 const Act: React.FC = () => {
   const { t, isRTL } = useTranslation();
@@ -23,7 +21,7 @@ const Act: React.FC = () => {
   
   // Track the active detail view based on command bar actions
   const [detailView, setDetailView] = useState<DetailView>('default');
-  // Track the currently selected bundle - fix type to be Bundle | null instead of string
+  // Track the currently selected bundle - fix type to be Bundle | null
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   // Track if the playbooks library is expanded
   const [playbooksExpanded, setPlaybooksExpanded] = useState<boolean>(false);

@@ -1,3 +1,4 @@
+
 // Updated ACT types to match Phase 2 database structure
 import { Bundle as DatabaseBundle, BundleStatus, KPI } from '@/types/database';
 
@@ -30,15 +31,21 @@ export interface Bundle extends Omit<DatabaseBundle, 'createdBy' | 'createdAt' |
   coherence: number; // Already matches database
 }
 
-// Bundle form data for creating/editing bundles
+// Bundle form data for creating/editing bundles - Updated to match BundleModal
 export interface BundleFormData {
+  id?: string;
   name: string;
   summary: string;
-  status: BundleStatus;
+  status?: BundleStatus; // Made optional to match BundleModal
   tags?: { name: string; type: string }[];
   objectives?: string[];
   pillars?: ('population' | 'resource' | 'services' | 'social')[];
   geography?: string[];
+  owner?: string;
+  lastModified?: string;
+  isApproved?: boolean;
+  coherence?: number;
+  ndiImpact?: number;
 }
 
 // Custom types for Bundle creation form

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Filter, Search, MoreVertical, Archive, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
@@ -9,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useBundles, useBundleActions } from '@/hooks/useBundles';
 import { useToast } from '@/hooks/use-toast';
 import BundleModal from './BundleModal';
-import type { Bundle, BundleFormData, mapDatabaseBundleToUI } from './types/act-types';
+import type { Bundle, BundleFormData } from './types/act-types';
 
 interface BundlesRailProps {
   selectedBundle?: Bundle | null;
@@ -74,34 +75,35 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
     setIsModalOpen(true);
   };
 
-  const handleSaveBundle = async (bundleData: BundleFormData) => {
-    try {
-      if (editingBundle) {
-        await updateBundle.mutateAsync({
-          bundleId: editingBundle.id,
-          updates: {
-            name: bundleData.name,
-            summary: bundleData.summary,
-            status: bundleData.status,
-            leveragePoints: bundleData.tags?.map(tag => ({ name: tag.name, type: tag.type })) || [],
-            tags: bundleData.tags?.map(tag => tag.name) || [],
-            objectives: bundleData.objectives || [],
-            pillars: bundleData.pillars || [],
-            geography: bundleData.geography || []
-          }
-        });
-      } else {
-        const newRawBundle = await createBundle.mutateAsync({
+  const handleSaveBundle = (bundleData: BundleFormData) => {
+    // Make this function synchronous and handle async operations inside
+    if (editingBundle) {
+      updateBundle.mutateAsync({
+        bundleId: editingBundle.id,
+        updates: {
           name: bundleData.name,
           summary: bundleData.summary,
-          status: bundleData.status || 'draft',
+          status: bundleData.status || editingBundle.status,
           leveragePoints: bundleData.tags?.map(tag => ({ name: tag.name, type: tag.type })) || [],
           tags: bundleData.tags?.map(tag => tag.name) || [],
           objectives: bundleData.objectives || [],
           pillars: bundleData.pillars || [],
           geography: bundleData.geography || []
-        });
-        
+        }
+      }).catch(error => {
+        console.error('Error updating bundle:', error);
+      });
+    } else {
+      createBundle.mutateAsync({
+        name: bundleData.name,
+        summary: bundleData.summary,
+        status: bundleData.status || 'draft',
+        leveragePoints: bundleData.tags?.map(tag => ({ name: tag.name, type: tag.type })) || [],
+        tags: bundleData.tags?.map(tag => tag.name) || [],
+        objectives: bundleData.objectives || [],
+        pillars: bundleData.pillars || [],
+        geography: bundleData.geography || []
+      }).then(newRawBundle => {
         // Convert to UI bundle and select it
         const newBundle = {
           ...newRawBundle,
@@ -109,19 +111,17 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           lastModified: newRawBundle.updatedAt.toISOString()
         };
         onBundleSelect(newBundle);
-      }
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error('Error saving bundle:', error);
+      }).catch(error => {
+        console.error('Error creating bundle:', error);
+      });
     }
+    setIsModalOpen(false);
   };
 
-  const handleApproveBundle = async (bundleId: string) => {
-    try {
-      await approveBundle.mutateAsync(bundleId);
-    } catch (error) {
+  const handleApproveBundle = (bundleId: string) => {
+    approveBundle.mutateAsync(bundleId).catch(error => {
       console.error('Error approving bundle:', error);
-    }
+    });
   };
 
   if (error) {
