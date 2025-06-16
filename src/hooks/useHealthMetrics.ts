@@ -19,7 +19,17 @@ export const useHealthMetrics = (zone?: ZoneName) => {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as HealthMetric[];
+      
+      // Map database fields to TypeScript interface
+      return data?.map(row => ({
+        id: row.id,
+        name: row.name,
+        zone: row.zone,
+        value: row.value,
+        target: row.target,
+        timestamp: new Date(row.timestamp),
+        createdAt: new Date(row.created_at)
+      })) as HealthMetric[];
     },
   });
 };
@@ -38,10 +48,18 @@ export const useLatestHealthMetrics = () => {
       
       // Group by name and zone to get latest values
       const latest = new Map();
-      data?.forEach((metric: HealthMetric) => {
-        const key = `${metric.name}-${metric.zone}`;
+      data?.forEach((row) => {
+        const key = `${row.name}-${row.zone}`;
         if (!latest.has(key)) {
-          latest.set(key, metric);
+          latest.set(key, {
+            id: row.id,
+            name: row.name,
+            zone: row.zone,
+            value: row.value,
+            target: row.target,
+            timestamp: new Date(row.timestamp),
+            createdAt: new Date(row.created_at)
+          });
         }
       });
       
@@ -66,7 +84,16 @@ export const useHealthMetricHistory = (metricId: string, range: string = '30d') 
         .order('timestamp', { ascending: true });
       
       if (error) throw error;
-      return data as HealthMetric[];
+      
+      return data?.map(row => ({
+        id: row.id,
+        name: row.name,
+        zone: row.zone,
+        value: row.value,
+        target: row.target,
+        timestamp: new Date(row.timestamp),
+        createdAt: new Date(row.created_at)
+      })) as HealthMetric[];
     },
   });
 };

@@ -21,7 +21,25 @@ export const useBundles = (status?: BundleStatus) => {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as Bundle[];
+      
+      // Map database fields to TypeScript interface
+      return data?.map(row => ({
+        id: row.id,
+        name: row.name,
+        summary: row.summary,
+        status: row.status,
+        createdBy: row.created_by,
+        leveragePoints: row.leverage_points || [],
+        tags: row.tags || [],
+        objectives: row.objectives || [],
+        pillars: row.pillars || [],
+        geography: row.geography || [],
+        coherence: row.coherence || 50,
+        ndiImpact: row.ndi_impact || 0,
+        isApproved: row.is_approved || false,
+        createdAt: new Date(row.created_at),
+        updatedAt: new Date(row.updated_at)
+      })) as Bundle[];
     },
   });
 };
@@ -37,7 +55,25 @@ export const useBundle = (bundleId: string) => {
         .single();
       
       if (error) throw error;
-      return data as Bundle;
+      
+      // Map database fields to TypeScript interface
+      return {
+        id: data.id,
+        name: data.name,
+        summary: data.summary,
+        status: data.status,
+        createdBy: data.created_by,
+        leveragePoints: data.leverage_points || [],
+        tags: data.tags || [],
+        objectives: data.objectives || [],
+        pillars: data.pillars || [],
+        geography: data.geography || [],
+        coherence: data.coherence || 50,
+        ndiImpact: data.ndi_impact || 0,
+        isApproved: data.is_approved || false,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at)
+      } as Bundle;
     },
     enabled: !!bundleId,
   });
@@ -55,14 +91,39 @@ export const useBundleActions = () => {
       const { data, error } = await supabase
         .from('bundles')
         .insert({
-          ...bundleData,
+          name: bundleData.name!,
+          summary: bundleData.summary,
+          status: bundleData.status || 'draft',
           created_by: user.id,
+          leverage_points: bundleData.leveragePoints || [],
+          tags: bundleData.tags || [],
+          objectives: bundleData.objectives || [],
+          pillars: bundleData.pillars || [],
+          geography: bundleData.geography || [],
         })
         .select()
         .single();
       
       if (error) throw error;
-      return data as Bundle;
+      
+      // Map database fields to TypeScript interface
+      return {
+        id: data.id,
+        name: data.name,
+        summary: data.summary,
+        status: data.status,
+        createdBy: data.created_by,
+        leveragePoints: data.leverage_points || [],
+        tags: data.tags || [],
+        objectives: data.objectives || [],
+        pillars: data.pillars || [],
+        geography: data.geography || [],
+        coherence: data.coherence || 50,
+        ndiImpact: data.ndi_impact || 0,
+        isApproved: data.is_approved || false,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at)
+      } as Bundle;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bundles'] });
@@ -82,7 +143,14 @@ export const useBundleActions = () => {
       const { error } = await supabase
         .from('bundles')
         .update({
-          ...updates,
+          name: updates.name,
+          summary: updates.summary,
+          status: updates.status,
+          leverage_points: updates.leveragePoints,
+          tags: updates.tags,
+          objectives: updates.objectives,
+          pillars: updates.pillars,
+          geography: updates.geography,
           updated_at: new Date().toISOString()
         })
         .eq('id', bundleId);

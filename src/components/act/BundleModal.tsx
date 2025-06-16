@@ -22,7 +22,7 @@ export interface BundleFormData {
   objectives: string[];
   pillars: ('population' | 'resource' | 'services' | 'social')[];
   geography: string[];
-  status?: 'draft' | 'pending' | 'active';
+  status?: 'draft' | 'active' | 'pilot' | 'completed';
   owner?: string;
   lastModified?: string;
   isApproved?: boolean;
@@ -185,11 +185,12 @@ const BundleModal: React.FC<BundleModalProps> = ({
   };
 
   // Helper function to translate bundle status
-  const translateStatus = (status: 'draft' | 'pending' | 'active'): string => {
+  const translateStatus = (status: 'draft' | 'active' | 'pilot' | 'completed'): string => {
     switch(status) {
       case 'draft': return t('draft');
-      case 'pending': return t('pendingApproval');
       case 'active': return t('active');
+      case 'pilot': return t('pilot');
+      case 'completed': return t('completed');
       default: return status;
     }
   }

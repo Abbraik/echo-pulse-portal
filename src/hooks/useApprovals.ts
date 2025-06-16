@@ -24,7 +24,21 @@ export const useApprovals = (userId?: string, status?: ApprovalStatus) => {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as Approval[];
+      
+      // Map database fields to TypeScript interface
+      return data?.map(row => ({
+        id: row.id,
+        type: row.type,
+        title: row.title,
+        createdBy: row.created_by,
+        assignedTo: row.assigned_to,
+        createdAt: new Date(row.created_at),
+        dueAt: row.due_at ? new Date(row.due_at) : undefined,
+        status: row.status,
+        contextSnapshot: row.context_snapshot || {},
+        revisionNotes: row.revision_notes,
+        updatedAt: new Date(row.updated_at)
+      })) as Approval[];
     },
   });
 };

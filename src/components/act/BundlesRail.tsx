@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Check, Pencil, Plus, Search, Filter, ArrowRight, Tag, Clock, User } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
@@ -17,10 +16,14 @@ interface Bundle {
   coherence: number;
   ndiImpact: number;
   isApproved: boolean;
-  status: 'draft' | 'pending' | 'active';
+  status: 'draft' | 'active' | 'pilot' | 'completed';
   owner: string;
   lastModified: string;
   tags: BundleTag[];
+  leveragePoints: any[];
+  objectives: string[];
+  pillars: string[];
+  geography: string[];
 }
 
 interface BundlesRailProps {
@@ -53,7 +56,11 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
       status: 'draft',
       owner: "Water Management Team",
       lastModified: "2h ago",
-      tags: ["Water", "Incentive", "Short-Term"] as BundleTag[]
+      tags: ["Water", "Incentive", "Short-Term"] as BundleTag[],
+      leveragePoints: [],
+      objectives: ["Improve water conservation", "Optimize irrigation systems"],
+      pillars: ["resource", "services"],
+      geography: ["Dubai", "Abu Dhabi"]
     },
     { 
       id: 'b2', 
@@ -65,7 +72,11 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
       status: 'active',
       owner: "Education Directorate",
       lastModified: "1d ago",
-      tags: ["Education", "Social", "Long-Term"] as BundleTag[]
+      tags: ["Education", "Social", "Long-Term"] as BundleTag[],
+      leveragePoints: [],
+      objectives: ["Enhance curriculum", "Develop future skills"],
+      pillars: ["population", "social"],
+      geography: ["All Emirates"]
     },
     { 
       id: 'b3', 
@@ -74,10 +85,14 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
       coherence: 72, 
       ndiImpact: 2.8,
       isApproved: false,
-      status: 'pending',
+      status: 'pilot',
       owner: "Health Authority",
       lastModified: "4h ago",
-      tags: ["Health", "Social", "Infrastructure"] as BundleTag[]
+      tags: ["Health", "Social", "Infrastructure"] as BundleTag[],
+      leveragePoints: [],
+      objectives: ["Expand facilities", "Improve access"],
+      pillars: ["services", "social"],
+      geography: ["Northern Emirates"]
     },
     { 
       id: 'b4', 
@@ -89,7 +104,11 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
       status: 'draft',
       owner: "Digital Agency",
       lastModified: "3d ago",
-      tags: ["Digital", "Governance", "Innovation"] as BundleTag[]
+      tags: ["Digital", "Governance", "Innovation"] as BundleTag[],
+      leveragePoints: [],
+      objectives: ["Digitize services", "Improve efficiency"],
+      pillars: ["services", "governance"],
+      geography: ["All Emirates"]
     },
   ]);
   
@@ -124,6 +143,8 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
     switch (status) {
       case 'active': return 'bg-green-500/20 text-green-500 border-green-500/30';
       case 'pending': return 'bg-amber-500/20 text-amber-500 border-amber-500/30';
+      case 'pilot': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
+      case 'completed': return 'bg-purple-500/20 text-purple-500 border-purple-500/30';
       default: return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
     }
   };
@@ -131,7 +152,8 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   const getStatusText = (status: string) => {
     switch (status) {
       case 'active': return t('active');
-      case 'pending': return t('pendingApproval');
+      case 'pilot': return t('pilot');
+      case 'completed': return t('completed');
       default: return t('draft');
     }
   };
@@ -182,6 +204,10 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
       owner: "Current User", // In a real app, this would be the current user
       lastModified: "Just now",
       tags: bundleData.tags,
+      leveragePoints: [],
+      objectives: [],
+      pillars: [],
+      geography: [],
     };
     
     setBundles([newBundle, ...bundles]);
@@ -197,7 +223,11 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
             name: bundleData.name, 
             summary: bundleData.summary, 
             tags: bundleData.tags,
-            lastModified: "Just now", 
+            lastModified: "Just now",
+            leveragePoints: [],
+            objectives: [],
+            pillars: [],
+            geography: [],
           }
         : bundle
     );
@@ -268,16 +298,6 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
             {t('draft')}
           </button>
           <button 
-            onClick={() => setStatusFilter(statusFilter === 'pending' ? null : 'pending')} 
-            className={`px-3 py-1 rounded-full text-xs ${
-              statusFilter === 'pending' 
-              ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' 
-              : 'bg-white/5 hover:bg-white/10 border border-white/20'
-            }`}
-          >
-            {t('pendingApproval')}
-          </button>
-          <button 
             onClick={() => setStatusFilter(statusFilter === 'active' ? null : 'active')} 
             className={`px-3 py-1 rounded-full text-xs ${
               statusFilter === 'active' 
@@ -286,6 +306,26 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
             }`}
           >
             {t('active')}
+          </button>
+          <button 
+            onClick={() => setStatusFilter(statusFilter === 'pilot' ? null : 'pilot')} 
+            className={`px-3 py-1 rounded-full text-xs ${
+              statusFilter === 'pilot' 
+              ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' 
+              : 'bg-white/5 hover:bg-white/10 border border-white/20'
+            }`}
+          >
+            {t('pilot')}
+          </button>
+          <button 
+            onClick={() => setStatusFilter(statusFilter === 'completed' ? null : 'completed')} 
+            className={`px-3 py-1 rounded-full text-xs ${
+              statusFilter === 'completed' 
+              ? 'bg-purple-500/20 text-purple-500 border border-purple-500/30' 
+              : 'bg-white/5 hover:bg-white/10 border border-white/20'
+            }`}
+          >
+            {t('completed')}
           </button>
         </div>
       </div>

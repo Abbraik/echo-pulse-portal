@@ -15,7 +15,19 @@ export const useScenarios = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as Scenario[];
+      
+      // Map database fields to TypeScript interface
+      return data?.map(row => ({
+        id: row.id,
+        name: row.name,
+        description: row.description,
+        createdBy: row.created_by,
+        parameters: row.parameters || {},
+        results: row.results || {},
+        isBaseline: row.is_baseline || false,
+        createdAt: new Date(row.created_at),
+        updatedAt: new Date(row.updated_at)
+      })) as Scenario[];
     },
   });
 };
@@ -53,14 +65,30 @@ export const useScenarioActions = () => {
       const { data, error } = await supabase
         .from('scenarios')
         .insert({
-          ...scenarioData,
+          name: scenarioData.name!,
+          description: scenarioData.description,
           created_by: user.id,
+          parameters: scenarioData.parameters || {},
+          results: scenarioData.results || {},
+          is_baseline: scenarioData.isBaseline || false,
         })
         .select()
         .single();
       
       if (error) throw error;
-      return data as Scenario;
+      
+      // Map database fields to TypeScript interface
+      return {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        createdBy: data.created_by,
+        parameters: data.parameters || {},
+        results: data.results || {},
+        isBaseline: data.is_baseline || false,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at)
+      } as Scenario;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scenarios'] });
@@ -80,7 +108,11 @@ export const useScenarioActions = () => {
       const { error } = await supabase
         .from('scenarios')
         .update({
-          ...updates,
+          name: updates.name,
+          description: updates.description,
+          parameters: updates.parameters,
+          results: updates.results,
+          is_baseline: updates.isBaseline,
           updated_at: new Date().toISOString()
         })
         .eq('id', scenarioId);

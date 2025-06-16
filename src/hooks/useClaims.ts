@@ -25,7 +25,19 @@ export const useClaims = (zone?: ZoneName, status?: ClaimStatus) => {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as Claim[];
+      
+      // Map database fields to TypeScript interface
+      return data?.map(row => ({
+        id: row.id,
+        zone: row.zone,
+        taskId: row.task_id,
+        status: row.status,
+        claimedBy: row.claimed_by,
+        openedAt: new Date(row.opened_at),
+        closedAt: row.closed_at ? new Date(row.closed_at) : undefined,
+        metadata: row.metadata || {},
+        createdAt: new Date(row.created_at)
+      })) as Claim[];
     },
   });
 };
