@@ -7,11 +7,10 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { BundleTag } from '../types/act-types';
 
 interface TagSelectorProps {
-  selectedTags: BundleTag[];
-  onTagsChange: (tags: BundleTag[]) => void;
+  selectedTags: { name: string; type: string; }[];
+  onTagsChange: (tags: { name: string; type: string; }[]) => void;
 }
 
 const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagsChange }) => {
@@ -21,7 +20,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagsChange })
   const inputRef = useRef<HTMLInputElement>(null);
   
   // Some sample tags
-  const availableTags: BundleTag[] = [
+  const availableTags: string[] = [
     'Water',
     'Energy',
     'Climate',
@@ -42,28 +41,28 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagsChange })
   
   // Filter tags that aren't already selected
   const filteredTags = availableTags.filter(
-    (tag) => !selectedTags.includes(tag)
+    (tag) => !selectedTags.some(selectedTag => selectedTag.name === tag)
   );
   
-  const handleSelect = (tag: BundleTag) => {
-    if (!selectedTags.includes(tag)) {
-      onTagsChange([...selectedTags, tag]);
+  const handleSelect = (tagName: string) => {
+    if (!selectedTags.some(tag => tag.name === tagName)) {
+      onTagsChange([...selectedTags, { name: tagName, type: 'category' }]);
     }
     setInputValue('');
     setOpen(false);
   };
   
-  const handleRemove = (tag: BundleTag) => {
-    onTagsChange(selectedTags.filter((t) => t !== tag));
+  const handleRemove = (tagToRemove: { name: string; type: string; }) => {
+    onTagsChange(selectedTags.filter((tag) => tag.name !== tagToRemove.name));
   };
   
   const handleCreateTag = () => {
     if (
       inputValue && 
-      !selectedTags.includes(inputValue as BundleTag) && 
-      !availableTags.includes(inputValue as BundleTag)
+      !selectedTags.some(tag => tag.name === inputValue) && 
+      !availableTags.includes(inputValue)
     ) {
-      onTagsChange([...selectedTags, inputValue as BundleTag]);
+      onTagsChange([...selectedTags, { name: inputValue, type: 'custom' }]);
       setInputValue('');
       setOpen(false);
     }
@@ -72,13 +71,13 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagsChange })
   return (
     <div className="w-full">
       <div className="flex flex-wrap gap-2 mb-2">
-        {selectedTags.map((tag) => (
+        {selectedTags.map((tag, index) => (
           <Badge 
-            key={tag} 
+            key={`${tag.name}-${index}`} 
             variant="secondary"
             className="bg-white/10 hover:bg-white/20 text-sm h-6 px-2 gap-1"
           >
-            {tag}
+            {tag.name}
             <Button
               variant="ghost"
               size="sm"
@@ -145,12 +144,12 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagsChange })
                       <CommandItem 
                         key={tag}
                         value={tag}
-                        onSelect={() => handleSelect(tag as BundleTag)}
+                        onSelect={() => handleSelect(tag)}
                         className="cursor-pointer"
                       >
                         <Check 
                           className={`mr-2 h-4 w-4 ${
-                            selectedTags.includes(tag) ? 'opacity-100' : 'opacity-0'
+                            selectedTags.some(selectedTag => selectedTag.name === tag) ? 'opacity-100' : 'opacity-0'
                           }`}
                         />
                         {tag}

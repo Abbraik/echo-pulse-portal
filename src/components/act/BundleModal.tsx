@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info, ChevronLeft, ChevronRight, Trash2, Save } from 'lucide-react';
@@ -12,23 +13,7 @@ import { GlassCard } from '@/components/ui/glass-card';
 import BundleStepOne from './bundle-modal/BundleStepOne';
 import BundleStepTwo from './bundle-modal/BundleStepTwo';
 import BundleStepThree from './bundle-modal/BundleStepThree';
-import { BundleTag, Bundle } from './types/act-types';
-
-export interface BundleFormData {
-  id?: string;
-  name: string;
-  summary: string;
-  tags: BundleTag[];
-  objectives: string[];
-  pillars: ('population' | 'resource' | 'services' | 'social')[];
-  geography: string[];
-  status?: 'draft' | 'active' | 'pilot' | 'completed';
-  owner?: string;
-  lastModified?: string;
-  isApproved?: boolean;
-  coherence?: number;
-  ndiImpact?: number;
-}
+import { BundleTag, Bundle, BundleFormData } from './types/act-types';
 
 interface BundleModalProps {
   open: boolean;
@@ -65,7 +50,7 @@ const BundleModal: React.FC<BundleModalProps> = ({
         id: initialBundle.id,
         name: initialBundle.name,
         summary: initialBundle.summary || '',
-        tags: initialBundle.tags || [],
+        tags: initialBundle.tags?.map(tag => ({ name: tag, type: 'category' })) || [],
         objectives: ['Improve water conservation', 'Optimize irrigation systems'], // Sample objectives
         pillars: ['resource', 'services'], // Sample pillars
         geography: ['Dubai', 'Abu Dhabi'], // Sample geography

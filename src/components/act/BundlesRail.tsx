@@ -76,7 +76,6 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   };
 
   const handleSaveBundle = (bundleData: BundleFormData) => {
-    // Make this function synchronous and handle async operations inside
     if (editingBundle) {
       updateBundle.mutateAsync({
         bundleId: editingBundle.id,
