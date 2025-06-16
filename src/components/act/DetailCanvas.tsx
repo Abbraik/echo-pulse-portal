@@ -43,14 +43,21 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="p-6"
+        className="p-6 h-full"
       >
         {bundleLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
           </div>
-        ) : (
+        ) : bundleData ? (
           <BundleView bundleId={selectedBundle} onClose={handleCloseBundleView} />
+        ) : (
+          <div className="flex items-center justify-center h-64 text-gray-400">
+            <div className="text-center">
+              <Info className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>Bundle not found</p>
+            </div>
+          </div>
         )}
       </motion.div>
     );
@@ -419,7 +426,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
   };
   
   return (
-    <div className="min-h-[500px] relative overflow-hidden">
+    <div className="h-full relative overflow-hidden">
       {view !== 'default' && (
         <motion.div
           className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-gradient-to-br from-teal-500/10 to-blue-500/5 blur-3xl"

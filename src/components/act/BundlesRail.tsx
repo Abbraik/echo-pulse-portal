@@ -45,11 +45,11 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'draft': return <Clock className="h-4 w-4" />;
-      case 'active': return <CheckCircle className="h-4 w-4" />;
-      case 'pilot': return <AlertTriangle className="h-4 w-4" />;
-      case 'completed': return <Archive className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
+      case 'draft': return <Clock className="h-3 w-3" />;
+      case 'active': return <CheckCircle className="h-3 w-3" />;
+      case 'pilot': return <AlertTriangle className="h-3 w-3" />;
+      case 'completed': return <Archive className="h-3 w-3" />;
+      default: return <Clock className="h-3 w-3" />;
     }
   };
 
@@ -144,9 +144,9 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
 
   return (
     <>
-      <div className={`w-80 glass-morphism border-r border-white/10 flex flex-col ${isRTL ? 'border-l border-r-0' : ''}`}>
+      <div className={`w-80 glass-morphism border-r border-white/10 flex flex-col h-full ${isRTL ? 'border-l border-r-0' : ''}`}>
         {/* Header */}
-        <div className="p-4 border-b border-white/10 space-y-4">
+        <div className="p-4 border-b border-white/10 space-y-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white">{t('bundles')}</h2>
             <Button
@@ -171,14 +171,14 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           </div>
 
           {/* Status Filter */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1">
             {['all', 'draft', 'active', 'pilot', 'completed'].map((status) => (
               <Button
                 key={status}
                 variant={statusFilter === status ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setStatusFilter(status as any)}
-                className="text-xs"
+                className="text-xs px-2 py-1 h-auto"
               >
                 {t(status)}
               </Button>
@@ -187,112 +187,114 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
         </div>
 
         {/* Bundles List */}
-        <ScrollArea className="flex-1">
-          <div className="p-3 space-y-3">
-            {isLoading ? (
-              <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-24 bg-white/5 rounded-lg animate-pulse" />
-                ))}
-              </div>
-            ) : filteredBundles.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
-                <Archive className="h-8 w-8 mx-auto mb-2" />
-                <p>{searchTerm ? t('noBundlesFound') : t('noBundlesYet')}</p>
-                {!error && (
-                  <p className="text-xs mt-1">Create your first bundle to get started</p>
-                )}
-              </div>
-            ) : (
-              <AnimatePresence>
-                {filteredBundles.map((bundle) => (
-                  <motion.div
-                    key={bundle.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className={`p-3 rounded-lg glass-panel border cursor-pointer transition-all duration-200 ${
-                      selectedBundle?.id === bundle.id
-                        ? 'border-teal-500/50 bg-teal-500/10'
-                        : 'border-white/20 hover:border-white/30 hover:bg-white/5'
-                    }`}
-                    onClick={() => onBundleSelect(bundle)}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-white text-sm line-clamp-2 flex-1 pr-2">
-                        {bundle.name}
-                      </h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditBundle(bundle);
-                        }}
-                        className="h-6 w-6 p-0 hover:bg-white/10 flex-shrink-0"
-                      >
-                        <MoreVertical className="h-3 w-3" />
-                      </Button>
-                    </div>
-
-                    <p className="text-xs text-gray-400 mb-3 line-clamp-2">
-                      {bundle.summary || t('noSummary')}
-                    </p>
-
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="secondary" className={getStatusColor(bundle.status)}>
-                          <div className="flex items-center space-x-1">
-                            {getStatusIcon(bundle.status)}
-                            <span className="text-xs capitalize">{t(bundle.status)}</span>
-                          </div>
-                        </Badge>
-                        {bundle.coherence && (
-                          <span className="text-xs text-gray-400">
-                            {bundle.coherence}% coherent
-                          </span>
-                        )}
-                      </div>
-                      {bundle.status === 'draft' && (
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-3 space-y-3">
+              {isLoading ? (
+                <div className="space-y-3">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-24 bg-white/5 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : filteredBundles.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <Archive className="h-8 w-8 mx-auto mb-2" />
+                  <p>{searchTerm ? t('noBundlesFound') : t('noBundlesYet')}</p>
+                  {!error && (
+                    <p className="text-xs mt-1">Create your first bundle to get started</p>
+                  )}
+                </div>
+              ) : (
+                <AnimatePresence>
+                  {filteredBundles.map((bundle) => (
+                    <motion.div
+                      key={bundle.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className={`p-3 rounded-lg glass-panel border cursor-pointer transition-all duration-200 ${
+                        selectedBundle?.id === bundle.id
+                          ? 'border-teal-500/50 bg-teal-500/10'
+                          : 'border-white/20 hover:border-white/30 hover:bg-white/5'
+                      }`}
+                      onClick={() => onBundleSelect(bundle)}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-white text-sm line-clamp-1 flex-1 pr-2">
+                          {bundle.name}
+                        </h3>
                         <Button
-                          size="sm"
                           variant="ghost"
+                          size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleApproveBundle(bundle.id);
+                            handleEditBundle(bundle);
                           }}
-                          className="text-teal-400 hover:text-teal-300 text-xs px-2 py-1 h-auto flex-shrink-0"
+                          className="h-6 w-6 p-0 hover:bg-white/10 flex-shrink-0"
                         >
-                          Approve ▶
+                          <MoreVertical className="h-3 w-3" />
                         </Button>
-                      )}
-                    </div>
+                      </div>
 
-                    {bundle.tags && bundle.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {bundle.tags.slice(0, 2).map((tag, index) => (
-                          <Badge
-                            key={index}
-                            variant="outline"
-                            className="text-xs px-1 py-0 border-gray-600 text-gray-300"
+                      <p className="text-xs text-gray-400 mb-3 line-clamp-2">
+                        {bundle.summary || t('noSummary')}
+                      </p>
+
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="secondary" className={`${getStatusColor(bundle.status)} text-xs px-2 py-0`}>
+                            <div className="flex items-center space-x-1">
+                              {getStatusIcon(bundle.status)}
+                              <span className="capitalize">{t(bundle.status)}</span>
+                            </div>
+                          </Badge>
+                          {bundle.coherence && (
+                            <span className="text-xs text-gray-400">
+                              {bundle.coherence}%
+                            </span>
+                          )}
+                        </div>
+                        {bundle.status === 'draft' && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleApproveBundle(bundle.id);
+                            }}
+                            className="text-teal-400 hover:text-teal-300 text-xs px-2 py-1 h-auto flex-shrink-0"
                           >
-                            {tag}
-                          </Badge>
-                        ))}
-                        {bundle.tags.length > 2 && (
-                          <Badge variant="outline" className="text-xs px-1 py-0 border-gray-600 text-gray-300">
-                            +{bundle.tags.length - 2}
-                          </Badge>
+                            Approve
+                          </Button>
                         )}
                       </div>
-                    )}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            )}
-          </div>
-        </ScrollArea>
+
+                      {bundle.tags && bundle.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {bundle.tags.slice(0, 2).map((tag, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="text-xs px-1 py-0 border-gray-600 text-gray-300"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                          {bundle.tags.length > 2 && (
+                            <Badge variant="outline" className="text-xs px-1 py-0 border-gray-600 text-gray-300">
+                              +{bundle.tags.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
       </div>
 
       {/* Bundle Modal */}
