@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -243,7 +244,7 @@ const Act: React.FC = () => {
                 <div className="relative">
                   <DetailCanvas 
                     view={detailView} 
-                    selectedBundle={selectedBundle}
+                    selectedBundle={selectedBundle ? selectedBundle.id : null}
                   />
                 </div>
               </div>
