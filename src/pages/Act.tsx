@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { useTranslation } from '@/hooks/use-translation';

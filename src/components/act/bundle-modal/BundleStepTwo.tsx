@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/use-translation';
-import { BundleFormData } from '../BundleModal';
+import { BundleFormData } from '../types/act-types';
 import { motion, Reorder } from 'framer-motion';
 import { GlassCard } from '@/components/ui/glass-card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';

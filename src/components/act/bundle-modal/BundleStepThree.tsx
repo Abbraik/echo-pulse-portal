@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { useTranslation } from '@/hooks/use-translation';
-import { BundleFormData } from '../BundleModal';
+import { BundleFormData } from '../types/act-types';
 import { Check, MapPin, Tag, Users, Calendar, Diamond } from 'lucide-react';
 
 interface BundleStepThreeProps {
