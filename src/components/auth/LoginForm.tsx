@@ -10,9 +10,14 @@ import { useAuth } from '@/hooks/use-auth';
 interface LoginFormProps {
   onLoginSuccess: (email: string, requiresMfa: boolean) => void;
   onForgotPassword: () => void;
+  onSignUp: () => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onForgotPassword }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ 
+  onLoginSuccess, 
+  onForgotPassword,
+  onSignUp 
+}) => {
   const { t } = useTranslation();
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
@@ -131,6 +136,22 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onForgotPa
           </>
         )}
       </Button>
+
+      {/* Sign Up Section */}
+      <div className="text-center pt-4 border-t border-white/10">
+        <p className="text-sm text-white/60 mb-3">
+          {t('dontHaveAccount', { defaultValue: "Don't have an account?" })}
+        </p>
+        <Button
+          type="button"
+          onClick={onSignUp}
+          variant="outline"
+          className="w-full bg-transparent border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all duration-200"
+          disabled={isLoading}
+        >
+          {t('createAccount', { defaultValue: 'Create Account' })}
+        </Button>
+      </div>
     </form>
   );
 };

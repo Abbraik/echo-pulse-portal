@@ -6,6 +6,7 @@ import ParticlesBackground from '@/components/ui/particles-background';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { MfaChallenge } from '@/components/auth/MfaChallenge';
 import { ForgotPasswordModal } from '@/components/auth/ForgotPasswordModal';
+import { SignUpModal } from '@/components/auth/SignUpModal';
 import LanguageToggle from '@/components/home/LanguageToggle';
 import ThemeToggle from '@/components/home/ThemeToggle';
 
@@ -13,6 +14,7 @@ const Login: React.FC = () => {
   const { t, isRTL } = useTranslation();
   const [currentStep, setCurrentStep] = useState<'login' | 'mfa' | 'forgot'>('login');
   const [userEmail, setUserEmail] = useState('');
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
 
   const handleLoginSuccess = (email: string, requiresMfa: boolean) => {
     setUserEmail(email);
@@ -32,6 +34,15 @@ const Login: React.FC = () => {
 
   const handleBackToLogin = () => {
     setCurrentStep('login');
+  };
+
+  const handleSignUp = () => {
+    setShowSignUpModal(true);
+  };
+
+  const handleSignUpSuccess = () => {
+    // Show success message or handle post-signup logic
+    console.log('Sign up successful!');
   };
 
   return (
@@ -103,6 +114,7 @@ const Login: React.FC = () => {
                     <LoginForm 
                       onLoginSuccess={handleLoginSuccess}
                       onForgotPassword={handleForgotPassword}
+                      onSignUp={handleSignUp}
                     />
                   </motion.div>
                 )}
@@ -159,6 +171,13 @@ const Login: React.FC = () => {
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Sign Up Modal */}
+      <SignUpModal
+        isOpen={showSignUpModal}
+        onClose={() => setShowSignUpModal(false)}
+        onSignUpSuccess={handleSignUpSuccess}
+      />
     </div>
   );
 };
