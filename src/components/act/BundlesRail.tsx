@@ -99,14 +99,14 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
         pillars: bundleData.pillars || [],
         geography: bundleData.geography || []
       }).then(newBundle => {
-        const uiBundle = {
+        const uiBundle: Bundle = {
           id: newBundle.id,
           name: newBundle.name,
           summary: newBundle.summary,
           status: newBundle.status,
           owner: newBundle.created_by,
-          lastModified: newBundle.updated_at?.toISOString ? newBundle.updated_at.toISOString() : new Date().toISOString(),
-          leveragePoints: newBundle.leverage_points || [],
+          lastModified: new Date(newBundle.updated_at).toISOString(),
+          leveragePoints: Array.isArray(newBundle.leverage_points) ? newBundle.leverage_points : [],
           tags: newBundle.tags || [],
           objectives: newBundle.objectives || [],
           pillars: newBundle.pillars || [],
