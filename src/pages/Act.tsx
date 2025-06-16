@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -269,7 +268,7 @@ const Act: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/5 rounded-2xl"></div>
               <div className="relative">
                 <DeliveryChains 
-                  highlightBundle={detailView === 'launch-delivery' ? selectedBundle : null}
+                  highlightBundle={detailView === 'launch-delivery' && selectedBundle ? selectedBundle.id : null}
                 />
               </div>
             </div>
