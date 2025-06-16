@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Filter, Search, MoreVertical, Archive, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
@@ -145,7 +146,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
     <>
       <div className={`w-80 glass-morphism border-r border-white/10 flex flex-col ${isRTL ? 'border-l border-r-0' : ''}`}>
         {/* Header */}
-        <div className="p-6 border-b border-white/10 space-y-4">
+        <div className="p-4 border-b border-white/10 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white">{t('bundles')}</h2>
             <Button
@@ -187,7 +188,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
 
         {/* Bundles List */}
         <ScrollArea className="flex-1">
-          <div className="p-4 space-y-3">
+          <div className="p-3 space-y-3">
             {isLoading ? (
               <div className="space-y-3">
                 {[...Array(5)].map((_, i) => (
@@ -211,7 +212,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className={`p-4 rounded-lg glass-panel border cursor-pointer transition-all duration-200 ${
+                    className={`p-3 rounded-lg glass-panel border cursor-pointer transition-all duration-200 ${
                       selectedBundle?.id === bundle.id
                         ? 'border-teal-500/50 bg-teal-500/10'
                         : 'border-white/20 hover:border-white/30 hover:bg-white/5'
@@ -219,7 +220,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                     onClick={() => onBundleSelect(bundle)}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-white text-sm line-clamp-2">
+                      <h3 className="font-semibold text-white text-sm line-clamp-2 flex-1 pr-2">
                         {bundle.name}
                       </h3>
                       <Button
@@ -229,7 +230,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                           e.stopPropagation();
                           handleEditBundle(bundle);
                         }}
-                        className="h-6 w-6 p-0 hover:bg-white/10"
+                        className="h-6 w-6 p-0 hover:bg-white/10 flex-shrink-0"
                       >
                         <MoreVertical className="h-3 w-3" />
                       </Button>
@@ -239,7 +240,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                       {bundle.summary || t('noSummary')}
                     </p>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-2">
                         <Badge variant="secondary" className={getStatusColor(bundle.status)}>
                           <div className="flex items-center space-x-1">
@@ -261,7 +262,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                             e.stopPropagation();
                             handleApproveBundle(bundle.id);
                           }}
-                          className="text-teal-400 hover:text-teal-300 text-xs px-2 py-1 h-auto"
+                          className="text-teal-400 hover:text-teal-300 text-xs px-2 py-1 h-auto flex-shrink-0"
                         >
                           Approve ▶
                         </Button>
@@ -269,8 +270,8 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                     </div>
 
                     {bundle.tags && bundle.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {bundle.tags.slice(0, 3).map((tag, index) => (
+                      <div className="flex flex-wrap gap-1">
+                        {bundle.tags.slice(0, 2).map((tag, index) => (
                           <Badge
                             key={index}
                             variant="outline"
@@ -279,9 +280,9 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                             {tag}
                           </Badge>
                         ))}
-                        {bundle.tags.length > 3 && (
+                        {bundle.tags.length > 2 && (
                           <Badge variant="outline" className="text-xs px-1 py-0 border-gray-600 text-gray-300">
-                            +{bundle.tags.length - 3}
+                            +{bundle.tags.length - 2}
                           </Badge>
                         )}
                       </div>

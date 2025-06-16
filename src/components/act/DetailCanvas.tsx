@@ -8,6 +8,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { DetailView } from '@/pages/Act';
 import { motion, AnimatePresence } from 'framer-motion';
 import BundleView from './BundleView';
+import { useBundle } from '@/hooks/useBundles';
 
 interface DetailCanvasProps {
   view: DetailView;
@@ -17,6 +18,9 @@ interface DetailCanvasProps {
 const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => {
   const { t, isRTL } = useTranslation();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  
+  // Fetch bundle data if selectedBundle exists
+  const { data: bundleData, isLoading: bundleLoading } = useBundle(selectedBundle || '');
   
   // Steps for assign leverage flow
   const steps = [
@@ -41,7 +45,13 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="p-6"
       >
-        <BundleView bundleId={selectedBundle} onClose={handleCloseBundleView} />
+        {bundleLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+          </div>
+        ) : (
+          <BundleView bundleId={selectedBundle} onClose={handleCloseBundleView} />
+        )}
       </motion.div>
     );
   }
@@ -52,6 +62,17 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
       case 'assign-leverage':
         return (
           <div className="h-full flex flex-col p-6">
+            {/* Show bundle context if available */}
+            {selectedBundle && bundleData && (
+              <div className="mb-6 p-4 rounded-xl backdrop-blur-sm bg-teal-500/10 border border-teal-500/20">
+                <h3 className="text-lg font-semibold text-teal-300 mb-2">Working with Bundle:</h3>
+                <p className="text-white font-medium">{bundleData.name}</p>
+                {bundleData.summary && (
+                  <p className="text-gray-300 text-sm mt-1">{bundleData.summary}</p>
+                )}
+              </div>
+            )}
+
             {/* Cinematic Stepper header */}
             <div className="flex justify-between mb-8 px-4">
               {steps.map((step, index) => (
@@ -138,7 +159,10 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                       {steps[currentStepIndex].title}
                     </h3>
                     <p className="text-gray-300 font-noto-regular mb-6 max-w-md">
-                      {t('stepContent', { defaultValue: `Complete the ${steps[currentStepIndex].title.toLowerCase()} phase of your strategy.` })}
+                      {bundleData ? 
+                        `Configure ${steps[currentStepIndex].title.toLowerCase()} for "${bundleData.name}"` :
+                        t('stepContent', { defaultValue: `Complete the ${steps[currentStepIndex].title.toLowerCase()} phase of your strategy.` })
+                      }
                     </p>
                     <div className="w-full max-w-sm bg-white/5 rounded-lg p-4 border border-white/10">
                       <div className="text-sm text-gray-400 mb-2">Progress</div>
@@ -193,6 +217,17 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
       case 're-optimize':
         return (
           <div className="h-full p-6">
+            {/* Show bundle context if available */}
+            {selectedBundle && bundleData && (
+              <div className="mb-6 p-4 rounded-xl backdrop-blur-sm bg-teal-500/10 border border-teal-500/20">
+                <h3 className="text-lg font-semibold text-teal-300 mb-2">Optimizing Bundle:</h3>
+                <p className="text-white font-medium">{bundleData.name}</p>
+                {bundleData.coherence && (
+                  <p className="text-gray-300 text-sm mt-1">Current coherence: {bundleData.coherence}%</p>
+                )}
+              </div>
+            )}
+
             <motion.h2 
               className="text-2xl font-noto-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-400"
               initial={{ opacity: 0, y: -10 }}
@@ -291,6 +326,14 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
       case 'launch-delivery':
         return (
           <div className="h-full flex flex-col items-center justify-center text-center py-12 p-6">
+            {/* Show bundle context if available */}
+            {selectedBundle && bundleData && (
+              <div className="mb-6 p-4 rounded-xl backdrop-blur-sm bg-teal-500/10 border border-teal-500/20">
+                <h3 className="text-lg font-semibold text-teal-300 mb-2">Launching Bundle:</h3>
+                <p className="text-white font-medium">{bundleData.name}</p>
+              </div>
+            )}
+
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -363,7 +406,10 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                   }
                 </h2>
                 <p className="text-gray-400 max-w-md mx-auto font-noto-regular">
-                  {t('detailInstructions')}
+                  {selectedBundle ? 
+                    'Choose an action from the command bar above to work with the selected bundle.' :
+                    t('detailInstructions')
+                  }
                 </p>
               </div>
             </motion.div>
