@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -15,14 +14,17 @@ import { motion } from 'framer-motion';
 // View states for the main detail canvas
 export type DetailView = 'assign-leverage' | 're-optimize' | 'launch-delivery' | 'default';
 
+// Define the type for Bundle
+type Bundle = string;
+
 const Act: React.FC = () => {
   const { t, isRTL } = useTranslation();
   const { toast } = useToast();
   
   // Track the active detail view based on command bar actions
   const [detailView, setDetailView] = useState<DetailView>('default');
-  // Track the currently selected bundle
-  const [selectedBundle, setSelectedBundle] = useState<string | null>(null);
+  // Track the currently selected bundle - fix type to be Bundle | null instead of string
+  const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   // Track if the playbooks library is expanded
   const [playbooksExpanded, setPlaybooksExpanded] = useState<boolean>(false);
   // Track if we need to scroll to the delivery chains
@@ -59,9 +61,9 @@ const Act: React.FC = () => {
     }
   };
 
-  // Handle bundle selection
-  const handleBundleSelect = (bundleId: string) => {
-    setSelectedBundle(bundleId);
+  // Handle bundle selection - fix parameter type
+  const handleBundleSelect = (bundle: Bundle | null) => {
+    setSelectedBundle(bundle);
     setDetailView('default'); // Reset the view to default to show the bundle view
   };
   
@@ -219,7 +221,7 @@ const Act: React.FC = () => {
                 <div className="relative">
                   <BundlesRail 
                     selectedBundle={selectedBundle} 
-                    onSelectBundle={handleBundleSelect}
+                    onBundleSelect={handleBundleSelect}
                   />
                 </div>
               </div>

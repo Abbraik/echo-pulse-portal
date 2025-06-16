@@ -30,6 +30,17 @@ export interface Bundle extends Omit<DatabaseBundle, 'createdBy' | 'createdAt' |
   coherence: number; // Already matches database
 }
 
+// Bundle form data for creating/editing bundles
+export interface BundleFormData {
+  name: string;
+  summary: string;
+  status: BundleStatus;
+  tags?: { name: string; type: string }[];
+  objectives?: string[];
+  pillars?: ('population' | 'resource' | 'services' | 'social')[];
+  geography?: string[];
+}
+
 // Custom types for Bundle creation form
 export type BundleFormFields = {
   name: string;
@@ -47,7 +58,7 @@ export type ActCommandAction = 'assign-leverage' | 're-optimize' | 'launch-deliv
 export const mapDatabaseBundleToUI = (dbBundle: DatabaseBundle): Bundle => ({
   ...dbBundle,
   owner: dbBundle.createdBy,
-  lastModified: dbBundle.updatedAt.toString(),
+  lastModified: dbBundle.updatedAt.toISOString(),
   tags: dbBundle.tags as BundleTag[],
 });
 

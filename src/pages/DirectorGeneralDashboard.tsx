@@ -45,6 +45,15 @@ const DirectorGeneralDashboard: React.FC = () => {
         status: openClaims?.some(c => c.zone === zone) ? 'attention' : 'good',
         claims: openClaims?.filter(c => c.zone === zone).length || 0
       }))
+    },
+    notes: {
+      recent: [
+        'System performance optimized',
+        'New policy framework implemented',
+        'Strategic alignment confirmed'
+      ],
+      priority: pendingApprovals?.filter(a => a.dueAt && new Date(a.dueAt) < new Date(Date.now() + 24 * 60 * 60 * 1000))
+        .map(a => a.title).slice(0, 3) || []
     }
   };
 

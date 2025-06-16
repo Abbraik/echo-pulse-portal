@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Filter, Search, MoreVertical, Archive, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
@@ -10,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useBundles, useBundleActions } from '@/hooks/useBundles';
 import { useToast } from '@/hooks/use-toast';
 import BundleModal from './BundleModal';
-import type { Bundle, BundleFormData } from './types/act-types';
+import type { Bundle, BundleFormData, mapDatabaseBundleToUI } from './types/act-types';
 
 interface BundlesRailProps {
   selectedBundle?: Bundle | null;
@@ -29,14 +28,21 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   const [editingBundle, setEditingBundle] = useState<Bundle | null>(null);
 
   // Use real data from our hooks
-  const { data: bundles, isLoading, error } = useBundles(statusFilter === 'all' ? undefined : statusFilter);
+  const { data: rawBundles, isLoading, error } = useBundles(statusFilter === 'all' ? undefined : statusFilter);
   const { createBundle, updateBundle, approveBundle } = useBundleActions();
 
-  const filteredBundles = bundles?.filter(bundle =>
+  // Convert database bundles to UI bundles
+  const bundles = rawBundles?.map(bundle => ({
+    ...bundle,
+    owner: bundle.createdBy,
+    lastModified: bundle.updatedAt.toISOString()
+  })) || [];
+
+  const filteredBundles = bundles.filter(bundle =>
     bundle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     bundle.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     bundle.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-  ) || [];
+  );
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -85,7 +91,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           }
         });
       } else {
-        const newBundle = await createBundle.mutateAsync({
+        const newRawBundle = await createBundle.mutateAsync({
           name: bundleData.name,
           summary: bundleData.summary,
           status: bundleData.status || 'draft',
@@ -95,6 +101,13 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           pillars: bundleData.pillars || [],
           geography: bundleData.geography || []
         });
+        
+        // Convert to UI bundle and select it
+        const newBundle = {
+          ...newRawBundle,
+          owner: newRawBundle.createdBy,
+          lastModified: newRawBundle.updatedAt.toISOString()
+        };
         onBundleSelect(newBundle);
       }
       setIsModalOpen(false);
