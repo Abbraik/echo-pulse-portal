@@ -1,8 +1,8 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Bundle, BundleFormData } from '../types/act-types';
 import { useToast } from '@/hooks/use-toast';
+import { BundleStatus } from '@/types/database';
 
 // Convert database bundle to UI bundle - fix the type mapping
 const mapDatabaseBundleToUI = (dbBundle: any): Bundle => ({
@@ -32,7 +32,11 @@ export const useRealBundles = (statusFilter?: string) => {
         .order('created_at', { ascending: false });
 
       if (statusFilter && statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
+        // Type-safe status filtering
+        const validStatuses: BundleStatus[] = ['draft', 'active', 'pilot', 'completed'];
+        if (validStatuses.includes(statusFilter as BundleStatus)) {
+          query = query.eq('status', statusFilter as BundleStatus);
+        }
       }
 
       const { data, error } = await query;
