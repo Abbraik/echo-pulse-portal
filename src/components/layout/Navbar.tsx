@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe, Search, X } from 'lucide-react';
@@ -26,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const location = useLocation();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const { t, language, setLanguage, isRTL } = useTranslation();
-  const [notifications] = useState(3); // Mock notification count
+  const [notifications] = useState(3);
   const [isHovering, setIsHovering] = useState<string | null>(null);
 
   // Listen for scroll events
@@ -80,7 +81,6 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
-    // Handle search logic here
   };
 
   return (
@@ -132,13 +132,6 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                     onMouseLeave={() => setIsHovering(null)}
                   >
                     {link.name}
-                    {/* Active state underline */}
-                    <NavLink
-                      to={link.path}
-                      className={({ isActive }) =>
-                        isActive ? 'absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-teal-500 to-blue-600' : 'hidden'
-                      }
-                    />
                     {/* Hover underline */}
                     {isHovering === link.path && (
                       <motion.span
@@ -162,7 +155,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowSearch(true)}
-                className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5"
+                className="rounded-full hover:bg-white/5 dark:hover:bg-white/5"
                 aria-label="Search"
               >
                 <Search size={18} className="text-gray-600 dark:text-gray-300" />
@@ -173,7 +166,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                 variant="ghost"
                 size="icon"
                 onClick={toggleLanguage}
-                className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5 relative"
+                className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 relative"
                 aria-label="Toggle language"
               >
                 <Globe size={18} className="text-gray-600 dark:text-gray-300" />
@@ -187,7 +180,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5"
+                  className="rounded-full hover:bg-white/5 dark:hover:bg-white/5"
                   aria-label="Notifications"
                 >
                   <Bell size={18} className="text-gray-600 dark:text-gray-300" />
@@ -208,7 +201,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-                className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/10"
+                className="rounded-full hover:bg-white/5 dark:hover:bg-white/5"
                 aria-label="Toggle theme"
               >
                 <AnimatePresence mode="wait">
@@ -241,7 +234,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5 flex items-center space-x-1"
+                    className="rounded-full hover:bg-white/5 dark:hover:bg-white/5 flex items-center space-x-1"
                     aria-label="User menu"
                   >
                     <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500/30 to-teal-500/30 flex items-center justify-center">
@@ -259,15 +252,15 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                   <DropdownMenuSeparator className={
                     resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300'
                   } />
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100 text-gray-700 dark:text-gray-300">{t('profile')}</DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100 text-gray-700 dark:text-gray-300">{t('settings')}</DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100 text-gray-700 dark:text-gray-300">{t('support')}</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300">{t('profile')}</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300">{t('settings')}</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300">{t('support')}</DropdownMenuItem>
                   <DropdownMenuSeparator className={
                     resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300'
                   } />
                   <DropdownMenuItem 
                     onClick={onLogout}
-                    className="text-red-600 dark:text-red-400 cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-gray-100"
+                    className="text-red-600 dark:text-red-400 cursor-pointer hover:bg-white/5 dark:hover:bg-white/5"
                   >
                     {t('logout')}
                   </DropdownMenuItem>
@@ -278,7 +271,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden rounded-full hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-black/5"
+                className="md:hidden rounded-full hover:bg-white/5 dark:hover:bg-white/5"
                 aria-label="Mobile menu"
               >
                 <Menu size={20} className="text-gray-700 dark:text-gray-300" />
