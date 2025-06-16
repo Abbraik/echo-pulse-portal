@@ -9,7 +9,7 @@ interface Profile {
   email: string;
   first_name: string | null;
   last_name: string | null;
-  role: 'admin' | 'director_general' | 'zone_lead' | 'analyst';
+  role: 'director_general';
   department: string | null;
   zone: string | null;
   avatar_url: string | null;
@@ -141,12 +141,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.log('Attempting sign up for:', email, 'with data:', userData);
       const redirectUrl = `${window.location.origin}/`;
       
+      // Always set role to director_general since that's the only role now
+      const signUpData = {
+        ...userData,
+        role: 'director_general'
+      };
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: redirectUrl,
-          data: userData || {}
+          data: signUpData
         }
       });
 
