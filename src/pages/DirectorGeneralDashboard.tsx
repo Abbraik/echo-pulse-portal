@@ -1,139 +1,97 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
-import { useHealthMetrics, useLatestHealthMetrics } from '@/hooks/useHealthMetrics';
-import { useApprovals } from '@/hooks/useApprovals';
-import { useBundles } from '@/hooks/useBundles';
-import { useClaims } from '@/hooks/useClaims';
+import { AnimatedPage } from '@/components/ui/motion';
 import DirectorHeader from '@/components/dashboard/DirectorHeader';
 import StrategicOverview from '@/components/dashboard/StrategicOverview';
 import ThinkSnapshot from '@/components/dashboard/ThinkSnapshot';
 import ActSnapshot from '@/components/dashboard/ActSnapshot';
-import MonitorSnapshot from '@/components/dashboard/MonitorSnapshot';
 import LearnSnapshot from '@/components/dashboard/LearnSnapshot';
 import InnovateSnapshot from '@/components/dashboard/InnovateSnapshot';
-import { EnhancedDashboardGrid } from '@/components/dashboard/enhanced/EnhancedDashboardGrid';
+import MonitorSnapshot from '@/components/dashboard/MonitorSnapshot';
+import SystemStabilityGauge from '@/components/home/SystemStabilityGauge';
+import KpiCarousel from '@/components/home/KpiCarousel';
+import { PulseData } from '@/api/dashboard';
 
 const DirectorGeneralDashboard: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, isRTL } = useTranslation();
   const [viewMode, setViewMode] = useState<'classic' | 'enhanced'>('enhanced');
+  const [isLoading, setIsLoading] = useState(true);
+  const [pulseData, setPulseData] = useState<PulseData | null>(null);
 
-  // Fetch real data using our hooks
-  const { data: healthMetrics, isLoading: healthLoading } = useLatestHealthMetrics();
-  const { data: pendingApprovals, isLoading: approvalsLoading } = useApprovals(undefined, 'pending');
-  const { data: activeBundles, isLoading: bundlesLoading } = useBundles('active');
-  const { data: openClaims, isLoading: claimsLoading } = useClaims(undefined, 'open');
+  // Simulate loading and data fetching
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPulseData({
+        stability: 78,
+        status: 'System operating within equilibrium thresholds'
+      });
+      setIsLoading(false);
+    }, 1500);
 
-  // Transform data for components
-  const strategicData = {
-    hasStrategicAlert: (pendingApprovals?.length || 0) > 3,
-    approvals: {
-      pendingCount: pendingApprovals?.length || 0,
-      highPriority: pendingApprovals?.filter(a => a.dueAt && new Date(a.dueAt) < new Date(Date.now() + 24 * 60 * 60 * 1000)).length || 0,
-      items: pendingApprovals?.slice(0, 5) || []
-    },
-    systemHealth: {
-      deiScore: healthMetrics?.find(m => m.name === 'DEI Score')?.value || 78.5,
-      metrics: healthMetrics || [],
-      alerts: openClaims?.filter(c => c.zone === 'MONITOR').length || 0
-    },
-    coordination: {
-      activeBundles: activeBundles?.length || 0,
-      openClaims: openClaims?.length || 0,
-      zones: ['THINK', 'ACT', 'LEARN', 'INNOVATE', 'MONITOR'].map(zone => ({
-        name: zone,
-        status: openClaims?.some(c => c.zone === zone) ? 'attention' : 'good',
-        claims: openClaims?.filter(c => c.zone === zone).length || 0
-      }))
-    },
-    notes: {
-      recent: [
-        'System performance optimized',
-        'New policy framework implemented',
-        'Strategic alignment confirmed'
-      ],
-      priority: pendingApprovals?.filter(a => a.dueAt && new Date(a.dueAt) < new Date(Date.now() + 24 * 60 * 60 * 1000))
-        .map(a => a.title).slice(0, 3) || []
-    }
-  };
-
-  const actData = {
-    pendingApprovals: pendingApprovals?.map(approval => ({
-      id: approval.id,
-      title: approval.title,
-      owner: 'System', // We don't have owner mapping yet
-      dueDate: approval.dueAt ? new Date(approval.dueAt).toLocaleDateString() : 'No due date',
-      riskRating: approval.dueAt && new Date(approval.dueAt) < new Date(Date.now() + 24 * 60 * 60 * 1000) ? 'high' : 'low'
-    })) || [],
-    performance: {
-      successRate: Math.round((activeBundles?.filter(b => b.isApproved).length || 0) / Math.max(activeBundles?.length || 1, 1) * 100),
-      timeToDeployAvg: 45, // Mock data for now
-      underperformers: activeBundles?.filter(b => !b.isApproved && b.status === 'active').length || 0
-    },
-    escalations: openClaims?.filter(c => c.zone === 'ACT').map(c => 
-      `Open claim: ${c.metadata?.bundle_name || 'Unknown task'}`
-    ).slice(0, 3) || []
-  };
-
-  const monitorData = {
-    topAlerts: openClaims?.slice(0, 3).map(claim => ({
-      type: claim.metadata?.type || 'System Alert',
-      severity: 'medium',
-      description: claim.metadata?.bundle_name || 'System monitoring alert'
-    })) || [],
-    liveMetrics: {
-      dei: healthMetrics?.find(m => m.name === 'DEI Score')?.value || 78.5,
-      trust: healthMetrics?.find(m => m.name === 'Trust Index')?.value || 82.1,
-      migration: '+12.3%' // Mock data
-    },
-    recentActivity: [
-      'Health metrics updated',
-      `${openClaims?.length || 0} active claims`,
-      `${activeBundles?.length || 0} active bundles`
-    ]
-  };
-
-  if (viewMode === 'enhanced') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
-        <DirectorHeader 
-          viewMode={viewMode} 
-          onViewModeChange={setViewMode}
-          isLoading={healthLoading || approvalsLoading || bundlesLoading || claimsLoading}
-        />
-        <EnhancedDashboardGrid strategicData={strategicData} />
-      </div>
-    );
-  }
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
-      <DirectorHeader 
-        viewMode={viewMode} 
-        onViewModeChange={setViewMode}
-        isLoading={healthLoading || approvalsLoading || bundlesLoading || claimsLoading}
-      />
-      
-      <div className="container mx-auto px-6 py-8 space-y-8">
-        {/* Strategic Overview - Takes full width */}
-        <StrategicOverview data={strategicData} />
-        
-        {/* Zone Snapshots Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          <ThinkSnapshot />
-          <ActSnapshot data={actData} />
-          <div className="xl:col-span-1 lg:col-span-2 xl:col-start-1 xl:row-start-2">
-            <MonitorSnapshot data={monitorData} />
-          </div>
-          <div className="xl:col-span-1 xl:col-start-2 xl:row-start-2">
-            <LearnSnapshot />
-          </div>
-          <div className="xl:col-span-1 xl:col-start-3 xl:row-start-2">
-            <InnovateSnapshot />
-          </div>
+    <AnimatedPage>
+      <div className="min-h-screen">
+        {/* Header */}
+        <DirectorHeader 
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          isLoading={isLoading}
+        />
+
+        {/* Main Dashboard Content */}
+        <div className="max-w-[1600px] mx-auto p-6 space-y-6">
+          {/* Strategic Overview - Full Width */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="w-full"
+          >
+            <StrategicOverview />
+          </motion.div>
+
+          {/* System Health Row */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+          >
+            <SystemStabilityGauge pulse={pulseData} />
+            <KpiCarousel />
+          </motion.div>
+
+          {/* Zone Snapshots Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
+          >
+            <div className="lg:col-span-1">
+              <ThinkSnapshot />
+            </div>
+            <div className="lg:col-span-1">
+              <ActSnapshot />
+            </div>
+            <div className="lg:col-span-1">
+              <LearnSnapshot />
+            </div>
+            <div className="lg:col-span-1">
+              <InnovateSnapshot />
+            </div>
+            <div className="lg:col-span-1">
+              <MonitorSnapshot />
+            </div>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </AnimatedPage>
   );
 };
 

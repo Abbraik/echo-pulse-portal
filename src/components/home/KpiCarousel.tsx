@@ -25,37 +25,41 @@ const KpiCarousel: React.FC = () => {
 
   return (
     <div 
-      className="w-full" 
+      className="w-full h-full" 
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <GlassCard className="p-6 relative overflow-hidden" variant="deep">
-        <h2 className="text-xl font-semibold mb-6">Key Performance Indicators</h2>
-        
-        <Carousel 
-          className="w-full"
-          opts={{
-            loop: true,
-            align: "start",
-          }}
-        >
-          <CarouselContent>
-            {kpis.map((kpi) => (
-              <CarouselItem key={kpi.id} className="md:basis-1/2 lg:basis-1/2">
-                <div className="p-1">
-                  <KpiCard kpi={kpi} />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
+      <GlassCard className="p-6 relative overflow-hidden h-full" variant="deep">
+        <div className="flex flex-col h-full">
+          <h2 className="text-xl font-semibold mb-6 text-white">Key Performance Indicators</h2>
           
-          <div className="hidden md:flex justify-end mt-4">
-            <CarouselPrevious className="relative static transform-none mx-2" />
-            <CarouselNext className="relative static transform-none mx-2" />
+          <div className="flex-1">
+            <Carousel 
+              className="w-full h-full"
+              opts={{
+                loop: true,
+                align: "start",
+              }}
+            >
+              <CarouselContent className="h-full">
+                {kpis.map((kpi) => (
+                  <CarouselItem key={kpi.id} className="md:basis-1/2 lg:basis-1/2 h-full">
+                    <div className="p-1 h-full">
+                      <KpiCard kpi={kpi} />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              
+              <div className="hidden md:flex justify-end mt-4">
+                <CarouselPrevious className="relative static transform-none mx-2" />
+                <CarouselNext className="relative static transform-none mx-2" />
+              </div>
+            </Carousel>
           </div>
-        </Carousel>
-        
-        <MobileIndicators kpis={kpis} />
+          
+          <MobileIndicators kpis={kpis} />
+        </div>
       </GlassCard>
     </div>
   );
