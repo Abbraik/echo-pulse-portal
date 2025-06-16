@@ -6,12 +6,6 @@ import { useTranslation } from '@/hooks/use-translation';
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 interface DirectorHeaderProps {
   viewMode?: 'classic' | 'enhanced';
@@ -39,7 +33,7 @@ const DirectorHeader: React.FC<DirectorHeaderProps> = ({
   return (
     <div className="flex items-center justify-between p-4 bg-slate-900/50 backdrop-blur-sm border-b border-white/10">
       <div className="flex items-center space-x-4">
-        <h1 className="text-xl font-bold text-white">Director General Dashboard</h1>
+        <h1 className="text-xl font-bold text-white">System Dashboard</h1>
         {isLoading && (
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-400"></div>
         )}
