@@ -24,6 +24,10 @@ const DirectorGeneralDashboard: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPulseData({
+        id: 1,
+        timestamp: new Date().toISOString(),
+        level: 78,
+        performance: 92,
         stability: 78,
         status: 'System operating within equilibrium thresholds'
       });
