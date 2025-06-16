@@ -9,14 +9,14 @@ import {
 } from "@/components/ui/carousel";
 import { GlassCard } from '@/components/ui/glass-card';
 import { useTranslation } from '@/hooks/use-translation';
-import { useKpiData } from './hooks/useKpiData';
+import { useRealKpiData } from './hooks/useRealKpiData';
 import { useAutoplay } from './hooks/useAutoplay';
 import KpiCard from './KpiCard';
 import KpiCarouselSkeleton from './KpiCarouselSkeleton';
 
 const KpiCarousel: React.FC = () => {
   const { t, isRTL } = useTranslation();
-  const { kpis, loading } = useKpiData();
+  const { kpis, loading } = useRealKpiData();
   const { handleMouseEnter, handleMouseLeave } = useAutoplay();
 
   if (loading) {

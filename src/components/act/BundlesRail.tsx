@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Filter, Search, MoreVertical, Archive, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
@@ -7,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useBundles, useBundleActions } from '@/hooks/useBundles';
+import { useRealBundles, useRealBundleActions } from './hooks/useRealBundles';
+import { useTestUser } from '@/hooks/useTestUser';
 import { useToast } from '@/hooks/use-toast';
 import BundleModal from './BundleModal';
 import type { Bundle, BundleFormData } from './types/act-types';
@@ -28,17 +28,14 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBundle, setEditingBundle] = useState<Bundle | null>(null);
 
-  // Use real data from our hooks
-  const { data: rawBundles, isLoading, error } = useBundles(statusFilter === 'all' ? undefined : statusFilter);
-  const { createBundle, updateBundle, approveBundle } = useBundleActions();
+  // Initialize test user for development
+  useTestUser();
+
+  // Use real data from Supabase
+  const { data: bundles = [], isLoading, error } = useRealBundles(statusFilter === 'all' ? undefined : statusFilter);
+  const { createBundle, updateBundle, approveBundle } = useRealBundleActions();
 
   // Convert database bundles to UI bundles
-  const bundles = rawBundles?.map(bundle => ({
-    ...bundle,
-    owner: bundle.createdBy,
-    lastModified: bundle.updatedAt.toISOString()
-  })) || [];
-
   const filteredBundles = bundles.filter(bundle =>
     bundle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     bundle.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -83,7 +80,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           name: bundleData.name,
           summary: bundleData.summary,
           status: bundleData.status || editingBundle.status,
-          leveragePoints: bundleData.tags?.map(tag => ({ name: tag.name, type: tag.type })) || [],
+          leverage_points: bundleData.tags?.map(tag => ({ name: tag.name, type: tag.type })) || [],
           tags: bundleData.tags?.map(tag => tag.name) || [],
           objectives: bundleData.objectives || [],
           pillars: bundleData.pillars || [],
@@ -97,19 +94,17 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
         name: bundleData.name,
         summary: bundleData.summary,
         status: bundleData.status || 'draft',
-        leveragePoints: bundleData.tags?.map(tag => ({ name: tag.name, type: tag.type })) || [],
-        tags: bundleData.tags?.map(tag => tag.name) || [],
+        tags: bundleData.tags,
         objectives: bundleData.objectives || [],
         pillars: bundleData.pillars || [],
         geography: bundleData.geography || []
-      }).then(newRawBundle => {
-        // Convert to UI bundle and select it
-        const newBundle = {
-          ...newRawBundle,
-          owner: newRawBundle.createdBy,
-          lastModified: newRawBundle.updatedAt.toISOString()
+      }).then(newBundle => {
+        const uiBundle = {
+          ...newBundle,
+          owner: newBundle.createdBy,
+          lastModified: newBundle.updatedAt?.toISOString() || new Date().toISOString()
         };
-        onBundleSelect(newBundle);
+        onBundleSelect(uiBundle);
       }).catch(error => {
         console.error('Error creating bundle:', error);
       });
@@ -126,9 +121,10 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   if (error) {
     return (
       <div className="w-80 glass-morphism border-r border-white/10 p-6">
-        <div className="text-center text-red-400">
+        <div className="text-center text-amber-400">
           <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
-          <p>Error loading bundles</p>
+          <p>Using offline mode</p>
+          <p className="text-xs text-gray-400">Database connection unavailable</p>
         </div>
       </div>
     );
@@ -191,6 +187,9 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
               <div className="text-center py-8 text-gray-400">
                 <Archive className="h-8 w-8 mx-auto mb-2" />
                 <p>{searchTerm ? t('noBundlesFound') : t('noBundlesYet')}</p>
+                {!error && (
+                  <p className="text-xs mt-1">Create your first bundle to get started</p>
+                )}
               </div>
             ) : (
               <AnimatePresence>

@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { useTranslation } from '@/hooks/use-translation';
+import { useTestUser } from '@/hooks/useTestUser';
 import CommandBar from '@/components/act/CommandBar';
 import BundlesRail from '@/components/act/BundlesRail';
 import DetailCanvas from '@/components/act/DetailCanvas';
@@ -19,6 +19,9 @@ export type DetailView = 'assign-leverage' | 're-optimize' | 'launch-delivery' |
 const Act: React.FC = () => {
   const { t, isRTL } = useTranslation();
   const { toast } = useToast();
+  
+  // Initialize test user for development
+  useTestUser();
   
   // Track the active detail view based on command bar actions
   const [detailView, setDetailView] = useState<DetailView>('default');
