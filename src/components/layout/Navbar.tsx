@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe, Search, X } from 'lucide-react';
@@ -13,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+import { useUIContent } from '@/hooks/use-ui-content';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavbarProps {
@@ -27,6 +27,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const location = useLocation();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const { t, language, setLanguage, isRTL } = useTranslation();
+  const { getContent } = useUIContent('global', 'navigation');
   const [notifications] = useState(3);
   const [isHovering, setIsHovering] = useState<string | null>(null);
 
@@ -66,12 +67,12 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   }, [showSearch]);
 
   const navLinks = [
-    { name: 'HOME', path: '/' },
-    { name: 'THINK', path: '/think' },
-    { name: 'ACT', path: '/act' },
-    { name: 'MONITOR', path: '/monitor' },
-    { name: 'LEARN', path: '/learn' },
-    { name: 'INNOVATE', path: '/innovate' },
+    { name: getContent('nav.home', 'HOME'), path: '/' },
+    { name: getContent('nav.think', 'THINK'), path: '/think' },
+    { name: getContent('nav.act', 'ACT'), path: '/act' },
+    { name: getContent('nav.monitor', 'MONITOR'), path: '/monitor' },
+    { name: getContent('nav.learn', 'LEARN'), path: '/learn' },
+    { name: getContent('nav.innovate', 'INNOVATE'), path: '/innovate' },
   ];
 
   const toggleLanguage = () => {
@@ -107,7 +108,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                   <div className="absolute inset-0 bg-gradient-to-br from-teal-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <span className="hidden md:block text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">
-                  POPULATION DYNAMICS SYSTEM
+                  {getContent('homepage.title', 'POPULATION DYNAMICS SYSTEM')}
                 </span>
               </NavLink>
             </div>

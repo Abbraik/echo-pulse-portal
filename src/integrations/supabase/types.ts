@@ -510,6 +510,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ui_content: {
+        Row: {
+          category: string | null
+          component: string | null
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          page: string | null
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          category?: string | null
+          component?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          page?: string | null
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          category?: string | null
+          component?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          page?: string | null
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

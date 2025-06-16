@@ -4,6 +4,7 @@ import { AnimatedPage } from '@/components/ui/motion';
 import { Lightbulb, Info, Archive, Rocket, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
+import { useUIContent } from '@/hooks/use-ui-content';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { GlassCard } from '@/components/ui/glass-card';
 import { InnovateDesignHub } from '@/components/innovate/InnovateDesignHub';
@@ -14,6 +15,7 @@ import { motion } from 'framer-motion';
 const Innovate: React.FC = () => {
   const [isMetaDesignOpen, setIsMetaDesignOpen] = useState(false);
   const { t, isRTL } = useTranslation();
+  const { getContent } = useUIContent('innovate');
 
   return (
     <AnimatedPage>
@@ -38,7 +40,7 @@ const Innovate: React.FC = () => {
                 <div className="text-left">
                   <div className="flex items-center">
                     <h1 className="font-noto-bold text-teal-300 text-3xl leading-tight">
-                      {t('innovateZoneTitle')} 🚀: {t('systemRedesignHub')}
+                      {getContent('innovate.zone_title', 'INNOVATE ZONE')} 🚀: {getContent('innovate.system_redesign_hub', 'System Redesign Hub')}
                     </h1>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -47,11 +49,15 @@ const Innovate: React.FC = () => {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent className="glass-panel-deep border-teal-400/30">
-                        <p className="max-w-xs font-noto-regular text-gray-200">{t('innovateZoneDescription')}</p>
+                        <p className="max-w-xs font-noto-regular text-gray-200">
+                          {getContent('innovate.zone_description', 'Advanced innovation and system redesign workspace for breakthrough solutions')}
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
-                  <p className="font-noto-medium text-gray-300 mt-1">Design & R&D Innovation Hub</p>
+                  <p className="font-noto-medium text-gray-300 mt-1">
+                    {getContent('zones.innovate.description', 'Design & R&D Innovation Hub')}
+                  </p>
                 </div>
               </div>
               
@@ -64,11 +70,13 @@ const Innovate: React.FC = () => {
                       className="glass-panel border-teal-400/30 hover:border-teal-300/50 text-teal-300 hover:text-teal-200 transition-all duration-300"
                     >
                       <RefreshCw size={16} className="mr-2" />
-                      <span className="font-noto-medium">{t('scenarioForkButton')}</span>
+                      <span className="font-noto-medium">
+                        {getContent('innovate.scenario_fork_button', 'Fork Scenario')}
+                      </span>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{t('scenarioForkTooltip')}</p>
+                    <p>{getContent('innovate.scenario_fork_tooltip', 'Create a new scenario branch for experimentation')}</p>
                   </TooltipContent>
                 </Tooltip>
                 
@@ -80,11 +88,13 @@ const Innovate: React.FC = () => {
                       className="glass-panel border-blue-400/30 hover:border-blue-300/50 text-blue-300 hover:text-blue-200 transition-all duration-300"
                     >
                       <Archive size={16} className="mr-2" />
-                      <span className="font-noto-medium">{t('archiveScenarioButton')}</span>
+                      <span className="font-noto-medium">
+                        {getContent('innovate.archive_scenario_button', 'Archive')}
+                      </span>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{t('archiveScenarioTooltip')}</p>
+                    <p>{getContent('innovate.archive_scenario_tooltip', 'Archive this scenario for future reference')}</p>
                   </TooltipContent>
                 </Tooltip>
                 
@@ -96,11 +106,13 @@ const Innovate: React.FC = () => {
                       className="glass-panel border-gold-400/30 hover:border-gold-300/50 text-gold-300 hover:text-gold-200 transition-all duration-300"
                     >
                       <Rocket size={16} className="mr-2" />
-                      <span className="font-noto-medium">{t('promoteBlueprintButton')}</span>
+                      <span className="font-noto-medium">
+                        {getContent('innovate.promote_blueprint_button', 'Promote')}
+                      </span>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{t('promoteBlueprintTooltip')}</p>
+                    <p>{getContent('innovate.promote_blueprint_tooltip', 'Promote this blueprint to implementation')}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -126,7 +138,7 @@ const Innovate: React.FC = () => {
         >
           <FabButton 
             onClick={() => setIsMetaDesignOpen(true)}
-            tooltip={t('generateMetaDesignBlueprint')}
+            tooltip={getContent('innovate.generate_meta_design_blueprint', 'Generate Meta Design Blueprint')}
             icon={<Rocket size={20} />}
           />
         </motion.div>

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
+import { useUIContent } from '@/hooks/use-ui-content';
 import { Package, GitBranch, Wrench } from 'lucide-react';
 import { ConceptBlocksPalette } from './revolutionary/ConceptBlocksPalette';
 import { ScenarioFork } from './revolutionary/ScenarioFork';
@@ -46,6 +47,7 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({
   onCustomBlocksAdded
 }) => {
   const { t } = useTranslation();
+  const { getContent } = useUIContent('toolbox');
   const [isCustomBlocksModalOpen, setIsCustomBlocksModalOpen] = useState(false);
 
   const handleCustomBlocksSave = (blocks: CustomBlock[]) => {
@@ -55,17 +57,23 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({
 
   return (
     <div className="h-full flex flex-col p-4">
-      <h2 className="text-lg font-semibold mb-4">System Redesign</h2>
+      <h2 className="text-lg font-semibold mb-4">
+        {getContent('innovate.system_redesign_hub', 'System Redesign')}
+      </h2>
       
       <Tabs defaultValue="blocks" className="flex-1 flex flex-col">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="blocks" className="flex items-center gap-1">
             <Package size={14} />
-            <span className="hidden sm:inline">Blocks</span>
+            <span className="hidden sm:inline">
+              {getContent('toolbox.blocks', 'Blocks')}
+            </span>
           </TabsTrigger>
           <TabsTrigger value="forks" className="flex items-center gap-1">
             <GitBranch size={14} />
-            <span className="hidden sm:inline">Forks</span>
+            <span className="hidden sm:inline">
+              {getContent('toolbox.forks', 'Forks')}
+            </span>
           </TabsTrigger>
         </TabsList>
         
@@ -94,7 +102,7 @@ export const InnovateToolbox: React.FC<InnovateToolboxProps> = ({
         size="lg"
       >
         <Wrench size={18} />
-        New system redesign
+        {getContent('toolbox.new_system_redesign', 'New system redesign')}
       </Button>
 
       {/* Custom Blocks Modal */}

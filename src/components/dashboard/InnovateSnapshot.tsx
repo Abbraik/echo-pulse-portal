@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Beaker, Rocket, Archive, Users } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
+import { useUIContent } from '@/hooks/use-ui-content';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +14,7 @@ interface InnovateSnapshotProps {
 
 const InnovateSnapshot: React.FC<InnovateSnapshotProps> = ({ data }) => {
   const { t, isRTL } = useTranslation();
+  const { getContent } = useUIContent('innovate');
 
   const mockData = {
     prototypes: [
@@ -46,7 +49,7 @@ const InnovateSnapshot: React.FC<InnovateSnapshotProps> = ({ data }) => {
           <Zap size={20} />
         </div>
         <h2 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-500">
-          INNOVATE
+          {getContent('zones.innovate.title', 'INNOVATE')}
         </h2>
       </div>
 
@@ -89,12 +92,12 @@ const InnovateSnapshot: React.FC<InnovateSnapshotProps> = ({ data }) => {
                   {decision.type === 'promote' ? (
                     <Button size="sm" className="bg-green-600 hover:bg-green-700 text-xs px-2 py-1">
                       <Rocket size={10} className="mr-1" />
-                      Promote ▶
+                      {getContent('innovate.promote_blueprint_button', 'Promote')} ▶
                     </Button>
                   ) : (
                     <Button size="sm" variant="outline" className="border-gray-500/50 text-gray-400 text-xs px-2 py-1">
                       <Archive size={10} className="mr-1" />
-                      Archive ▶
+                      {getContent('innovate.archive_scenario_button', 'Archive')} ▶
                     </Button>
                   )}
                 </div>
