@@ -9,11 +9,7 @@ import { ForgotPasswordModal } from '@/components/auth/ForgotPasswordModal';
 import LanguageToggle from '@/components/home/LanguageToggle';
 import ThemeToggle from '@/components/home/ThemeToggle';
 
-interface LoginProps {
-  onLoginSuccess: () => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
+const Login: React.FC = () => {
   const { t, isRTL } = useTranslation();
   const [currentStep, setCurrentStep] = useState<'login' | 'mfa' | 'forgot'>('login');
   const [userEmail, setUserEmail] = useState('');
@@ -22,13 +18,12 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     setUserEmail(email);
     if (requiresMfa) {
       setCurrentStep('mfa');
-    } else {
-      onLoginSuccess();
     }
+    // If no MFA required, the auth context will handle the redirect
   };
 
   const handleMfaSuccess = () => {
-    onLoginSuccess();
+    // MFA success will be handled by auth context
   };
 
   const handleForgotPassword = () => {

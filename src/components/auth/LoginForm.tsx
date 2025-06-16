@@ -5,6 +5,7 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/use-translation';
+import { useAuth } from '@/hooks/use-auth';
 
 interface LoginFormProps {
   onLoginSuccess: (email: string, requiresMfa: boolean) => void;
@@ -13,25 +14,48 @@ interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onForgotPassword }) => {
   const { t } = useTranslation();
-  const [email, setEmail] = useState('demo@example.com');
-  const [password, setPassword] = useState('password');
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
     setIsLoading(true);
+    setError(null);
     
-    // Simulate a brief loading state for demonstration
-    setTimeout(() => {
+    try {
+      const { error: signInError } = await signIn(email, password);
+      
+      if (signInError) {
+        setError(signInError.message);
+      } else {
+        // Success will be handled by the auth context
+        onLoginSuccess(email, false);
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+    } finally {
       setIsLoading(false);
-      // Auto-login without credential validation for demo purposes
-      onLoginSuccess('demo@example.com', false);
-    }, 1000);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-center">
+          <p className="text-sm text-red-300">{error}</p>
+        </div>
+      )}
+
       {/* Email Field */}
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-white/80">
@@ -47,6 +71,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onForgotPa
             className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-teal-400 focus:ring-teal-400/20"
             placeholder={t('enterEmail', { defaultValue: 'Enter your email' })}
             disabled={isLoading}
+            required
           />
         </div>
       </div>
@@ -66,6 +91,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onForgotPa
             className="pl-10 pr-10 bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-teal-400 focus:ring-teal-400/20"
             placeholder={t('enterPassword', { defaultValue: 'Enter your password' })}
             disabled={isLoading}
+            required
           />
           <button
             type="button"
@@ -90,17 +116,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onForgotPa
         </button>
       </div>
 
-      {/* Demo Notice */}
-      <div className="bg-teal-500/10 border border-teal-500/20 rounded-lg p-3 text-center">
-        <p className="text-sm text-teal-300">
-          {t('demoMode', { defaultValue: 'Demo Mode - Click Sign In to continue' })}
-        </p>
-      </div>
-
       {/* Sign In Button */}
       <Button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || !email || !password}
         className="w-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? (

@@ -9,16 +9,64 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          department: string | null
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          preferences: Json | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+          zone: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          department?: string | null
+          email: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          preferences?: Json | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+          zone?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          preferences?: Json | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+          zone?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      has_role: {
+        Args: { _role: Database["public"]["Enums"]["user_role"] }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "director_general" | "zone_lead" | "analyst"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +181,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["admin", "director_general", "zone_lead", "analyst"],
+    },
   },
 } as const
