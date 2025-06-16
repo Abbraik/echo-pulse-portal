@@ -1,6 +1,5 @@
-
 // Updated ACT types to match Phase 2 database structure
-import { Bundle as DatabaseBundle, BundleStatus, KPI } from '@/types/database';
+import { BundleStatus, KPI } from '@/types/database';
 
 // Bundle tag types (keeping existing for UI compatibility)
 export type BundleTag = 
@@ -23,12 +22,22 @@ export type BundleTag =
   | "High-Priority"
   | string;
 
-// Extended Bundle interface that combines database structure with UI needs
-export interface Bundle extends Omit<DatabaseBundle, 'createdBy' | 'createdAt' | 'updatedAt'> {
-  owner: string; // Maps to createdBy for UI compatibility
-  lastModified: string; // Maps to updatedAt for UI compatibility
-  ndiImpact: number; // Already matches database
-  coherence: number; // Already matches database
+// UI Bundle interface that matches what the frontend expects
+export interface Bundle {
+  id: string;
+  name: string;
+  summary?: string;
+  status: BundleStatus;
+  owner: string; // Maps to created_by from database
+  lastModified: string; // Maps to updated_at from database
+  leveragePoints: any[]; // Maps to leverage_points from database
+  tags: string[]; // Maps to tags from database
+  objectives: string[]; // Maps to objectives from database
+  pillars: string[]; // Maps to pillars from database
+  geography: string[]; // Maps to geography from database
+  coherence: number; // Maps to coherence from database
+  ndiImpact: number; // Maps to ndi_impact from database
+  isApproved: boolean; // Maps to is_approved from database
 }
 
 // Bundle form data for creating/editing bundles - Updated to match BundleModal
@@ -61,16 +70,8 @@ export type BundleFormFields = {
 // Act Zone Command Actions
 export type ActCommandAction = 'assign-leverage' | 're-optimize' | 'launch-delivery';
 
-// Helper function to convert database bundle to UI bundle
-export const mapDatabaseBundleToUI = (dbBundle: DatabaseBundle): Bundle => ({
-  ...dbBundle,
-  owner: dbBundle.createdBy,
-  lastModified: dbBundle.updatedAt.toISOString(),
-  tags: dbBundle.tags as BundleTag[],
-});
-
-// Helper function to convert UI bundle form to database bundle
-export const mapUIBundleToDatabase = (formData: BundleFormFields): Partial<DatabaseBundle> => ({
+// Helper function to convert UI bundle form to database bundle format
+export const mapUIBundleToDatabase = (formData: BundleFormFields) => ({
   name: formData.name,
   summary: formData.summary,
   tags: formData.tags,

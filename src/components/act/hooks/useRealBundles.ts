@@ -1,17 +1,25 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Bundle as DatabaseBundle } from '@/types/database';
 import { Bundle, BundleFormData } from '../types/act-types';
 import { useToast } from '@/hooks/use-toast';
 
-// Convert database bundle to UI bundle
-const mapDatabaseBundleToUI = (dbBundle: DatabaseBundle): Bundle => ({
-  ...dbBundle,
-  owner: dbBundle.createdBy,
-  lastModified: dbBundle.updatedAt?.toISOString() || new Date().toISOString(),
-  createdAt: dbBundle.createdAt || new Date(),
-  updatedAt: dbBundle.updatedAt || new Date()
+// Convert database bundle to UI bundle - fix the type mapping
+const mapDatabaseBundleToUI = (dbBundle: any): Bundle => ({
+  id: dbBundle.id,
+  name: dbBundle.name,
+  summary: dbBundle.summary,
+  status: dbBundle.status,
+  owner: dbBundle.created_by,
+  lastModified: dbBundle.updated_at?.toISOString ? dbBundle.updated_at.toISOString() : new Date().toISOString(),
+  leveragePoints: dbBundle.leverage_points || [],
+  tags: dbBundle.tags || [],
+  objectives: dbBundle.objectives || [],
+  pillars: dbBundle.pillars || [],
+  geography: dbBundle.geography || [],
+  coherence: dbBundle.coherence || 0,
+  ndiImpact: dbBundle.ndi_impact || 0,
+  isApproved: dbBundle.is_approved || false
 });
 
 export const useRealBundles = (statusFilter?: string) => {
@@ -84,7 +92,7 @@ export const useRealBundleActions = () => {
   });
 
   const updateBundle = useMutation({
-    mutationFn: async ({ bundleId, updates }: { bundleId: string; updates: Partial<DatabaseBundle> }) => {
+    mutationFn: async ({ bundleId, updates }: { bundleId: string; updates: any }) => {
       const { data, error } = await supabase
         .from('bundles')
         .update(updates)

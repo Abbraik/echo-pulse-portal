@@ -100,9 +100,20 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
         geography: bundleData.geography || []
       }).then(newBundle => {
         const uiBundle = {
-          ...newBundle,
-          owner: newBundle.createdBy,
-          lastModified: newBundle.updatedAt?.toISOString() || new Date().toISOString()
+          id: newBundle.id,
+          name: newBundle.name,
+          summary: newBundle.summary,
+          status: newBundle.status,
+          owner: newBundle.created_by,
+          lastModified: newBundle.updated_at?.toISOString ? newBundle.updated_at.toISOString() : new Date().toISOString(),
+          leveragePoints: newBundle.leverage_points || [],
+          tags: newBundle.tags || [],
+          objectives: newBundle.objectives || [],
+          pillars: newBundle.pillars || [],
+          geography: newBundle.geography || [],
+          coherence: newBundle.coherence || 0,
+          ndiImpact: newBundle.ndi_impact || 0,
+          isApproved: newBundle.is_approved || false
         };
         onBundleSelect(uiBundle);
       }).catch(error => {
