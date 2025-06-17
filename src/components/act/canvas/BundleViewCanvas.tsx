@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useRealBundle } from '../hooks/useRealBundles';
-import { Target, MapPin, Tag, Calendar, T ChechCircle, AlertCircle } from 'lucide-react';
+import { Target, MapPin, Tag, Calendar, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface BundleViewCanvasProps {
   bundleId: string;
