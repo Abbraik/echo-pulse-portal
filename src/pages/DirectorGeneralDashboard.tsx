@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
 import { AnimatedPage } from '@/components/ui/motion';
+import ParticlesBackground from '@/components/ui/particles-background';
 import StrategicOverview from '@/components/dashboard/StrategicOverview';
 import ThinkSnapshot from '@/components/dashboard/ThinkSnapshot';
 import ActSnapshot from '@/components/dashboard/ActSnapshot';
@@ -39,6 +39,15 @@ const DirectorGeneralDashboard: React.FC = () => {
   return (
     <AnimatedPage>
       <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        <ParticlesBackground 
+          count={80}
+          colorStart="#14B8A6"
+          colorEnd="#3B82F6"
+          minSize={1}
+          maxSize={3}
+          speed={0.3}
+        />
+        
         {/* Simplified background effects */}
         <div className="fixed inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>

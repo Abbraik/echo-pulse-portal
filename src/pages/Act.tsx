@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -6,6 +5,7 @@ import { useTestUser } from '@/hooks/useTestUser';
 import { useToast } from '@/hooks/use-toast';
 import { Bundle } from '@/components/act/types/act-types';
 import { useActScroll } from '@/hooks/useActScroll';
+import ParticlesBackground from '@/components/ui/particles-background';
 import ActBackground from '@/components/act/layout/ActBackground';
 import ActHeader from '@/components/act/layout/ActHeader';
 import ActCommandSection from '@/components/act/layout/ActCommandSection';
@@ -72,6 +72,14 @@ const Act: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      <ParticlesBackground 
+        count={60}
+        colorStart="#14B8A6"
+        colorEnd="#2563EB"
+        minSize={2}
+        maxSize={4}
+        speed={0.5}
+      />
       <ActBackground />
 
       <AnimatedPage>

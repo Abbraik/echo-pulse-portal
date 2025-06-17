@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { Lightbulb, Info, Archive, Rocket, RefreshCw } from 'lucide-react';
@@ -7,6 +6,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { useUIContent } from '@/hooks/use-ui-content';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { GlassCard } from '@/components/ui/glass-card';
+import ParticlesBackground from '@/components/ui/particles-background';
 import { InnovateDesignHub } from '@/components/innovate/InnovateDesignHub';
 import { FabButton } from '@/components/innovate/FabButton';
 import { MetaDesignModal } from '@/components/innovate/MetaDesignModal';
@@ -19,10 +19,19 @@ const Innovate: React.FC = () => {
 
   return (
     <AnimatedPage>
-      <div className="flex flex-col h-[calc(100vh-5rem)] overflow-hidden">
+      <div className="flex flex-col h-[calc(100vh-5rem)] overflow-hidden relative">
+        <ParticlesBackground 
+          count={50}
+          colorStart="#8B5CF6"
+          colorEnd="#14B8A6"
+          minSize={2}
+          maxSize={5}
+          speed={0.4}
+        />
+        
         {/* Cinematic Header */}
         <motion.header 
-          className="flex-none mb-6"
+          className="flex-none mb-6 relative z-10"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -122,7 +131,7 @@ const Innovate: React.FC = () => {
         
         {/* Main content area with cinematic entrance */}
         <motion.div 
-          className="flex-1 overflow-hidden"
+          className="flex-1 overflow-hidden relative z-10"
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
@@ -132,6 +141,7 @@ const Innovate: React.FC = () => {
         
         {/* Enhanced Floating Action Button */}
         <motion.div
+          className="relative z-20"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.8 }}
