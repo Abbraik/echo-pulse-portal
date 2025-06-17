@@ -1,26 +1,9 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Bundle, BundleFormData } from '../types/act-types';
+import { Bundle, BundleFormData, mapDatabaseBundleToUI, mapUIBundleToDatabase } from '../types/act-types';
 import { useToast } from '@/hooks/use-toast';
 import { BundleStatus } from '@/types/database';
-
-// Convert database bundle to UI bundle - fix the type mapping
-const mapDatabaseBundleToUI = (dbBundle: any): Bundle => ({
-  id: dbBundle.id,
-  name: dbBundle.name,
-  summary: dbBundle.summary,
-  status: dbBundle.status,
-  owner: dbBundle.created_by,
-  lastModified: new Date(dbBundle.updated_at).toISOString(),
-  leveragePoints: Array.isArray(dbBundle.leverage_points) ? dbBundle.leverage_points : [],
-  tags: dbBundle.tags || [],
-  objectives: dbBundle.objectives || [],
-  pillars: dbBundle.pillars || [],
-  geography: dbBundle.geography || [],
-  coherence: dbBundle.coherence || 0,
-  ndiImpact: dbBundle.ndi_impact || 0,
-  isApproved: dbBundle.is_approved || false
-});
 
 export const useRealBundles = (statusFilter?: string) => {
   return useQuery({
@@ -59,24 +42,19 @@ export const useRealBundleActions = () => {
 
   const createBundle = useMutation({
     mutationFn: async (bundleData: Omit<BundleFormData, 'id'>) => {
+      const dbData = mapUIBundleToDatabase(bundleData);
+      
       const { data, error } = await supabase
         .from('bundles')
         .insert({
-          name: bundleData.name,
-          summary: bundleData.summary,
-          status: bundleData.status || 'draft',
+          ...dbData,
           created_by: 'test-user-id', // In real app, get from auth
-          leverage_points: bundleData.tags?.map(tag => ({ name: tag.name, type: tag.type })) || [],
-          tags: bundleData.tags?.map(tag => tag.name) || [],
-          objectives: bundleData.objectives || [],
-          pillars: bundleData.pillars || [],
-          geography: bundleData.geography || []
         })
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return mapDatabaseBundleToUI(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bundles'] });
@@ -96,16 +74,21 @@ export const useRealBundleActions = () => {
   });
 
   const updateBundle = useMutation({
-    mutationFn: async ({ bundleId, updates }: { bundleId: string; updates: any }) => {
+    mutationFn: async ({ bundleId, updates }: { bundleId: string; updates: Partial<BundleFormData> }) => {
+      const dbUpdates = mapUIBundleToDatabase(updates as BundleFormData);
+      
       const { data, error } = await supabase
         .from('bundles')
-        .update(updates)
+        .update({
+          ...dbUpdates,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', bundleId)
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return mapDatabaseBundleToUI(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bundles'] });
@@ -120,13 +103,17 @@ export const useRealBundleActions = () => {
     mutationFn: async (bundleId: string) => {
       const { data, error } = await supabase
         .from('bundles')
-        .update({ is_approved: true, status: 'active' })
+        .update({ 
+          is_approved: true, 
+          status: 'active',
+          updated_at: new Date().toISOString()
+        })
         .eq('id', bundleId)
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return mapDatabaseBundleToUI(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bundles'] });
@@ -138,4 +125,22 @@ export const useRealBundleActions = () => {
   });
 
   return { createBundle, updateBundle, approveBundle };
+};
+
+// Single bundle hook for fetching individual bundles
+export const useRealBundle = (bundleId: string) => {
+  return useQuery({
+    queryKey: ['bundle', bundleId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('bundles')
+        .select('*')
+        .eq('id', bundleId)
+        .single();
+      
+      if (error) throw error;
+      return mapDatabaseBundleToUI(data);
+    },
+    enabled: !!bundleId,
+  });
 };

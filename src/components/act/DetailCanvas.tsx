@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Check, Info, ThumbsUp } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
@@ -8,7 +7,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { DetailView } from '@/pages/Act';
 import { motion, AnimatePresence } from 'framer-motion';
 import BundleView from './BundleView';
-import { useBundle } from '@/hooks/useBundles';
+import { useRealBundle } from './hooks/useRealBundles';
 
 interface DetailCanvasProps {
   view: DetailView;
@@ -21,8 +20,8 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
   
   console.log('DetailCanvas - selectedBundle:', selectedBundle, 'view:', view);
   
-  // Fetch bundle data if selectedBundle exists
-  const { data: bundleData, isLoading: bundleLoading, error: bundleError } = useBundle(selectedBundle || '');
+  // Fetch bundle data if selectedBundle exists using the real bundle hook
+  const { data: bundleData, isLoading: bundleLoading, error: bundleError } = useRealBundle(selectedBundle || '');
   
   console.log('DetailCanvas - bundleData:', bundleData, 'loading:', bundleLoading, 'error:', bundleError);
   
@@ -89,7 +88,8 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
                 )}
                 <div className="mt-2 flex items-center space-x-4 text-sm text-gray-400">
                   <span>Status: {bundleData.status}</span>
-                  {bundleData.coherence && <span>Coherence: {bundleData.coherence}%</span>}
+                  {bundleData.coherence > 0 && <span>Coherence: {bundleData.coherence}%</span>}
+                  {bundleData.ndiImpact > 0 && <span>NDI Impact: {bundleData.ndiImpact}</span>}
                 </div>
               </div>
             )}
@@ -254,7 +254,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
               <div className="mb-6 p-4 rounded-xl backdrop-blur-sm bg-teal-500/10 border border-teal-500/20">
                 <h3 className="text-lg font-semibold text-teal-300 mb-2">Optimizing Bundle:</h3>
                 <p className="text-white font-medium">{bundleData.name}</p>
-                {bundleData.coherence && (
+                {bundleData.coherence > 0 && (
                   <p className="text-gray-300 text-sm mt-1">Current coherence: {bundleData.coherence}%</p>
                 )}
               </div>

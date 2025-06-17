@@ -85,16 +85,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
     if (editingBundle) {
       updateBundle.mutateAsync({
         bundleId: editingBundle.id,
-        updates: {
-          name: bundleData.name,
-          summary: bundleData.summary,
-          status: bundleData.status || editingBundle.status,
-          leverage_points: bundleData.tags?.map(tag => ({ name: tag.name, type: tag.type })) || [],
-          tags: bundleData.tags?.map(tag => tag.name) || [],
-          objectives: bundleData.objectives || [],
-          pillars: bundleData.pillars || [],
-          geography: bundleData.geography || []
-        }
+        updates: bundleData
       }).then(() => {
         toast({
           title: "Bundle Updated",
@@ -109,32 +100,8 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
         });
       });
     } else {
-      createBundle.mutateAsync({
-        name: bundleData.name,
-        summary: bundleData.summary,
-        status: bundleData.status || 'draft',
-        tags: bundleData.tags,
-        objectives: bundleData.objectives || [],
-        pillars: bundleData.pillars || [],
-        geography: bundleData.geography || []
-      }).then(newBundle => {
-        const uiBundle: Bundle = {
-          id: newBundle.id,
-          name: newBundle.name,
-          summary: newBundle.summary,
-          status: newBundle.status,
-          owner: newBundle.created_by,
-          lastModified: new Date(newBundle.updated_at).toISOString(),
-          leveragePoints: Array.isArray(newBundle.leverage_points) ? newBundle.leverage_points : [],
-          tags: newBundle.tags || [],
-          objectives: newBundle.objectives || [],
-          pillars: newBundle.pillars || [],
-          geography: newBundle.geography || [],
-          coherence: newBundle.coherence || 0,
-          ndiImpact: newBundle.ndi_impact || 0,
-          isApproved: newBundle.is_approved || false
-        };
-        onBundleSelect(uiBundle);
+      createBundle.mutateAsync(bundleData).then(newBundle => {
+        onBundleSelect(newBundle);
         toast({
           title: "Bundle Created",
           description: "Bundle has been successfully created.",
@@ -182,7 +149,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
 
   return (
     <>
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full w-full">
         {/* Header */}
         <div className="p-4 border-b border-white/10 space-y-4 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -287,7 +254,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
                               <span className="capitalize">{t(bundle.status)}</span>
                             </div>
                           </Badge>
-                          {bundle.coherence && (
+                          {bundle.coherence > 0 && (
                             <span className="text-xs text-gray-400">
                               {bundle.coherence}%
                             </span>

@@ -25,7 +25,7 @@ const Act: React.FC = () => {
   
   // Track the active detail view based on command bar actions
   const [detailView, setDetailView] = useState<DetailView>('default');
-  // Track the currently selected bundle - fix type to be Bundle | null
+  // Track the currently selected bundle - using consistent Bundle type
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   // Track if the playbooks library is expanded
   const [playbooksExpanded, setPlaybooksExpanded] = useState<boolean>(false);
@@ -66,7 +66,7 @@ const Act: React.FC = () => {
     }
   };
 
-  // Handle bundle selection - fix parameter type
+  // Handle bundle selection - using consistent Bundle type
   const handleBundleSelect = (bundle: Bundle | null) => {
     console.log('Bundle selected:', bundle?.id, bundle?.name);
     setSelectedBundle(bundle);
