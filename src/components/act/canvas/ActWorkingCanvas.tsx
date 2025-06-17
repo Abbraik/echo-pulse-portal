@@ -1,13 +1,17 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, MapPin, Settings, Users, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useRealBundle } from '../hooks/useRealBundles';
 import CanvasHeader from './working-canvas/CanvasHeader';
 import CanvasTabNavigation from './working-canvas/CanvasTabNavigation';
 import OverviewTab from './working-canvas/tabs/OverviewTab';
+import ObjectivesTab from './working-canvas/tabs/ObjectivesTab';
+import GeographyTab from './working-canvas/tabs/GeographyTab';
+import LeverageTab from './working-canvas/tabs/LeverageTab';
+import StakeholdersTab from './working-canvas/tabs/StakeholdersTab';
+import MetricsTab from './working-canvas/tabs/MetricsTab';
 
 interface ActWorkingCanvasProps {
   bundleId: string | null;
@@ -48,176 +52,16 @@ const ActWorkingCanvas: React.FC<ActWorkingCanvasProps> = ({ bundleId, onClose }
     switch (activeTab) {
       case 'overview':
         return <OverviewTab bundle={bundle} />;
-
       case 'objectives':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-teal-300">Bundle Objectives</h3>
-            {bundle.objectives && bundle.objectives.length > 0 ? (
-              <div className="space-y-3">
-                {bundle.objectives.map((objective, index) => (
-                  <div key={index} className="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
-                        {index + 1}
-                      </div>
-                      <p className="text-gray-300 flex-1">{objective}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <Target className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No objectives defined for this bundle</p>
-              </div>
-            )}
-          </div>
-        );
-
+        return <ObjectivesTab bundle={bundle} />;
       case 'geography':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-teal-300">Geographic Coverage</h3>
-            {bundle.geography && bundle.geography.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {bundle.geography.map((location, index) => (
-                  <div key={index} className="p-3 bg-white/5 rounded-lg border border-white/10 text-center">
-                    <MapPin className="h-5 w-5 text-teal-400 mx-auto mb-2" />
-                    <span className="text-gray-300 text-sm">{location}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <MapPin className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No geographic areas specified</p>
-              </div>
-            )}
-          </div>
-        );
-
+        return <GeographyTab bundle={bundle} />;
       case 'leverage':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-teal-300">Leverage Points</h3>
-            {bundle.leveragePoints && bundle.leveragePoints.length > 0 ? (
-              <div className="space-y-3">
-                {bundle.leveragePoints.map((point, index) => (
-                  <div key={index} className="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Settings className="h-4 w-4 text-teal-400" />
-                      <span className="text-white font-medium">
-                        {typeof point === 'object' ? point.name || `Leverage Point ${index + 1}` : point}
-                      </span>
-                    </div>
-                    {typeof point === 'object' && point.type && (
-                      <Badge variant="outline" className="text-xs">
-                        {point.type}
-                      </Badge>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No leverage points identified</p>
-              </div>
-            )}
-          </div>
-        );
-
+        return <LeverageTab bundle={bundle} />;
       case 'stakeholders':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-teal-300">Stakeholder Analysis</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h4 className="text-md font-medium text-blue-300">Primary Stakeholders</h4>
-                <div className="space-y-2">
-                  <div className="p-3 bg-white/5 rounded-lg border border-white/10">
-                    <div className="flex items-center gap-3">
-                      <Users className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-300">Government Entities</span>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-white/5 rounded-lg border border-white/10">
-                    <div className="flex items-center gap-3">
-                      <Users className="h-4 w-4 text-blue-400" />
-                      <span className="text-gray-300">Private Sector</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <h4 className="text-md font-medium text-purple-300">Secondary Stakeholders</h4>
-                <div className="space-y-2">
-                  <div className="p-3 bg-white/5 rounded-lg border border-white/10">
-                    <div className="flex items-center gap-3">
-                      <Users className="h-4 w-4 text-purple-400" />
-                      <span className="text-gray-300">Civil Society</span>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-white/5 rounded-lg border border-white/10">
-                    <div className="flex items-center gap-3">
-                      <Users className="h-4 w-4 text-purple-400" />
-                      <span className="text-gray-300">International Organizations</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
+        return <StakeholdersTab />;
       case 'metrics':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-teal-300">Key Performance Indicators</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-300">Coherence Score</span>
-                  <BarChart3 className="h-4 w-4 text-teal-400" />
-                </div>
-                <div className="text-2xl font-bold text-white mb-1">{bundle.coherence}%</div>
-                <div className="w-full bg-white/10 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-teal-500 to-blue-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${bundle.coherence}%` }}
-                  />
-                </div>
-              </div>
-              
-              <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-300">NDI Impact</span>
-                  <BarChart3 className="h-4 w-4 text-purple-400" />
-                </div>
-                <div className="text-2xl font-bold text-white mb-1">{bundle.ndiImpact}</div>
-                <div className="text-sm text-gray-400">Impact Score</div>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              <h4 className="text-md font-medium text-blue-300">Pillar Coverage</h4>
-              {bundle.pillars && bundle.pillars.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {bundle.pillars.map((pillar, index) => (
-                    <div key={index} className="p-2 bg-white/5 rounded border border-white/10 text-center">
-                      <span className="text-xs text-gray-300 capitalize">{pillar}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-400 text-sm">No pillars assigned</p>
-              )}
-            </div>
-          </div>
-        );
-
+        return <MetricsTab bundle={bundle} />;
       default:
         return <div className="text-center text-gray-400">Tab content not available</div>;
     }
