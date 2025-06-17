@@ -1,13 +1,13 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, FileText, Target, MapPin, Settings, Users, BarChart3 } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
+import { Target, MapPin, Settings, Users, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useRealBundle } from '../hooks/useRealBundles';
-import { Bundle } from '../types/act-types';
+import CanvasHeader from './working-canvas/CanvasHeader';
+import CanvasTabNavigation from './working-canvas/CanvasTabNavigation';
+import OverviewTab from './working-canvas/tabs/OverviewTab';
 
 interface ActWorkingCanvasProps {
   bundleId: string | null;
@@ -15,19 +15,9 @@ interface ActWorkingCanvasProps {
 }
 
 const ActWorkingCanvas: React.FC<ActWorkingCanvasProps> = ({ bundleId, onClose }) => {
-  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
   
   const { data: bundle, isLoading, error } = useRealBundle(bundleId || '');
-
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: FileText },
-    { id: 'objectives', label: 'Objectives', icon: Target },
-    { id: 'geography', label: 'Geography', icon: MapPin },
-    { id: 'leverage', label: 'Leverage Points', icon: Settings },
-    { id: 'stakeholders', label: 'Stakeholders', icon: Users },
-    { id: 'metrics', label: 'Metrics', icon: BarChart3 },
-  ];
 
   if (!bundleId) {
     return null;
@@ -57,77 +47,7 @@ const ActWorkingCanvas: React.FC<ActWorkingCanvasProps> = ({ bundleId, onClose }
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-teal-300 mb-2">Bundle Information</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Status:</span>
-                      <Badge variant="outline" className="capitalize">
-                        {bundle.status}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Created:</span>
-                      <span className="text-white">{new Date(bundle.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Last Updated:</span>
-                      <span className="text-white">{new Date(bundle.updatedAt).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Approved:</span>
-                      <Badge variant={bundle.isApproved ? "default" : "secondary"}>
-                        {bundle.isApproved ? 'Yes' : 'No'}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold text-teal-300 mb-2">Performance Metrics</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Coherence:</span>
-                      <span className="text-white">{bundle.coherence}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">NDI Impact:</span>
-                      <span className="text-white">{bundle.ndiImpact}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-teal-300 mb-2">Summary</h3>
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                    {bundle.summary || 'No summary available for this bundle.'}
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold text-teal-300 mb-2">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {bundle.tags && bundle.tags.length > 0 ? (
-                      bundle.tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className="text-gray-400 text-sm">No tags assigned</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <OverviewTab bundle={bundle} />;
 
       case 'objectives':
         return (
@@ -313,51 +233,9 @@ const ActWorkingCanvas: React.FC<ActWorkingCanvasProps> = ({ bundleId, onClose }
         transition={{ duration: 0.4, ease: 'easeInOut' }}
       >
         <div className="w-full h-full glass-panel-cinematic rounded-2xl flex flex-col relative overflow-hidden">
-          {/* Header */}
-          <div className="p-6 border-b border-white/10 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-white mb-1">{bundle.name}</h2>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
-                  <span>Bundle Analysis & Configuration</span>
-                  <Badge variant="outline" className="capitalize">
-                    {bundle.status}
-                  </Badge>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Tab Navigation */}
-          <div className="px-6 py-4 border-b border-white/10 flex-shrink-0">
-            <div className="flex space-x-2 overflow-x-auto">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <Button
-                    key={tab.id}
-                    variant={activeTab === tab.id ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setActiveTab(tab.id)}
-                    className="flex items-center gap-2 whitespace-nowrap"
-                  >
-                    <Icon className="h-4 w-4" />
-                    {tab.label}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Content */}
+          <CanvasHeader bundle={bundle} onClose={onClose} />
+          <CanvasTabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+          
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full">
               <div className="p-6">
