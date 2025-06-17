@@ -51,15 +51,13 @@ const BundleModal: React.FC<BundleModalProps> = ({
         name: initialBundle.name,
         summary: initialBundle.summary || '',
         tags: initialBundle.tags?.map(tag => ({ name: tag, type: 'category' })) || [],
-        objectives: ['Improve water conservation', 'Optimize irrigation systems'], // Sample objectives
-        pillars: ['resource', 'services'], // Sample pillars
-        geography: ['Dubai', 'Abu Dhabi'], // Sample geography
+        objectives: initialBundle.objectives || ['Improve water conservation', 'Optimize irrigation systems'],
+        pillars: initialBundle.pillars as ('population' | 'resource' | 'services' | 'social')[] || ['resource', 'services'],
+        geography: initialBundle.geography || ['Dubai', 'Abu Dhabi'],
         status: initialBundle.status,
-        owner: initialBundle.owner,
-        lastModified: initialBundle.lastModified,
-        isApproved: initialBundle.isApproved,
         coherence: initialBundle.coherence,
         ndiImpact: initialBundle.ndiImpact,
+        isApproved: initialBundle.isApproved,
       });
     } else {
       // Reset form when creating a new bundle
