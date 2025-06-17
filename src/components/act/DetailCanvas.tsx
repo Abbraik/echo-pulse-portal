@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Info, ThumbsUp } from 'lucide-react';
+import { Check, Info, ThumbsUp, Maximize2 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { DetailView } from '@/pages/Act';
 import { motion, AnimatePresence } from 'framer-motion';
 import BundleView from './BundleView';
+import ActWorkingCanvas from './canvas/ActWorkingCanvas';
 import { useRealBundle } from './hooks/useRealBundles';
 
 interface DetailCanvasProps {
@@ -17,6 +18,7 @@ interface DetailCanvasProps {
 const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => {
   const { t, isRTL } = useTranslation();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [showWorkingCanvas, setShowWorkingCanvas] = useState(false);
   
   console.log('DetailCanvas - selectedBundle:', selectedBundle, 'view:', view);
   
@@ -40,7 +42,7 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
     // For now, we'll handle it in the view logic below
   };
 
-  // If a bundle is selected and the view is 'default', show the bundle view
+  // If a bundle is selected and the view is 'default', show the bundle view with working canvas option
   if (selectedBundle && view === 'default') {
     console.log('Rendering bundle view for:', selectedBundle);
     return (
@@ -48,14 +50,45 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="p-6 h-full"
+        className="p-6 h-full relative"
       >
         {bundleLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
           </div>
         ) : bundleData ? (
-          <BundleView bundleId={selectedBundle} onClose={handleCloseBundleView} />
+          <>
+            {/* Bundle View with Working Canvas Button */}
+            <div className="h-full flex flex-col">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-blue-400">
+                    {bundleData.name}
+                  </h2>
+                  <p className="text-gray-400 mt-1">Bundle Details & Configuration</p>
+                </div>
+                <Button
+                  onClick={() => setShowWorkingCanvas(true)}
+                  className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 flex items-center gap-2"
+                >
+                  <Maximize2 className="h-4 w-4" />
+                  Open Working Canvas
+                </Button>
+              </div>
+              
+              <div className="flex-1 overflow-hidden">
+                <BundleView bundleId={selectedBundle} onClose={handleCloseBundleView} />
+              </div>
+            </div>
+
+            {/* Working Canvas Overlay */}
+            {showWorkingCanvas && (
+              <ActWorkingCanvas
+                bundleId={selectedBundle}
+                onClose={() => setShowWorkingCanvas(false)}
+              />
+            )}
+          </>
         ) : (
           <div className="flex items-center justify-center h-64 text-gray-400">
             <div className="text-center">
@@ -81,15 +114,28 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
             {/* Show bundle context if available */}
             {selectedBundle && bundleData && (
               <div className="mb-6 p-4 rounded-xl backdrop-blur-sm bg-teal-500/10 border border-teal-500/20">
-                <h3 className="text-lg font-semibold text-teal-300 mb-2">Working with Bundle:</h3>
-                <p className="text-white font-medium">{bundleData.name}</p>
-                {bundleData.summary && (
-                  <p className="text-gray-300 text-sm mt-1">{bundleData.summary}</p>
-                )}
-                <div className="mt-2 flex items-center space-x-4 text-sm text-gray-400">
-                  <span>Status: {bundleData.status}</span>
-                  {bundleData.coherence > 0 && <span>Coherence: {bundleData.coherence}%</span>}
-                  {bundleData.ndiImpact > 0 && <span>NDI Impact: {bundleData.ndiImpact}</span>}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold text-teal-300 mb-2">Working with Bundle:</h3>
+                    <p className="text-white font-medium">{bundleData.name}</p>
+                    {bundleData.summary && (
+                      <p className="text-gray-300 text-sm mt-1">{bundleData.summary}</p>
+                    )}
+                    <div className="mt-2 flex items-center space-x-4 text-sm text-gray-400">
+                      <span>Status: {bundleData.status}</span>
+                      {bundleData.coherence > 0 && <span>Coherence: {bundleData.coherence}%</span>}
+                      {bundleData.ndiImpact > 0 && <span>NDI Impact: {bundleData.ndiImpact}</span>}
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowWorkingCanvas(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Maximize2 className="h-3 w-3" />
+                    Expand
+                  </Button>
                 </div>
               </div>
             )}
@@ -252,11 +298,24 @@ const DetailCanvas: React.FC<DetailCanvasProps> = ({ view, selectedBundle }) => 
             {/* Show bundle context if available */}
             {selectedBundle && bundleData && (
               <div className="mb-6 p-4 rounded-xl backdrop-blur-sm bg-teal-500/10 border border-teal-500/20">
-                <h3 className="text-lg font-semibold text-teal-300 mb-2">Optimizing Bundle:</h3>
-                <p className="text-white font-medium">{bundleData.name}</p>
-                {bundleData.coherence > 0 && (
-                  <p className="text-gray-300 text-sm mt-1">Current coherence: {bundleData.coherence}%</p>
-                )}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold text-teal-300 mb-2">Optimizing Bundle:</h3>
+                    <p className="text-white font-medium">{bundleData.name}</p>
+                    {bundleData.coherence > 0 && (
+                      <p className="text-gray-300 text-sm mt-1">Current coherence: {bundleData.coherence}%</p>
+                    )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowWorkingCanvas(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Maximize2 className="h-3 w-3" />
+                    Expand
+                  </Button>
+                </div>
               </div>
             )}
 
