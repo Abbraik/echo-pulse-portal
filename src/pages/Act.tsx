@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -71,7 +72,7 @@ const Act: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative">
       <ParticlesBackground 
         count={60}
         colorStart="#14B8A6"
@@ -83,33 +84,35 @@ const Act: React.FC = () => {
       <ActBackground />
 
       <AnimatedPage>
-        <ActHeader hideHeader={hideHeader} />
+        <div className="relative" style={{ zIndex: 10 }}>
+          <ActHeader hideHeader={hideHeader} />
 
-        {/* Main Content Container */}
-        <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
-          <ActCommandSection onAction={handleCommandAction} />
+          {/* Main Content Container */}
+          <div className="max-w-[1440px] mx-auto px-6 pb-8">
+            <ActCommandSection onAction={handleCommandAction} />
+            
+            <ActMainContent 
+              selectedBundle={selectedBundle}
+              onBundleSelect={handleBundleSelect}
+              detailView={detailView}
+            />
+            
+            <ActDeliverySection 
+              detailView={detailView}
+              selectedBundleId={selectedBundle?.id || null}
+            />
+            
+            <ActPlaybooksSection 
+              playbooksExpanded={playbooksExpanded}
+              onToggleExpanded={() => setPlaybooksExpanded(!playbooksExpanded)}
+            />
+          </div>
           
-          <ActMainContent 
-            selectedBundle={selectedBundle}
-            onBundleSelect={handleBundleSelect}
-            detailView={detailView}
-          />
-          
-          <ActDeliverySection 
-            detailView={detailView}
-            selectedBundleId={selectedBundle?.id || null}
-          />
-          
-          <ActPlaybooksSection 
-            playbooksExpanded={playbooksExpanded}
-            onToggleExpanded={() => setPlaybooksExpanded(!playbooksExpanded)}
+          <ActScrollToTop 
+            showScrollToTop={showScrollToTop}
+            onScrollToTop={scrollToTop}
           />
         </div>
-        
-        <ActScrollToTop 
-          showScrollToTop={showScrollToTop}
-          onScrollToTop={scrollToTop}
-        />
       </AnimatedPage>
     </div>
   );

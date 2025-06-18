@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -38,7 +39,7 @@ const DirectorGeneralDashboard: React.FC = () => {
 
   return (
     <AnimatedPage>
-      <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative">
         <ParticlesBackground 
           count={80}
           colorStart="#14B8A6"
@@ -48,12 +49,7 @@ const DirectorGeneralDashboard: React.FC = () => {
           speed={0.3}
         />
         
-        {/* Simplified background effects */}
-        <div className="fixed inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent"></div>
-        </div>
-
-        <div className="relative z-10">
+        <div className="relative" style={{ zIndex: 10 }}>
           {/* Main Dashboard Content */}
           <div className="max-w-[1600px] mx-auto p-6 space-y-6">
             {/* Strategic Overview - Full Width */}

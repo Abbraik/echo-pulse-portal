@@ -63,7 +63,7 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({
           speedX: (Math.random() - 0.5) * speed,
           speedY: (Math.random() - 0.5) * speed,
           color: i % 2 === 0 ? colorStart : colorEnd,
-          opacity: Math.random() * 0.6 + 0.1,
+          opacity: Math.random() * 0.8 + 0.2,
         });
       }
     };
@@ -113,9 +113,8 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({
   }, [count, colorStart, colorEnd, minSize, maxSize, speed]);
   
   return (
-    <div className={`fixed inset-0 -z-10 ${className}`}>
+    <div className={`fixed inset-0 pointer-events-none ${className}`} style={{ zIndex: 1 }}>
       <canvas ref={canvasRef} className="absolute inset-0" />
-      <div className="absolute inset-0 bg-gradient-to-b dark:from-navy-900/50 dark:to-navy-900/80 from-blue-50/50 to-white/80"></div>
     </div>
   );
 };
