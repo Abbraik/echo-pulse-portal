@@ -250,7 +250,7 @@ const ThinkPage: React.FC = () => {
     
     Object.keys(adjustedMetrics.pillars).forEach(pillar => {
       const pillarKey = pillar as keyof typeof adjustedMetrics.pillars;
-      const adjustmentF actor = (1 + (trendDirection / 100));
+      const adjustmentFactor = (1 + (trendDirection / 100));
       adjustedMetrics.pillars[pillarKey].value = Math.min(
         100,
         Math.max(1, Math.round(adjustedMetrics.pillars[pillarKey].value * adjustmentFactor))
