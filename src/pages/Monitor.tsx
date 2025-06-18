@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, HelpCircle } from 'lucide-react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { FullscreenButton } from '@/components/ui/fullscreen-button';
+import ParticlesBackground from '@/components/ui/particles-background';
 import HeatmapTableView from '@/components/monitor/HeatmapTableView';
 import RadialHubView from '@/components/monitor/RadialHubView';
 import TileDashboardView from '@/components/monitor/TileDashboardView';
@@ -75,6 +76,15 @@ const Monitor: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      <ParticlesBackground 
+        count={70}
+        colorStart="#14B8A6"
+        colorEnd="#2563EB"
+        minSize={2}
+        maxSize={5}
+        speed={0.4}
+      />
+
       {/* Enhanced cinematic background */}
       <div className="fixed inset-0 z-0">
         <motion.div 
@@ -111,7 +121,7 @@ const Monitor: React.FC = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="flex flex-col min-h-screen"
+          className="flex flex-col min-h-screen relative z-10"
         >
           {/* Primary Monitor Header Bar - Always Visible */}
           <motion.header 
