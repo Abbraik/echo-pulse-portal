@@ -12,12 +12,14 @@ import KpiCarousel from '@/components/home/KpiCarousel';
 import AlertsPanel from '@/components/home/AlertsPanel';
 import ActivityPanel from '@/components/home/ActivityPanel';
 import WelcomeOverlay from '@/components/home/WelcomeOverlay';
-import { PulseData } from '@/api/dashboard';
+import { PulseData, Alert, ActivityEvent, getAlerts, getActivity } from '@/api/dashboard';
 
 const HomePage: React.FC = () => {
   const { t, isRTL } = useTranslation();
   const [showWelcome, setShowWelcome] = useState(false);
   const [pulseData, setPulseData] = useState<PulseData | null>(null);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [activities, setActivities] = useState<ActivityEvent[]>([]);
 
   // Check for first visit
   useEffect(() => {
@@ -42,6 +44,27 @@ const HomePage: React.FC = () => {
     }, 1000);
 
     return () => clearTimeout(timer);
+  }, []);
+
+  // Load alerts and activities
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [alertsData, activitiesData] = await Promise.all([
+          getAlerts(),
+          getActivity()
+        ]);
+        setAlerts(alertsData);
+        setActivities(activitiesData);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        // Set empty arrays as fallback
+        setAlerts([]);
+        setActivities([]);
+      }
+    };
+
+    loadData();
   }, []);
 
   return (
@@ -96,7 +119,7 @@ const HomePage: React.FC = () => {
               className="grid grid-cols-1 lg:grid-cols-2 gap-6"
             >
               <QuickActions />
-              <AlertsPanel />
+              <AlertsPanel alerts={alerts} />
             </motion.div>
 
             {/* Activity Timeline */}
@@ -105,7 +128,7 @@ const HomePage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <ActivityPanel />
+              <ActivityPanel activities={activities} />
             </motion.div>
           </div>
         </div>
@@ -113,7 +136,7 @@ const HomePage: React.FC = () => {
         {/* Welcome Overlay */}
         {showWelcome && (
           <WelcomeOverlay 
-            isOpen={showWelcome} 
+            open={showWelcome} 
             onClose={() => setShowWelcome(false)} 
           />
         )}

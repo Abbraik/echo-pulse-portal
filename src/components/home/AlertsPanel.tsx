@@ -13,7 +13,7 @@ interface AlertsPanelProps {
   alerts: Alert[];
 }
 
-const AlertsPanel: React.FC<AlertsPanelProps> = ({ alerts }) => {
+const AlertsPanel: React.FC<AlertsPanelProps> = ({ alerts = [] }) => {
   const { t } = useTranslation();
 
   const getAlertColor = (priority: string) => {
@@ -41,36 +41,42 @@ const AlertsPanel: React.FC<AlertsPanelProps> = ({ alerts }) => {
         <GlassCardContent>
           <ScrollArea className="h-[300px] pr-4">
             <div className="space-y-4">
-              {alerts.slice(0, 3).map((alert) => {
-                const color = getAlertColor(alert.priority);
-                
-                return (
-                  <motion.div
-                    key={alert.id}
-                    whileHover={{ scale: 1.02 }}
-                    className={`p-4 rounded-lg bg-${color}-500/10 border border-${color}-500/20`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-1">
-                        <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium bg-${color}-500/20 text-${color}-500`}>
-                          {alert.priority} Priority
+              {alerts.length === 0 ? (
+                <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+                  <p>{t('noAlertsAvailable', { defaultValue: 'No alerts available' })}</p>
+                </div>
+              ) : (
+                alerts.slice(0, 3).map((alert) => {
+                  const color = getAlertColor(alert.priority);
+                  
+                  return (
+                    <motion.div
+                      key={alert.id}
+                      whileHover={{ scale: 1.02 }}
+                      className={`p-4 rounded-lg bg-${color}-500/10 border border-${color}-500/20`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium bg-${color}-500/20 text-${color}-500`}>
+                            {alert.priority} Priority
+                          </div>
+                          <h4 className="font-medium text-base">{alert.message}</h4>
+                          <p className="text-sm text-muted-foreground">{alert.details}</p>
                         </div>
-                        <h4 className="font-medium text-base">{alert.message}</h4>
-                        <p className="text-sm text-muted-foreground">{alert.details}</p>
                       </div>
-                    </div>
-                    <div className="mt-3 flex justify-end">
-                      <Button variant="ghost" size="sm" className="text-xs">
-                        Recalibrate
-                      </Button>
-                      <Button variant="outline" size="sm" className="ml-2 text-xs">
-                        <span>Consider</span>
-                        <ExternalLink className="ml-1 h-3 w-3" />
-                      </Button>
-                    </div>
-                  </motion.div>
-                );
-              })}
+                      <div className="mt-3 flex justify-end">
+                        <Button variant="ghost" size="sm" className="text-xs">
+                          Recalibrate
+                        </Button>
+                        <Button variant="outline" size="sm" className="ml-2 text-xs">
+                          <span>Consider</span>
+                          <ExternalLink className="ml-1 h-3 w-3" />
+                        </Button>
+                      </div>
+                    </motion.div>
+                  );
+                })
+              )}
             </div>
           </ScrollArea>
         </GlassCardContent>
