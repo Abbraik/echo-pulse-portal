@@ -113,8 +113,9 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({
   }, [count, colorStart, colorEnd, minSize, maxSize, speed]);
   
   return (
-    <div className={`fixed inset-0 z-0 pointer-events-none ${className}`}>
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+    <div className={`fixed inset-0 -z-10 ${className}`}>
+      <canvas ref={canvasRef} className="absolute inset-0" />
+      <div className="absolute inset-0 bg-gradient-to-b dark:from-navy-900/50 dark:to-navy-900/80 from-blue-50/50 to-white/80"></div>
     </div>
   );
 };

@@ -83,29 +83,27 @@ const Act: React.FC = () => {
       <ActBackground />
 
       <AnimatedPage>
-        <div className="relative z-10">
-          <ActHeader hideHeader={hideHeader} />
+        <ActHeader hideHeader={hideHeader} />
 
-          {/* Main Content Container */}
-          <div className="max-w-[1440px] mx-auto px-6 pb-8">
-            <ActCommandSection onAction={handleCommandAction} />
-            
-            <ActMainContent 
-              selectedBundle={selectedBundle}
-              onBundleSelect={handleBundleSelect}
-              detailView={detailView}
-            />
-            
-            <ActDeliverySection 
-              detailView={detailView}
-              selectedBundleId={selectedBundle?.id || null}
-            />
-            
-            <ActPlaybooksSection 
-              playbooksExpanded={playbooksExpanded}
-              onToggleExpanded={() => setPlaybooksExpanded(!playbooksExpanded)}
-            />
-          </div>
+        {/* Main Content Container */}
+        <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
+          <ActCommandSection onAction={handleCommandAction} />
+          
+          <ActMainContent 
+            selectedBundle={selectedBundle}
+            onBundleSelect={handleBundleSelect}
+            detailView={detailView}
+          />
+          
+          <ActDeliverySection 
+            detailView={detailView}
+            selectedBundleId={selectedBundle?.id || null}
+          />
+          
+          <ActPlaybooksSection 
+            playbooksExpanded={playbooksExpanded}
+            onToggleExpanded={() => setPlaybooksExpanded(!playbooksExpanded)}
+          />
         </div>
         
         <ActScrollToTop 
