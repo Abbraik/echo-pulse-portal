@@ -17,6 +17,7 @@ import Innovate from "./pages/Innovate";
 import Monitor from "./pages/Monitor";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import SecretaryGeneralDashboard from "./pages/SecretaryGeneralDashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,6 +53,7 @@ const AppContent = () => {
               <Route path="/learn" element={<Learn />} />
               <Route path="/innovate" element={<Innovate />} />
               <Route path="/monitor" element={<Monitor />} />
+              <Route path="/secretary-general" element={<SecretaryGeneralDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
