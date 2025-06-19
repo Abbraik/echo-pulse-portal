@@ -1,10 +1,16 @@
+
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import { useSGData } from '@/hooks/useSGData';
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
+import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
+import { useDataValidation } from '@/hooks/useDataValidation';
 import SGDashboardPanel from '@/components/sg/SGDashboardPanel';
 import { OptimizedPanelWrapper } from '@/components/sg/OptimizedPanelWrapper';
+import { ConnectionStatus } from '@/components/sg/ConnectionStatus';
+import { DataSyncIndicator } from '@/components/sg/DataSyncIndicator';
+import { SmartRefreshButton } from '@/components/sg/SmartRefreshButton';
 import StrategicCommandPanel from '@/components/sg/panels/StrategicCommandPanel';
 import ApprovalsPanel from '@/components/sg/panels/ApprovalsPanel';
 import CoordinationPanel from '@/components/sg/panels/CoordinationPanel';
