@@ -10,7 +10,7 @@ export const useModularBundles = (status?: string) => {
     queryKey: ['modular-bundles', status],
     queryFn: async () => {
       let query = supabase
-        .from('act.bundles')
+        .from('bundles')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -22,36 +22,7 @@ export const useModularBundles = (status?: string) => {
       
       if (error) {
         console.error('Error fetching bundles:', error);
-        // Fallback to public schema if modular schema doesn't exist yet
-        const fallbackQuery = supabase
-          .from('bundles')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (status) {
-          fallbackQuery.eq('status', status as any);
-        }
-        
-        const { data: fallbackData, error: fallbackError } = await fallbackQuery;
-        if (fallbackError) throw fallbackError;
-        
-        return fallbackData?.map(row => ({
-          id: row.id,
-          name: row.name,
-          summary: row.summary,
-          createdBy: row.created_by,
-          leveragePoints: row.leverage_points || [],
-          objectives: row.objectives || [],
-          pillars: row.pillars || [],
-          geography: row.geography || [],
-          tags: row.tags || [],
-          status: row.status,
-          coherence: row.coherence || 50,
-          ndiImpact: row.ndi_impact || 0,
-          isApproved: row.is_approved || false,
-          createdAt: new Date(row.created_at),
-          updatedAt: new Date(row.updated_at)
-        })) as ActBundle[];
+        throw error;
       }
       
       return data?.map(row => ({
@@ -84,10 +55,6 @@ export const useModularBundleActions = () => {
     mutationFn: async (bundleData: Partial<ActBundle>) => {
       if (!user) throw new Error('User not authenticated');
       
-      // Try modular schema first, fallback to public schema
-      let query = supabase.from('act.bundles');
-      let fallbackQuery = supabase.from('bundles');
-      
       const bundleRecord = {
         name: bundleData.name!,
         summary: bundleData.summary,
@@ -100,18 +67,13 @@ export const useModularBundleActions = () => {
         status: bundleData.status || 'draft'
       };
       
-      const { data, error } = await query.insert(bundleRecord).select().single();
+      const { data, error } = await supabase
+        .from('bundles')
+        .insert(bundleRecord)
+        .select()
+        .single();
       
-      if (error) {
-        // Fallback to public schema
-        const { data: fallbackData, error: fallbackError } = await fallbackQuery
-          .insert(bundleRecord)
-          .select()
-          .single();
-        
-        if (fallbackError) throw fallbackError;
-        return fallbackData;
-      }
+      if (error) throw error;
       
       return data;
     },

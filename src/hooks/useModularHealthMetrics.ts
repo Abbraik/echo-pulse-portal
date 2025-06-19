@@ -9,7 +9,7 @@ export const useModularHealthMetrics = (zone?: string) => {
     queryKey: ['modular-health-metrics', zone],
     queryFn: async () => {
       let query = supabase
-        .from('monitor.health_metrics')
+        .from('health_metrics')
         .select('*')
         .order('timestamp', { ascending: false });
 
@@ -20,48 +20,22 @@ export const useModularHealthMetrics = (zone?: string) => {
       const { data, error } = await query;
       
       if (error) {
-        console.error('Error fetching from modular schema:', error);
-        // Fallback to public schema
-        let fallbackQuery = supabase
-          .from('health_metrics')
-          .select('*')
-          .order('timestamp', { ascending: false });
-
-        if (zone) {
-          fallbackQuery = fallbackQuery.eq('zone', zone as any);
-        }
-
-        const { data: fallbackData, error: fallbackError } = await fallbackQuery;
-        if (fallbackError) throw fallbackError;
-        
-        return fallbackData?.map(row => ({
-          id: row.id,
-          runId: null,
-          zone: row.zone,
-          indicator: 'HEALTH',
-          name: row.name,
-          value: row.value,
-          target: row.target,
-          unit: null,
-          measurementType: 'point' as const,
-          timestamp: new Date(row.timestamp),
-          metadata: {},
-          createdAt: new Date(row.created_at)
-        })) as MonitorHealthMetric[];
+        console.error('Error fetching health metrics:', error);
+        throw error;
       }
       
       return data?.map(row => ({
         id: row.id,
-        runId: row.run_id,
+        runId: null,
         zone: row.zone,
-        indicator: row.indicator,
+        indicator: 'HEALTH',
         name: row.name,
         value: row.value,
         target: row.target,
-        unit: row.unit,
-        measurementType: row.measurement_type as 'point' | 'cumulative' | 'average',
+        unit: null,
+        measurementType: 'point' as const,
         timestamp: new Date(row.timestamp),
-        metadata: row.metadata || {},
+        metadata: {},
         createdAt: new Date(row.created_at)
       })) as MonitorHealthMetric[];
     },
@@ -74,38 +48,20 @@ export const useModularHealthMetricActions = () => {
 
   const createHealthMetric = useMutation({
     mutationFn: async (metricData: Partial<MonitorHealthMetric>) => {
-      // Try modular schema first
-      let query = supabase.from('monitor.health_metrics');
-      let fallbackQuery = supabase.from('health_metrics');
-      
       const metricRecord = {
         zone: metricData.zone as any,
-        indicator: metricData.indicator!,
         name: metricData.name!,
         value: metricData.value!,
-        target: metricData.target,
-        unit: metricData.unit,
-        measurement_type: metricData.measurementType,
-        metadata: metricData.metadata || {}
+        target: metricData.target
       };
       
-      const { data, error } = await query.insert(metricRecord).select().single();
+      const { data, error } = await supabase
+        .from('health_metrics')
+        .insert(metricRecord)
+        .select()
+        .single();
       
-      if (error) {
-        // Fallback to public schema
-        const { data: fallbackData, error: fallbackError } = await fallbackQuery
-          .insert({
-            zone: metricData.zone as any,
-            name: metricData.name!,
-            value: metricData.value!,
-            target: metricData.target
-          })
-          .select()
-          .single();
-        
-        if (fallbackError) throw fallbackError;
-        return fallbackData;
-      }
+      if (error) throw error;
       
       return data;
     },

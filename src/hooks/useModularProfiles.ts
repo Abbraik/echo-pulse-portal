@@ -13,45 +13,23 @@ export const useModularCurrentProfile = () => {
     queryFn: async () => {
       if (!user) return null;
       
-      // Try modular schema first
       const { data, error } = await supabase
-        .from('core.profiles')
+        .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
       
       if (error) {
-        console.error('Error fetching from modular schema:', error);
-        // Fallback to public schema
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        
-        if (fallbackError) throw fallbackError;
-        
-        return {
-          id: fallbackData.id,
-          fullName: `${fallbackData.first_name || ''} ${fallbackData.last_name || ''}`.trim(),
-          role: fallbackData.role,
-          language: 'en',
-          theme: 'dark',
-          avatarUrl: fallbackData.avatar_url,
-          department: fallbackData.department,
-          zone: fallbackData.zone,
-          preferences: fallbackData.preferences || {},
-          createdAt: new Date(fallbackData.created_at),
-          updatedAt: new Date(fallbackData.updated_at)
-        } as CoreProfile;
+        console.error('Error fetching profile:', error);
+        throw error;
       }
       
       return {
         id: data.id,
-        fullName: data.full_name,
+        fullName: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
         role: data.role,
-        language: data.language || 'en',
-        theme: data.theme || 'dark',
+        language: 'en',
+        theme: 'dark',
         avatarUrl: data.avatar_url,
         department: data.department,
         zone: data.zone,
