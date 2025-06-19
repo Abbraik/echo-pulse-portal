@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
@@ -12,7 +11,7 @@ import CoordinationPanel from '@/components/sg/panels/CoordinationPanel';
 import HealthRiskPanel from '@/components/sg/panels/HealthRiskPanel';
 import ExecutiveSummaryPanel from '@/components/sg/panels/ExecutiveSummaryPanel';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Shield, Globe, Keyboard, Info, Activity, Zap } from 'lucide-react';
+import { RefreshCw, Shield, Globe, Keyboard, Info, Activity, Zap, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Memoized panel components for better performance
@@ -39,6 +38,32 @@ const SecretaryGeneralDashboard: React.FC = () => {
   const [showPerformanceStats, setShowPerformanceStats] = useState(false);
   
   const performanceMetrics = usePerformanceMonitor('SecretaryGeneralDashboard');
+  const { validateData, lastValidation, getValidationSummary } = useDataValidation();
+  
+  // Real-time updates configuration
+  const realTimeConfig = useMemo(() => ({
+    enabled: autoRefresh,
+    interval: 30000, // 30 seconds
+    maxRetries: 3,
+    backoffMultiplier: 2
+  }), [autoRefresh]);
+
+  const realTimeState = useRealTimeUpdates(refreshData, realTimeConfig);
+
+  // Validate data when it changes
+  useEffect(() => {
+    if (data) {
+      validateData(data);
+    }
+  }, [data, validateData]);
+
+  // Get sync status based on real-time state and data validation
+  const getSyncStatus = useCallback(() => {
+    if (loading) return 'syncing';
+    if (error || !lastValidation?.isValid) return 'error';
+    if (realTimeState.isConnected && lastValidation?.isValid) return 'synced';
+    return 'stale';
+  }, [loading, error, lastValidation, realTimeState.isConnected]);
 
   // Memoized panel configuration with proper props
   const panelConfig: PanelConfigItem[] = useMemo(() => [
@@ -101,8 +126,23 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
   // Optimized refresh function with loading state
   const handleRefresh = useCallback(async () => {
-    await refreshData();
-  }, [refreshData]);
+    try {
+      await refreshData();
+      if (data) {
+        const validation = validateData(data);
+        if (!validation.isValid) {
+          console.warn('Data validation failed:', validation.errors);
+        }
+      }
+    } catch (err) {
+      console.error('Refresh failed:', err);
+    }
+  }, [refreshData, data, validateData]);
+
+  // Toggle auto-refresh and real-time updates
+  const handleToggleAutoRefresh = useCallback(() => {
+    setAutoRefresh(!autoRefresh);
+  }, [autoRefresh]);
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -297,7 +337,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
           }}
         />
         
-        {/* Enhanced Dashboard Header */}
+        {/* Enhanced Dashboard Header with Real-time Features */}
         <motion.div 
           className="relative z-10 mb-6 glass-panel-cinematic p-6 border border-white/20"
           initial={{ y: -20, opacity: 0 }}
@@ -318,21 +358,30 @@ const SecretaryGeneralDashboard: React.FC = () => {
                   Secretary General Command Center
                 </h1>
                 <p className="text-gray-300 font-noto">Strategic oversight and system coordination</p>
-                <div className="flex items-center space-x-4 mt-2">
-                  {lastUpdated && (
-                    <p className="text-xs text-gray-400 font-mono">
-                      Last synchronized: {new Date(lastUpdated).toLocaleString()}
-                    </p>
+                
+                {/* Enhanced Status Information */}
+                <div className="flex items-center space-x-4 mt-3">
+                  <ConnectionStatus
+                    isConnected={realTimeState.isConnected}
+                    lastUpdate={realTimeState.lastUpdate}
+                    error={realTimeState.error}
+                    retryCount={realTimeState.retryCount}
+                    onReconnect={realTimeState.reconnect}
+                  />
+                  
+                  <DataSyncIndicator
+                    status={getSyncStatus()}
+                    lastSync={lastUpdated}
+                    nextSync={autoRefresh ? new Date(Date.now() + 30000).toISOString() : undefined}
+                  />
+                  
+                  {lastValidation && !lastValidation.isValid && (
+                    <span className="text-xs text-red-400 font-mono flex items-center">
+                      <AlertCircle size={12} className="mr-1" />
+                      {getValidationSummary()}
+                    </span>
                   )}
-                  {autoRefresh && (
-                    <motion.span 
-                      className="text-xs text-green-400 font-mono flex items-center"
-                      animate={{ opacity: [1, 0.5, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      ● Auto-refresh active
-                    </motion.span>
-                  )}
+                  
                   {showPerformanceStats && (
                     <div className="text-xs text-blue-400 font-mono flex items-center space-x-2">
                       <Zap size={12} />
@@ -355,28 +404,13 @@ const SecretaryGeneralDashboard: React.FC = () => {
                 Shortcuts
               </Button>
               
-              <Button
-                onClick={() => setAutoRefresh(!autoRefresh)}
-                variant="outline"
-                size="sm"
-                className={`backdrop-blur-sm transition-all duration-200 ${
-                  autoRefresh
-                    ? 'border-green-500/30 text-green-400 hover:bg-green-500/10 hover:border-green-400/50'
-                    : 'border-gray-500/30 text-gray-400 hover:bg-gray-500/10 hover:border-gray-400/50'
-                }`}
-              >
-                <RefreshCw className={`mr-2 h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`} />
-                Auto
-              </Button>
-              
-              <Button
-                onClick={handleRefresh}
-                variant="outline"
-                className="border-teal-500/30 text-teal-400 hover:bg-teal-500/10 hover:border-teal-400/50 backdrop-blur-sm transition-all duration-200"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Sync Data
-              </Button>
+              <SmartRefreshButton
+                onRefresh={handleRefresh}
+                autoRefresh={autoRefresh}
+                onToggleAutoRefresh={handleToggleAutoRefresh}
+                isLoading={loading}
+                lastRefresh={lastUpdated}
+              />
             </div>
           </div>
         </motion.div>
