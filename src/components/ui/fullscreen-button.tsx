@@ -24,20 +24,27 @@ export const FullscreenButton: React.FC<FullscreenButtonProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.25 }}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.2 }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
     >
       <Button
         size="sm"
         variant="ghost"
         onClick={onToggle}
         onKeyDown={handleKeyDown}
-        className={`opacity-0 group-hover:opacity-100 transition-opacity duration-250 bg-white/10 hover:bg-white/20 ${className}`}
+        className={`opacity-0 group-hover:opacity-100 transition-all duration-300 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 hover:border-white/40 ${className}`}
         aria-expanded={isFullscreen}
-        aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+        aria-label={isFullscreen ? "Exit fullscreen (Esc)" : "Enter fullscreen (Shift+Enter)"}
       >
-        {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+        <motion.div
+          animate={{ rotate: isFullscreen ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+        </motion.div>
       </Button>
     </motion.div>
   );

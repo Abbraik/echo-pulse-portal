@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
+import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import { useSGData } from '@/hooks/useSGData';
 import SGDashboardPanel from '@/components/sg/SGDashboardPanel';
 import StrategicCommandPanel from '@/components/sg/panels/StrategicCommandPanel';
@@ -8,39 +10,87 @@ import CoordinationPanel from '@/components/sg/panels/CoordinationPanel';
 import HealthRiskPanel from '@/components/sg/panels/HealthRiskPanel';
 import ExecutiveSummaryPanel from '@/components/sg/panels/ExecutiveSummaryPanel';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Shield, Globe } from 'lucide-react';
+import { RefreshCw, Shield, Globe, Keyboard, Info } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const SecretaryGeneralDashboard: React.FC = () => {
   const { data, loading, error, lastUpdated, refreshData, actions } = useSGData();
   const [hoveredPanel, setHoveredPanel] = useState<string | null>(null);
   const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(false);
 
-  const handleToggleFullscreen = (panelId: string) => {
+  // Enhanced fullscreen toggle with animations
+  const handleToggleFullscreen = useCallback((panelId: string) => {
     setFullscreenPanel(fullscreenPanel === panelId ? null : panelId);
-  };
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape' && fullscreenPanel) {
-      setFullscreenPanel(null);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
   }, [fullscreenPanel]);
 
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      // Help overlay
+      if (event.key === '?' || (event.key === 'h' && event.ctrlKey)) {
+        event.preventDefault();
+        setShowKeyboardHelp(!showKeyboardHelp);
+      }
+      
+      // Quick panel access with number keys
+      if (event.ctrlKey && !isNaN(Number(event.key))) {
+        event.preventDefault();
+        const panelNumber = parseInt(event.key);
+        const panelIds = ['strategic', 'approvals', 'coordination', 'health', 'summary'];
+        if (panelNumber >= 1 && panelNumber <= panelIds.length) {
+          handleToggleFullscreen(panelIds[panelNumber - 1]);
+        }
+      }
+      
+      // Refresh with Ctrl+R
+      if (event.key === 'r' && event.ctrlKey) {
+        event.preventDefault();
+        refreshData();
+      }
+      
+      // Toggle auto-refresh with Ctrl+Shift+A
+      if (event.key === 'a' && event.ctrlKey && event.shiftKey) {
+        event.preventDefault();
+        setAutoRefresh(!autoRefresh);
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [showKeyboardHelp, handleToggleFullscreen, refreshData, autoRefresh]);
+
+  // Auto-refresh functionality
+  useEffect(() => {
+    if (!autoRefresh) return;
+    
+    const interval = setInterval(() => {
+      refreshData();
+    }, 30000); // Refresh every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [autoRefresh, refreshData]);
+
+  // Loading state with enhanced animation
   if (loading) {
     return (
       <AnimatedPage>
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-          <div className="text-center glass-panel-cinematic p-8">
-            <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <motion.div 
+            className="text-center glass-panel-cinematic p-8"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div 
+              className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full mx-auto mb-6"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
             <h2 className="text-xl font-bold text-white mb-2 font-noto">Initializing Command Center</h2>
             <p className="text-teal-200">Loading Secretary General Dashboard...</p>
-          </div>
+          </motion.div>
         </div>
       </AnimatedPage>
     );
@@ -50,7 +100,12 @@ const SecretaryGeneralDashboard: React.FC = () => {
     return (
       <AnimatedPage>
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-          <div className="text-center text-white max-w-md glass-panel-cinematic p-8">
+          <motion.div 
+            className="text-center text-white max-w-md glass-panel-cinematic p-8"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <Shield className="w-16 h-16 text-red-400 mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-4 text-red-400 font-noto">System Alert</h1>
             <p className="text-gray-300 mb-6 font-noto">{error}</p>
@@ -61,7 +116,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
               <RefreshCw className="mr-2 h-4 w-4" />
               Retry Connection
             </Button>
-          </div>
+          </motion.div>
         </div>
       </AnimatedPage>
     );
@@ -71,7 +126,12 @@ const SecretaryGeneralDashboard: React.FC = () => {
     return (
       <AnimatedPage>
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-          <div className="text-center text-white glass-panel-cinematic p-8">
+          <motion.div 
+            className="text-center text-white glass-panel-cinematic p-8"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <Globe className="w-16 h-16 text-amber-400 mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-2 font-noto">No Data Stream</h1>
             <p className="text-gray-400 mb-4 font-noto">Unable to establish data connection</p>
@@ -82,130 +142,224 @@ const SecretaryGeneralDashboard: React.FC = () => {
               <RefreshCw className="mr-2 h-4 w-4" />
               Reconnect
             </Button>
-          </div>
+          </motion.div>
         </div>
       </AnimatedPage>
     );
   }
+
+  const renderFullscreenPanel = () => {
+    if (!fullscreenPanel) return null;
+
+    const panels = {
+      strategic: data.strategic && <StrategicCommandPanel data={data.strategic} />,
+      approvals: <ApprovalsPanel data={data.approvals} actions={actions} />,
+      coordination: <CoordinationPanel data={data.coordination} actions={actions} />,
+      health: <HealthRiskPanel risks={data.risks} anomalies={data.anomalies} actions={actions} />,
+      summary: <ExecutiveSummaryPanel data={data.summary} actions={actions} />
+    };
+
+    const titles = {
+      strategic: "Strategic Command",
+      approvals: "Approvals & Directives", 
+      coordination: "Coordination Hub",
+      health: "System Health & Risk",
+      summary: "Executive Summary"
+    };
+
+    return (
+      <SGDashboardPanel
+        title={titles[fullscreenPanel as keyof typeof titles]}
+        panelId={fullscreenPanel}
+        isHovered={false}
+        isExpanded={false}
+        isFullscreen={true}
+        onHover={() => {}}
+        onToggleFullscreen={handleToggleFullscreen}
+        className="h-full"
+      >
+        {panels[fullscreenPanel as keyof typeof panels]}
+      </SGDashboardPanel>
+    );
+  };
 
   return (
     <AnimatedPage>
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-transparent to-blue-500/5" />
-        <div className="absolute top-20 left-20 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <motion.div 
+          className="absolute top-20 left-20 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.5, 0.8, 0.5] 
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity,
+            ease: "easeInOut" 
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1.1, 1, 1.1],
+            opacity: [0.3, 0.6, 0.3] 
+          }}
+          transition={{ 
+            duration: 10, 
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2 
+          }}
+        />
         
         {/* Enhanced Dashboard Header */}
-        <div className="relative z-10 mb-6 glass-panel-cinematic p-6 border border-white/20">
+        <motion.div 
+          className="relative z-10 mb-6 glass-panel-cinematic p-6 border border-white/20"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-blue-500/20 backdrop-blur-sm border border-teal-400/30">
+              <motion.div 
+                className="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-blue-500/20 backdrop-blur-sm border border-teal-400/30"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
                 <Shield size={24} className="text-teal-400" />
-              </div>
+              </motion.div>
               <div>
                 <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-blue-400 to-purple-400 mb-2 font-noto">
                   Secretary General Command Center
                 </h1>
                 <p className="text-gray-300 font-noto">Strategic oversight and system coordination</p>
-                {lastUpdated && (
-                  <p className="text-xs text-gray-400 mt-1 font-mono">
-                    Last synchronized: {new Date(lastUpdated).toLocaleString()}
-                  </p>
-                )}
+                <div className="flex items-center space-x-4 mt-2">
+                  {lastUpdated && (
+                    <p className="text-xs text-gray-400 font-mono">
+                      Last synchronized: {new Date(lastUpdated).toLocaleString()}
+                    </p>
+                  )}
+                  {autoRefresh && (
+                    <motion.span 
+                      className="text-xs text-green-400 font-mono flex items-center"
+                      animate={{ opacity: [1, 0.5, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      ● Auto-refresh active
+                    </motion.span>
+                  )}
+                </div>
               </div>
             </div>
-            <Button
-              onClick={refreshData}
-              variant="outline"
-              className="border-teal-500/30 text-teal-400 hover:bg-teal-500/10 hover:border-teal-400/50 backdrop-blur-sm transition-all duration-200"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Sync Data
-            </Button>
-          </div>
-        </div>
-
-        {/* Fullscreen Overlay with Enhanced Styling */}
-        {fullscreenPanel && (
-          <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm p-4">
-            <div className="h-full w-full max-w-7xl mx-auto">
-              {fullscreenPanel === 'strategic' && data.strategic && (
-                <SGDashboardPanel
-                  title="Strategic Command"
-                  panelId="strategic"
-                  isHovered={false}
-                  isExpanded={false}
-                  isFullscreen={true}
-                  onHover={() => {}}
-                  onToggleFullscreen={handleToggleFullscreen}
-                  className="h-full"
-                >
-                  <StrategicCommandPanel data={data.strategic} />
-                </SGDashboardPanel>
-              )}
-              {fullscreenPanel === 'approvals' && (
-                <SGDashboardPanel
-                  title="Approvals & Directives"
-                  panelId="approvals"
-                  isHovered={false}
-                  isExpanded={false}
-                  isFullscreen={true}
-                  onHover={() => {}}
-                  onToggleFullscreen={handleToggleFullscreen}
-                  className="h-full"
-                >
-                  <ApprovalsPanel data={data.approvals} actions={actions} />
-                </SGDashboardPanel>
-              )}
-              {fullscreenPanel === 'coordination' && (
-                <SGDashboardPanel
-                  title="Coordination Hub"
-                  panelId="coordination"
-                  isHovered={false}
-                  isExpanded={false}
-                  isFullscreen={true}
-                  onHover={() => {}}
-                  onToggleFullscreen={handleToggleFullscreen}
-                  className="h-full"
-                >
-                  <CoordinationPanel data={data.coordination} actions={actions} />
-                </SGDashboardPanel>
-              )}
-              {fullscreenPanel === 'health' && (
-                <SGDashboardPanel
-                  title="System Health & Risk"
-                  panelId="health"
-                  isHovered={false}
-                  isExpanded={false}
-                  isFullscreen={true}
-                  onHover={() => {}}
-                  onToggleFullscreen={handleToggleFullscreen}
-                  className="h-full"
-                >
-                  <HealthRiskPanel risks={data.risks} anomalies={data.anomalies} actions={actions} />
-                </SGDashboardPanel>
-              )}
-              {fullscreenPanel === 'summary' && (
-                <SGDashboardPanel
-                  title="Executive Summary"
-                  panelId="summary"
-                  isHovered={false}
-                  isExpanded={false}
-                  isFullscreen={true}
-                  onHover={() => {}}
-                  onToggleFullscreen={handleToggleFullscreen}
-                  className="h-full"
-                >
-                  <ExecutiveSummaryPanel data={data.summary} actions={actions} />
-                </SGDashboardPanel>
-              )}
+            
+            <div className="flex items-center space-x-3">
+              <Button
+                onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
+                variant="outline"
+                size="sm"
+                className="border-gray-500/30 text-gray-400 hover:bg-gray-500/10 hover:border-gray-400/50 backdrop-blur-sm"
+              >
+                <Keyboard className="mr-2 h-4 w-4" />
+                Shortcuts
+              </Button>
+              
+              <Button
+                onClick={() => setAutoRefresh(!autoRefresh)}
+                variant="outline"
+                size="sm"
+                className={`backdrop-blur-sm transition-all duration-200 ${
+                  autoRefresh
+                    ? 'border-green-500/30 text-green-400 hover:bg-green-500/10 hover:border-green-400/50'
+                    : 'border-gray-500/30 text-gray-400 hover:bg-gray-500/10 hover:border-gray-400/50'
+                }`}
+              >
+                <RefreshCw className={`mr-2 h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`} />
+                Auto
+              </Button>
+              
+              <Button
+                onClick={refreshData}
+                variant="outline"
+                className="border-teal-500/30 text-teal-400 hover:bg-teal-500/10 hover:border-teal-400/50 backdrop-blur-sm transition-all duration-200"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Sync Data
+              </Button>
             </div>
           </div>
-        )}
+        </motion.div>
+
+        {/* Keyboard Help Overlay */}
+        <AnimatePresence>
+          {showKeyboardHelp && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+              onClick={() => setShowKeyboardHelp(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="glass-panel-cinematic p-6 max-w-md w-full border border-white/20"
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="flex items-center space-x-3 mb-4">
+                  <Info size={20} className="text-teal-400" />
+                  <h3 className="text-lg font-semibold text-white font-noto">Keyboard Shortcuts</h3>
+                </div>
+                
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Help</span>
+                    <kbd className="bg-white/10 px-2 py-1 rounded text-xs font-mono">?</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Refresh</span>
+                    <kbd className="bg-white/10 px-2 py-1 rounded text-xs font-mono">Ctrl+R</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Quick Panel Access</span>
+                    <kbd className="bg-white/10 px-2 py-1 rounded text-xs font-mono">Ctrl+1-5</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Fullscreen Panel</span>
+                    <kbd className="bg-white/10 px-2 py-1 rounded text-xs font-mono">Shift+Enter</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Exit Fullscreen</span>
+                    <kbd className="bg-white/10 px-2 py-1 rounded text-xs font-mono">Esc</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Toggle Auto-refresh</span>
+                    <kbd className="bg-white/10 px-2 py-1 rounded text-xs font-mono">Ctrl+Shift+A</kbd>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Fullscreen Panel Overlay */}
+        <FullscreenOverlay
+          isOpen={!!fullscreenPanel}
+          onClose={() => setFullscreenPanel(null)}
+          title={fullscreenPanel ? `${fullscreenPanel} Panel` : ''}
+        >
+          {renderFullscreenPanel()}
+        </FullscreenOverlay>
 
         {/* Enhanced Dashboard Grid */}
-        <div className={`relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[calc(100vh-12rem)] ${fullscreenPanel ? 'hidden' : ''}`}>
+        <motion.div 
+          className={`relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[calc(100vh-12rem)] ${fullscreenPanel ? 'hidden' : ''}`}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
           {/* Strategic Command */}
           <SGDashboardPanel
             title="Strategic Command"
@@ -275,7 +429,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
           >
             <ExecutiveSummaryPanel data={data.summary} actions={actions} />
           </SGDashboardPanel>
-        </div>
+        </motion.div>
       </div>
     </AnimatedPage>
   );
