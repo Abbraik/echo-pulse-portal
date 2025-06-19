@@ -6,11 +6,11 @@ import { useSGData } from '@/hooks/useSGData';
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import { useDataValidation } from '@/hooks/useDataValidation';
-import SGDashboardPanel from '@/components/sg/SGDashboardPanel';
-import { OptimizedPanelWrapper } from '@/components/sg/OptimizedPanelWrapper';
 import { ConnectionStatus } from '@/components/sg/ConnectionStatus';
 import { DataSyncIndicator } from '@/components/sg/DataSyncIndicator';
 import { SmartRefreshButton } from '@/components/sg/SmartRefreshButton';
+import SGDashboardPanel from '@/components/sg/SGDashboardPanel';
+import { OptimizedPanelWrapper } from '@/components/sg/OptimizedPanelWrapper';
 import StrategicCommandPanel from '@/components/sg/panels/StrategicCommandPanel';
 import ApprovalsPanel from '@/components/sg/panels/ApprovalsPanel';
 import CoordinationPanel from '@/components/sg/panels/CoordinationPanel';
@@ -209,7 +209,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
   if (loading) {
     return (
       <AnimatedPage>
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
           <motion.div 
             className="text-center glass-panel-cinematic p-8"
             initial={{ scale: 0.9, opacity: 0 }}
@@ -238,7 +238,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
   if (error) {
     return (
       <AnimatedPage>
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
           <motion.div 
             className="text-center text-white max-w-md glass-panel-cinematic p-8"
             initial={{ y: 20, opacity: 0 }}
@@ -264,7 +264,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
   if (!data) {
     return (
       <AnimatedPage>
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
           <motion.div 
             className="text-center text-white glass-panel-cinematic p-8"
             initial={{ scale: 0.95, opacity: 0 }}
@@ -314,7 +314,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
   return (
     <AnimatedPage>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden">
+      <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-transparent to-blue-500/5" />
         <motion.div 
@@ -489,7 +489,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
         {/* Enhanced Dashboard Grid with Performance Optimizations */}
         <motion.div 
-          className={`relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[calc(100vh-12rem)] ${fullscreenPanel ? 'hidden' : ''}`}
+          className={`relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[calc(100vh-16rem)] ${fullscreenPanel ? 'hidden' : ''}`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
