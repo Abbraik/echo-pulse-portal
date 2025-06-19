@@ -1,13 +1,17 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { QueryClient } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
 import DirectorGeneralDashboard from '@/pages/DirectorGeneralDashboard';
 import SecretaryGeneralDashboard from '@/pages/SecretaryGeneralDashboard';
 
+// Create a client
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <QueryClient>
+    <QueryClientProvider client={queryClient}>
       <div className="App">
         <Router>
           <Routes>
@@ -18,7 +22,7 @@ function App() {
         </Router>
         <Toaster />
       </div>
-    </QueryClient>
+    </QueryClientProvider>
   );
 }
 
