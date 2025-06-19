@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -7,9 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { FullscreenButton } from '@/components/ui/fullscreen-button';
 import ThinkSnapshot from '@/components/dashboard/ThinkSnapshot';
 import ActSnapshot from '@/components/dashboard/ActSnapshot';
-import MonitorSnapshot from '@/components/dashboard/MonitorSnapshot';
-import LearnSnapshot from '@/components/dashboard/LearnSnapshot';
-import InnovateSnapshot from '@/components/dashboard/InnovateSnapshot';
 
 interface ZoneSnapshotGridProps {
   data?: any;
@@ -28,9 +26,6 @@ const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({
   const zones = [
     { name: 'THINK', component: ThinkSnapshot, color: 'text-teal-400', bgColor: 'bg-teal-500/10' },
     { name: 'ACT', component: ActSnapshot, color: 'text-blue-400', bgColor: 'bg-blue-500/10' },
-    { name: 'MONITOR', component: MonitorSnapshot, color: 'text-purple-400', bgColor: 'bg-purple-500/10' },
-    { name: 'LEARN', component: LearnSnapshot, color: 'text-orange-400', bgColor: 'bg-orange-500/10' },
-    { name: 'INNOVATE', component: InnovateSnapshot, color: 'text-green-400', bgColor: 'bg-green-500/10' }
   ];
 
   const handleZoneExpand = (zoneName: string) => {
@@ -100,7 +95,7 @@ const ZoneSnapshotGrid: React.FC<ZoneSnapshotGridProps> = ({
               </motion.div>
             ) : (
               /* Grid View */
-              <div className={`grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 ${isFullscreen ? 'h-full overflow-auto' : ''}`}>
+              <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 ${isFullscreen ? 'h-full overflow-auto' : ''}`}>
                 {zones.map((zone, index) => (
                   <motion.div
                     key={zone.name}

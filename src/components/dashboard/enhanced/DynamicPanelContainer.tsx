@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RotateCcw } from 'lucide-react';
 import EnhancedApprovalsPanel from './EnhancedApprovalsPanel';
-import EnhancedSystemHealthPanel from './EnhancedSystemHealthPanel';
 import EnhancedCoordinationPanel from './EnhancedCoordinationPanel';
 
 interface DynamicPanelContainerProps {
@@ -15,7 +14,7 @@ interface DynamicPanelContainerProps {
   onToggleFullscreen: (panel: string) => void;
 }
 
-type PanelType = 'approvals' | 'health' | 'coordination' | null;
+type PanelType = 'approvals' | 'coordination' | null;
 
 const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
   dashboardData,
@@ -38,8 +37,8 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
   };
 
   const getPanelWidth = (panelType: PanelType) => {
-    if (!hoveredPanel) return '33.333%';
-    return hoveredPanel === panelType ? '60%' : '20%';
+    if (!hoveredPanel) return '50%';
+    return hoveredPanel === panelType ? '70%' : '30%';
   };
 
   const getPanelOpacity = (panelType: PanelType) => {
@@ -99,7 +98,7 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
         )}
       </div>
 
-      {/* Dynamic Panels Container - Increased height and better spacing */}
+      {/* Dynamic Panels Container */}
       <div 
         className="flex gap-4 h-[65vh] min-h-[700px] w-full"
         onDoubleClick={handleReset}
@@ -148,55 +147,6 @@ const DynamicPanelContainer: React.FC<DynamicPanelContainerProps> = ({
                 onToggleFullscreen={() => onToggleFullscreen('approvals')}
                 isExpanded={isExpanded('approvals')}
                 isContracted={isContracted('approvals')}
-              />
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Health Panel */}
-        <motion.div
-          className="relative overflow-hidden"
-          animate={{
-            width: getPanelWidth('health'),
-            opacity: getPanelOpacity('health')
-          }}
-          transition={{
-            width: { duration: 0.3, ease: 'easeInOut' },
-            opacity: { duration: 0.2, ease: 'easeInOut' }
-          }}
-          variants={panelVariants}
-          initial="default"
-          whileHover="hover"
-          onMouseEnter={() => handlePanelHover('health')}
-          onMouseLeave={handlePanelLeave}
-        >
-          <div
-            className="h-full cursor-pointer flex flex-col"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handlePanelHover('health');
-              }
-              if (e.key === 'Escape') {
-                handleReset();
-              }
-            }}
-            onFocus={() => handlePanelHover('health')}
-            onBlur={handlePanelLeave}
-            tabIndex={0}
-            role="button"
-            aria-expanded={hoveredPanel === 'health'}
-            aria-controls="health-content"
-            style={getThemeBackground(hoveredPanel === 'health')}
-          >
-            <div className="flex-1 min-h-0 w-full">
-              <EnhancedSystemHealthPanel
-                data={dashboardData?.systemHealth}
-                onViewModeChange={onViewModeChange}
-                currentMode={viewMode}
-                onToggleFullscreen={() => onToggleFullscreen('health')}
-                isExpanded={isExpanded('health')}
-                isContracted={isContracted('health')}
               />
             </div>
           </div>
