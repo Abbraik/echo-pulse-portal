@@ -105,7 +105,7 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({
 
         {/* Top 2 Flags */}
         <div className="space-y-1 mb-3 flex-shrink-0">
-          {(displayData.redesignFlags || []).slice(0, 2).map((flag: any) => (
+          {displayData.redesignFlags.slice(0, 2).map((flag: any) => (
             <div key={flag.id} className="p-2 bg-white/5 rounded text-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-1">
@@ -123,7 +123,7 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({
         {/* Zone Status */}
         <div className="flex-1 min-h-0 overflow-hidden">
           <div className="space-y-1">
-            {(displayData.zoneLeads || []).slice(0, 3).map((lead: any) => (
+            {displayData.zoneLeads.slice(0, 3).map((lead: any) => (
               <div key={lead.zone} className="flex items-center justify-between p-1 bg-white/5 rounded text-xs">
                 <span className={`font-medium ${getZoneColor(lead.zone)} text-xs`}>
                   {lead.zone}
@@ -194,7 +194,7 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({
                   
                   <div className="space-y-1">
                     <AnimatePresence>
-                      {(isDetailsExpanded ? (displayData.redesignFlags || []) : (displayData.redesignFlags || []).slice(0, 2)).map((flag: any) => (
+                      {(isDetailsExpanded ? displayData.redesignFlags : displayData.redesignFlags.slice(0, 2)).map((flag: any) => (
                         <motion.div
                           key={flag.id}
                           className={`rounded-lg hover:bg-white/10 transition-all group cursor-pointer ${isExpanded ? 'p-3 bg-white/10' : 'p-2 bg-white/5'}`}
@@ -238,7 +238,7 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({
                   
                   <div className="space-y-1">
                     <AnimatePresence>
-                      {(isDetailsExpanded ? (displayData.escalations || []) : (displayData.escalations || []).slice(0, 2)).map((escalation: any) => (
+                      {(isDetailsExpanded ? displayData.escalations : displayData.escalations.slice(0, 2)).map((escalation: any) => (
                         <motion.div
                           key={escalation.id}
                           className={`rounded-lg hover:bg-white/10 transition-all group cursor-pointer ${isExpanded ? 'p-3 bg-white/10' : 'p-2 bg-white/5'}`}
@@ -290,7 +290,7 @@ const EnhancedCoordinationPanel: React.FC<EnhancedCoordinationPanelProps> = ({
               
               <ScrollArea className="h-full">
                 <div className="grid grid-cols-1 gap-1 pr-1">
-                  {(displayData.zoneLeads || []).map((lead: any) => (
+                  {displayData.zoneLeads.map((lead: any) => (
                     <motion.div
                       key={lead.zone}
                       className={`rounded-lg hover:bg-white/10 transition-all group cursor-pointer ${isExpanded ? 'p-2 bg-white/10' : 'p-1 bg-white/5'}`}

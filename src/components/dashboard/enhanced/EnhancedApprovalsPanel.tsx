@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Pin, Eye, Filter, ChevronDown, ChevronUp, Maximize2 } from 'lucide-react';
@@ -43,8 +44,8 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
   };
 
   const displayData = data || mockData;
-  const topItems = isContracted ? (displayData.items || []).slice(0, 2) : (displayData.items || []);
-  const pinnedItemsData = (displayData.items || []).filter((item: any) => pinnedItems.includes(item.id));
+  const topItems = isContracted ? displayData.items.slice(0, 2) : displayData.items;
+  const pinnedItemsData = displayData.items.filter((item: any) => pinnedItems.includes(item.id));
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -260,10 +261,10 @@ const EnhancedApprovalsPanel: React.FC<EnhancedApprovalsPanelProps> = ({
                   <div className="flex items-center justify-between">
                     <h4 className={`font-medium text-blue-400 ${textSizes.body}`}>Priority Items</h4>
                     <Button size="sm" variant="ghost" className={`text-xs text-blue-400 h-6 ${textSizes.body}`}>
-                      View All ({(displayData.items || []).length}) ▶
+                      View All ({displayData.items.length}) ▶
                     </Button>
                   </div>
-                  {(isDetailsExpanded ? (displayData.items || []) : topItems).map((item: any) => (
+                  {(isDetailsExpanded ? displayData.items : topItems).map((item: any) => (
                     <motion.div
                       key={item.id}
                       className={`rounded-lg hover:bg-white/10 transition-all group cursor-pointer ${isExpanded ? 'p-3 bg-white/5' : 'p-2 bg-white/5'}`}
