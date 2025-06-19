@@ -47,6 +47,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
   };
 
   const displayData = data || mockData;
+  const psiuData = displayData.psiu || mockData.psiu;
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -114,11 +115,11 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
           <div className="text-center">
             <div className="grid grid-cols-2 gap-1 text-xs mb-1">
               <div className="bg-teal-500/20 rounded p-1">
-                <div className="font-bold text-teal-400 text-xs">{displayData.psiu.producer}</div>
+                <div className="font-bold text-teal-400 text-xs">{psiuData.producer}</div>
                 <div className="text-gray-400 text-xs">P</div>
               </div>
               <div className="bg-green-500/20 rounded p-1">
-                <div className="font-bold text-green-400 text-xs">{displayData.psiu.stabilizer}</div>
+                <div className="font-bold text-green-400 text-xs">{psiuData.stabilizer}</div>
                 <div className="text-gray-400 text-xs">S</div>
               </div>
             </div>
@@ -129,7 +130,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
         {/* Top 2 Alerts */}
         <div className="flex-1 min-h-0 overflow-hidden">
           <div className="space-y-1 h-full">
-            {displayData.alerts.slice(0, 2).map((alert: any) => (
+            {(displayData.alerts || []).slice(0, 2).map((alert: any) => (
               <div key={alert.id} className="p-2 bg-white/5 rounded text-xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-1 flex-1 min-w-0">
@@ -210,19 +211,19 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
           <h4 className={`font-medium text-teal-400 mb-2 ${textSizes.body}`}>PSIU Balance</h4>
           <div className={`grid grid-cols-2 gap-1 ${textSizes.body}`}>
             <div className={`bg-teal-500/20 rounded text-center ${isExpanded ? 'p-2' : 'p-1'}`}>
-              <div className={`font-bold text-teal-400 ${isExpanded ? 'text-base' : 'text-sm'}`}>{displayData.psiu.producer}</div>
+              <div className={`font-bold text-teal-400 ${isExpanded ? 'text-base' : 'text-sm'}`}>{psiuData.producer}</div>
               <div className="text-gray-400 text-xs">P</div>
             </div>
             <div className={`bg-green-500/20 rounded text-center ${isExpanded ? 'p-2' : 'p-1'}`}>
-              <div className={`font-bold text-green-400 ${isExpanded ? 'text-base' : 'text-sm'}`}>{displayData.psiu.stabilizer}</div>
+              <div className={`font-bold text-green-400 ${isExpanded ? 'text-base' : 'text-sm'}`}>{psiuData.stabilizer}</div>
               <div className="text-gray-400 text-xs">S</div>
             </div>
             <div className={`bg-purple-500/20 rounded text-center ${isExpanded ? 'p-2' : 'p-1'}`}>
-              <div className={`font-bold text-purple-400 ${isExpanded ? 'text-base' : 'text-sm'}`}>{displayData.psiu.innovator}</div>
+              <div className={`font-bold text-purple-400 ${isExpanded ? 'text-base' : 'text-sm'}`}>{psiuData.innovator}</div>
               <div className="text-gray-400 text-xs">I</div>
             </div>
             <div className={`bg-orange-500/20 rounded text-center ${isExpanded ? 'p-2' : 'p-1'}`}>
-              <div className={`font-bold text-orange-400 ${isExpanded ? 'text-base' : 'text-sm'}`}>{displayData.psiu.unifier}</div>
+              <div className={`font-bold text-orange-400 ${isExpanded ? 'text-base' : 'text-sm'}`}>{psiuData.unifier}</div>
               <div className="text-gray-400 text-xs">U</div>
             </div>
           </div>
@@ -243,7 +244,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
               </div>
               <div className="space-y-1">
                 <AnimatePresence>
-                  {(isDetailsExpanded ? displayData.alerts : displayData.alerts.slice(0, 3)).map((alert: any) => (
+                  {(isDetailsExpanded ? (displayData.alerts || []) : (displayData.alerts || []).slice(0, 3)).map((alert: any) => (
                     <motion.div
                       key={alert.id}
                       className={`flex items-center justify-between rounded-lg ${isExpanded ? 'p-3 bg-white/10' : 'p-2 bg-white/5'}`}
@@ -275,7 +276,7 @@ const EnhancedSystemHealthPanel: React.FC<EnhancedSystemHealthPanelProps> = ({
             <div className="space-y-2">
               <h4 className={`font-medium text-teal-400 ${textSizes.body}`}>Entropy Trends</h4>
               <div className="grid grid-cols-1 gap-1">
-                {displayData.entropy.map((zone: any) => (
+                {(displayData.entropy || []).map((zone: any) => (
                   <motion.div
                     key={zone.zone}
                     className={`flex items-center justify-between rounded ${isExpanded ? 'p-2 bg-white/10' : 'p-1 bg-white/5'}`}
