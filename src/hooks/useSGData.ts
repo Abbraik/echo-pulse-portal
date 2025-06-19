@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { SGDashboardData } from '@/types/sg';
 import { sgMockApi } from '@/api/sg-mock-api';
@@ -10,9 +11,11 @@ export const useSGData = () => {
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const fetchAllData = async () => {
+  const fetchAllData = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       setError(null);
 
       // Fetch all data in parallel
@@ -56,18 +59,25 @@ export const useSGData = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard data';
       setError(errorMessage);
-      toast({
-        title: "Data Loading Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      
+      // Only show toast on initial load errors, not refresh errors
+      if (showLoading) {
+        toast({
+          title: "Data Loading Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
   const refreshData = async () => {
-    await fetchAllData();
+    // Don't show loading state on refresh to avoid disrupting user experience
+    await fetchAllData(false);
   };
 
   // Action handlers
@@ -196,7 +206,7 @@ export const useSGData = () => {
   };
 
   useEffect(() => {
-    fetchAllData();
+    fetchAllData(true);
   }, []);
 
   return {

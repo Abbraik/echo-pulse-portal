@@ -42,14 +42,15 @@ const SecretaryGeneralDashboard: React.FC = () => {
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [showPerformanceStats, setShowPerformanceStats] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   const performanceMetrics = usePerformanceMonitor('SecretaryGeneralDashboard');
   const { validateData, lastValidation, getValidationSummary } = useDataValidation();
   
-  // Real-time updates configuration
+  // Real-time updates configuration with longer intervals to reduce frequency
   const realTimeConfig = useMemo(() => ({
     enabled: autoRefresh,
-    interval: 30000, // 30 seconds
+    interval: 120000, // Increased to 2 minutes to reduce frequency
     maxRetries: 3,
     backoffMultiplier: 2
   }), [autoRefresh]);
@@ -65,11 +66,11 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
   // Get sync status based on real-time state and data validation
   const getSyncStatus = useCallback(() => {
-    if (loading) return 'syncing';
+    if (isRefreshing) return 'syncing';
     if (error || !lastValidation?.isValid) return 'error';
     if (realTimeState.isConnected && lastValidation?.isValid) return 'synced';
     return 'stale';
-  }, [loading, error, lastValidation, realTimeState.isConnected]);
+  }, [isRefreshing, error, lastValidation, realTimeState.isConnected]);
 
   // Memoized panel configuration with proper props
   const panelConfig: PanelConfigItem[] = useMemo(() => [
@@ -130,9 +131,10 @@ const SecretaryGeneralDashboard: React.FC = () => {
     setFullscreenPanel(fullscreenPanel === panelId ? null : panelId);
   }, [fullscreenPanel]);
 
-  // Optimized refresh function with loading state
+  // Optimized refresh function with loading state management
   const handleRefresh = useCallback(async () => {
     try {
+      setIsRefreshing(true);
       await refreshData();
       if (data) {
         const validation = validateData(data);
@@ -142,6 +144,8 @@ const SecretaryGeneralDashboard: React.FC = () => {
       }
     } catch (err) {
       console.error('Refresh failed:', err);
+    } finally {
+      setIsRefreshing(false);
     }
   }, [refreshData, data, validateData]);
 
@@ -191,25 +195,11 @@ const SecretaryGeneralDashboard: React.FC = () => {
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
   }, [showKeyboardHelp, handleToggleFullscreen, handleRefresh, autoRefresh, panelConfig, showPerformanceStats]);
 
-  // Auto-refresh functionality with performance considerations
-  useEffect(() => {
-    if (!autoRefresh) return;
-    
-    const interval = setInterval(() => {
-      // Only refresh if not in fullscreen mode to maintain performance
-      if (!fullscreenPanel) {
-        refreshData();
-      }
-    }, 30000);
-    
-    return () => clearInterval(interval);
-  }, [autoRefresh, refreshData, fullscreenPanel]);
-
-  // Loading state with enhanced animation
-  if (loading) {
+  // Show loading screen only on initial load, not on refreshes
+  if (loading && !data) {
     return (
       <AnimatedPage>
-        <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
           <motion.div 
             className="text-center glass-panel-cinematic p-8"
             initial={{ scale: 0.9, opacity: 0 }}
@@ -238,7 +228,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
   if (error) {
     return (
       <AnimatedPage>
-        <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
           <motion.div 
             className="text-center text-white max-w-md glass-panel-cinematic p-8"
             initial={{ y: 20, opacity: 0 }}
@@ -264,7 +254,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
   if (!data) {
     return (
       <AnimatedPage>
-        <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
           <motion.div 
             className="text-center text-white glass-panel-cinematic p-8"
             initial={{ scale: 0.95, opacity: 0 }}
@@ -314,7 +304,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
   return (
     <AnimatedPage>
-      <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden">
+      <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-transparent to-blue-500/5" />
         <motion.div 
@@ -378,7 +368,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
                   <DataSyncIndicator
                     status={getSyncStatus()}
                     lastSync={lastUpdated}
-                    nextSync={autoRefresh ? new Date(Date.now() + 30000).toISOString() : undefined}
+                    nextSync={autoRefresh ? new Date(Date.now() + 120000).toISOString() : undefined}
                   />
                   
                   {lastValidation && !lastValidation.isValid && (
@@ -414,7 +404,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
                 onRefresh={handleRefresh}
                 autoRefresh={autoRefresh}
                 onToggleAutoRefresh={handleToggleAutoRefresh}
-                isLoading={loading}
+                isLoading={isRefreshing}
                 lastRefresh={lastUpdated}
               />
             </div>

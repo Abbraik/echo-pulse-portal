@@ -20,7 +20,7 @@ export const useRealTimeUpdates = (
   refreshCallback: () => Promise<void>,
   config: RealTimeConfig = {
     enabled: true,
-    interval: 30000,
+    interval: 120000, // Default to 2 minutes instead of 30 seconds
     maxRetries: 3,
     backoffMultiplier: 2
   }
@@ -67,7 +67,7 @@ export const useRealTimeUpdates = (
       retryCount: prev.retryCount + 1
     }));
 
-    // Show toast for connection issues
+    // Show toast for connection issues only on first failure to avoid spam
     if (state.retryCount === 0) {
       toast({
         title: "Connection Issue",
@@ -99,10 +99,12 @@ export const useRealTimeUpdates = (
 
     clearTimers();
     
-    // Initial update
-    performUpdate();
+    // Initial update only if no data exists
+    if (!state.lastUpdate) {
+      performUpdate();
+    }
     
-    // Set up interval for regular updates
+    // Set up interval for regular updates with longer interval
     intervalRef.current = setInterval(() => {
       performUpdate();
     }, config.interval);
