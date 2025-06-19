@@ -37,7 +37,7 @@ const DirectorGeneralDashboard: React.FC = () => {
           animate="visible"
           className="flex flex-col min-h-screen relative z-10"
         >
-          <DirectorHeader profile={profile} />
+          <DirectorHeader />
 
           <div className="flex-1 max-w-7xl mx-auto px-4 pb-8 w-full space-y-8">
             <StrategicOverview bundles={bundles} />

@@ -23,10 +23,10 @@ export const useCurrentProfile = () => {
       
       return {
         id: data.id,
-        fullName: data.full_name,
+        fullName: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
         role: data.role,
-        language: data.language,
-        theme: data.theme,
+        language: 'en', // Default since not in current schema
+        theme: 'dark', // Default since not in current schema
         avatarUrl: data.avatar_url,
         department: data.department,
         zone: data.zone,
@@ -48,25 +48,17 @@ export const useProfileActions = () => {
     mutationFn: async (updates: Partial<CoreProfile>) => {
       if (!user) throw new Error('User not authenticated');
       
-      // Ensure user exists in core.users
-      await supabase
-        .from('users')
-        .upsert({ id: user.id, email: user.email || '' }, { onConflict: 'id' });
-      
-      // Update or create profile
       const { data, error } = await supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
-          full_name: updates.fullName,
-          role: updates.role || 'director_general',
-          language: updates.language || 'en',
-          theme: updates.theme || 'dark',
+        .update({
+          first_name: updates.fullName?.split(' ')[0],
+          last_name: updates.fullName?.split(' ').slice(1).join(' '),
           avatar_url: updates.avatarUrl,
           department: updates.department,
           zone: updates.zone,
           preferences: updates.preferences || {}
-        }, { onConflict: 'id' })
+        })
+        .eq('id', user.id)
         .select()
         .single();
       

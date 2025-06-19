@@ -15,11 +15,11 @@ export const useNewClaims = (zone?: string, status?: string) => {
         .order('opened_at', { ascending: false });
 
       if (zone) {
-        query = query.eq('zone', zone);
+        query = query.eq('zone', zone as any);
       }
       
       if (status) {
-        query = query.eq('status', status);
+        query = query.eq('status', status as any);
       }
 
       const { data, error } = await query;
@@ -30,12 +30,12 @@ export const useNewClaims = (zone?: string, status?: string) => {
         id: row.id,
         zone: row.zone,
         taskId: row.task_id,
-        taskType: row.task_type,
+        taskType: null, // Not available in current schema
         status: row.status,
         claimedBy: row.claimed_by,
         openedAt: new Date(row.opened_at),
         closedAt: row.closed_at ? new Date(row.closed_at) : undefined,
-        resolutionNotes: row.resolution_notes,
+        resolutionNotes: null, // Not available in current schema
         metadata: row.metadata || {},
         createdAt: new Date(row.created_at)
       })) as MonitorClaim[];
@@ -81,8 +81,7 @@ export const useNewClaimActions = () => {
         .from('claims')
         .update({ 
           status: 'closed', 
-          closed_at: new Date().toISOString(),
-          resolution_notes: notes
+          closed_at: new Date().toISOString()
         })
         .eq('id', claimId);
       

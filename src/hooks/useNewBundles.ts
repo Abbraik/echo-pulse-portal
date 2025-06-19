@@ -15,7 +15,7 @@ export const useNewBundles = (status?: string) => {
         .order('created_at', { ascending: false });
 
       if (status) {
-        query = query.eq('status', status);
+        query = query.eq('status', status as any);
       }
 
       const { data, error } = await query;
@@ -85,11 +85,6 @@ export const useNewBundleActions = () => {
   const createBundle = useMutation({
     mutationFn: async (bundleData: Partial<ActBundle>) => {
       if (!user) throw new Error('User not authenticated');
-      
-      // First create user entry in core.users if it doesn't exist
-      await supabase
-        .from('users')
-        .upsert({ id: user.id, email: user.email || '' }, { onConflict: 'id' });
       
       const { data, error } = await supabase
         .from('bundles')

@@ -14,7 +14,7 @@ export const useNewHealthMetrics = (zone?: string) => {
         .order('timestamp', { ascending: false });
 
       if (zone) {
-        query = query.eq('zone', zone);
+        query = query.eq('zone', zone as any);
       }
 
       const { data, error } = await query;
@@ -23,16 +23,16 @@ export const useNewHealthMetrics = (zone?: string) => {
       
       return data?.map(row => ({
         id: row.id,
-        runId: row.run_id,
+        runId: null, // Not available in current schema
         zone: row.zone,
-        indicator: row.indicator,
+        indicator: 'HEALTH', // Default value since not in current schema
         name: row.name,
         value: row.value,
         target: row.target,
-        unit: row.unit,
-        measurementType: row.measurement_type || 'point',
+        unit: null, // Not available in current schema
+        measurementType: 'point' as const,
         timestamp: new Date(row.timestamp),
-        metadata: row.metadata || {},
+        metadata: {},
         createdAt: new Date(row.created_at)
       })) as MonitorHealthMetric[];
     },
@@ -56,16 +56,16 @@ export const useLatestNewHealthMetrics = () => {
         if (!latest.has(key)) {
           latest.set(key, {
             id: row.id,
-            runId: row.run_id,
+            runId: null,
             zone: row.zone,
-            indicator: row.indicator,
+            indicator: 'HEALTH',
             name: row.name,
             value: row.value,
             target: row.target,
-            unit: row.unit,
-            measurementType: row.measurement_type || 'point',
+            unit: null,
+            measurementType: 'point' as const,
             timestamp: new Date(row.timestamp),
-            metadata: row.metadata || {},
+            metadata: {},
             createdAt: new Date(row.created_at)
           });
         }
@@ -85,15 +85,10 @@ export const useHealthMetricActions = () => {
       const { data, error } = await supabase
         .from('health_metrics')
         .insert({
-          run_id: metricData.runId,
-          zone: metricData.zone,
-          indicator: metricData.indicator,
-          name: metricData.name,
-          value: metricData.value,
-          target: metricData.target,
-          unit: metricData.unit,
-          measurement_type: metricData.measurementType || 'point',
-          metadata: metricData.metadata || {}
+          zone: metricData.zone as any,
+          name: metricData.name!,
+          value: metricData.value!,
+          target: metricData.target
         })
         .select()
         .single();
