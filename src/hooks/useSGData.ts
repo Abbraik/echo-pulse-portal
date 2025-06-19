@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { SGDashboardData } from '@/types/sg';
 import { sgMockApi } from '@/api/sg-mock-api';
@@ -67,8 +66,8 @@ export const useSGData = () => {
     }
   };
 
-  const refreshData = () => {
-    fetchAllData();
+  const refreshData = async () => {
+    await fetchAllData();
   };
 
   // Action handlers
