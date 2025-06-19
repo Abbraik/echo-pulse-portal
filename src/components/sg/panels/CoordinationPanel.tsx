@@ -3,13 +3,16 @@ import React from 'react';
 import { CoordinationHub } from '@/types/sg';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, Users } from 'lucide-react';
 
 interface CoordinationPanelProps {
   data: CoordinationHub;
+  actions?: {
+    acknowledgeEscalation: (id: string) => Promise<void>;
+  };
 }
 
-const CoordinationPanel: React.FC<CoordinationPanelProps> = ({ data }) => {
+const CoordinationPanel: React.FC<CoordinationPanelProps> = ({ data, actions }) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'good':
@@ -51,6 +54,12 @@ const CoordinationPanel: React.FC<CoordinationPanelProps> = ({ data }) => {
     }
   };
 
+  const handleAcknowledge = async (id: string) => {
+    if (actions?.acknowledgeEscalation) {
+      await actions.acknowledgeEscalation(id);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Zone Leads */}
@@ -58,14 +67,27 @@ const CoordinationPanel: React.FC<CoordinationPanelProps> = ({ data }) => {
         <h4 className="text-sm font-medium text-teal-400 mb-3">Zone Status</h4>
         <div className="grid grid-cols-2 gap-2">
           {data.zoneLeads.map((lead) => (
-            <div key={lead.zone} className="bg-white/5 rounded-lg p-2 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                {getStatusIcon(lead.status)}
-                <span className="text-xs text-white">{lead.zone}</span>
+            <div key={lead.zone} className="bg-white/5 rounded-lg p-2">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center space-x-2">
+                  {getStatusIcon(lead.status)}
+                  <span className="text-xs text-white font-medium">{lead.zone}</span>
+                </div>
+                <Badge className={getStatusColor(lead.status)}>
+                  {lead.status}
+                </Badge>
               </div>
-              <Badge className={getStatusColor(lead.status)}>
-                {lead.status}
-              </Badge>
+              {lead.leadName && (
+                <div className="flex items-center space-x-1 text-xs text-gray-400">
+                  <Users size={10} />
+                  <span>{lead.leadName}</span>
+                </div>
+              )}
+              {lead.activeItems && (
+                <div className="text-xs text-gray-400 mt-1">
+                  {lead.activeItems} active items
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -78,15 +100,34 @@ const CoordinationPanel: React.FC<CoordinationPanelProps> = ({ data }) => {
           {data.escalations.map((escalation) => (
             <div key={escalation.id} className="bg-white/5 rounded-lg p-3 space-y-2">
               <div className="flex items-start justify-between">
-                <div>
+                <div className="flex-1">
                   <h5 className="text-sm font-medium text-white">{escalation.issue}</h5>
-                  <span className="text-xs text-gray-400">{escalation.openedAt}</span>
+                  <div className="flex items-center space-x-3 text-xs text-gray-400 mt-1">
+                    <span>{escalation.openedAt}</span>
+                    {escalation.assignedTo && (
+                      <span>Assigned: {escalation.assignedTo}</span>
+                    )}
+                  </div>
+                  {escalation.affectedZones && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {escalation.affectedZones.map((zone) => (
+                        <span key={zone} className="text-xs bg-blue-500/20 text-blue-400 px-1 rounded">
+                          {zone}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <Badge className={getSeverityColor(escalation.severity)}>
                   {escalation.severity}
                 </Badge>
               </div>
-              <Button size="sm" variant="outline" className="border-teal-500 text-teal-400 hover:bg-teal-500/10">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="border-teal-500 text-teal-400 hover:bg-teal-500/10"
+                onClick={() => handleAcknowledge(escalation.id)}
+              >
                 Acknowledge
               </Button>
             </div>
