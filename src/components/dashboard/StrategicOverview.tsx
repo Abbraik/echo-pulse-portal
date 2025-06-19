@@ -1,149 +1,92 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Maximize2, Minimize2, AlertTriangle } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
-import { GlassCard } from '@/components/ui/glass-card';
-import { Button } from '@/components/ui/button';
-import { ApprovalsDecisionsPanel } from './strategic/ApprovalsDecisionsPanel';
-import { SystemHealthAlertsPanel } from './strategic/SystemHealthAlertsPanel';
-import { CoordinationTriggersPanel } from './strategic/CoordinationTriggersPanel';
-import { DGNotesSidebar } from './strategic/DGNotesSidebar';
-import { ExecutiveReportButton } from './strategic/ExecutiveReportButton';
+import { TrendingUp, Target, CheckCircle, Clock } from 'lucide-react';
+import { ActBundle } from '@/types/act';
 
 interface StrategicOverviewProps {
-  data?: {
-    hasStrategicAlert: boolean;
-    approvals: any;
-    systemHealth: any;
-    coordination: any;
-    notes: any;
-  };
+  bundles?: ActBundle[];
 }
 
-const StrategicOverview: React.FC<StrategicOverviewProps> = ({ data }) => {
-  const { t, isRTL } = useTranslation();
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
-
-  // Mock data structure for sub-panels
-  const panelData = {
-    approvals: data?.approvals,
-    systemHealth: data?.systemHealth,
-    coordination: data?.coordination,
-    notes: data?.notes
+const StrategicOverview: React.FC<StrategicOverviewProps> = ({ bundles = [] }) => {
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" }
+    }
   };
 
-  const hasStrategicAlert = data?.hasStrategicAlert ?? true;
+  const activeBundles = bundles.filter(b => b.status === 'active').length;
+  const completedBundles = bundles.filter(b => b.status === 'completed').length;
+  const draftBundles = bundles.filter(b => b.status === 'draft').length;
+  const avgCoherence = bundles.length > 0 
+    ? Math.round(bundles.reduce((sum, b) => sum + b.coherence, 0) / bundles.length)
+    : 0;
+
+  const stats = [
+    {
+      title: 'Active Bundles',
+      value: activeBundles,
+      icon: TrendingUp,
+      color: 'text-emerald-400',
+      bgColor: 'from-emerald-500/20 to-teal-500/20'
+    },
+    {
+      title: 'Completed',
+      value: completedBundles,
+      icon: CheckCircle,
+      color: 'text-blue-400',
+      bgColor: 'from-blue-500/20 to-cyan-500/20'
+    },
+    {
+      title: 'Draft Bundles',
+      value: draftBundles,
+      icon: Clock,
+      color: 'text-amber-400',
+      bgColor: 'from-amber-500/20 to-orange-500/20'
+    },
+    {
+      title: 'Avg Coherence',
+      value: `${avgCoherence}%`,
+      icon: Target,
+      color: 'text-purple-400',
+      bgColor: 'from-purple-500/20 to-pink-500/20'
+    }
+  ];
 
   return (
-    <div className={`transition-all duration-500 ${isExpanded ? 'fixed inset-0 z-50 bg-black/50' : 'h-[40vh] min-h-[400px]'}`}>
-      <div className={`h-full flex ${isExpanded ? 'p-4' : ''}`}>
-        {/* Main Panel Container */}
-        <div className={`flex-1 ${isSidebarCollapsed ? 'mr-12' : 'mr-4'} transition-all duration-300`}>
-          <GlassCard 
-            className="h-full" 
-            variant="deep" 
-            style={{ 
-              background: 'rgba(255, 255, 255, 0.3)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '2rem',
-              boxShadow: 'inset 0 1px 0 0 rgba(56, 178, 172, 0.1), 0 0 30px rgba(56, 178, 172, 0.15)'
-            }}
+    <motion.div variants={itemVariants} className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+          Strategic Overview
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, index) => (
+          <motion.div
+            key={stat.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            whileHover={{ y: -5, scale: 1.02 }}
+            className={`p-6 rounded-2xl backdrop-blur-xl bg-gradient-to-br ${stat.bgColor} border border-white/10 shadow-2xl`}
           >
-            <div className="p-6 h-full flex flex-col">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
-                  STRATEGIC OVERVIEW
-                </h2>
-                <div className="flex items-center space-x-4">
-                  <ExecutiveReportButton />
-                  <Button
-                    size="sm"
-                    className={`${hasStrategicAlert ? 'animate-pulse bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'}`}
-                  >
-                    <AlertTriangle size={14} className="mr-2" />
-                    Review Strategic Alert ▶
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-gray-500/50 text-gray-400"
-                    onClick={() => setIsExpanded(!isExpanded)}
-                  >
-                    {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-                  </Button>
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-300 mb-1">{stat.title}</p>
+                <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
               </div>
-
-              {/* Three Sub-Panels Grid */}
-              <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-hidden">
-                {/* Approvals & Decisions Panel */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="h-full"
-                >
-                  <ApprovalsDecisionsPanel data={panelData.approvals} />
-                </motion.div>
-
-                {/* System Health & Alerts Panel */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="h-full"
-                >
-                  <SystemHealthAlertsPanel data={panelData.systemHealth} />
-                </motion.div>
-
-                {/* Coordination & Triggers Panel */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="h-full"
-                >
-                  <CoordinationTriggersPanel data={panelData.coordination} />
-                </motion.div>
-              </div>
-
-              {/* Footer with System Status */}
-              <div className="mt-4 flex items-center justify-between text-xs text-gray-400">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span>Live Sync Active</span>
-                  </div>
-                  <div>Last Update: {new Date().toLocaleTimeString()}</div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="text-xs text-gray-400 hover:text-white"
-                    onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                  >
-                    {isSidebarCollapsed ? 'Show' : 'Hide'} Notes ▶
-                  </Button>
-                </div>
+              <div className={`p-3 rounded-lg bg-white/10 ${stat.color}`}>
+                <stat.icon size={24} />
               </div>
             </div>
-          </GlassCard>
-        </div>
-
-        {/* DG Notes Sidebar */}
-        <div className="flex-shrink-0">
-          <DGNotesSidebar 
-            isCollapsed={isSidebarCollapsed}
-            onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            data={panelData.notes}
-          />
-        </div>
+          </motion.div>
+        ))}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

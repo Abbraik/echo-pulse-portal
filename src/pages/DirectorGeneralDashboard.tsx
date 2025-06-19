@@ -1,105 +1,52 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { useTranslation } from '@/hooks/use-translation';
 import { AnimatedPage } from '@/components/ui/motion';
-import ParticlesBackground from '@/components/ui/particles-background';
+import { useNewHealthMetrics } from '@/hooks/useNewHealthMetrics';
+import { useNewBundles } from '@/hooks/useNewBundles';
+import { useNewClaims } from '@/hooks/useNewClaims';
+import { useCurrentProfile } from '@/hooks/useNewProfiles';
+import DirectorHeader from '@/components/dashboard/DirectorHeader';
 import StrategicOverview from '@/components/dashboard/StrategicOverview';
-import ThinkSnapshot from '@/components/dashboard/ThinkSnapshot';
-import ActSnapshot from '@/components/dashboard/ActSnapshot';
-import LearnSnapshot from '@/components/dashboard/LearnSnapshot';
-import InnovateSnapshot from '@/components/dashboard/InnovateSnapshot';
-import MonitorSnapshot from '@/components/dashboard/MonitorSnapshot';
-import SystemStabilityGauge from '@/components/home/SystemStabilityGauge';
-import KpiCarousel from '@/components/home/KpiCarousel';
-import { PulseData } from '@/api/dashboard';
+import SystemHealth from '@/components/dashboard/SystemHealth';
+import ZoneSnapshots from '@/components/dashboard/ZoneSnapshots';
 
 const DirectorGeneralDashboard: React.FC = () => {
-  const { t, isRTL } = useTranslation();
-  const [viewMode, setViewMode] = useState<'classic' | 'enhanced'>('enhanced');
-  const [isLoading, setIsLoading] = useState(true);
-  const [pulseData, setPulseData] = useState<PulseData | null>(null);
+  const { data: profile } = useCurrentProfile();
+  const { data: healthMetrics } = useNewHealthMetrics();
+  const { data: bundles } = useNewBundles();
+  const { data: claims } = useNewClaims();
 
-  // Simulate loading and data fetching
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setPulseData({
-        id: 1,
-        timestamp: new Date().toISOString(),
-        level: 78,
-        performance: 92,
-        stability: 78,
-        status: 'System operating within equilibrium thresholds'
-      });
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
 
   return (
-    <AnimatedPage>
-      <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative">
-        <ParticlesBackground 
-          count={80}
-          colorStart="#14B8A6"
-          colorEnd="#3B82F6"
-          minSize={1}
-          maxSize={3}
-          speed={0.3}
-        />
-        
-        <div className="relative" style={{ zIndex: 10 }}>
-          {/* Main Dashboard Content */}
-          <div className="max-w-[1600px] mx-auto p-6 space-y-6">
-            {/* Strategic Overview - Full Width */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="w-full"
-            >
-              <StrategicOverview />
-            </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      <AnimatedPage>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col min-h-screen relative z-10"
+        >
+          <DirectorHeader profile={profile} />
 
-            {/* System Health Row */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-            >
-              <SystemStabilityGauge pulse={pulseData} />
-              <KpiCarousel />
-            </motion.div>
-
-            {/* Zone Snapshots Grid */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
-            >
-              <div className="lg:col-span-1">
-                <ThinkSnapshot />
-              </div>
-              <div className="lg:col-span-1">
-                <ActSnapshot />
-              </div>
-              <div className="lg:col-span-1">
-                <LearnSnapshot />
-              </div>
-              <div className="lg:col-span-1">
-                <InnovateSnapshot />
-              </div>
-              <div className="lg:col-span-1">
-                <MonitorSnapshot />
-              </div>
-            </motion.div>
+          <div className="flex-1 max-w-7xl mx-auto px-4 pb-8 w-full space-y-8">
+            <StrategicOverview bundles={bundles} />
+            <SystemHealth metrics={healthMetrics} />
+            <ZoneSnapshots claims={claims} metrics={healthMetrics} />
           </div>
-        </div>
-      </div>
-    </AnimatedPage>
+        </motion.div>
+      </AnimatedPage>
+    </div>
   );
 };
 
