@@ -63,7 +63,7 @@ const CoordinationPanel: React.FC<CoordinationPanelProps> = ({ data }) => {
                 {getStatusIcon(lead.status)}
                 <span className="text-xs text-white">{lead.zone}</span>
               </div>
-              <Badge className={getStatusColor(lead.status)} size="sm">
+              <Badge className={getStatusColor(lead.status)}>
                 {lead.status}
               </Badge>
             </div>
