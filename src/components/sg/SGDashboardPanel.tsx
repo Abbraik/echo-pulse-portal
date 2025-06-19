@@ -56,25 +56,28 @@ const SGDashboardPanel: React.FC<SGDashboardPanelProps> = ({
       onMouseEnter={() => onHover(panelId)}
       onMouseLeave={() => onHover(null)}
     >
-      <GlassCard className="h-full flex flex-col overflow-hidden">
-        {/* Panel Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
-          <h3 className="text-lg font-semibold text-white/90 font-noto">
-            {title}
-          </h3>
+      <GlassCard className="h-full flex flex-col overflow-hidden glass-panel-cinematic border border-white/20 hover:border-teal-400/30 transition-all duration-300">
+        {/* Enhanced Panel Header with Glassmorphic Design */}
+        <div className="flex items-center justify-between p-4 border-b border-white/10 backdrop-blur-sm">
+          <div className="flex items-center space-x-3">
+            <div className="w-2 h-8 bg-gradient-to-b from-teal-400 to-blue-500 rounded-full" />
+            <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400 font-noto">
+              {title}
+            </h3>
+          </div>
           <Button
             size="sm"
             variant="ghost"
             onClick={() => onToggleFullscreen(panelId)}
-            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-teal-400 hover:text-teal-300"
+            className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-teal-400 hover:text-teal-300 hover:bg-teal-500/10 backdrop-blur-sm border border-teal-500/20 hover:border-teal-400/40"
             aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
             {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
           </Button>
         </div>
 
-        {/* Panel Content */}
-        <div className="flex-1 p-4 overflow-auto">
+        {/* Enhanced Panel Content */}
+        <div className="flex-1 p-4 overflow-auto custom-scrollbar">
           {children}
         </div>
       </GlassCard>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { useSGData } from '@/hooks/useSGData';
@@ -9,7 +8,7 @@ import CoordinationPanel from '@/components/sg/panels/CoordinationPanel';
 import HealthRiskPanel from '@/components/sg/panels/HealthRiskPanel';
 import ExecutiveSummaryPanel from '@/components/sg/panels/ExecutiveSummaryPanel';
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Shield, Globe } from 'lucide-react';
 
 const SecretaryGeneralDashboard: React.FC = () => {
   const { data, loading, error, lastUpdated, refreshData, actions } = useSGData();
@@ -37,9 +36,10 @@ const SecretaryGeneralDashboard: React.FC = () => {
     return (
       <AnimatedPage>
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-white/80">Loading Secretary General Dashboard...</p>
+          <div className="text-center glass-panel-cinematic p-8">
+            <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <h2 className="text-xl font-bold text-white mb-2 font-noto">Initializing Command Center</h2>
+            <p className="text-teal-200">Loading Secretary General Dashboard...</p>
           </div>
         </div>
       </AnimatedPage>
@@ -50,12 +50,16 @@ const SecretaryGeneralDashboard: React.FC = () => {
     return (
       <AnimatedPage>
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-          <div className="text-center text-white max-w-md">
-            <h1 className="text-2xl font-bold mb-4 text-red-400">Dashboard Error</h1>
-            <p className="text-gray-300 mb-6">{error}</p>
-            <Button onClick={refreshData} className="bg-teal-600 hover:bg-teal-700">
+          <div className="text-center text-white max-w-md glass-panel-cinematic p-8">
+            <Shield className="w-16 h-16 text-red-400 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold mb-4 text-red-400 font-noto">System Alert</h1>
+            <p className="text-gray-300 mb-6 font-noto">{error}</p>
+            <Button 
+              onClick={refreshData} 
+              className="bg-teal-600/20 hover:bg-teal-600/40 text-teal-400 border border-teal-500/30 hover:border-teal-400/50 backdrop-blur-sm"
+            >
               <RefreshCw className="mr-2 h-4 w-4" />
-              Retry Loading
+              Retry Connection
             </Button>
           </div>
         </div>
@@ -67,12 +71,16 @@ const SecretaryGeneralDashboard: React.FC = () => {
     return (
       <AnimatedPage>
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-2xl font-bold mb-2">No Data Available</h1>
-            <p className="text-gray-400 mb-4">Unable to load dashboard data</p>
-            <Button onClick={refreshData} className="bg-teal-600 hover:bg-teal-700">
+          <div className="text-center text-white glass-panel-cinematic p-8">
+            <Globe className="w-16 h-16 text-amber-400 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold mb-2 font-noto">No Data Stream</h1>
+            <p className="text-gray-400 mb-4 font-noto">Unable to establish data connection</p>
+            <Button 
+              onClick={refreshData} 
+              className="bg-teal-600/20 hover:bg-teal-600/40 text-teal-400 border border-teal-500/30 hover:border-teal-400/50 backdrop-blur-sm"
+            >
               <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh Data
+              Reconnect
             </Button>
           </div>
         </div>
@@ -82,32 +90,46 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
   return (
     <AnimatedPage>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4">
-        {/* Dashboard Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2 font-noto">Secretary General Dashboard</h1>
-            <p className="text-gray-300">Strategic oversight and system coordination</p>
-            {lastUpdated && (
-              <p className="text-xs text-gray-400 mt-1">
-                Last updated: {new Date(lastUpdated).toLocaleString()}
-              </p>
-            )}
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden">
+        {/* Enhanced Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-transparent to-blue-500/5" />
+        <div className="absolute top-20 left-20 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        
+        {/* Enhanced Dashboard Header */}
+        <div className="relative z-10 mb-6 glass-panel-cinematic p-6 border border-white/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-blue-500/20 backdrop-blur-sm border border-teal-400/30">
+                <Shield size={24} className="text-teal-400" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-blue-400 to-purple-400 mb-2 font-noto">
+                  Secretary General Command Center
+                </h1>
+                <p className="text-gray-300 font-noto">Strategic oversight and system coordination</p>
+                {lastUpdated && (
+                  <p className="text-xs text-gray-400 mt-1 font-mono">
+                    Last synchronized: {new Date(lastUpdated).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            </div>
+            <Button
+              onClick={refreshData}
+              variant="outline"
+              className="border-teal-500/30 text-teal-400 hover:bg-teal-500/10 hover:border-teal-400/50 backdrop-blur-sm transition-all duration-200"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Sync Data
+            </Button>
           </div>
-          <Button
-            onClick={refreshData}
-            variant="outline"
-            className="border-teal-500 text-teal-400 hover:bg-teal-500/10"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
-          </Button>
         </div>
 
-        {/* Fullscreen Overlay */}
+        {/* Fullscreen Overlay with Enhanced Styling */}
         {fullscreenPanel && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm p-4">
-            <div className="h-full w-full max-w-6xl mx-auto">
+          <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm p-4">
+            <div className="h-full w-full max-w-7xl mx-auto">
               {fullscreenPanel === 'strategic' && data.strategic && (
                 <SGDashboardPanel
                   title="Strategic Command"
@@ -182,8 +204,8 @@ const SecretaryGeneralDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Dashboard Grid */}
-        <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[calc(100vh-12rem)] ${fullscreenPanel ? 'hidden' : ''}`}>
+        {/* Enhanced Dashboard Grid */}
+        <div className={`relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[calc(100vh-12rem)] ${fullscreenPanel ? 'hidden' : ''}`}>
           {/* Strategic Command */}
           <SGDashboardPanel
             title="Strategic Command"
