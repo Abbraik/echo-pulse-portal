@@ -1,10 +1,10 @@
 
 import React from 'react';
-import DirectorGeneralDashboard from './DirectorGeneralDashboard';
+import SecretaryGeneralDashboard from './SecretaryGeneralDashboard';
 
 const HomePage: React.FC = () => {
   return (
-    <DirectorGeneralDashboard />
+    <SecretaryGeneralDashboard />
   );
 };
 
