@@ -1,17 +1,26 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
 import { useSGData } from '@/hooks/useSGData';
+import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import SGDashboardPanel from '@/components/sg/SGDashboardPanel';
+import { OptimizedPanelWrapper } from '@/components/sg/OptimizedPanelWrapper';
 import StrategicCommandPanel from '@/components/sg/panels/StrategicCommandPanel';
 import ApprovalsPanel from '@/components/sg/panels/ApprovalsPanel';
 import CoordinationPanel from '@/components/sg/panels/CoordinationPanel';
 import HealthRiskPanel from '@/components/sg/panels/HealthRiskPanel';
 import ExecutiveSummaryPanel from '@/components/sg/panels/ExecutiveSummaryPanel';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Shield, Globe, Keyboard, Info } from 'lucide-react';
+import { RefreshCw, Shield, Globe, Keyboard, Info, Activity, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Memoized panel components for better performance
+const MemoizedStrategicPanel = memo(StrategicCommandPanel);
+const MemoizedApprovalsPanel = memo(ApprovalsPanel);
+const MemoizedCoordinationPanel = memo(CoordinationPanel);
+const MemoizedHealthRiskPanel = memo(HealthRiskPanel);
+const MemoizedExecutiveSummaryPanel = memo(ExecutiveSummaryPanel);
 
 const SecretaryGeneralDashboard: React.FC = () => {
   const { data, loading, error, lastUpdated, refreshData, actions } = useSGData();
@@ -19,11 +28,58 @@ const SecretaryGeneralDashboard: React.FC = () => {
   const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [showPerformanceStats, setShowPerformanceStats] = useState(false);
+  
+  const performanceMetrics = usePerformanceMonitor('SecretaryGeneralDashboard');
+
+  // Memoized panel configuration
+  const panelConfig = useMemo(() => [
+    {
+      id: 'strategic',
+      title: 'Strategic Command',
+      component: MemoizedStrategicPanel,
+      props: { data: data?.strategic },
+      className: 'md:col-span-1 xl:col-span-1'
+    },
+    {
+      id: 'approvals',
+      title: 'Approvals & Directives',
+      component: MemoizedApprovalsPanel,
+      props: { data: data?.approvals, actions },
+      className: 'md:col-span-1 xl:col-span-1'
+    },
+    {
+      id: 'coordination',
+      title: 'Coordination Hub',
+      component: MemoizedCoordinationPanel,
+      props: { data: data?.coordination, actions },
+      className: 'md:col-span-2 xl:col-span-1'
+    },
+    {
+      id: 'health',
+      title: 'System Health & Risk',
+      component: MemoizedHealthRiskPanel,
+      props: { risks: data?.risks, anomalies: data?.anomalies, actions },
+      className: 'md:col-span-1 xl:col-span-1'
+    },
+    {
+      id: 'summary',
+      title: 'Executive Summary',
+      component: MemoizedExecutiveSummaryPanel,
+      props: { data: data?.summary, actions },
+      className: 'md:col-span-1 xl:col-span-2'
+    }
+  ], [data, actions]);
 
   // Enhanced fullscreen toggle with animations
   const handleToggleFullscreen = useCallback((panelId: string) => {
     setFullscreenPanel(fullscreenPanel === panelId ? null : panelId);
   }, [fullscreenPanel]);
+
+  // Optimized refresh function with loading state
+  const handleRefresh = useCallback(async () => {
+    await refreshData();
+  }, [refreshData]);
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -34,20 +90,25 @@ const SecretaryGeneralDashboard: React.FC = () => {
         setShowKeyboardHelp(!showKeyboardHelp);
       }
       
+      // Performance stats toggle
+      if (event.key === 'p' && event.ctrlKey && event.shiftKey) {
+        event.preventDefault();
+        setShowPerformanceStats(!showPerformanceStats);
+      }
+      
       // Quick panel access with number keys
       if (event.ctrlKey && !isNaN(Number(event.key))) {
         event.preventDefault();
         const panelNumber = parseInt(event.key);
-        const panelIds = ['strategic', 'approvals', 'coordination', 'health', 'summary'];
-        if (panelNumber >= 1 && panelNumber <= panelIds.length) {
-          handleToggleFullscreen(panelIds[panelNumber - 1]);
+        if (panelNumber >= 1 && panelNumber <= panelConfig.length) {
+          handleToggleFullscreen(panelConfig[panelNumber - 1].id);
         }
       }
       
       // Refresh with Ctrl+R
       if (event.key === 'r' && event.ctrlKey) {
         event.preventDefault();
-        refreshData();
+        handleRefresh();
       }
       
       // Toggle auto-refresh with Ctrl+Shift+A
@@ -59,18 +120,21 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
     document.addEventListener('keydown', handleGlobalKeyDown);
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [showKeyboardHelp, handleToggleFullscreen, refreshData, autoRefresh]);
+  }, [showKeyboardHelp, handleToggleFullscreen, handleRefresh, autoRefresh, panelConfig, showPerformanceStats]);
 
-  // Auto-refresh functionality
+  // Auto-refresh functionality with performance considerations
   useEffect(() => {
     if (!autoRefresh) return;
     
     const interval = setInterval(() => {
-      refreshData();
-    }, 30000); // Refresh every 30 seconds
+      // Only refresh if not in fullscreen mode to maintain performance
+      if (!fullscreenPanel) {
+        refreshData();
+      }
+    }, 30000);
     
     return () => clearInterval(interval);
-  }, [autoRefresh, refreshData]);
+  }, [autoRefresh, refreshData, fullscreenPanel]);
 
   // Loading state with enhanced animation
   if (loading) {
@@ -90,6 +154,12 @@ const SecretaryGeneralDashboard: React.FC = () => {
             />
             <h2 className="text-xl font-bold text-white mb-2 font-noto">Initializing Command Center</h2>
             <p className="text-teal-200">Loading Secretary General Dashboard...</p>
+            <div className="mt-4 flex items-center justify-center space-x-2">
+              <Activity size={16} className="text-teal-400 animate-pulse" />
+              <span className="text-xs text-gray-400 font-mono">
+                Optimizing performance...
+              </span>
+            </div>
           </motion.div>
         </div>
       </AnimatedPage>
@@ -110,7 +180,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
             <h1 className="text-2xl font-bold mb-4 text-red-400 font-noto">System Alert</h1>
             <p className="text-gray-300 mb-6 font-noto">{error}</p>
             <Button 
-              onClick={refreshData} 
+              onClick={handleRefresh} 
               className="bg-teal-600/20 hover:bg-teal-600/40 text-teal-400 border border-teal-500/30 hover:border-teal-400/50 backdrop-blur-sm"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
@@ -136,7 +206,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
             <h1 className="text-2xl font-bold mb-2 font-noto">No Data Stream</h1>
             <p className="text-gray-400 mb-4 font-noto">Unable to establish data connection</p>
             <Button 
-              onClick={refreshData} 
+              onClick={handleRefresh} 
               className="bg-teal-600/20 hover:bg-teal-600/40 text-teal-400 border border-teal-500/30 hover:border-teal-400/50 backdrop-blur-sm"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
@@ -151,25 +221,14 @@ const SecretaryGeneralDashboard: React.FC = () => {
   const renderFullscreenPanel = () => {
     if (!fullscreenPanel) return null;
 
-    const panels = {
-      strategic: data.strategic && <StrategicCommandPanel data={data.strategic} />,
-      approvals: <ApprovalsPanel data={data.approvals} actions={actions} />,
-      coordination: <CoordinationPanel data={data.coordination} actions={actions} />,
-      health: <HealthRiskPanel risks={data.risks} anomalies={data.anomalies} actions={actions} />,
-      summary: <ExecutiveSummaryPanel data={data.summary} actions={actions} />
-    };
+    const panelInfo = panelConfig.find(p => p.id === fullscreenPanel);
+    if (!panelInfo) return null;
 
-    const titles = {
-      strategic: "Strategic Command",
-      approvals: "Approvals & Directives", 
-      coordination: "Coordination Hub",
-      health: "System Health & Risk",
-      summary: "Executive Summary"
-    };
+    const PanelComponent = panelInfo.component;
 
     return (
       <SGDashboardPanel
-        title={titles[fullscreenPanel as keyof typeof titles]}
+        title={panelInfo.title}
         panelId={fullscreenPanel}
         isHovered={false}
         isExpanded={false}
@@ -178,7 +237,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
         onToggleFullscreen={handleToggleFullscreen}
         className="h-full"
       >
-        {panels[fullscreenPanel as keyof typeof panels]}
+        <PanelComponent {...panelInfo.props} />
       </SGDashboardPanel>
     );
   };
@@ -250,6 +309,13 @@ const SecretaryGeneralDashboard: React.FC = () => {
                       ● Auto-refresh active
                     </motion.span>
                   )}
+                  {showPerformanceStats && (
+                    <div className="text-xs text-blue-400 font-mono flex items-center space-x-2">
+                      <Zap size={12} />
+                      <span>Render: {performanceMetrics.renderTime.toFixed(1)}ms</span>
+                      <span>Components: {performanceMetrics.componentCount}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -280,7 +346,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
               </Button>
               
               <Button
-                onClick={refreshData}
+                onClick={handleRefresh}
                 variant="outline"
                 className="border-teal-500/30 text-teal-400 hover:bg-teal-500/10 hover:border-teal-400/50 backdrop-blur-sm transition-all duration-200"
               >
@@ -338,6 +404,10 @@ const SecretaryGeneralDashboard: React.FC = () => {
                     <span className="text-gray-300">Toggle Auto-refresh</span>
                     <kbd className="bg-white/10 px-2 py-1 rounded text-xs font-mono">Ctrl+Shift+A</kbd>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Performance Stats</span>
+                    <kbd className="bg-white/10 px-2 py-1 rounded text-xs font-mono">Ctrl+Shift+P</kbd>
+                  </div>
                 </div>
               </motion.div>
             </motion.div>
@@ -353,82 +423,38 @@ const SecretaryGeneralDashboard: React.FC = () => {
           {renderFullscreenPanel()}
         </FullscreenOverlay>
 
-        {/* Enhanced Dashboard Grid */}
+        {/* Enhanced Dashboard Grid with Performance Optimizations */}
         <motion.div 
           className={`relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[calc(100vh-12rem)] ${fullscreenPanel ? 'hidden' : ''}`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          {/* Strategic Command */}
-          <SGDashboardPanel
-            title="Strategic Command"
-            panelId="strategic"
-            isHovered={hoveredPanel !== null}
-            isExpanded={hoveredPanel === 'strategic'}
-            isFullscreen={false}
-            onHover={setHoveredPanel}
-            onToggleFullscreen={handleToggleFullscreen}
-            className="md:col-span-1 xl:col-span-1"
-          >
-            {data.strategic && <StrategicCommandPanel data={data.strategic} />}
-          </SGDashboardPanel>
-
-          {/* Approvals & Directives */}
-          <SGDashboardPanel
-            title="Approvals & Directives"
-            panelId="approvals"
-            isHovered={hoveredPanel !== null}
-            isExpanded={hoveredPanel === 'approvals'}
-            isFullscreen={false}
-            onHover={setHoveredPanel}
-            onToggleFullscreen={handleToggleFullscreen}
-            className="md:col-span-1 xl:col-span-1"
-          >
-            <ApprovalsPanel data={data.approvals} actions={actions} />
-          </SGDashboardPanel>
-
-          {/* Coordination Hub */}
-          <SGDashboardPanel
-            title="Coordination Hub"
-            panelId="coordination"
-            isHovered={hoveredPanel !== null}
-            isExpanded={hoveredPanel === 'coordination'}
-            isFullscreen={false}
-            onHover={setHoveredPanel}
-            onToggleFullscreen={handleToggleFullscreen}
-            className="md:col-span-2 xl:col-span-1"
-          >
-            <CoordinationPanel data={data.coordination} actions={actions} />
-          </SGDashboardPanel>
-
-          {/* System Health & Risk */}
-          <SGDashboardPanel
-            title="System Health & Risk"
-            panelId="health"
-            isHovered={hoveredPanel !== null}
-            isExpanded={hoveredPanel === 'health'}
-            isFullscreen={false}
-            onHover={setHoveredPanel}
-            onToggleFullscreen={handleToggleFullscreen}
-            className="md:col-span-1 xl:col-span-1"
-          >
-            <HealthRiskPanel risks={data.risks} anomalies={data.anomalies} actions={actions} />
-          </SGDashboardPanel>
-
-          {/* Executive Summary */}
-          <SGDashboardPanel
-            title="Executive Summary"
-            panelId="summary"
-            isHovered={hoveredPanel !== null}
-            isExpanded={hoveredPanel === 'summary'}
-            isFullscreen={false}
-            onHover={setHoveredPanel}
-            onToggleFullscreen={handleToggleFullscreen}
-            className="md:col-span-1 xl:col-span-2"
-          >
-            <ExecutiveSummaryPanel data={data.summary} actions={actions} />
-          </SGDashboardPanel>
+          {panelConfig.map((panelInfo, index) => {
+            const PanelComponent = panelInfo.component;
+            
+            return (
+              <OptimizedPanelWrapper
+                key={panelInfo.id}
+                isVisible={!fullscreenPanel}
+                animationDelay={index * 0.1}
+                className={panelInfo.className}
+              >
+                <SGDashboardPanel
+                  title={panelInfo.title}
+                  panelId={panelInfo.id}
+                  isHovered={hoveredPanel !== null}
+                  isExpanded={hoveredPanel === panelInfo.id}
+                  isFullscreen={false}
+                  onHover={setHoveredPanel}
+                  onToggleFullscreen={handleToggleFullscreen}
+                  className="h-full"
+                >
+                  <PanelComponent {...panelInfo.props} />
+                </SGDashboardPanel>
+              </OptimizedPanelWrapper>
+            );
+          })}
         </motion.div>
       </div>
     </AnimatedPage>
