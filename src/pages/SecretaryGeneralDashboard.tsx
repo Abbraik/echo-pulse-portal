@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { FullscreenOverlay } from '@/components/ui/fullscreen-overlay';
@@ -72,7 +71,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
     return 'stale';
   }, [isRefreshing, error, lastValidation, realTimeState.isConnected]);
 
-  // Memoized panel configuration with proper props
+  // Memoized panel configuration with proper props - updated to include Strategic panel
   const panelConfig: PanelConfigItem[] = useMemo(() => [
     {
       id: 'strategic',
@@ -304,7 +303,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
   return (
     <AnimatedPage>
-      <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden">
+      <div className="min-h-screen pt-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4 relative overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-transparent to-blue-500/5" />
         <motion.div 
