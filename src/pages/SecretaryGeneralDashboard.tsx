@@ -22,6 +22,14 @@ const MemoizedCoordinationPanel = memo(CoordinationPanel);
 const MemoizedHealthRiskPanel = memo(HealthRiskPanel);
 const MemoizedExecutiveSummaryPanel = memo(ExecutiveSummaryPanel);
 
+// Define panel configuration with proper typing
+interface PanelConfigItem {
+  id: string;
+  title: string;
+  component: React.ComponentType<any>;
+  className: string;
+}
+
 const SecretaryGeneralDashboard: React.FC = () => {
   const { data, loading, error, lastUpdated, refreshData, actions } = useSGData();
   const [hoveredPanel, setHoveredPanel] = useState<string | null>(null);
@@ -32,44 +40,59 @@ const SecretaryGeneralDashboard: React.FC = () => {
   
   const performanceMetrics = usePerformanceMonitor('SecretaryGeneralDashboard');
 
-  // Memoized panel configuration
-  const panelConfig = useMemo(() => [
+  // Memoized panel configuration with proper props
+  const panelConfig: PanelConfigItem[] = useMemo(() => [
     {
       id: 'strategic',
       title: 'Strategic Command',
       component: MemoizedStrategicPanel,
-      props: { data: data?.strategic },
       className: 'md:col-span-1 xl:col-span-1'
     },
     {
       id: 'approvals',
       title: 'Approvals & Directives',
       component: MemoizedApprovalsPanel,
-      props: { data: data?.approvals, actions },
       className: 'md:col-span-1 xl:col-span-1'
     },
     {
       id: 'coordination',
       title: 'Coordination Hub',
       component: MemoizedCoordinationPanel,
-      props: { data: data?.coordination, actions },
       className: 'md:col-span-2 xl:col-span-1'
     },
     {
       id: 'health',
       title: 'System Health & Risk',
       component: MemoizedHealthRiskPanel,
-      props: { risks: data?.risks, anomalies: data?.anomalies, actions },
       className: 'md:col-span-1 xl:col-span-1'
     },
     {
       id: 'summary',
       title: 'Executive Summary',
       component: MemoizedExecutiveSummaryPanel,
-      props: { data: data?.summary, actions },
       className: 'md:col-span-1 xl:col-span-2'
     }
-  ], [data, actions]);
+  ], []);
+
+  // Function to get props for each panel
+  const getPanelProps = useCallback((panelId: string) => {
+    if (!data) return {};
+
+    switch (panelId) {
+      case 'strategic':
+        return { data: data.strategic };
+      case 'approvals':
+        return { data: data.approvals, actions };
+      case 'coordination':
+        return { data: data.coordination, actions };
+      case 'health':
+        return { risks: data.risks, anomalies: data.anomalies, actions };
+      case 'summary':
+        return { data: data.summary, actions };
+      default:
+        return {};
+    }
+  }, [data, actions]);
 
   // Enhanced fullscreen toggle with animations
   const handleToggleFullscreen = useCallback((panelId: string) => {
@@ -225,6 +248,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
     if (!panelInfo) return null;
 
     const PanelComponent = panelInfo.component;
+    const panelProps = getPanelProps(fullscreenPanel);
 
     return (
       <SGDashboardPanel
@@ -237,7 +261,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
         onToggleFullscreen={handleToggleFullscreen}
         className="h-full"
       >
-        <PanelComponent {...panelInfo.props} />
+        <PanelComponent {...panelProps} />
       </SGDashboardPanel>
     );
   };
@@ -432,6 +456,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
         >
           {panelConfig.map((panelInfo, index) => {
             const PanelComponent = panelInfo.component;
+            const panelProps = getPanelProps(panelInfo.id);
             
             return (
               <OptimizedPanelWrapper
@@ -450,7 +475,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
                   onToggleFullscreen={handleToggleFullscreen}
                   className="h-full"
                 >
-                  <PanelComponent {...panelInfo.props} />
+                  <PanelComponent {...panelProps} />
                 </SGDashboardPanel>
               </OptimizedPanelWrapper>
             );
