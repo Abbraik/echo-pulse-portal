@@ -489,7 +489,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
         {/* Enhanced Dashboard Grid with Performance Optimizations */}
         <motion.div 
-          className={`relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[calc(100vh-16rem)] ${fullscreenPanel ? 'hidden' : ''}`}
+          className={`relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[calc(100vh-20rem)] ${fullscreenPanel ? 'hidden' : ''}`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
