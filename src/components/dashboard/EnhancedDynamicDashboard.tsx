@@ -1,19 +1,16 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Maximize2, Minimize2, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useModularBundles } from '@/hooks/useModularBundles';
 import { useModularHealthMetrics } from '@/hooks/useModularHealthMetrics';
 import { useModularCurrentProfile } from '@/hooks/useModularProfiles';
-import StrategicOverview from './StrategicOverview';
-import SystemHealth from './SystemHealth';
-import ZoneSnapshots from './ZoneSnapshots';
+import DynamicPanelContainer from './enhanced/DynamicPanelContainer';
+import AlertsAnomalySection from '../monitor/AlertsAnomalySection';
 
 const EnhancedDynamicDashboard: React.FC = () => {
-  const [layout, setLayout] = useState<'balanced' | 'left-focus' | 'right-focus'>('balanced');
-  const [expandedPanel, setExpandedPanel] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'full' | 'approvals' | 'health'>('full');
+  const [fullscreenPanel, setFullscreenPanel] = useState<string | null>(null);
   
   const { data: profile } = useModularCurrentProfile();
   const { data: healthMetrics } = useModularHealthMetrics();
@@ -39,44 +36,28 @@ const EnhancedDynamicDashboard: React.FC = () => {
     }
   };
 
-  const getLayoutStyles = () => {
-    if (expandedPanel) {
-      return 'grid-cols-1';
-    }
-    
-    switch (layout) {
-      case 'left-focus':
-        return 'grid-cols-12 gap-6';
-      case 'right-focus':
-        return 'grid-cols-12 gap-6';
-      default:
-        return 'grid-cols-1 lg:grid-cols-3 gap-6';
-    }
+  const handleViewModeChange = (mode: 'full' | 'approvals' | 'health') => {
+    setViewMode(mode);
   };
 
-  const getPanelStyles = (panelId: string) => {
-    if (expandedPanel === panelId) {
-      return 'col-span-12';
-    }
-    
-    if (expandedPanel && expandedPanel !== panelId) {
-      return 'hidden';
-    }
-    
-    switch (layout) {
-      case 'left-focus':
-        if (panelId === 'strategic') return 'col-span-8';
-        return 'col-span-2';
-      case 'right-focus':
-        if (panelId === 'zones') return 'col-span-8';
-        return 'col-span-2';
-      default:
-        return 'col-span-1';
-    }
+  const handleToggleFullscreen = (panel: string) => {
+    setFullscreenPanel(fullscreenPanel === panel ? null : panel);
   };
 
-  const toggleExpanded = (panelId: string) => {
-    setExpandedPanel(expandedPanel === panelId ? null : panelId);
+  // Mock dashboard data structure
+  const dashboardData = {
+    approvals: {
+      pending: bundles?.filter(b => !b.isApproved).length || 0,
+      recent: bundles?.slice(0, 3) || []
+    },
+    systemHealth: {
+      metrics: healthMetrics || [],
+      overall: healthMetrics?.length > 0 ? 85 : 0
+    },
+    coordination: {
+      activeTasks: 12,
+      zones: ['THINK', 'ACT', 'LEARN', 'INNOVATE', 'MONITOR']
+    }
   };
 
   return (
@@ -87,122 +68,59 @@ const EnhancedDynamicDashboard: React.FC = () => {
         animate="visible"
         className="max-w-7xl mx-auto space-y-6"
       >
-        {/* Header with Layout Controls */}
-        <motion.div variants={itemVariants} className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              Director General Dashboard
-            </h1>
-            <p className="text-slate-400 mt-2">
-              Welcome back, {profile?.fullName || 'Director'}
-            </p>
-          </div>
-          
-          <div className="flex gap-2">
-            <Button
-              variant={layout === 'balanced' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setLayout('balanced')}
-              className="text-xs"
-            >
-              Balanced
-            </Button>
-            <Button
-              variant={layout === 'left-focus' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setLayout('left-focus')}
-              className="text-xs"
-            >
-              Strategy Focus
-            </Button>
-            <Button
-              variant={layout === 'right-focus' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setLayout('right-focus')}
-              className="text-xs"
-            >
-              Operations Focus
-            </Button>
-          </div>
+        {/* Welcome Header */}
+        <motion.div variants={itemVariants} className="text-center">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent mb-4">
+            Director General Dashboard
+          </h1>
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            Welcome back, {profile?.fullName || 'Director'}. Navigate strategic decisions, monitor system health, 
+            and coordinate operations across all zones from your centralized command center.
+          </p>
         </motion.div>
 
-        {/* Dynamic Grid Layout */}
-        <div className={`grid ${getLayoutStyles()}`}>
-          {/* Strategic Overview Panel */}
-          <motion.div 
-            variants={itemVariants}
-            className={`${getPanelStyles('strategic')} transition-all duration-300`}
+        {/* View Mode Controls */}
+        <motion.div variants={itemVariants} className="flex justify-center gap-3">
+          <Button
+            variant={viewMode === 'full' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => handleViewModeChange('full')}
+            className="text-sm"
           >
-            <Card className="h-full backdrop-blur-xl bg-slate-800/40 border-white/10">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-lg font-medium text-white">
-                  Strategic Overview
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleExpanded('strategic')}
-                  className="h-8 w-8 p-0 text-slate-400 hover:text-white"
-                >
-                  {expandedPanel === 'strategic' ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <StrategicOverview bundles={bundles} />
-              </CardContent>
-            </Card>
-          </motion.div>
+            Full Overview
+          </Button>
+          <Button
+            variant={viewMode === 'approvals' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => handleViewModeChange('approvals')}
+            className="text-sm"
+          >
+            Approvals Focus
+          </Button>
+          <Button
+            variant={viewMode === 'health' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => handleViewModeChange('health')}
+            className="text-sm"
+          >
+            Health Focus
+          </Button>
+        </motion.div>
 
-          {/* System Health Panel */}
-          <motion.div 
-            variants={itemVariants}
-            className={`${getPanelStyles('health')} transition-all duration-300`}
-          >
-            <Card className="h-full backdrop-blur-xl bg-slate-800/40 border-white/10">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-lg font-medium text-white">
-                  System Health
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleExpanded('health')}
-                  className="h-8 w-8 p-0 text-slate-400 hover:text-white"
-                >
-                  {expandedPanel === 'health' ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <SystemHealth metrics={healthMetrics} />
-              </CardContent>
-            </Card>
-          </motion.div>
+        {/* Alerts Section */}
+        <motion.div variants={itemVariants}>
+          <AlertsAnomalySection />
+        </motion.div>
 
-          {/* Zone Operations Panel */}
-          <motion.div 
-            variants={itemVariants}
-            className={`${getPanelStyles('zones')} transition-all duration-300`}
-          >
-            <Card className="h-full backdrop-blur-xl bg-slate-800/40 border-white/10">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-lg font-medium text-white">
-                  Zone Operations
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleExpanded('zones')}
-                  className="h-8 w-8 p-0 text-slate-400 hover:text-white"
-                >
-                  {expandedPanel === 'zones' ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <ZoneSnapshots claims={[]} metrics={healthMetrics} />
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
+        {/* Dynamic Three Panel Container */}
+        <motion.div variants={itemVariants}>
+          <DynamicPanelContainer
+            dashboardData={dashboardData}
+            viewMode={viewMode}
+            onViewModeChange={handleViewModeChange}
+            onToggleFullscreen={handleToggleFullscreen}
+          />
+        </motion.div>
       </motion.div>
     </div>
   );
