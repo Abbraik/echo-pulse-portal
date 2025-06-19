@@ -71,12 +71,32 @@ const SecretaryGeneralDashboard: React.FC = () => {
     return 'stale';
   }, [isRefreshing, error, lastValidation, realTimeState.isConnected]);
 
-  // Memoized panel configuration with proper props - updated to include Strategic panel
+  // Import the Strategic panel component
+  const SecretaryGeneralStrategic = React.lazy(() => import('@/components/sg/panels/SecretaryGeneralStrategic'));
+
+  // Memoized panel configuration - Updated to use the new Strategic component
   const panelConfig: PanelConfigItem[] = useMemo(() => [
     {
       id: 'strategic',
       title: 'Strategic Command',
-      component: MemoizedStrategicPanel,
+      component: React.memo(() => (
+        <React.Suspense fallback={<div className="flex items-center justify-center h-full text-white">Loading...</div>}>
+          <SecretaryGeneralStrategic 
+            data={data?.strategic || {
+              deiComposite: { current: 82, target: 85, history: [79, 80, 82] },
+              trustIndex: { current: 74, target: 80, history: [70, 73, 74] },
+              psiScores: { Producer: 0.65, Stabilizer: 0.72, Innovator: 0.58, Unifier: 0.61 },
+              entropyTrends: [
+                { zone: 'Think', values: [0.30, 0.35, 0.32] },
+                { zone: 'Act', values: [0.40, 0.42, 0.38] },
+                { zone: 'Monitor', values: [0.25, 0.28, 0.26] },
+                { zone: 'Learn', values: [0.20, 0.22, 0.21] }
+              ]
+            }}
+            onFullscreen={() => handleToggleFullscreen('strategic')}
+          />
+        </React.Suspense>
+      )),
       className: 'md:col-span-1 xl:col-span-1'
     },
     {
@@ -103,15 +123,28 @@ const SecretaryGeneralDashboard: React.FC = () => {
       component: MemoizedExecutiveSummaryPanel,
       className: 'md:col-span-1 xl:col-span-2'
     }
-  ], []);
+  ], [data]);
 
-  // Function to get props for each panel
+  // Function to get props for each panel - Updated to handle strategic panel
   const getPanelProps = useCallback((panelId: string) => {
     if (!data) return {};
 
     switch (panelId) {
       case 'strategic':
-        return { data: data.strategic };
+        return { 
+          data: data.strategic || {
+            deiComposite: { current: 82, target: 85, history: [79, 80, 82] },
+            trustIndex: { current: 74, target: 80, history: [70, 73, 74] },
+            psiScores: { Producer: 0.65, Stabilizer: 0.72, Innovator: 0.58, Unifier: 0.61 },
+            entropyTrends: [
+              { zone: 'Think', values: [0.30, 0.35, 0.32] },
+              { zone: 'Act', values: [0.40, 0.42, 0.38] },
+              { zone: 'Monitor', values: [0.25, 0.28, 0.26] },
+              { zone: 'Learn', values: [0.20, 0.22, 0.21] }
+            ]
+          },
+          onFullscreen: () => handleToggleFullscreen('strategic')
+        };
       case 'approvals':
         return { data: data.approvals, actions };
       case 'coordination':
@@ -283,6 +316,29 @@ const SecretaryGeneralDashboard: React.FC = () => {
     if (!panelInfo) return null;
 
     const PanelComponent = panelInfo.component;
+
+    // For strategic panel, render the component directly in fullscreen
+    if (fullscreenPanel === 'strategic') {
+      return (
+        <React.Suspense fallback={<div className="flex items-center justify-center h-full text-white">Loading...</div>}>
+          <SecretaryGeneralStrategic 
+            data={data?.strategic || {
+              deiComposite: { current: 82, target: 85, history: [79, 80, 82] },
+              trustIndex: { current: 74, target: 80, history: [70, 73, 74] },
+              psiScores: { Producer: 0.65, Stabilizer: 0.72, Innovator: 0.58, Unifier: 0.61 },
+              entropyTrends: [
+                { zone: 'Think', values: [0.30, 0.35, 0.32] },
+                { zone: 'Act', values: [0.40, 0.42, 0.38] },
+                { zone: 'Monitor', values: [0.25, 0.28, 0.26] },
+                { zone: 'Learn', values: [0.20, 0.22, 0.21] }
+              ]
+            }}
+            onFullscreen={() => setFullscreenPanel(null)}
+          />
+        </React.Suspense>
+      );
+    }
+
     const panelProps = getPanelProps(fullscreenPanel);
 
     return (
