@@ -196,7 +196,7 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
         title: backendTask.title,
         status: backendTask.status,
         assignee: backendTask.assignee,
-        assigneeAvatar: backendTask.assignee_avatar,
+        assigneeAvatar: backendTask.assignee_avatar || undefined,
         assigneeInitial: backendTask.assignee_initial || backendTask.assignee.split(' ').map(n => n[0]).join('').toUpperCase(),
         dueDate: backendTask.due_date || new Date().toISOString().split('T')[0],
         needsApproval: backendTask.needs_approval,
@@ -226,16 +226,12 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
 
   // Function to toggle task expansion
   const toggleTaskExpansion = (taskId: string) => {
-    
-
-    
+    // Implementation for task expansion
   };
 
   // Function to toggle chat panel
   const toggleChatPanel = (taskId: string) => {
-    
-
-    
+    // Implementation for chat panel
   };
 
   // Get color based on task status
@@ -343,8 +339,16 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
       const task = lane.tasks.find(t => t.id === taskId);
       if (task) return task;
     }
+    
+    // Also check backend tasks directly
+    if (backendTasks) {
+      const backendTask = backendTasks.find(t => t.id === taskId);
+      if (backendTask) return backendTask;
+    }
+    
     return null;
   };
+  
   const handleCreateTask = (laneId: string, laneTitle: string) => {
     setSelectedLaneForTask({
       id: laneId,
@@ -352,6 +356,7 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
     });
     setShowCreateTaskModal(true);
   };
+  
   const handleCloseTaskModal = () => {
     setShowCreateTaskModal(false);
     setSelectedLaneForTask(null);
@@ -359,6 +364,7 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
 
   // Handle task click to open details modal
   const handleTaskClick = (taskId: string) => {
+    console.log('Task clicked:', taskId);
     setSelectedTaskId(taskId);
     setShowTaskDetailsModal(true);
   };
