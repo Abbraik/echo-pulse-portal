@@ -1,5 +1,5 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Bundle } from '../types/act-types';
 
@@ -70,13 +70,19 @@ const mockBundles: Bundle[] = [
   }
 ];
 
-export const useRealBundles = () => {
+export const useRealBundles = (statusFilter?: string) => {
   return useQuery({
-    queryKey: ['bundles'],
+    queryKey: ['bundles', statusFilter],
     queryFn: async (): Promise<Bundle[]> => {
       // For now, return mock data instead of making real API calls
       // In production, this would fetch from Supabase
-      return mockBundles;
+      let filteredBundles = mockBundles;
+      
+      if (statusFilter && statusFilter !== 'all') {
+        filteredBundles = mockBundles.filter(bundle => bundle.status === statusFilter);
+      }
+      
+      return filteredBundles;
     }
   });
 };
@@ -90,4 +96,105 @@ export const useRealBundle = (bundleId: string) => {
       return bundle || null;
     }
   });
+};
+
+export const useRealBundleActions = () => {
+  const queryClient = useQueryClient();
+
+  const createBundle = useMutation({
+    mutationFn: async (bundleData: any) => {
+      // Mock implementation - in production this would call Supabase
+      const newBundle = {
+        id: crypto.randomUUID(),
+        ...bundleData,
+        created_by: "9b431078-a2b4-4d42-b0a8-2ec8a351dedc",
+        leverage_points: bundleData.leveragePoints || [],
+        ndi_impact: bundleData.ndiImpact || 0,
+        is_approved: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      // Add to mock data
+      mockBundles.push({
+        ...newBundle,
+        createdBy: newBundle.created_by,
+        leveragePoints: newBundle.leverage_points,
+        ndiImpact: newBundle.ndi_impact,
+        isApproved: newBundle.is_approved,
+        createdAt: new Date(newBundle.created_at),
+        updatedAt: new Date(newBundle.updated_at)
+      });
+      
+      return newBundle;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bundles'] });
+    }
+  });
+
+  const updateBundle = useMutation({
+    mutationFn: async ({ bundleId, updates }: { bundleId: string; updates: any }) => {
+      // Mock implementation - in production this would call Supabase
+      const bundleIndex = mockBundles.findIndex(b => b.id === bundleId);
+      if (bundleIndex !== -1) {
+        const updatedBundle = {
+          ...mockBundles[bundleIndex],
+          ...updates,
+          updatedAt: new Date()
+        };
+        mockBundles[bundleIndex] = updatedBundle;
+        
+        return {
+          id: updatedBundle.id,
+          name: updatedBundle.name,
+          summary: updatedBundle.summary,
+          created_by: updatedBundle.createdBy,
+          leverage_points: updatedBundle.leveragePoints,
+          objectives: updatedBundle.objectives,
+          pillars: updatedBundle.pillars,
+          geography: updatedBundle.geography,
+          tags: updatedBundle.tags,
+          status: updatedBundle.status,
+          coherence: updatedBundle.coherence,
+          ndi_impact: updatedBundle.ndiImpact,
+          is_approved: updatedBundle.isApproved,
+          created_at: updatedBundle.createdAt.toISOString(),
+          updated_at: updatedBundle.updatedAt.toISOString()
+        };
+      }
+      throw new Error('Bundle not found');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bundles'] });
+      queryClient.invalidateQueries({ queryKey: ['bundle'] });
+    }
+  });
+
+  const approveBundle = useMutation({
+    mutationFn: async (bundleId: string) => {
+      // Mock implementation - in production this would call Supabase
+      const bundleIndex = mockBundles.findIndex(b => b.id === bundleId);
+      if (bundleIndex !== -1) {
+        mockBundles[bundleIndex] = {
+          ...mockBundles[bundleIndex],
+          isApproved: true,
+          status: 'active',
+          updatedAt: new Date()
+        };
+        return mockBundles[bundleIndex];
+      }
+      throw new Error('Bundle not found');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bundles'] });
+      queryClient.invalidateQueries({ queryKey: ['bundle'] });
+    }
+  });
+
+  return {
+    createBundle,
+    updateBundle,
+    approveBundle
+  };
 };
