@@ -1,58 +1,26 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Json } from '@/integrations/supabase/types';
+import { supabase } from '@/lib/supabase';
 
-// Define Task interface to match database schema
+// Define Task interface
 interface Task {
   id: string;
   title: string;
   status: 'to-do' | 'in-progress' | 'completed';
   assignee: string;
-  assignee_avatar?: string | null;
-  assignee_initial?: string | null;
-  due_date?: string | null;
+  assignee_avatar?: string;
+  assignee_initial?: string;
+  due_date?: string;
   needs_approval: boolean;
-  teams_chat_history?: Json | null;
-  description?: string | null;
-  dependencies?: string[] | null;
-  gantt_start?: number | null;
-  gantt_duration?: number | null;
-  bundle_id?: string | null;
-  created_at: string;
-  updated_at: string;
-  created_by?: string | null;
+  teams_chat_history?: {
+    user: string;
+    userColor: string;
+    message: string;
+  }[];
+  description?: string;
+  dependencies?: string[];
+  gantt_start?: number; // Day offset
+  gantt_duration?: number; // Days
 }
-
-// Chat message interface for type safety when working with teams_chat_history
-export interface ChatMessage {
-  user: string;
-  userColor: string;
-  message: string;
-  timestamp?: string;
-}
-
-// Helper function to safely parse chat history
-export const parseChatHistory = (chatHistory: Json | null): ChatMessage[] => {
-  if (!chatHistory) return [];
-  if (Array.isArray(chatHistory)) {
-    return chatHistory
-      .filter((item: any): boolean => {
-        return typeof item === 'object' && 
-               item !== null && 
-               typeof item.user === 'string' && 
-               typeof item.userColor === 'string' && 
-               typeof item.message === 'string';
-      })
-      .map((item: any): ChatMessage => ({
-        user: item.user,
-        userColor: item.userColor,
-        message: item.message,
-        timestamp: item.timestamp
-      }));
-  }
-  return [];
-};
 
 export const useTasks = () => {
   const queryClient = useQueryClient();
@@ -69,7 +37,7 @@ export const useTasks = () => {
   });
 
   const createTaskMutation = useMutation({
-    mutationFn: async (newTask: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (newTask: Omit<Task, 'id'>) => {
       const { data, error } = await supabase
         .from('tasks')
         .insert([newTask])
@@ -83,10 +51,9 @@ export const useTasks = () => {
     },
   });
 
-  const createTask = async (newTask: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
+  const createTask = async (newTask: Omit<Task, 'id'>) => {
     return createTaskMutation.mutateAsync(newTask);
   };
-
   const updateTaskMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Task> }) => {
       const { data, error } = await supabase
@@ -111,7 +78,6 @@ export const useTasks = () => {
   return {
     tasks: tasksQuery.data || [],
     isLoading: tasksQuery.isLoading || createTaskMutation.isPending || updateTaskMutation.isPending,
-    isCreating: createTaskMutation.isPending,
     error: tasksQuery.error,
     createTask,
     updateTask,

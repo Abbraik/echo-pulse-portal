@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
-import { useTasks, ChatMessage, parseChatHistory } from '../hooks/useTasks';
+import { useTasks } from '../hooks/useTasks';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface TaskDetailsModalProps {
@@ -19,6 +19,13 @@ interface TaskDetailsModalProps {
   onClose: () => void;
   taskId: string | null;
   bundleId: string;
+}
+
+interface ChatMessage {
+  user: string;
+  userColor: string;
+  message: string;
+  timestamp?: string;
 }
 
 const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
@@ -107,12 +114,11 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     };
 
     try {
-      // Parse existing chat history safely
-      const currentHistory = parseChatHistory(currentTask?.teams_chat_history);
+      const currentHistory = currentTask?.teams_chat_history || [];
       const updatedHistory = [...currentHistory, message];
       
       await updateTask(taskId, {
-        teams_chat_history: updatedHistory as any
+        teams_chat_history: updatedHistory
       });
       
       setNewMessage('');
@@ -140,12 +146,11 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     };
 
     try {
-      // Parse existing chat history safely
-      const currentHistory = parseChatHistory(currentTask?.teams_chat_history);
+      const currentHistory = currentTask?.teams_chat_history || [];
       const updatedHistory = [...currentHistory, mention];
       
       await updateTask(taskId, {
-        teams_chat_history: updatedHistory as any
+        teams_chat_history: updatedHistory
       });
       
       setMentionInput('');
@@ -170,9 +175,6 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       default: return 'bg-gray-500';
     }
   };
-
-  // Parse chat history safely
-  const chatHistory = parseChatHistory(currentTask?.teams_chat_history);
 
   if (!currentTask) {
     return null;
@@ -221,11 +223,14 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden grid grid-cols-2 gap-6 p-6">
+          {/* Left Column - Task Details */}
           <div className="space-y-6 overflow-y-auto">
+            {/* Basic Info */}
             <div className="bg-white/5 rounded-lg p-4 border border-white/10">
               <h3 className="text-lg font-medium text-white mb-4">Task Details</h3>
               
               <div className="space-y-4">
+                {/* Assignee */}
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8">
                     {currentTask.assignee_avatar && <AvatarImage src={currentTask.assignee_avatar} />}
@@ -249,6 +254,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                   </div>
                 </div>
 
+                {/* Status */}
                 <div>
                   <label className="text-sm text-gray-400 mb-2 block">Status</label>
                   {editMode ? (
@@ -269,6 +275,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                   )}
                 </div>
 
+                {/* Due Date */}
                 <div>
                   <label className="text-sm text-gray-400 mb-2 block">Due Date</label>
                   {editMode ? (
@@ -283,6 +290,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                   )}
                 </div>
 
+                {/* Description */}
                 <div>
                   <label className="text-sm text-gray-400 mb-2 block">Description</label>
                   {editMode ? (
@@ -297,6 +305,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                   )}
                 </div>
 
+                {/* Needs Approval */}
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">Needs Approval</span>
                   <Switch
@@ -312,6 +321,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
               </div>
             </div>
 
+            {/* Teams Integration Actions */}
             <div className="bg-white/5 rounded-lg p-4 border border-white/10">
               <h3 className="text-lg font-medium text-white mb-4">Teams Integration</h3>
               
@@ -367,6 +377,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
             </div>
           </div>
 
+          {/* Right Column - Teams Chat */}
           <div className="bg-white/5 rounded-lg border border-white/10 flex flex-col">
             <div className="border-b border-white/10 p-4">
               <div className="flex items-center space-x-2">
@@ -375,10 +386,11 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
               </div>
             </div>
 
+            {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               <AnimatePresence>
-                {chatHistory && chatHistory.length > 0 ? (
-                  chatHistory.map((msg: ChatMessage, index: number) => (
+                {currentTask.teams_chat_history && currentTask.teams_chat_history.length > 0 ? (
+                  currentTask.teams_chat_history.map((msg: any, index: number) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, y: 10 }}
@@ -407,6 +419,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
               </AnimatePresence>
             </div>
 
+            {/* Message Input */}
             <div className="border-t border-white/10 p-4">
               <div className="flex items-center space-x-2">
                 <Input
