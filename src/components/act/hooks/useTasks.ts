@@ -1,5 +1,6 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 // Define Task interface
 interface Task {
@@ -78,6 +79,7 @@ export const useTasks = () => {
   return {
     tasks: tasksQuery.data || [],
     isLoading: tasksQuery.isLoading || createTaskMutation.isPending || updateTaskMutation.isPending,
+    isCreating: createTaskMutation.isPending,
     error: tasksQuery.error,
     createTask,
     updateTask,
