@@ -15,7 +15,8 @@ export const useLeveragePoints = () => {
         throw error;
       }
       
-      return data || [];
+      // Cast the Json type to our expected LeveragePoint[] type
+      return (data as LeveragePoint[]) || [];
     }
   });
 };
