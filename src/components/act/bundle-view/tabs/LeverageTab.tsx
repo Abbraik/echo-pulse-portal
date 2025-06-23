@@ -21,8 +21,13 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
   const [selectedPointsForDescription, setSelectedPointsForDescription] = useState<LeveragePointChipData[]>([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
   
-  const { data: leveragePoints = [] } = useLeveragePoints();
+  const { data: leveragePoints = [], isLoading, error } = useLeveragePoints();
   const taskGeneration = useTaskGeneration();
+
+  // Add debugging
+  console.log('LeverageTab - bundle:', bundle);
+  console.log('LeverageTab - leveragePoints:', leveragePoints);
+  console.log('LeverageTab - selectedPointsForDescription:', selectedPointsForDescription);
 
   // Convert bundle.leveragePoints to string array if needed
   const leveragePointIds = Array.isArray(bundle.leveragePoints) 
@@ -55,19 +60,35 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
       });
       setShowTaskModal(false);
     } catch (error) {
-      // Error is handled by the mutation
+      console.error('Task generation error:', error);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-red-400">Failed to load leverage points</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Enhanced Leverage Point Selector Section */}
       <GlassCard className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-medium">
+          <h3 className="text-lg font-medium text-white">
             {t('leveragePoints', { defaultValue: 'Leverage Points' })}
           </h3>
-          <Button variant="outline" size="sm" className="bg-white/5">
+          <Button variant="outline" size="sm" className="bg-white/5 border-white/20 text-white hover:bg-white/10">
             <Sparkles className="h-4 w-4 mr-1" />
             {t('suggestPoints', { defaultValue: 'Suggest Points' })}
           </Button>
@@ -79,7 +100,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
           onUpdate={handleLeverageUpdate} 
         />
 
-        {/* Description Panel */}
+        {/* Description Panel - Always show container for debugging */}
         <LeveragePointDescriptions 
           selectedPoints={selectedPointsForDescription}
           leveragePoints={leveragePoints}

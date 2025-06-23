@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Star, Save, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,6 +25,12 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
   const { data: leveragePoints = [], isLoading } = useLeveragePoints();
   const updateMutation = useUpdateBundleLeverage();
 
+  // Add debugging
+  console.log('EnhancedLeverageSelector - bundleId:', bundleId);
+  console.log('EnhancedLeverageSelector - initialPoints:', initialPoints);
+  console.log('EnhancedLeverageSelector - leveragePoints:', leveragePoints);
+  console.log('EnhancedLeverageSelector - selectedPoints:', selectedPoints);
+
   useEffect(() => {
     // Initialize selected points from bundle data
     if (leveragePoints.length > 0 && initialPoints) {
@@ -41,8 +46,10 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
         .filter((chip): chip is LeveragePointChipData => chip !== null);
       
       setSelectedPoints(chips);
+      // Immediately notify parent component
+      onUpdate?.(chips.map(c => c.id));
     }
-  }, [leveragePoints, initialPoints]);
+  }, [leveragePoints, initialPoints, onUpdate]);
 
   const handleAddPoint = (pointId: string) => {
     if (selectedPoints.length >= 5) return;
@@ -57,6 +64,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
       setSelectedPoints(newPoints);
       setSelectedValue('');
       setHasChanges(true);
+      onUpdate?.(newPoints.map(p => p.id));
     }
   };
 
@@ -64,6 +72,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
     const newPoints = selectedPoints.filter(sp => sp.id !== pointId);
     setSelectedPoints(newPoints);
     setHasChanges(true);
+    onUpdate?.(newPoints.map(p => p.id));
   };
 
   const handleSave = async () => {
@@ -93,6 +102,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
       
       setSelectedPoints(chips);
       setHasChanges(false);
+      onUpdate?.(chips.map(c => c.id));
     }
   };
 
@@ -104,6 +114,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
+        <span className="ml-2 text-white">Loading leverage points...</span>
       </div>
     );
   }
@@ -117,7 +128,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
             Edit Leverage Points
           </h3>
           <p className="text-sm text-gray-300">
-            Select up to 5 Meadows' Leverage Points
+            Select up to 5 Meadows' Leverage Points ({leveragePoints.length} available)
           </p>
         </div>
         <div className="flex gap-2">
@@ -149,25 +160,31 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
             <SelectValue placeholder="Choose a leverage point…" />
           </SelectTrigger>
           <SelectContent className="backdrop-blur-xl bg-slate-900/90 border-white/20">
-            {availablePoints.map((point) => (
-              <SelectItem 
-                key={point.id} 
-                value={point.id}
-                className="text-white hover:bg-white/10 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  {point.recommended && (
-                    <Star className="h-3 w-3 text-teal-400 fill-current" />
-                  )}
-                  <div>
-                    <div className="font-medium">{point.name}</div>
-                    <div className="text-xs text-gray-400 max-w-xs truncate">
-                      {point.description}
+            {availablePoints.length > 0 ? (
+              availablePoints.map((point) => (
+                <SelectItem 
+                  key={point.id} 
+                  value={point.id}
+                  className="text-white hover:bg-white/10 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    {point.recommended && (
+                      <Star className="h-3 w-3 text-teal-400 fill-current" />
+                    )}
+                    <div>
+                      <div className="font-medium">{point.name}</div>
+                      <div className="text-xs text-gray-400 max-w-xs truncate">
+                        {point.description}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-options" disabled className="text-gray-400">
+                No more points available
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
       </div>
