@@ -467,6 +467,33 @@ export type Database = {
           },
         ]
       }
+      leverage_points_reference: {
+        Row: {
+          created_at: string | null
+          current_usage: number | null
+          description: string
+          id: string
+          name: string
+          recommended: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_usage?: number | null
+          description: string
+          id: string
+          name: string
+          recommended?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          current_usage?: number | null
+          description?: string
+          id?: string
+          name?: string
+          recommended?: boolean | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -594,12 +621,18 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      get_leverage_points: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       has_role: {
         Args: { _role: Database["public"]["Enums"]["user_role"] }
         Returns: boolean
       }
       update_bundle_leverage: {
-        Args: { bundle_id: string; point: string }
+        Args:
+          | { bundle_id: string; point: string }
+          | { bundle_id: string; points: string[] }
         Returns: undefined
       }
       update_coherence_score: {
