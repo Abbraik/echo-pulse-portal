@@ -135,24 +135,14 @@ const CLDConnectorMesh: React.FC<{
     new THREE.Vector3(toIsoX, toIsoY, 0)
   ];
 
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
   return (
-    <line>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={points.length}
-          array={new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <lineBasicMaterial
-        color={connector.polarity === 'positive' ? '#10b981' : '#ef4444'}
-        transparent
-        opacity={0.8}
-        linecap="round"
-        linejoin="round"
-      />
-    </line>
+    <primitive object={new THREE.Line(geometry, new THREE.LineBasicMaterial({
+      color: connector.polarity === 'positive' ? '#10b981' : '#ef4444',
+      transparent: true,
+      opacity: 0.8
+    }))} />
   );
 };
 
@@ -161,35 +151,35 @@ const IsometricGrid: React.FC<{ size: number; divisions: number }> = ({ size, di
   const gridRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
-    if (gridRef.current) {
-      gridRef.current.clear();
-      
-      const material = new THREE.LineBasicMaterial({
-        color: 0x14b8a6,
-        transparent: true,
-        opacity: 0.1
-      });
+    if (!gridRef.current) return;
 
-      // Create isometric grid lines
-      for (let i = -divisions; i <= divisions; i++) {
-        // Horizontal lines
-        const hPoints = [
-          new THREE.Vector3(-size * 0.866, i * size * 0.5, 0),
-          new THREE.Vector3(size * 0.866, i * size * 0.5, 0)
-        ];
-        const hGeometry = new THREE.BufferGeometry().setFromPoints(hPoints);
-        const hLine = new THREE.Line(hGeometry, material);
-        gridRef.current.add(hLine);
+    gridRef.current.clear();
+    
+    const material = new THREE.LineBasicMaterial({
+      color: 0x14b8a6,
+      transparent: true,
+      opacity: 0.1
+    });
 
-        // Vertical lines
-        const vPoints = [
-          new THREE.Vector3(i * size * 0.866, -size * 0.5, 0),
-          new THREE.Vector3(i * size * 0.866, size * 0.5, 0)
-        ];
-        const vGeometry = new THREE.BufferGeometry().setFromPoints(vPoints);
-        const vLine = new THREE.Line(vGeometry, material);
-        gridRef.current.add(vLine);
-      }
+    // Create isometric grid lines
+    for (let i = -divisions; i <= divisions; i++) {
+      // Horizontal lines
+      const hPoints = [
+        new THREE.Vector3(-size * 0.866, i * size * 0.5, 0),
+        new THREE.Vector3(size * 0.866, i * size * 0.5, 0)
+      ];
+      const hGeometry = new THREE.BufferGeometry().setFromPoints(hPoints);
+      const hLine = new THREE.Line(hGeometry, material);
+      gridRef.current.add(hLine);
+
+      // Vertical lines
+      const vPoints = [
+        new THREE.Vector3(i * size * 0.866, -size * 0.5, 0),
+        new THREE.Vector3(i * size * 0.866, size * 0.5, 0)
+      ];
+      const vGeometry = new THREE.BufferGeometry().setFromPoints(vPoints);
+      const vLine = new THREE.Line(vGeometry, material);
+      gridRef.current.add(vLine);
     }
   }, [size, divisions]);
 
