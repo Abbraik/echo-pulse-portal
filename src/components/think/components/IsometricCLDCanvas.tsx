@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrthographicCamera, Text, Html, Line } from '@react-three/drei';
@@ -129,7 +130,7 @@ const CLDConnectorMesh: React.FC<{
   const toX = toNode.x / 100;
   const toY = toNode.y / 100;
 
-  const points = [
+  const points: [number, number, number][] = [
     [fromX, fromY, 0],
     [toX, toY, 0]
   ];
