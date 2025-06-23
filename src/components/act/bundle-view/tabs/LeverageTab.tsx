@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Sparkles, Zap } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,24 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
   const leveragePointIds = Array.isArray(bundle.leveragePoints) 
     ? bundle.leveragePoints.filter((point): point is string => typeof point === 'string') 
     : [];
+
+  // Initialize selectedPointsForDescription from bundle data only once when leverage points load
+  useEffect(() => {
+    if (leveragePoints.length > 0 && leveragePointIds.length > 0) {
+      const chips = leveragePointIds
+        .map(pointId => {
+          const point = leveragePoints.find(p => p.id === pointId);
+          return point ? {
+            id: point.id,
+            name: point.name,
+            recommended: point.recommended
+          } : null;
+        })
+        .filter((chip): chip is LeveragePointChipData => chip !== null);
+      
+      setSelectedPointsForDescription(chips);
+    }
+  }, [leveragePoints.length]); // Only depend on leveragePoints.length to avoid infinite loops
 
   // Use useCallback to stabilize the function reference and prevent infinite loops
   const handleLeverageUpdate = useCallback(async (points: string[]) => {

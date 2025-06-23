@@ -23,7 +23,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
   
   const { data: leveragePoints = [], isLoading } = useLeveragePoints();
 
-  // Initialize selected points from bundle data - removed onUpdate from dependencies to prevent infinite loop
+  // Initialize selected points from initialPoints only - don't call onUpdate from here
   useEffect(() => {
     if (leveragePoints.length > 0 && initialPoints && initialPoints.length > 0) {
       const chips = initialPoints
@@ -39,12 +39,8 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
       
       console.log('Initializing with chips:', chips);
       setSelectedPoints(chips);
-      // Only call onUpdate if the selected points have actually changed
-      if (chips.length > 0) {
-        onUpdate?.(chips.map(c => c.id));
-      }
     }
-  }, [leveragePoints, initialPoints]); // Removed onUpdate from dependencies
+  }, [leveragePoints.length, initialPoints.length]); // Use .length to avoid deep comparison
 
   const handleAddPoint = (pointId: string) => {
     if (selectedPoints.length >= 5) return;
