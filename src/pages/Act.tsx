@@ -31,6 +31,8 @@ const Act: React.FC = () => {
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   // Track if the playbooks library is expanded
   const [playbooksExpanded, setPlaybooksExpanded] = useState<boolean>(false);
+  // Track if the delivery chains manager is collapsed
+  const [deliveryCollapsed, setDeliveryCollapsed] = useState<boolean>(false);
   
   // Use scroll hook
   const { scrollToDelivery, setScrollToDelivery, showScrollToTop, hideHeader, scrollToTop } = useActScroll();
@@ -55,6 +57,11 @@ const Act: React.FC = () => {
     if (action === 'launch-delivery') {
       // Auto-scroll to delivery chains manager when launch is clicked
       setScrollToDelivery(true);
+      
+      // Expand delivery section if collapsed
+      if (deliveryCollapsed) {
+        setDeliveryCollapsed(false);
+      }
       
       // Show a toast indicating successful launch
       toast({
@@ -95,11 +102,14 @@ const Act: React.FC = () => {
               selectedBundle={selectedBundle}
               onBundleSelect={handleBundleSelect}
               detailView={detailView}
+              isDeliveryCollapsed={deliveryCollapsed}
             />
             
             <ActDeliverySection 
               detailView={detailView}
               selectedBundleId={selectedBundle?.id || null}
+              isCollapsed={deliveryCollapsed}
+              onToggleCollapse={() => setDeliveryCollapsed(!deliveryCollapsed)}
             />
             
             <ActPlaybooksSection 

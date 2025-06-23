@@ -10,19 +10,24 @@ interface ActMainContentProps {
   selectedBundle: Bundle | null;
   onBundleSelect: (bundle: Bundle | null) => void;
   detailView: DetailView;
+  isDeliveryCollapsed: boolean;
 }
 
 const ActMainContent: React.FC<ActMainContentProps> = ({
   selectedBundle,
   onBundleSelect,
-  detailView
+  detailView,
+  isDeliveryCollapsed
 }) => {
+  // Calculate height based on delivery section state
+  const contentHeight = isDeliveryCollapsed ? 'h-[calc(100vh-12rem)]' : 'h-[600px]';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-      className="flex flex-col lg:flex-row gap-6 mb-8"
+      className={`flex flex-col lg:flex-row gap-6 mb-8 transition-all duration-300 ${contentHeight}`}
     >
       {/* Bundles Rail (Sidebar) */}
       <motion.div 
@@ -32,7 +37,7 @@ const ActMainContent: React.FC<ActMainContentProps> = ({
         transition={{ delay: 0.3, duration: 0.6 }}
       >
         <div 
-          className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative h-[600px]"
+          className={`rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative ${contentHeight}`}
           style={{
             background: 'rgba(20, 30, 50, 0.6)',
             boxShadow: 'inset 0 0 30px rgba(59, 130, 246, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
@@ -56,7 +61,7 @@ const ActMainContent: React.FC<ActMainContentProps> = ({
         transition={{ delay: 0.4, duration: 0.6 }}
       >
         <div 
-          className="rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative h-[600px]"
+          className={`rounded-2xl backdrop-blur-[24px] border border-white/20 overflow-hidden relative ${contentHeight}`}
           style={{
             background: 'rgba(20, 30, 50, 0.6)',
             boxShadow: 'inset 0 0 30px rgba(59, 130, 246, 0.15), 0 16px 32px rgba(0, 0, 0, 0.4)'
