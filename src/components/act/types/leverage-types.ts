@@ -7,7 +7,7 @@ export interface LeveragePoint {
   recommended: boolean;
 }
 
-export interface LeveragePointChip {
+export interface LeveragePointChipData {
   id: string;
   name: string;
   recommended: boolean;

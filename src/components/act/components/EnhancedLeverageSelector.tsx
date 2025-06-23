@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLeveragePoints, useUpdateBundleLeverage } from '../hooks/useLeveragePoints';
-import { LeveragePoint, LeveragePointChip } from '../types/leverage-types';
+import type { LeveragePoint, LeveragePointChipData } from '../types/leverage-types';
 import LeveragePointChip from './LeveragePointChip';
 
 interface EnhancedLeverageSelectorProps {
@@ -19,7 +19,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
   initialPoints,
   onUpdate
 }) => {
-  const [selectedPoints, setSelectedPoints] = useState<LeveragePointChip[]>([]);
+  const [selectedPoints, setSelectedPoints] = useState<LeveragePointChipData[]>([]);
   const [selectedValue, setSelectedValue] = useState<string>('');
   const [hasChanges, setHasChanges] = useState(false);
   
@@ -38,7 +38,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
             recommended: point.recommended
           } : null;
         })
-        .filter((chip): chip is LeveragePointChip => chip !== null);
+        .filter((chip): chip is LeveragePointChipData => chip !== null);
       
       setSelectedPoints(chips);
     }
@@ -89,7 +89,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
             recommended: point.recommended
           } : null;
         })
-        .filter((chip): chip is LeveragePointChip => chip !== null);
+        .filter((chip): chip is LeveragePointChipData => chip !== null);
       
       setSelectedPoints(chips);
       setHasChanges(false);

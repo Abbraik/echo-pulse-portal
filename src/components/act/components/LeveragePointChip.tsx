@@ -2,10 +2,10 @@
 import React from 'react';
 import { X, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { LeveragePointChip } from '../types/leverage-types';
+import type { LeveragePointChipData } from '../types/leverage-types';
 
 interface LeveragePointChipProps {
-  point: LeveragePointChip;
+  point: LeveragePointChipData;
   onRemove: (id: string) => void;
 }
 
