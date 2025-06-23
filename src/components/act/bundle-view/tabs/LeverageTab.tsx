@@ -21,6 +21,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
   const { t } = useTranslation();
   const [selectedPointsForDescription, setSelectedPointsForDescription] = useState<LeveragePointChipData[]>([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [localLeveragePoints, setLocalLeveragePoints] = useState<any[]>([]);
   
   const { data: leveragePoints = [], isLoading, error } = useLeveragePoints();
   const taskGeneration = useTaskGeneration();
@@ -31,12 +32,19 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
     ? bundle.leveragePoints.filter((point): point is string => typeof point === 'string') 
     : [];
 
+  // Initialize local leverage points from server data
+  useEffect(() => {
+    if (leveragePoints.length > 0) {
+      setLocalLeveragePoints([...leveragePoints]);
+    }
+  }, [leveragePoints.length]);
+
   // Initialize selectedPointsForDescription from bundle data only once when leverage points load
   useEffect(() => {
-    if (leveragePoints.length > 0 && leveragePointIds.length > 0) {
+    if (localLeveragePoints.length > 0 && leveragePointIds.length > 0) {
       const chips = leveragePointIds
         .map(pointId => {
-          const point = leveragePoints.find(p => p.id === pointId);
+          const point = localLeveragePoints.find(p => p.id === pointId);
           return point ? {
             id: point.id,
             name: point.name,
@@ -47,7 +55,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
       
       setSelectedPointsForDescription(chips);
     }
-  }, [leveragePoints.length]); // Only depend on leveragePoints.length to avoid infinite loops
+  }, [localLeveragePoints.length, leveragePointIds.length]);
 
   // Use useCallback to stabilize the function reference and prevent infinite loops
   const handleLeverageUpdate = useCallback(async (points: string[]) => {
@@ -56,7 +64,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
     // Update the selected points for description panel
     const updatedChips = points
       .map(pointId => {
-        const point = leveragePoints.find(p => p.id === pointId);
+        const point = localLeveragePoints.find(p => p.id === pointId);
         return point ? {
           id: point.id,
           name: point.name,
@@ -80,7 +88,20 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
     } catch (error) {
       console.error('Failed to update bundle leverage points:', error);
     }
-  }, [leveragePoints, updateBundle, bundle.id]);
+  }, [localLeveragePoints, updateBundle, bundle.id]);
+
+  const handleDescriptionUpdate = useCallback((pointId: string, newDescription: string) => {
+    console.log('Updating description for point:', pointId, 'New description:', newDescription);
+    
+    // Update local leverage points state
+    setLocalLeveragePoints(prev => 
+      prev.map(point => 
+        point.id === pointId 
+          ? { ...point, description: newDescription }
+          : point
+      )
+    );
+  }, []);
 
   const handleGenerateTasks = async () => {
     try {
@@ -133,7 +154,8 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
         {/* Description Panel - Always show for selected points */}
         <LeveragePointDescriptions 
           selectedPoints={selectedPointsForDescription}
-          leveragePoints={leveragePoints}
+          leveragePoints={localLeveragePoints}
+          onDescriptionUpdate={handleDescriptionUpdate}
         />
 
         {/* Translate to Tasks Button */}
