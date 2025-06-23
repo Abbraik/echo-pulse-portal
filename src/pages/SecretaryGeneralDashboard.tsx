@@ -78,7 +78,7 @@ const SecretaryGeneralDashboard: React.FC = () => {
       id: 'strategic',
       title: 'Strategic Command',
       component: MemoizedStrategicPanel,
-      className: 'md:col-span-1 xl:col-span-1'
+      className: 'md:col-span-2 xl:col-span-2'
     },
     {
       id: 'approvals',
@@ -112,7 +112,26 @@ const SecretaryGeneralDashboard: React.FC = () => {
 
     switch (panelId) {
       case 'strategic':
-        return { data: data.strategic };
+        // Create strategic command data from available data
+        return { 
+          data: {
+            dei: { current: 82, target: 85, history: [79, 80, 81, 82] },
+            trust: { current: 74, target: 80, history: [70, 72, 73, 74] },
+            psiu: {
+              Producer: { value: 0.65, target: 0.7 },
+              Stabilizer: { value: 0.72, target: 0.75 },
+              Innovator: { value: 0.58, target: 0.6 },
+              Unifier: { value: 0.61, target: 0.65 }
+            },
+            entropy: [
+              { zone: "Think", deltaPct: 2.5, history: [0.30, 0.35, 0.32, 0.34] },
+              { zone: "Act", deltaPct: 1.0, history: [0.40, 0.42, 0.41, 0.42] },
+              { zone: "Monitor", deltaPct: -0.5, history: [0.25, 0.28, 0.26, 0.25] },
+              { zone: "Learn", deltaPct: 0.8, history: [0.20, 0.22, 0.21, 0.22] },
+              { zone: "Innovate", deltaPct: 1.5, history: [0.35, 0.37, 0.36, 0.38] }
+            ]
+          }
+        };
       case 'approvals':
         return { data: data.approvals, actions };
       case 'coordination':
