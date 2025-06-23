@@ -34,10 +34,11 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
 
   useEffect(() => {
     // Initialize selected points from bundle data
-    if (leveragePoints.length > 0 && initialPoints) {
+    if (leveragePoints.length > 0 && initialPoints && initialPoints.length > 0) {
       const chips = initialPoints
         .map(pointId => {
           const point = leveragePoints.find(p => p.id === pointId);
+          console.log('Finding point for ID:', pointId, 'Found:', point);
           return point ? {
             id: point.id,
             name: point.name,
@@ -46,6 +47,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
         })
         .filter((chip): chip is LeveragePointChipData => chip !== null);
       
+      console.log('Initializing with chips:', chips);
       setSelectedPoints(chips);
       // Immediately notify parent component
       onUpdate?.(chips.map(c => c.id));

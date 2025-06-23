@@ -34,6 +34,8 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
     ? bundle.leveragePoints.filter((point): point is string => typeof point === 'string') 
     : [];
 
+  console.log('LeverageTab - leveragePointIds from bundle:', leveragePointIds);
+
   const handleLeverageUpdate = (points: string[]) => {
     console.log('Leverage points updated:', points);
     
@@ -101,7 +103,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
           onUpdate={handleLeverageUpdate} 
         />
 
-        {/* Description Panel - Always show for debugging */}
+        {/* Description Panel - Always show for selected points */}
         <LeveragePointDescriptions 
           selectedPoints={selectedPointsForDescription}
           leveragePoints={leveragePoints}
