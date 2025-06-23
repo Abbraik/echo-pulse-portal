@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Save, RotateCcw, Plus, Network } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -13,6 +12,7 @@ import { Actor, Connection, SNAMetrics } from './types/sna-types';
 import CytoscapeView from './components/CytoscapeView';
 import SparklineChart from './components/SparklineChart';
 import NetworkView from './components/NetworkView';
+import { IsometricSystemFramingStudio } from './IsometricSystemFramingStudio';
 
 // Mock data for the SNA analysis
 const mockSNAData = {
@@ -184,7 +184,7 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
                 value="cld"
                 className="rounded-lg px-4 py-2 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400 transition-all duration-300"
               >
-                Causal Loop Diagram
+                Isometric CLD Studio
               </TabsTrigger>
               <TabsTrigger 
                 value="sna" 
@@ -237,12 +237,7 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              <CytoscapeView 
-                nodes={mockNodes} 
-                edges={mockEdges} 
-                onNodeClick={handleCyNodeClick}
-                cyRef={cyRef}
-              />
+              <IsometricSystemFramingStudio />
             </motion.div>
           ) : (
             <motion.div
