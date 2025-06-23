@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -15,8 +14,8 @@ export const useLeveragePoints = () => {
         throw error;
       }
       
-      // Cast the Json type to our expected LeveragePoint[] type
-      return (data as LeveragePoint[]) || [];
+      // Cast the Json type to our expected LeveragePoint[] type through unknown
+      return (data as unknown as LeveragePoint[]) || [];
     }
   });
 };
