@@ -49,6 +49,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
       })
       .filter((chip): chip is LeveragePointChipData => chip !== null);
     
+    console.log('Updated chips for description:', updatedChips);
     setSelectedPointsForDescription(updatedChips);
   };
 
@@ -100,7 +101,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
           onUpdate={handleLeverageUpdate} 
         />
 
-        {/* Description Panel - Always show container for debugging */}
+        {/* Description Panel - Always show for debugging */}
         <LeveragePointDescriptions 
           selectedPoints={selectedPointsForDescription}
           leveragePoints={leveragePoints}

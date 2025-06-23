@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Star, Save, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -65,6 +66,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
       setSelectedValue('');
       setHasChanges(true);
       onUpdate?.(newPoints.map(p => p.id));
+      console.log('Added point:', point.name, 'New selection:', newPoints);
     }
   };
 
@@ -73,6 +75,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
     setSelectedPoints(newPoints);
     setHasChanges(true);
     onUpdate?.(newPoints.map(p => p.id));
+    console.log('Removed point:', pointId, 'New selection:', newPoints);
   };
 
   const handleSave = async () => {
@@ -159,7 +162,7 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
           <SelectTrigger className="w-72 backdrop-blur-sm bg-white/10 border-white/20 text-white">
             <SelectValue placeholder="Choose a leverage point…" />
           </SelectTrigger>
-          <SelectContent className="backdrop-blur-xl bg-slate-900/90 border-white/20">
+          <SelectContent className="backdrop-blur-xl bg-slate-900/90 border-white/20 z-50">
             {availablePoints.length > 0 ? (
               availablePoints.map((point) => (
                 <SelectItem 

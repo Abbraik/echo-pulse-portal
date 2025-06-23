@@ -11,8 +11,20 @@ const LeveragePointDescriptions: React.FC<LeveragePointDescriptionsProps> = ({
   selectedPoints,
   leveragePoints
 }) => {
+  console.log('LeveragePointDescriptions - selectedPoints:', selectedPoints);
+  console.log('LeveragePointDescriptions - leveragePoints:', leveragePoints);
+
   if (selectedPoints.length === 0) {
-    return null;
+    return (
+      <div className="mt-6 backdrop-blur-sm bg-white/10 rounded-2xl p-4 border border-white/20">
+        <h4 className="text-sm font-medium text-gray-300 mb-2">
+          Selected Point Details
+        </h4>
+        <p className="text-xs text-gray-400">
+          Select leverage points above to see their detailed descriptions
+        </p>
+      </div>
+    );
   }
 
   return (
