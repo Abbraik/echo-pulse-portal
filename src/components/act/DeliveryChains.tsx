@@ -10,8 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import TeamsCollaborationPanel from './components/TeamsCollaborationPanel';
-import TeamsTaskActions from './components/TeamsTaskActions';
 import CreateTaskModal from './components/CreateTaskModal';
+import TaskDetailsModal from './components/TaskDetailsModal';
 import { useTasks } from './hooks/useTasks';
 interface DeliveryChainsProps {
   highlightBundle: string | null;
@@ -54,14 +54,14 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
     language
   } = useTranslation();
   const [activeTab, setActiveTab] = useState<'kanban' | 'gantt'>('kanban');
-  const [expandedTask, setExpandedTask] = useState<string | null>(null);
-  const [activeChatTask, setActiveChatTask] = useState<string | null>(null);
   const [displayMode, setDisplayMode] = useState<'simple' | 'pro'>('simple');
   const [ganttTimeScale, setGanttTimeScale] = useState<number>(14); // Days visible
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredStatus, setFilteredStatus] = useState<string | null>(null);
   const [showTeamsPanel, setShowTeamsPanel] = useState(false);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [showTaskDetailsModal, setShowTaskDetailsModal] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [selectedLaneForTask, setSelectedLaneForTask] = useState<{
     id: string;
     title: string;
@@ -224,24 +224,16 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
 
   // Function to toggle task expansion
   const toggleTaskExpansion = (taskId: string) => {
-    if (expandedTask === taskId) {
-      setExpandedTask(null);
-    } else {
-      setExpandedTask(taskId);
-      // Close chat if open
-      setActiveChatTask(null);
-    }
+    
+
+    
   };
 
   // Function to toggle chat panel
   const toggleChatPanel = (taskId: string) => {
-    if (activeChatTask === taskId) {
-      setActiveChatTask(null);
-    } else {
-      setActiveChatTask(taskId);
-      // Close expansion if open
-      setExpandedTask(null);
-    }
+    
+
+    
   };
 
   // Get color based on task status
@@ -362,6 +354,19 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
     setShowCreateTaskModal(false);
     setSelectedLaneForTask(null);
   };
+
+  // Handle task click to open details modal
+  const handleTaskClick = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setShowTaskDetailsModal(true);
+  };
+
+  // Handle closing task details modal
+  const handleCloseTaskDetails = () => {
+    setShowTaskDetailsModal(false);
+    setSelectedTaskId(null);
+  };
+
   return <>
       <GlassCard className="w-full">
         {/* Header with view switcher */}
@@ -450,11 +455,11 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
                   </div>
                   
                   <div className="space-y-3">
-                    {lane.tasks.map(task => <motion.div key={task.id} className={`bg-white/5 border ${task.id === 't1' && highlightBundle ? 'border-teal-500 ring-1 ring-teal-500' : 'border-white/10'} rounded-lg p-3 cursor-grab active:cursor-grabbing`} whileHover={{
+                    {lane.tasks.map(task => <motion.div key={task.id} className={`bg-white/5 border ${task.id === 't1' && highlightBundle ? 'border-teal-500 ring-1 ring-teal-500' : 'border-white/10'} rounded-lg p-3 cursor-pointer hover:bg-white/10 transition-colors`} whileHover={{
                 scale: 1.02
               }} whileTap={{
                 scale: 0.98
-              }} draggable onDragStart={() => handleDragStart(task.id)} animate={task.id === 't1' && highlightBundle ? {
+              }} draggable onDragStart={() => handleDragStart(task.id)} onClick={() => handleTaskClick(task.id)} animate={task.id === 't1' && highlightBundle ? {
                 y: [0, -5, 0],
                 transition: {
                   duration: 0.5,
@@ -483,24 +488,6 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
                             </Avatar>
                             <span className="text-sm text-gray-400">{task.assignee}</span>
                           </div>
-                          
-                          <div className="flex items-center gap-2">
-                            {/* Teams Meeting Quick Button */}
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" onClick={() => {
-                      const teamsUrl = `https://teams.microsoft.com/l/meetup-join/19%3ameeting_${task.id}`;
-                      window.open(teamsUrl, '_blank');
-                    }} title="Start quick huddle in Teams">
-                              <Video className="h-3.5 w-3.5" />
-                            </Button>
-
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" onClick={() => toggleChatPanel(task.id)}>
-                              <MessageSquare className="h-3.5 w-3.5" />
-                            </Button>
-                            
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-full bg-amber-500/10 text-amber-400 hover:bg-amber-500/20">
-                              <Calendar className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
                         </div>
                         
                         <div className="flex justify-between text-xs text-gray-400">
@@ -509,189 +496,10 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
                       defaultValue: 'Due'
                     })}: {task.dueDate}
                           </div>
-                          <Button variant="ghost" size="sm" className="p-1 h-auto text-xs hover:bg-white/10" onClick={() => toggleTaskExpansion(task.id)}>
-                            {expandedTask === task.id ? t('collapse', {
-                      defaultValue: 'Collapse'
-                    }) : t('expand', {
-                      defaultValue: 'Expand'
-                    })}
-                          </Button>
+                          <div className="text-xs text-blue-400 hover:text-blue-300">
+                            Click to open
+                          </div>
                         </div>
-                        
-                        {/* Task Details Expansion with Teams Integration */}
-                        <AnimatePresence>
-                          {expandedTask === task.id && <motion.div className="mt-3 pt-3 border-t border-white/10" initial={{
-                    opacity: 0,
-                    height: 0
-                  }} animate={{
-                    opacity: 1,
-                    height: 'auto'
-                  }} exit={{
-                    opacity: 0,
-                    height: 0
-                  }} transition={{
-                    duration: 0.2
-                  }}>
-                              <div className="space-y-3">
-                                {/* Status Selector */}
-                                <div className="flex items-center justify-between">
-                                  <span className="text-sm">{t('status', {
-                            defaultValue: 'Status'
-                          })}</span>
-                                  <div className="flex bg-white/5 rounded-lg overflow-hidden">
-                                    <button className={`px-2 py-1 text-xs ${task.status === 'to-do' ? 'bg-gray-500 text-white' : 'hover:bg-white/5'}`}>
-                                      {t('toDo', {
-                              defaultValue: 'To Do'
-                            })}
-                                    </button>
-                                    <button className={`px-2 py-1 text-xs ${task.status === 'in-progress' ? 'bg-blue-500 text-white' : 'hover:bg-white/5'}`}>
-                                      {t('inProgress', {
-                              defaultValue: 'In Progress'
-                            })}
-                                    </button>
-                                    <button className={`px-2 py-1 text-xs ${task.status === 'completed' ? 'bg-green-500 text-white' : 'hover:bg-white/5'}`}>
-                                      {t('completed', {
-                              defaultValue: 'Completed'
-                            })}
-                                    </button>
-                                  </div>
-                                </div>
-                                
-                                {/* Teams Integration Actions */}
-                                <TeamsTaskActions taskId={task.id} taskTitle={task.title} assignee={task.assignee} bundleId="education-hub" />
-                                
-                                {/* MS Teams collaboration tools */}
-                                <div className="bg-white/5 rounded-lg p-3">
-                                  <div className="flex items-center text-sm text-blue-400 mb-2">
-                                    <MessageSquare className="w-4 h-4 mr-2" />
-                                    {t('teamsChat', {
-                            defaultValue: 'Teams Chat'
-                          })}
-                                  </div>
-                                  <div className="text-xs bg-white/5 rounded p-2">
-                                    {task.teamsChatHistory && task.teamsChatHistory.length > 0 ? task.teamsChatHistory.map((msg, index) => <div key={index} className="mb-1">
-                                          <span className={msg.userColor}>
-                                            {msg.user}:
-                                          </span> {msg.message}
-                                        </div>) : <div className="text-gray-400 italic">
-                                        {t('noMessages', {
-                              defaultValue: 'No messages yet'
-                            })}
-                                      </div>}
-                                  </div>
-                                </div>
-                                
-                                <div className="flex items-center">
-                                  <div className="flex-1 mr-2">
-                                    <div className="flex items-center bg-white/5 rounded-lg p-2">
-                                      <AtSign className="w-4 h-4 mr-2 text-blue-400" />
-                                      <input className="bg-transparent flex-1 text-sm focus:outline-none" placeholder={t('mentionTeamMember', {
-                              defaultValue: 'Mention someone...'
-                            }) as string} />
-                                    </div>
-                                  </div>
-                                  
-                                  <Button variant="ghost" size="sm" className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30">
-                                    <Calendar className="w-4 h-4 mr-1" />
-                                    {t('scheduleMeeting', {
-                            defaultValue: 'Schedule'
-                          })}
-                                  </Button>
-                                </div>
-                                
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center">
-                                    <span className="text-sm mr-2">{t('needsApproval', {
-                              defaultValue: 'Needs Approval'
-                            })}</span>
-                                    <Switch checked={task.needsApproval} />
-                                  </div>
-                                  
-                                  <Button variant="ghost" size="sm" className="bg-green-500/20 text-green-400 hover:bg-green-500/30">
-                                    <Check className="w-4 h-4 mr-1" />
-                                    {t('markComplete', {
-                            defaultValue: 'Complete'
-                          })}
-                                  </Button>
-                                </div>
-                              </div>
-                            </motion.div>}
-                        </AnimatePresence>
-                        
-                        {/* MS Teams Chat Pane */}
-                        <AnimatePresence>
-                          {activeChatTask === task.id && <motion.div className="mt-3 pt-3 border-t border-white/10" initial={{
-                    opacity: 0,
-                    height: 0
-                  }} animate={{
-                    opacity: 1,
-                    height: 'auto'
-                  }} exit={{
-                    opacity: 0,
-                    height: 0
-                  }} transition={{
-                    duration: 0.2
-                  }}>
-                              <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-3">
-                                <div className="flex items-center justify-between mb-3">
-                                  <div className="flex items-center">
-                                    <div className="w-2 h-8 bg-blue-500 rounded-sm mr-2" />
-                                    <div>
-                                      <h4 className="font-medium text-blue-400">
-                                        {t('teamsChat', {
-                                defaultValue: 'Teams Chat'
-                              })}
-                                      </h4>
-                                      <p className="text-xs text-gray-400">
-                                        {task.title} - {t('channel', {
-                                defaultValue: 'Channel'
-                              })}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full" onClick={() => setActiveChatTask(null)}>
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                                
-                                <div className="h-32 overflow-y-auto mb-2 bg-white/5 rounded-lg p-2">
-                                  {task.teamsChatHistory && task.teamsChatHistory.length > 0 ? task.teamsChatHistory.map((msg, index) => <div key={index} className="mb-2">
-                                        <span className={`font-medium ${msg.userColor}`}>
-                                          {msg.user}:
-                                        </span> {msg.message}
-                                      </div>) : <div className="text-gray-400 italic text-center py-10">
-                                      {t('noMessagesStart', {
-                            defaultValue: 'No messages yet. Start the conversation!'
-                          })}
-                                    </div>}
-                                </div>
-                                
-                                <div className="flex items-center bg-white/5 rounded-lg p-2">
-                                  <input className="bg-transparent flex-1 text-sm focus:outline-none" placeholder={t('typeMessage', {
-                          defaultValue: 'Type a message...'
-                        }) as string} />
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full bg-blue-500/20 text-blue-400">
-                                    <Send className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                                
-                                <div className="mt-3 flex gap-2">
-                                  <Button variant="outline" size="sm" className="text-xs flex-1">
-                                    <Users className="h-3.5 w-3.5 mr-1" />
-                                    {t('inviteParticipants', {
-                            defaultValue: 'Invite'
-                          })}
-                                  </Button>
-                                  <Button variant="outline" size="sm" className="text-xs flex-1">
-                                    <Calendar className="h-3.5 w-3.5 mr-1" />
-                                    {t('scheduleMeeting', {
-                            defaultValue: 'Schedule'
-                          })}
-                                  </Button>
-                                </div>
-                              </div>
-                            </motion.div>}
-                        </AnimatePresence>
                       </motion.div>)}
                     
                     {/* Updated add task placeholder */}
@@ -860,6 +668,15 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
 
       {/* Create Task Modal */}
       <CreateTaskModal isOpen={showCreateTaskModal} onClose={handleCloseTaskModal} bundleId="education-hub" laneId={selectedLaneForTask?.id} laneTitle={selectedLaneForTask?.title} />
+
+      {/* Task Details Modal */}
+      <TaskDetailsModal 
+        isOpen={showTaskDetailsModal} 
+        onClose={handleCloseTaskDetails} 
+        taskId={selectedTaskId}
+        bundleId="education-hub"
+      />
     </>;
 };
+
 export default DeliveryChains;
