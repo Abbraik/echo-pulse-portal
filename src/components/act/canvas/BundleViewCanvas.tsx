@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -198,18 +199,25 @@ const BundleViewCanvas: React.FC<BundleViewCanvasProps> = ({ bundleId }) => {
           >
             <h2 className="text-lg font-semibold text-white mb-4">Leverage Points</h2>
             <div className="space-y-3">
-              {bundle.leveragePoints.map((point, index) => (
-                <div key={index} className="p-3 bg-white/5 rounded-lg border border-white/10">
-                  <span className="text-gray-300">
-                    {typeof point === 'object' ? point.name || `Leverage Point ${index + 1}` : point}
-                  </span>
-                  {typeof point === 'object' && point.type && (
-                    <Badge variant="outline" className="ml-2 text-xs">
-                      {point.type}
-                    </Badge>
-                  )}
-                </div>
-              ))}
+              {bundle.leveragePoints.map((point, index) => {
+                if (!point) return null; // Skip null/undefined points
+                
+                return (
+                  <div key={index} className="p-3 bg-white/5 rounded-lg border border-white/10">
+                    <span className="text-gray-300">
+                      {typeof point === 'object' && point !== null ? 
+                        (point as any).name || `Leverage Point ${index + 1}` : 
+                        point
+                      }
+                    </span>
+                    {typeof point === 'object' && point !== null && (point as any).type && (
+                      <Badge variant="outline" className="ml-2 text-xs">
+                        {(point as any).type}
+                      </Badge>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </motion.div>
         )}

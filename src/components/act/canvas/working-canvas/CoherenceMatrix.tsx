@@ -38,9 +38,19 @@ const CoherenceMatrix: React.FC<CoherenceMatrixProps> = ({
 
       if (error) throw error;
       
-      // Handle the response properly - it should be an array
-      const parsedData = Array.isArray(data) ? data : [];
-      setCoherenceData(parsedData);
+      // Handle the response properly - it should be an array of CoherenceScore objects
+      if (Array.isArray(data)) {
+        const validScores = data.filter((item): item is CoherenceScore => 
+          item && 
+          typeof item === 'object' && 
+          'objective' in item && 
+          'leverage_point' in item && 
+          'score' in item
+        );
+        setCoherenceData(validScores);
+      } else {
+        setCoherenceData([]);
+      }
     } catch (error) {
       console.error('Error fetching coherence matrix:', error);
       setCoherenceData([]);

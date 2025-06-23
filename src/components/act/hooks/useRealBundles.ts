@@ -12,7 +12,7 @@ export const useRealBundles = (statusFilter?: string) => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (statusFilter) {
+      if (statusFilter && statusFilter !== 'all') {
         query = query.eq('status', statusFilter);
       }
 
@@ -28,7 +28,9 @@ export const useRealBundles = (statusFilter?: string) => {
         name: bundle.name,
         summary: bundle.summary,
         createdBy: bundle.created_by,
-        leveragePoints: Array.isArray(bundle.leverage_points) ? bundle.leverage_points : [], // Ensure array
+        leveragePoints: Array.isArray(bundle.leverage_points) 
+          ? bundle.leverage_points.filter((point): point is string => typeof point === 'string')
+          : [],
         objectives: bundle.objectives || [],
         pillars: bundle.pillars || [],
         geography: bundle.geography || [],
@@ -68,7 +70,9 @@ export const useRealBundle = (bundleId: string) => {
         name: data.name,
         summary: data.summary,
         createdBy: data.created_by,
-        leveragePoints: Array.isArray(data.leverage_points) ? data.leverage_points : [], // Ensure array
+        leveragePoints: Array.isArray(data.leverage_points) 
+          ? data.leverage_points.filter((point): point is string => typeof point === 'string')
+          : [],
         objectives: data.objectives || [],
         pillars: data.pillars || [],
         geography: data.geography || [],
