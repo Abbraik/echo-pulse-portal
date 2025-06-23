@@ -32,6 +32,21 @@ export interface ChatMessage {
   timestamp?: string;
 }
 
+// Helper function to safely parse chat history
+export const parseChatHistory = (chatHistory: Json | null): ChatMessage[] => {
+  if (!chatHistory) return [];
+  if (Array.isArray(chatHistory)) {
+    return chatHistory.filter((item): item is ChatMessage => {
+      return typeof item === 'object' && 
+             item !== null && 
+             typeof (item as any).user === 'string' && 
+             typeof (item as any).userColor === 'string' && 
+             typeof (item as any).message === 'string';
+    });
+  }
+  return [];
+};
+
 export const useTasks = () => {
   const queryClient = useQueryClient();
 

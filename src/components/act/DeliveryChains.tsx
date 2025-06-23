@@ -12,7 +12,8 @@ import { Input } from '@/components/ui/input';
 import TeamsCollaborationPanel from './components/TeamsCollaborationPanel';
 import CreateTaskModal from './components/CreateTaskModal';
 import TaskDetailsModal from './components/TaskDetailsModal';
-import { useTasks } from './hooks/useTasks';
+import { useTasks, parseChatHistory } from './hooks/useTasks';
+
 interface DeliveryChainsProps {
   highlightBundle: string | null;
 }
@@ -45,6 +46,7 @@ interface Lane {
   color?: string;
   tasks: Task[];
 }
+
 const DeliveryChains: React.FC<DeliveryChainsProps> = ({
   highlightBundle
 }) => {
@@ -198,7 +200,7 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
         assigneeInitial: backendTask.assignee_initial || backendTask.assignee.split(' ').map(n => n[0]).join('').toUpperCase(),
         dueDate: backendTask.due_date || new Date().toISOString().split('T')[0],
         needsApproval: backendTask.needs_approval,
-        teamsChatHistory: backendTask.teams_chat_history || [],
+        teamsChatHistory: parseChatHistory(backendTask.teams_chat_history),
         dependencies: backendTask.dependencies || [],
         ganttStart: backendTask.gantt_start || 0,
         ganttDuration: backendTask.gantt_duration || 7

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { X, Video, Users, AtSign, ExternalLink, Calendar, MessageSquare, Send, Check, Bell } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -10,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
-import { useTasks, ChatMessage } from '../hooks/useTasks';
+import { useTasks, ChatMessage, parseChatHistory } from '../hooks/useTasks';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface TaskDetailsModalProps {
@@ -107,7 +108,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 
     try {
       // Parse existing chat history safely
-      const currentHistory = currentTask?.teams_chat_history as ChatMessage[] || [];
+      const currentHistory = parseChatHistory(currentTask?.teams_chat_history);
       const updatedHistory = [...currentHistory, message];
       
       await updateTask(taskId, {
@@ -140,7 +141,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 
     try {
       // Parse existing chat history safely
-      const currentHistory = currentTask?.teams_chat_history as ChatMessage[] || [];
+      const currentHistory = parseChatHistory(currentTask?.teams_chat_history);
       const updatedHistory = [...currentHistory, mention];
       
       await updateTask(taskId, {
@@ -171,7 +172,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   };
 
   // Parse chat history safely
-  const chatHistory = (currentTask?.teams_chat_history as ChatMessage[]) || [];
+  const chatHistory = parseChatHistory(currentTask?.teams_chat_history);
 
   if (!currentTask) {
     return null;
