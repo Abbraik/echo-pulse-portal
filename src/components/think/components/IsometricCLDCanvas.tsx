@@ -1,4 +1,5 @@
 
+
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrthographicCamera, Text, Html, Line } from '@react-three/drei';
@@ -376,42 +377,46 @@ const IsometricCLDCanvas: React.FC<IsometricCLDCanvasProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="w-full h-full relative overflow-hidden"
+      className="w-full h-full flex relative overflow-hidden"
       style={{ 
-        minHeight: '100%',
+        minHeight: '600px',
         background: 'rgba(15, 23, 42, 0.8)',
         cursor: isPanning ? 'grabbing' : selectedTool === 'pan' ? 'grab' : selectedTool === 'add-node' ? 'crosshair' : 'default'
       }}
     >
-      <Canvas
-        ref={canvasRef}
-        camera={{
-          left: -10,
-          right: 10,
-          top: 10,
-          bottom: -10,
-          near: 0.1,
-          far: 1000,
-          position: [0, 0, 10]
-        }}
-        orthographic
-        style={{ width: '100%', height: '100%' }}
-      >
-        <CLDScene
-          nodes={nodes}
-          connectors={connectors}
-          selectedNodeId={selectedNodeId}
-          selectedTool={selectedTool}
-          snapToGrid={snapToGrid}
-          gridSize={gridSize}
-          viewportTransform={viewportTransform}
-          onNodeMove={onNodeMove}
-          onNodeSelect={onNodeSelect}
-          onCanvasClick={onCanvasClick}
-        />
-      </Canvas>
+      {/* Canvas fills the entire container */}
+      <div className="flex-1 relative">
+        <Canvas
+          ref={canvasRef}
+          camera={{
+            left: -10,
+            right: 10,
+            top: 10,
+            bottom: -10,
+            near: 0.1,
+            far: 1000,
+            position: [0, 0, 10]
+          }}
+          orthographic
+          style={{ width: '100%', height: '100%' }}
+        >
+          <CLDScene
+            nodes={nodes}
+            connectors={connectors}
+            selectedNodeId={selectedNodeId}
+            selectedTool={selectedTool}
+            snapToGrid={snapToGrid}
+            gridSize={gridSize}
+            viewportTransform={viewportTransform}
+            onNodeMove={onNodeMove}
+            onNodeSelect={onNodeSelect}
+            onCanvasClick={onCanvasClick}
+          />
+        </Canvas>
+      </div>
     </div>
   );
 };
 
 export default IsometricCLDCanvas;
+

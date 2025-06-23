@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -77,51 +78,51 @@ const CLDToolbar: React.FC<CLDToolbarProps> = ({
 
   return (
     <motion.div
-      className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
+      className="absolute top-4 left-4 z-50"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
     >
       <div
-        className="flex items-center gap-1 p-2 backdrop-blur-[20px] border border-white/20 rounded-xl"
+        className="flex flex-col items-center gap-1 p-2 backdrop-blur-[20px] border border-white/20 rounded-xl"
         style={{
           background: 'rgba(20, 30, 50, 0.8)',
           boxShadow: 'inset 0 0 20px rgba(20, 184, 166, 0.1)'
         }}
       >
         {/* Selection Tools */}
-        <div className="flex items-center gap-1">
+        <div className="flex flex-col items-center gap-1">
           {tools.map((tool) => (
             <Button
               key={tool.id}
               variant={selectedTool === tool.id ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onToolChange(tool.id)}
-              className={`h-8 w-8 p-0 transition-all duration-200 ${
+              className={`h-10 w-10 p-0 transition-all duration-200 ${
                 selectedTool === tool.id
                   ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
                   : 'hover:bg-white/10 text-white/70 hover:text-white'
               }`}
               title={tool.label}
             >
-              <tool.icon size={14} />
+              <tool.icon size={16} />
             </Button>
           ))}
         </div>
 
-        <Separator orientation="vertical" className="h-6 bg-white/20" />
+        <Separator orientation="horizontal" className="w-8 bg-white/20 my-1" />
 
         {/* Action Tools */}
-        <div className="flex items-center gap-1">
+        <div className="flex flex-col items-center gap-1">
           <Button
             variant="ghost"
             size="sm"
             onClick={onUndo}
             disabled={!canUndo}
-            className="h-8 w-8 p-0 hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-30"
+            className="h-10 w-10 p-0 hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-30"
             title="Undo (Ctrl+Z)"
           >
-            <Undo size={14} />
+            <Undo size={16} />
           </Button>
           
           <Button
@@ -129,54 +130,54 @@ const CLDToolbar: React.FC<CLDToolbarProps> = ({
             size="sm"
             onClick={onRedo}
             disabled={!canRedo}
-            className="h-8 w-8 p-0 hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-30"
+            className="h-10 w-10 p-0 hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-30"
             title="Redo (Ctrl+Y)"
           >
-            <Redo size={14} />
+            <Redo size={16} />
           </Button>
         </div>
 
-        <Separator orientation="vertical" className="h-6 bg-white/20" />
+        <Separator orientation="horizontal" className="w-8 bg-white/20 my-1" />
 
         {/* View Controls */}
-        <div className="flex items-center gap-1">
+        <div className="flex flex-col items-center gap-1">
           <Button
             variant={snapToGrid ? 'default' : 'ghost'}
             size="sm"
             onClick={onToggleGrid}
-            className={`h-8 w-8 p-0 transition-all duration-200 ${
+            className={`h-10 w-10 p-0 transition-all duration-200 ${
               snapToGrid
                 ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
                 : 'hover:bg-white/10 text-white/70 hover:text-white'
             }`}
             title="Toggle Grid (G)"
           >
-            <Grid size={14} />
+            <Grid size={16} />
           </Button>
         </div>
 
-        <Separator orientation="vertical" className="h-6 bg-white/20" />
+        <Separator orientation="horizontal" className="w-8 bg-white/20 my-1" />
 
         {/* File Operations */}
-        <div className="flex items-center gap-1">
+        <div className="flex flex-col items-center gap-1">
           <Button
             variant="ghost"
             size="sm"
             onClick={onSave}
-            className="h-8 w-8 p-0 hover:bg-white/10 text-white/70 hover:text-white"
+            className="h-10 w-10 p-0 hover:bg-white/10 text-white/70 hover:text-white"
             title="Save (Ctrl+S)"
           >
-            <Save size={14} />
+            <Save size={16} />
           </Button>
           
           <Button
             variant="ghost"
             size="sm"
             onClick={onReset}
-            className="h-8 w-8 p-0 hover:bg-white/10 text-white/70 hover:text-white"
+            className="h-10 w-10 p-0 hover:bg-white/10 text-white/70 hover:text-white"
             title="Reset Canvas"
           >
-            <RotateCcw size={14} />
+            <RotateCcw size={16} />
           </Button>
         </div>
       </div>
@@ -185,3 +186,4 @@ const CLDToolbar: React.FC<CLDToolbarProps> = ({
 };
 
 export default CLDToolbar;
+
