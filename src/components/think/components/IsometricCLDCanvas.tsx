@@ -1,7 +1,6 @@
-
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrthographicCamera, Text, Html } from '@react-three/drei';
+import { OrthographicCamera, Text, Html, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion } from 'framer-motion';
 import { CLDNode, CLDConnector, ViewportTransform } from '../types/isometric-cld-types';
@@ -131,20 +130,18 @@ const CLDConnectorMesh: React.FC<{
   const toY = toNode.y / 100;
 
   const points = [
-    new THREE.Vector3(fromX, fromY, 0),
-    new THREE.Vector3(toX, toY, 0)
+    [fromX, fromY, 0],
+    [toX, toY, 0]
   ];
 
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
   return (
-    <line geometry={geometry}>
-      <lineBasicMaterial
-        color={connector.polarity === 'positive' ? '#10b981' : '#ef4444'}
-        transparent
-        opacity={0.8}
-      />
-    </line>
+    <Line
+      points={points}
+      color={connector.polarity === 'positive' ? '#10b981' : '#ef4444'}
+      transparent
+      opacity={0.8}
+      lineWidth={2}
+    />
   );
 };
 
