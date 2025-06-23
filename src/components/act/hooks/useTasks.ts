@@ -36,12 +36,12 @@ export interface ChatMessage {
 export const parseChatHistory = (chatHistory: Json | null): ChatMessage[] => {
   if (!chatHistory) return [];
   if (Array.isArray(chatHistory)) {
-    return chatHistory.filter((item): item is ChatMessage => {
+    return chatHistory.filter((item: any): item is ChatMessage => {
       return typeof item === 'object' && 
              item !== null && 
-             typeof (item as any).user === 'string' && 
-             typeof (item as any).userColor === 'string' && 
-             typeof (item as any).message === 'string';
+             typeof item.user === 'string' && 
+             typeof item.userColor === 'string' && 
+             typeof item.message === 'string';
     });
   }
   return [];
