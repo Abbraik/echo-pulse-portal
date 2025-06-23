@@ -51,12 +51,12 @@ const CLDNodeMesh: React.FC<{
     setIsDragging(false);
   }, []);
 
-  // Convert isometric coordinates
-  const isoX = (node.x - node.y) * 0.866;
-  const isoY = (node.x + node.y) * 0.5 - node.z;
+  // Convert to screen coordinates (flat 2D for better Miro-like experience)
+  const screenX = node.x / 100;
+  const screenY = node.y / 100;
 
   return (
-    <group position={[isoX, isoY, 0]}>
+    <group position={[screenX, screenY, 0]}>
       {/* Node background */}
       <mesh
         ref={meshRef}
@@ -64,7 +64,7 @@ const CLDNodeMesh: React.FC<{
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        <planeGeometry args={[node.width / 50, node.height / 50]} />
+        <planeGeometry args={[node.width / 100, node.height / 100]} />
         <meshBasicMaterial
           color={isSelected ? '#14b8a6' : node.color}
           transparent
@@ -74,7 +74,7 @@ const CLDNodeMesh: React.FC<{
       
       {/* Node border */}
       <lineSegments>
-        <edgesGeometry args={[new THREE.PlaneGeometry(node.width / 50, node.height / 50)]} />
+        <edgesGeometry args={[new THREE.PlaneGeometry(node.width / 100, node.height / 100)]} />
         <lineBasicMaterial
           color={isSelected ? '#14b8a6' : '#ffffff'}
           transparent
@@ -106,7 +106,7 @@ const CLDNodeMesh: React.FC<{
       {/* Selection indicator */}
       {isSelected && (
         <mesh position={[0, 0, 0.02]}>
-          <ringGeometry args={[node.width / 80, node.width / 70, 32]} />
+          <ringGeometry args={[node.width / 150, node.width / 120, 32]} />
           <meshBasicMaterial color="#14b8a6" transparent opacity={0.6} />
         </mesh>
       )}
@@ -124,30 +124,32 @@ const CLDConnectorMesh: React.FC<{
 
   if (!fromNode || !toNode) return null;
 
-  // Convert to isometric coordinates
-  const fromIsoX = (fromNode.x - fromNode.y) * 0.866;
-  const fromIsoY = (fromNode.x + fromNode.y) * 0.5 - fromNode.z;
-  const toIsoX = (toNode.x - toNode.y) * 0.866;
-  const toIsoY = (toNode.x + toNode.y) * 0.5 - toNode.z;
+  // Convert to screen coordinates
+  const fromX = fromNode.x / 100;
+  const fromY = fromNode.y / 100;
+  const toX = toNode.x / 100;
+  const toY = toNode.y / 100;
 
   const points = [
-    new THREE.Vector3(fromIsoX, fromIsoY, 0),
-    new THREE.Vector3(toIsoX, toIsoY, 0)
+    new THREE.Vector3(fromX, fromY, 0),
+    new THREE.Vector3(toX, toY, 0)
   ];
 
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   return (
-    <primitive object={new THREE.Line(geometry, new THREE.LineBasicMaterial({
-      color: connector.polarity === 'positive' ? '#10b981' : '#ef4444',
-      transparent: true,
-      opacity: 0.8
-    }))} />
+    <line geometry={geometry}>
+      <lineBasicMaterial
+        color={connector.polarity === 'positive' ? '#10b981' : '#ef4444'}
+        transparent
+        opacity={0.8}
+      />
+    </line>
   );
 };
 
 // Grid component
-const IsometricGrid: React.FC<{ size: number; divisions: number }> = ({ size, divisions }) => {
+const GridComponent: React.FC<{ size: number; divisions: number; zoom: number }> = ({ size, divisions, zoom }) => {
   const gridRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
@@ -158,15 +160,18 @@ const IsometricGrid: React.FC<{ size: number; divisions: number }> = ({ size, di
     const material = new THREE.LineBasicMaterial({
       color: 0x14b8a6,
       transparent: true,
-      opacity: 0.1
+      opacity: Math.min(0.3, zoom * 0.1)
     });
 
-    // Create isometric grid lines
+    const gridSize = size / zoom;
+    const step = gridSize / divisions;
+
+    // Create grid lines
     for (let i = -divisions; i <= divisions; i++) {
       // Horizontal lines
       const hPoints = [
-        new THREE.Vector3(-size * 0.866, i * size * 0.5, 0),
-        new THREE.Vector3(size * 0.866, i * size * 0.5, 0)
+        new THREE.Vector3(-gridSize, i * step, 0),
+        new THREE.Vector3(gridSize, i * step, 0)
       ];
       const hGeometry = new THREE.BufferGeometry().setFromPoints(hPoints);
       const hLine = new THREE.Line(hGeometry, material);
@@ -174,14 +179,14 @@ const IsometricGrid: React.FC<{ size: number; divisions: number }> = ({ size, di
 
       // Vertical lines
       const vPoints = [
-        new THREE.Vector3(i * size * 0.866, -size * 0.5, 0),
-        new THREE.Vector3(i * size * 0.866, size * 0.5, 0)
+        new THREE.Vector3(i * step, -gridSize, 0),
+        new THREE.Vector3(i * step, gridSize, 0)
       ];
       const vGeometry = new THREE.BufferGeometry().setFromPoints(vPoints);
       const vLine = new THREE.Line(vGeometry, material);
       gridRef.current.add(vLine);
     }
-  }, [size, divisions]);
+  }, [size, divisions, zoom]);
 
   return <group ref={gridRef} />;
 };
@@ -190,17 +195,35 @@ const IsometricGrid: React.FC<{ size: number; divisions: number }> = ({ size, di
 const CameraController: React.FC<{
   viewportTransform: ViewportTransform;
 }> = ({ viewportTransform }) => {
-  const { camera } = useThree();
+  const { camera, size } = useThree();
 
   useEffect(() => {
     if (camera instanceof THREE.OrthographicCamera) {
-      // Set isometric view angles
-      camera.position.set(10, 10, 10);
-      camera.lookAt(0, 0, 0);
-      camera.zoom = viewportTransform.zoom * 30;
+      // Set up orthographic camera for Miro-like 2D view
+      const aspect = size.width / size.height;
+      const zoom = viewportTransform.zoom;
+      const frustrumSize = 10;
+      
+      camera.left = -frustrumSize * aspect / zoom;
+      camera.right = frustrumSize * aspect / zoom;
+      camera.top = frustrumSize / zoom;
+      camera.bottom = -frustrumSize / zoom;
+      
+      // Position camera for top-down view
+      camera.position.set(
+        viewportTransform.panOffset.x / 100,
+        viewportTransform.panOffset.y / 100,
+        10
+      );
+      camera.lookAt(
+        viewportTransform.panOffset.x / 100,
+        viewportTransform.panOffset.y / 100,
+        0
+      );
+      
       camera.updateProjectionMatrix();
     }
-  }, [camera, viewportTransform.zoom]);
+  }, [camera, size, viewportTransform]);
 
   return null;
 };
@@ -231,7 +254,7 @@ const CLDScene: React.FC<{
 }) => {
   const handleCanvasClick = useCallback((e: any) => {
     if (selectedTool === 'add-node') {
-      onCanvasClick(e.point.x, e.point.y);
+      onCanvasClick(e.point.x * 100, e.point.y * 100);
     }
   }, [selectedTool, onCanvasClick]);
 
@@ -241,15 +264,15 @@ const CLDScene: React.FC<{
       <CameraController viewportTransform={viewportTransform} />
       
       {/* Lighting */}
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[10, 10, 5]} intensity={0.8} />
+      <ambientLight intensity={0.8} />
+      <directionalLight position={[0, 0, 10]} intensity={0.5} />
 
       {/* Grid */}
-      {snapToGrid && <IsometricGrid size={4} divisions={20} />}
+      {snapToGrid && <GridComponent size={20} divisions={20} zoom={viewportTransform.zoom} />}
 
       {/* Background plane for clicks */}
       <mesh onClick={handleCanvasClick} position={[0, 0, -0.1]}>
-        <planeGeometry args={[200, 200]} />
+        <planeGeometry args={[100, 100]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
@@ -294,12 +317,13 @@ const IsometricCLDCanvas: React.FC<IsometricCLDCanvasProps> = ({
   onViewportChange
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isPanning, setIsPanning] = useState(false);
   const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
 
   const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();
-    const newZoom = Math.max(0.5, Math.min(3, viewportTransform.zoom * (1 - e.deltaY * 0.001)));
+    const newZoom = Math.max(0.1, Math.min(5, viewportTransform.zoom * (1 - e.deltaY * 0.001)));
     onViewportChange({
       ...viewportTransform,
       zoom: newZoom
@@ -307,7 +331,7 @@ const IsometricCLDCanvas: React.FC<IsometricCLDCanvasProps> = ({
   }, [viewportTransform, onViewportChange]);
 
   const handleMouseDown = useCallback((e: MouseEvent) => {
-    if (selectedTool === 'pan') {
+    if (selectedTool === 'pan' || e.button === 1) { // Middle mouse button for pan
       setIsPanning(true);
       setLastPanPoint({ x: e.clientX, y: e.clientY });
     }
@@ -315,8 +339,8 @@ const IsometricCLDCanvas: React.FC<IsometricCLDCanvasProps> = ({
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isPanning) {
-      const deltaX = e.clientX - lastPanPoint.x;
-      const deltaY = e.clientY - lastPanPoint.y;
+      const deltaX = (e.clientX - lastPanPoint.x) * 2;
+      const deltaY = -(e.clientY - lastPanPoint.y) * 2; // Invert Y axis
       
       onViewportChange({
         ...viewportTransform,
@@ -335,16 +359,16 @@ const IsometricCLDCanvas: React.FC<IsometricCLDCanvasProps> = ({
   }, []);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      canvas.addEventListener('wheel', handleWheel);
-      canvas.addEventListener('mousedown', handleMouseDown);
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      container.addEventListener('mousedown', handleMouseDown);
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
 
       return () => {
-        canvas.removeEventListener('wheel', handleWheel);
-        canvas.removeEventListener('mousedown', handleMouseDown);
+        container.removeEventListener('wheel', handleWheel);
+        container.removeEventListener('mousedown', handleMouseDown);
         window.removeEventListener('mousemove', handleMouseMove);
         window.removeEventListener('mouseup', handleMouseUp);
       };
@@ -352,25 +376,28 @@ const IsometricCLDCanvas: React.FC<IsometricCLDCanvasProps> = ({
   }, [handleWheel, handleMouseDown, handleMouseMove, handleMouseUp]);
 
   return (
-    <div className="w-full h-full absolute inset-0">
+    <div 
+      ref={containerRef}
+      className="w-full h-full relative overflow-hidden"
+      style={{ 
+        minHeight: '100%',
+        background: 'rgba(15, 23, 42, 0.8)',
+        cursor: isPanning ? 'grabbing' : selectedTool === 'pan' ? 'grab' : selectedTool === 'add-node' ? 'crosshair' : 'default'
+      }}
+    >
       <Canvas
         ref={canvasRef}
-        style={{
-          width: '100%',
-          height: '100%',
-          background: 'transparent',
-          cursor: selectedTool === 'pan' ? 'grab' : selectedTool === 'add-node' ? 'crosshair' : 'default'
-        }}
         camera={{
-          left: -window.innerWidth / 2,
-          right: window.innerWidth / 2,
-          top: window.innerHeight / 2,
-          bottom: -window.innerHeight / 2,
+          left: -10,
+          right: 10,
+          top: 10,
+          bottom: -10,
           near: 0.1,
           far: 1000,
-          zoom: 50
+          position: [0, 0, 10]
         }}
         orthographic
+        style={{ width: '100%', height: '100%' }}
       >
         <CLDScene
           nodes={nodes}
