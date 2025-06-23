@@ -27,7 +27,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   laneTitle
 }) => {
   const { t } = useTranslation();
-  const { createTask, isCreating } = useTasks();
+  const { createTask, isCreating } = useTasks(bundleId);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -51,6 +51,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     try {
       await createTask({
         ...formData,
+        bundle_id: bundleId,
         assignee_initial: formData.assignee.split(' ').map(n => n[0]).join('').toUpperCase(),
       });
       
