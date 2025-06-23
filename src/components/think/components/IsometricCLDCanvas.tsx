@@ -186,6 +186,25 @@ const IsometricGrid: React.FC<{ size: number; divisions: number }> = ({ size, di
   return <group ref={gridRef} />;
 };
 
+// Camera controller component
+const CameraController: React.FC<{
+  viewportTransform: ViewportTransform;
+}> = ({ viewportTransform }) => {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    if (camera instanceof THREE.OrthographicCamera) {
+      // Set isometric view angles
+      camera.position.set(10, 10, 10);
+      camera.lookAt(0, 0, 0);
+      camera.zoom = viewportTransform.zoom * 30;
+      camera.updateProjectionMatrix();
+    }
+  }, [camera, viewportTransform.zoom]);
+
+  return null;
+};
+
 // Main scene component
 const CLDScene: React.FC<{
   nodes: CLDNode[];
@@ -194,6 +213,7 @@ const CLDScene: React.FC<{
   selectedTool: string;
   snapToGrid: boolean;
   gridSize: number;
+  viewportTransform: ViewportTransform;
   onNodeMove: (nodeId: string, x: number, y: number) => void;
   onNodeSelect: (nodeId: string) => void;
   onCanvasClick: (x: number, y: number) => void;
@@ -204,22 +224,11 @@ const CLDScene: React.FC<{
   selectedTool,
   snapToGrid,
   gridSize,
+  viewportTransform,
   onNodeMove,
   onNodeSelect,
   onCanvasClick
 }) => {
-  const { camera } = useThree();
-
-  useEffect(() => {
-    // Set up isometric camera
-    if (camera instanceof THREE.OrthographicCamera) {
-      camera.position.set(10, 10, 10);
-      camera.lookAt(0, 0, 0);
-      camera.zoom = 50;
-      camera.updateProjectionMatrix();
-    }
-  }, [camera]);
-
   const handleCanvasClick = useCallback((e: any) => {
     if (selectedTool === 'add-node') {
       onCanvasClick(e.point.x, e.point.y);
@@ -228,16 +237,19 @@ const CLDScene: React.FC<{
 
   return (
     <>
+      {/* Camera controller */}
+      <CameraController viewportTransform={viewportTransform} />
+      
       {/* Lighting */}
       <ambientLight intensity={0.6} />
       <directionalLight position={[10, 10, 5]} intensity={0.8} />
 
       {/* Grid */}
-      {snapToGrid && <IsometricGrid size={2} divisions={10} />}
+      {snapToGrid && <IsometricGrid size={4} divisions={20} />}
 
       {/* Background plane for clicks */}
       <mesh onClick={handleCanvasClick} position={[0, 0, -0.1]}>
-        <planeGeometry args={[100, 100]} />
+        <planeGeometry args={[200, 200]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
@@ -340,21 +352,26 @@ const IsometricCLDCanvas: React.FC<IsometricCLDCanvasProps> = ({
   }, [handleWheel, handleMouseDown, handleMouseMove, handleMouseUp]);
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full absolute inset-0">
       <Canvas
         ref={canvasRef}
-        camera={{
-          fov: 75,
-          near: 0.1,
-          far: 1000,
-          position: [0, 0, 5]
-        }}
         style={{
-          background: 'linear-gradient(135deg, rgba(20, 30, 50, 0.4) 0%, rgba(30, 40, 60, 0.4) 100%)',
+          width: '100%',
+          height: '100%',
+          background: 'transparent',
           cursor: selectedTool === 'pan' ? 'grab' : selectedTool === 'add-node' ? 'crosshair' : 'default'
         }}
+        camera={{
+          left: -window.innerWidth / 2,
+          right: window.innerWidth / 2,
+          top: window.innerHeight / 2,
+          bottom: -window.innerHeight / 2,
+          near: 0.1,
+          far: 1000,
+          zoom: 50
+        }}
+        orthographic
       >
-        <OrthographicCamera makeDefault position={[10, 10, 10]} zoom={viewportTransform.zoom} />
         <CLDScene
           nodes={nodes}
           connectors={connectors}
@@ -362,6 +379,7 @@ const IsometricCLDCanvas: React.FC<IsometricCLDCanvasProps> = ({
           selectedTool={selectedTool}
           snapToGrid={snapToGrid}
           gridSize={gridSize}
+          viewportTransform={viewportTransform}
           onNodeMove={onNodeMove}
           onNodeSelect={onNodeSelect}
           onCanvasClick={onCanvasClick}
