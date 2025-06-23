@@ -5,17 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Import new isometric CLD components
-import { CLDNode, CLDConnector, CLDLayer, IsometricCLDState } from './types/isometric-cld-types';
-import LayerManager from './components/LayerManager';
-import CLDToolbar from './components/CLDToolbar';
-import IsometricCLDCanvas from './components/IsometricCLDCanvas';
-
 // Import types and mock data
 import { SystemFramingStudioProps, Node, mockNodes, mockEdges } from './types/system-framing-types';
 import { Actor, Connection, SNAMetrics } from './types/sna-types';
 
-// Import components for SNA tab
+// Import components
+import CytoscapeView from './components/CytoscapeView';
 import SparklineChart from './components/SparklineChart';
 import NetworkView from './components/NetworkView';
 
@@ -108,272 +103,63 @@ const mockSNAData = {
   }
 };
 
-// Initial CLD data
-const initialCLDState: IsometricCLDState = {
-  nodes: [
-    {
-      id: 'node1',
-      x: 0,
-      y: 0,
-      z: 0,
-      layer: 'base',
-      label: 'Economic Growth',
-      width: 120,
-      height: 60,
-      color: '#3b82f6',
-      type: 'variable'
-    },
-    {
-      id: 'node2',
-      x: 200,
-      y: 100,
-      z: 0,
-      layer: 'base',
-      label: 'Environmental Impact',
-      width: 140,
-      height: 60,
-      color: '#10b981',
-      type: 'variable'
-    },
-    {
-      id: 'node3',
-      x: -150,
-      y: 200,
-      z: 0,
-      layer: 'base',
-      label: 'Social Welfare',
-      width: 120,
-      height: 60,
-      color: '#f59e0b',
-      type: 'variable'
-    }
-  ],
-  connectors: [
-    {
-      id: 'conn1',
-      from: 'node1',
-      to: 'node2',
-      bends: [],
-      layer: 'base',
-      style: 'solid',
-      polarity: 'negative'
-    },
-    {
-      id: 'conn2',
-      from: 'node1',
-      to: 'node3',
-      bends: [],
-      layer: 'base',
-      style: 'solid',
-      polarity: 'positive'
-    }
-  ],
-  layers: [
-    {
-      id: 'base',
-      name: 'Base Loop',
-      visible: true,
-      locked: false,
-      color: '#14b8a6',
-      order: 0
-    },
-    {
-      id: 'data',
-      name: 'Data Flows',
-      visible: true,
-      locked: false,
-      color: '#3b82f6',
-      order: 1
-    },
-    {
-      id: 'annotations',
-      name: 'Annotations',
-      visible: true,
-      locked: false,
-      color: '#f59e0b',
-      order: 2
-    }
-  ],
-  selectedTool: 'select',
-  selectedNodeId: null,
-  selectedConnectorId: null,
-  zoom: 1,
-  panOffset: { x: 0, y: 0 },
-  snapToGrid: true,
-  gridSize: 50
-};
-
 const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaData }) => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [selectedActor, setSelectedActor] = useState<Actor | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('cld');
+  const cyRef = useRef<any>(null);
+  const snaRef = useRef<any>(null);
+  const [isInfoOpen, setIsInfoOpen] = useState({
+    density: false,
+    clustering: false,
+    pathLength: false,
+    centralization: false,
+  });
   const [highlightedActors, setHighlightedActors] = useState<string[]>([]);
-  
-  // CLD State
-  const [cldState, setCldState] = useState<IsometricCLDState>(initialCLDState);
-  const [history, setHistory] = useState<IsometricCLDState[]>([initialCLDState]);
-  const [historyIndex, setHistoryIndex] = useState(0);
-
-  // CLD Event Handlers
-  const handleNodeMove = (nodeId: string, x: number, y: number) => {
-    setCldState(prev => ({
-      ...prev,
-      nodes: prev.nodes.map(node =>
-        node.id === nodeId ? { ...node, x, y } : node
-      )
-    }));
-  };
-
-  const handleNodeSelect = (nodeId: string) => {
-    setCldState(prev => ({
-      ...prev,
-      selectedNodeId: nodeId
-    }));
-  };
-
-  const handleCanvasClick = (x: number, y: number) => {
-    if (cldState.selectedTool === 'add-node') {
-      const newNode: CLDNode = {
-        id: `node_${Date.now()}`,
-        x,
-        y,
-        z: 0,
-        layer: 'base',
-        label: 'New Variable',
-        width: 120,
-        height: 60,
-        color: '#6366f1',
-        type: 'variable'
-      };
-
-      setCldState(prev => ({
-        ...prev,
-        nodes: [...prev.nodes, newNode]
-      }));
-    }
-  };
-
-  const handleViewportChange = (transform: { zoom: number; panOffset: { x: number; y: number } }) => {
-    setCldState(prev => ({
-      ...prev,
-      zoom: transform.zoom,
-      panOffset: transform.panOffset
-    }));
-  };
-
-  const handleToolChange = (tool: 'select' | 'pan' | 'add-node' | 'add-connector') => {
-    setCldState(prev => ({
-      ...prev,
-      selectedTool: tool
-    }));
-  };
-
-  const handleToggleGrid = () => {
-    setCldState(prev => ({
-      ...prev,
-      snapToGrid: !prev.snapToGrid
-    }));
-  };
-
-  const handleLayerToggle = (layerId: string) => {
-    setCldState(prev => ({
-      ...prev,
-      layers: prev.layers.map(layer =>
-        layer.id === layerId ? { ...layer, visible: !layer.visible } : layer
-      )
-    }));
-  };
-
-  const handleLayerLockToggle = (layerId: string) => {
-    setCldState(prev => ({
-      ...prev,
-      layers: prev.layers.map(layer =>
-        layer.id === layerId ? { ...layer, locked: !layer.locked } : layer
-      )
-    }));
-  };
-
-  const handleAddLayer = (name: string) => {
-    const newLayer: CLDLayer = {
-      id: `layer_${Date.now()}`,
-      name,
-      visible: true,
-      locked: false,
-      color: '#6366f1',
-      order: cldState.layers.length
-    };
-
-    setCldState(prev => ({
-      ...prev,
-      layers: [...prev.layers, newLayer]
-    }));
-  };
-
-  const handleLayerReorder = (layers: CLDLayer[]) => {
-    setCldState(prev => ({
-      ...prev,
-      layers
-    }));
-  };
-
-  const handleLayerRename = (layerId: string, newName: string) => {
-    setCldState(prev => ({
-      ...prev,
-      layers: prev.layers.map(layer =>
-        layer.id === layerId ? { ...layer, name: newName } : layer
-      )
-    }));
-  };
-
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      setCldState(history[newIndex]);
-    }
-  };
-
-  const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      setCldState(history[newIndex]);
-    }
-  };
 
   const handleSave = () => {
-    console.log('Saving CLD state...', cldState);
-    // In a real app, this would call the API endpoint
+    console.log('Saving system frame...');
+    // In a real app, this would call the API endpoint /think/cld/save
   };
 
   const handleReset = () => {
-    setCldState(initialCLDState);
-    setHistory([initialCLDState]);
-    setHistoryIndex(0);
+    console.log('Resetting system frame...');
+    // No longer reset layout when Reset button is clicked
+    // Instead, we could implement a function to reset node values but keep positions
   };
 
-  // SNA Event Handlers
+  const handleAddNode = () => {
+    console.log('Adding new node...');
+    // In a real app, this would open a node creation dialog
+  };
+
+  const handleNodeClick = (node: Node) => {
+    setSelectedNode(node);
+    setIsPopupOpen(true);
+  };
+
+  // Handler for cytoscape node click
+  const handleCyNodeClick = (nodeId: string) => {
+    const node = mockNodes.find(n => n.id === nodeId);
+    if (node) {
+      handleNodeClick(node);
+    }
+  };
+
+  // Handler for SNA node click
   const handleSnaNodeClick = (nodeId: string) => {
     const actor = mockSNAData.nodes.find(n => n.id === nodeId);
     if (actor) {
       setSelectedActor(actor);
+      // When selecting an actor, highlight it in the network
       setHighlightedActors([nodeId]);
     }
   };
 
-  // Filter visible nodes and connectors based on layers
-  const visibleNodes = cldState.nodes.filter(node => 
-    cldState.layers.find(layer => layer.id === node.layer)?.visible
-  );
-  
-  const visibleConnectors = cldState.connectors.filter(connector => 
-    cldState.layers.find(layer => layer.id === connector.layer)?.visible
-  );
-
   return (
     <motion.div 
-      className="flex flex-col h-full"
+      className="flex flex-col"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
@@ -410,73 +196,52 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
             </TabsList>
           </Tabs>
         </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <button 
+            onClick={handleAddNode}
+            className="px-4 py-2 text-sm backdrop-blur-[20px] border border-teal-500/30 bg-teal-500/20 text-teal-300 rounded-xl hover:bg-teal-500/30 transition-all duration-300 flex items-center shadow-lg"
+          >
+            <Plus size={16} className="mr-2" />
+            Add Node
+          </button>
+        </motion.div>
       </div>
 
       {/* Enhanced Main visualization area */}
       <motion.div 
-        className="flex-1 rounded-2xl flex items-center justify-center border border-white/20 mb-6 overflow-hidden relative"
+        className="aspect-video rounded-2xl flex items-center justify-center border border-white/20 mb-6 overflow-hidden relative"
         style={{
           background: 'rgba(15, 23, 42, 0.6)',
           backdropFilter: 'blur(20px)',
-          boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.1), 0 8px 24px rgba(0, 0, 0, 0.3)',
-          minHeight: '600px'
+          boxShadow: 'inset 0 0 30px rgba(20, 184, 166, 0.1), 0 8px 24px rgba(0, 0, 0, 0.3)'
         }}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.6 }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-purple-500/5 rounded-2xl"></div>
-        
         <AnimatePresence mode="wait">
           {activeTab === 'cld' ? (
             <motion.div
               key="cld"
-              className="w-full h-full relative"
+              className="w-full h-full"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              {/* CLD Toolbar */}
-              <CLDToolbar
-                selectedTool={cldState.selectedTool}
-                onToolChange={handleToolChange}
-                snapToGrid={cldState.snapToGrid}
-                onToggleGrid={handleToggleGrid}
-                onUndo={handleUndo}
-                onRedo={handleRedo}
-                onSave={handleSave}
-                onReset={handleReset}
-                canUndo={historyIndex > 0}
-                canRedo={historyIndex < history.length - 1}
-              />
-
-              {/* Layer Manager */}
-              <LayerManager
-                layers={cldState.layers}
-                onToggleLayer={handleLayerToggle}
-                onToggleLock={handleLayerLockToggle}
-                onAddLayer={handleAddLayer}
-                onReorderLayers={handleLayerReorder}
-                onRenameLayer={handleLayerRename}
-              />
-
-              {/* Isometric CLD Canvas */}
-              <IsometricCLDCanvas
-                nodes={visibleNodes}
-                connectors={visibleConnectors}
-                selectedNodeId={cldState.selectedNodeId}
-                selectedTool={cldState.selectedTool}
-                viewportTransform={{
-                  zoom: cldState.zoom,
-                  panOffset: cldState.panOffset
-                }}
-                snapToGrid={cldState.snapToGrid}
-                gridSize={cldState.gridSize}
-                onNodeMove={handleNodeMove}
-                onNodeSelect={handleNodeSelect}
-                onCanvasClick={handleCanvasClick}
-                onViewportChange={handleViewportChange}
+              <CytoscapeView 
+                nodes={mockNodes} 
+                edges={mockEdges} 
+                onNodeClick={handleCyNodeClick}
+                cyRef={cyRef}
               />
             </motion.div>
           ) : (
@@ -492,7 +257,7 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
                 nodes={mockSNAData.nodes}
                 edges={mockSNAData.edges}
                 onNodeClick={handleSnaNodeClick}
-                cyRef={useRef()}
+                cyRef={snaRef}
                 highlightedActors={highlightedActors}
               />
             </motion.div>
@@ -502,7 +267,35 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
 
       {/* Enhanced Bottom section */}
       <AnimatePresence mode="wait">
-        {activeTab === 'sna' && (
+        {activeTab === 'cld' ? (
+          <motion.div
+            key="cld-controls"
+            className="flex justify-end space-x-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.button
+              onClick={handleReset}
+              className="px-4 py-2 text-sm backdrop-blur-[20px] border border-white/20 bg-white/5 text-gray-300 rounded-xl hover:bg-white/10 transition-all duration-300 flex items-center"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <RotateCcw size={16} className="mr-2" />
+              Reset Values
+            </motion.button>
+            <motion.button
+              onClick={handleSave}
+              className="px-4 py-2 text-sm backdrop-blur-[20px] border border-teal-500/30 bg-gradient-to-br from-teal-500/60 to-blue-500/60 text-white rounded-xl hover:from-teal-500/70 hover:to-blue-500/70 transition-all duration-300 flex items-center shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Save size={16} className="mr-2" />
+              Save
+            </motion.button>
+          </motion.div>
+        ) : (
           <motion.div
             key="sna-metrics"
             className="grid grid-cols-2 gap-4 mt-4"
@@ -546,6 +339,49 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Enhanced Node Popup Dialog */}
+      <Dialog open={isPopupOpen && !!selectedNode} onOpenChange={setIsPopupOpen}>
+        <DialogContent 
+          className="backdrop-blur-[24px] border border-white/20 animate-scale-in shadow-2xl"
+          style={{
+            background: 'rgba(20, 30, 50, 0.8)',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)'
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-xl font-medium bg-gradient-to-r from-teal-300 to-blue-300 bg-clip-text text-transparent">
+              {selectedNode?.label}
+            </DialogTitle>
+          </DialogHeader>
+          <motion.div 
+            className="space-y-3 mt-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+          >
+            {selectedNode?.subIndicators?.map((indicator, index) => (
+              <motion.div 
+                key={indicator.name} 
+                className="flex items-center justify-between p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300"
+                style={{ background: 'rgba(255, 255, 255, 0.05)' }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+              >
+                <span className="text-gray-300">{indicator.name}: </span>
+                <div className="flex items-center">
+                  <span className="text-white font-medium mr-2">
+                    {indicator.value} {indicator.unit || ''}
+                  </span>
+                  {indicator.history && <SparklineChart data={indicator.history} />}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </DialogContent>
+      </Dialog>
 
       {/* Enhanced selected actor info for SNA */}
       <AnimatePresence>
