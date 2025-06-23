@@ -38,15 +38,24 @@ const CoherenceMatrix: React.FC<CoherenceMatrixProps> = ({
 
       if (error) throw error;
       
-      // Handle the response properly - it should be an array of CoherenceScore objects
-      if (Array.isArray(data)) {
-        const validScores = data.filter((item): item is CoherenceScore => 
-          item && 
-          typeof item === 'object' && 
-          'objective' in item && 
-          'leverage_point' in item && 
-          'score' in item
-        );
+      // Handle the response properly - check if data is valid and convert to CoherenceScore[]
+      if (data && Array.isArray(data)) {
+        const validScores: CoherenceScore[] = [];
+        
+        data.forEach((item: any) => {
+          if (item && 
+              typeof item === 'object' && 
+              typeof item.objective === 'string' && 
+              typeof item.leverage_point === 'string' && 
+              typeof item.score === 'number') {
+            validScores.push({
+              objective: item.objective,
+              leverage_point: item.leverage_point,
+              score: item.score
+            });
+          }
+        });
+        
         setCoherenceData(validScores);
       } else {
         setCoherenceData([]);

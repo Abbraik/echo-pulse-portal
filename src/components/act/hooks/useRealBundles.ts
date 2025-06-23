@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Bundle, BundleFormData } from '../types/act-types';
 
-export const useRealBundles = (statusFilter?: string) => {
+export const useRealBundles = (statusFilter?: 'draft' | 'active' | 'pilot' | 'completed') => {
   return useQuery({
     queryKey: ['bundles', statusFilter],
     queryFn: async (): Promise<Bundle[]> => {
@@ -12,7 +12,7 @@ export const useRealBundles = (statusFilter?: string) => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (statusFilter && statusFilter !== 'all') {
+      if (statusFilter) {
         query = query.eq('status', statusFilter);
       }
 

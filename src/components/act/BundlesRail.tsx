@@ -86,7 +86,28 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
       updateBundle.mutateAsync({
         bundleId: editingBundle.id,
         updates: bundleData
-      }).then(() => {
+      }).then((data) => {
+        // Transform the returned database object to Bundle format
+        const transformedBundle: Bundle = {
+          id: data.id,
+          name: data.name,
+          summary: data.summary,
+          createdBy: data.created_by,
+          leveragePoints: Array.isArray(data.leverage_points) 
+            ? data.leverage_points.filter((point): point is string => typeof point === 'string')
+            : [],
+          objectives: data.objectives || [],
+          pillars: data.pillars || [],
+          geography: data.geography || [],
+          tags: data.tags || [],
+          status: data.status as 'draft' | 'active' | 'pilot' | 'completed',
+          coherence: data.coherence || 0,
+          ndiImpact: data.ndi_impact || 0,
+          isApproved: data.is_approved || false,
+          createdAt: new Date(data.created_at),
+          updatedAt: new Date(data.updated_at)
+        };
+        onBundleSelect(transformedBundle);
         toast({
           title: "Bundle Updated",
           description: "Bundle has been successfully updated.",
@@ -100,8 +121,28 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
         });
       });
     } else {
-      createBundle.mutateAsync(bundleData).then(newBundle => {
-        onBundleSelect(newBundle);
+      createBundle.mutateAsync(bundleData).then(data => {
+        // Transform the returned database object to Bundle format
+        const transformedBundle: Bundle = {
+          id: data.id,
+          name: data.name,
+          summary: data.summary,
+          createdBy: data.created_by,
+          leveragePoints: Array.isArray(data.leverage_points) 
+            ? data.leverage_points.filter((point): point is string => typeof point === 'string')
+            : [],
+          objectives: data.objectives || [],
+          pillars: data.pillars || [],
+          geography: data.geography || [],
+          tags: data.tags || [],
+          status: data.status as 'draft' | 'active' | 'pilot' | 'completed',
+          coherence: data.coherence || 0,
+          ndiImpact: data.ndi_impact || 0,
+          isApproved: data.is_approved || false,
+          createdAt: new Date(data.created_at),
+          updatedAt: new Date(data.updated_at)
+        };
+        onBundleSelect(transformedBundle);
         toast({
           title: "Bundle Created",
           description: "Bundle has been successfully created.",

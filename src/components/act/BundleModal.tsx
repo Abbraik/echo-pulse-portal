@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info, ChevronLeft, ChevronRight, Trash2, Save } from 'lucide-react';
@@ -50,7 +49,10 @@ const BundleModal: React.FC<BundleModalProps> = ({
         id: initialBundle.id,
         name: initialBundle.name,
         summary: initialBundle.summary || '',
-        tags: initialBundle.tags?.map(tag => ({ name: tag, type: 'category' })) || [],
+        tags: initialBundle.tags?.map(tag => ({ 
+          name: tag, 
+          type: 'category' as 'category' | 'priority' | 'geography' | 'custom'
+        })) || [],
         objectives: initialBundle.objectives || ['Improve water conservation', 'Optimize irrigation systems'],
         pillars: initialBundle.pillars as ('population' | 'resource' | 'services' | 'social')[] || ['resource', 'services'],
         geography: initialBundle.geography || ['Dubai', 'Abu Dhabi'],
