@@ -16,6 +16,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import TeamsCollaborationPanel from './components/TeamsCollaborationPanel';
 import TeamsTaskActions from './components/TeamsTaskActions';
+import CreateTaskModal from './components/CreateTaskModal';
+import { useTasks } from './hooks/useTasks';
 
 interface DeliveryChainsProps {
   highlightBundle: string | null;
@@ -60,12 +62,17 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({ highlightBundle }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredStatus, setFilteredStatus] = useState<string | null>(null);
   const [showTeamsPanel, setShowTeamsPanel] = useState(false);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [selectedLaneForTask, setSelectedLaneForTask] = useState<{ id: string; title: string } | null>(null);
+  
+  // Get tasks from backend
+  const { tasks: backendTasks, isLoading: tasksLoading } = useTasks();
   
   // Refs for drag interaction
   const dragTaskRef = useRef<string | null>(null);
   const dragOverLaneRef = useRef<string | null>(null);
   
-  // Sample data for lanes/objectives with tasks
+  // Sample data for lanes/objectives with tasks - now we'll merge with backend tasks
   const [lanes, setLanes] = useState<Lane[]>([
     { 
       id: 'l1', 
@@ -175,7 +182,42 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({ highlightBundle }) => {
       ]
     }
   ]);
-  
+
+  // Merge backend tasks with frontend lanes
+  const getMergedLanes = () => {
+    if (!backendTasks || tasksLoading) return lanes;
+    
+    const mergedLanes = [...lanes];
+    
+    // Add backend tasks to appropriate lanes or create new ones
+    backendTasks.forEach(backendTask => {
+      const mappedTask: Task = {
+        id: backendTask.id,
+        title: backendTask.title,
+        status: backendTask.status,
+        assignee: backendTask.assignee,
+        assigneeAvatar: backendTask.assignee_avatar,
+        assigneeInitial: backendTask.assignee_initial || backendTask.assignee.split(' ').map(n => n[0]).join('').toUpperCase(),
+        dueDate: backendTask.due_date || new Date().toISOString().split('T')[0],
+        needsApproval: backendTask.needs_approval,
+        teamsChatHistory: backendTask.teams_chat_history || [],
+        dependencies: backendTask.dependencies || [],
+        ganttStart: backendTask.gantt_start || 0,
+        ganttDuration: backendTask.gantt_duration || 7
+      };
+      
+      // Add to first lane for now (in real app, you'd have lane assignment logic)
+      if (mergedLanes[0]) {
+        const existingTaskIndex = mergedLanes[0].tasks.findIndex(t => t.id === mappedTask.id);
+        if (existingTaskIndex === -1) {
+          mergedLanes[0].tasks.push(mappedTask);
+        }
+      }
+    });
+    
+    return mergedLanes;
+  };
+
   // Calculate completed task counts for lane progress badges
   const getLaneProgress = (lane: Lane) => {
     const totalTasks = lane.tasks.length;
@@ -273,9 +315,10 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({ highlightBundle }) => {
 
   // Filter tasks based on search and status filter
   const getFilteredLanes = () => {
-    if (!searchTerm && !filteredStatus) return lanes;
+    const mergedLanes = getMergedLanes();
+    if (!searchTerm && !filteredStatus) return mergedLanes;
     
-    return lanes.map(lane => {
+    return mergedLanes.map(lane => {
       const filteredTasks = lane.tasks.filter(task => {
         const matchesSearch = !searchTerm || 
           task.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -293,15 +336,26 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({ highlightBundle }) => {
     });
   };
   
-  // Find a task by ID across all lanes
+  // Find a task by ID across all lanes (updated for merged data)
   const findTaskById = (taskId: string) => {
-    for (const lane of lanes) {
+    const mergedLanes = getMergedLanes();
+    for (const lane of mergedLanes) {
       const task = lane.tasks.find(t => t.id === taskId);
       if (task) return task;
     }
     return null;
   };
   
+  const handleCreateTask = (laneId: string, laneTitle: string) => {
+    setSelectedLaneForTask({ id: laneId, title: laneTitle });
+    setShowCreateTaskModal(true);
+  };
+
+  const handleCloseTaskModal = () => {
+    setShowCreateTaskModal(false);
+    setSelectedLaneForTask(null);
+  };
+
   return (
     <>
       <GlassCard className="w-full">
@@ -432,16 +486,13 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({ highlightBundle }) => {
                       >
                         {getLaneProgress(lane)}
                       </Badge>
-                      {/* Sub-task creation button */}
+                      {/* Updated sub-task creation button */}
                       <Button
                         variant="ghost"
                         size="sm"
                         className="h-6 w-6 p-0 text-white/60 hover:text-white hover:bg-white/10"
-                        onClick={() => {
-                          const tasksUrl = `https://teams.microsoft.com/l/entity/com.microsoft.teamspace.tab.planner`;
-                          window.open(tasksUrl, '_blank');
-                        }}
-                        title="Create Sub-Task in Teams"
+                        onClick={() => handleCreateTask(lane.id, lane.title)}
+                        title={t('createTask', { defaultValue: 'Create Task' })}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
@@ -723,8 +774,11 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({ highlightBundle }) => {
                       </motion.div>
                     ))}
                     
-                    {/* Add task placeholder */}
-                    <div className="border border-dashed border-white/20 rounded-lg p-3 text-center text-sm text-gray-400 cursor-pointer hover:bg-white/5 flex items-center justify-center">
+                    {/* Updated add task placeholder */}
+                    <div 
+                      className="border border-dashed border-white/20 rounded-lg p-3 text-center text-sm text-gray-400 cursor-pointer hover:bg-white/5 flex items-center justify-center"
+                      onClick={() => handleCreateTask(lane.id, lane.title)}
+                    >
                       <Plus className="h-3.5 w-3.5 mr-1.5" />
                       {t('addTask', { defaultValue: 'Add Task' })}
                     </div>
@@ -898,6 +952,15 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({ highlightBundle }) => {
         onClose={() => setShowTeamsPanel(false)}
         bundleId="education-hub"
         bundleName="Education Innovation Hub"
+      />
+
+      {/* Create Task Modal */}
+      <CreateTaskModal
+        isOpen={showCreateTaskModal}
+        onClose={handleCloseTaskModal}
+        bundleId="education-hub"
+        laneId={selectedLaneForTask?.id}
+        laneTitle={selectedLaneForTask?.title}
       />
     </>
   );

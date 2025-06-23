@@ -572,6 +572,74 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          assignee: string
+          assignee_avatar: string | null
+          assignee_initial: string | null
+          bundle_id: string | null
+          created_at: string
+          created_by: string | null
+          dependencies: string[] | null
+          description: string | null
+          due_date: string | null
+          gantt_duration: number | null
+          gantt_start: number | null
+          id: string
+          needs_approval: boolean
+          status: string
+          teams_chat_history: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assignee: string
+          assignee_avatar?: string | null
+          assignee_initial?: string | null
+          bundle_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          dependencies?: string[] | null
+          description?: string | null
+          due_date?: string | null
+          gantt_duration?: number | null
+          gantt_start?: number | null
+          id?: string
+          needs_approval?: boolean
+          status?: string
+          teams_chat_history?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assignee?: string
+          assignee_avatar?: string | null
+          assignee_initial?: string | null
+          bundle_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          dependencies?: string[] | null
+          description?: string | null
+          due_date?: string | null
+          gantt_duration?: number | null
+          gantt_start?: number | null
+          id?: string
+          needs_approval?: boolean
+          status?: string
+          teams_chat_history?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ui_content: {
         Row: {
           category: string | null
