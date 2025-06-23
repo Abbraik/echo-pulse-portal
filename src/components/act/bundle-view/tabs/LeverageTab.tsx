@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Sparkles, Zap } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
@@ -26,19 +26,13 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
   const taskGeneration = useTaskGeneration();
   const { updateBundle } = useRealBundleActions();
 
-  // Add debugging
-  console.log('LeverageTab - bundle:', bundle);
-  console.log('LeverageTab - leveragePoints:', leveragePoints);
-  console.log('LeverageTab - selectedPointsForDescription:', selectedPointsForDescription);
-
   // Convert bundle.leveragePoints to string array if needed
   const leveragePointIds = Array.isArray(bundle.leveragePoints) 
     ? bundle.leveragePoints.filter((point): point is string => typeof point === 'string') 
     : [];
 
-  console.log('LeverageTab - leveragePointIds from bundle:', leveragePointIds);
-
-  const handleLeverageUpdate = async (points: string[]) => {
+  // Use useCallback to stabilize the function reference and prevent infinite loops
+  const handleLeverageUpdate = useCallback(async (points: string[]) => {
     console.log('Leverage points updated:', points);
     
     // Update the selected points for description panel
@@ -68,7 +62,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
     } catch (error) {
       console.error('Failed to update bundle leverage points:', error);
     }
-  };
+  }, [leveragePoints, updateBundle, bundle.id]);
 
   const handleGenerateTasks = async () => {
     try {

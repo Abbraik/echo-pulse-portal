@@ -23,19 +23,12 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
   
   const { data: leveragePoints = [], isLoading } = useLeveragePoints();
 
-  // Add debugging
-  console.log('EnhancedLeverageSelector - bundleId:', bundleId);
-  console.log('EnhancedLeverageSelector - initialPoints:', initialPoints);
-  console.log('EnhancedLeverageSelector - leveragePoints:', leveragePoints);
-  console.log('EnhancedLeverageSelector - selectedPoints:', selectedPoints);
-
+  // Initialize selected points from bundle data - removed onUpdate from dependencies to prevent infinite loop
   useEffect(() => {
-    // Initialize selected points from bundle data
     if (leveragePoints.length > 0 && initialPoints && initialPoints.length > 0) {
       const chips = initialPoints
         .map(pointId => {
           const point = leveragePoints.find(p => p.id === pointId);
-          console.log('Finding point for ID:', pointId, 'Found:', point);
           return point ? {
             id: point.id,
             name: point.name,
@@ -46,10 +39,12 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
       
       console.log('Initializing with chips:', chips);
       setSelectedPoints(chips);
-      // Immediately notify parent component
-      onUpdate?.(chips.map(c => c.id));
+      // Only call onUpdate if the selected points have actually changed
+      if (chips.length > 0) {
+        onUpdate?.(chips.map(c => c.id));
+      }
     }
-  }, [leveragePoints, initialPoints, onUpdate]);
+  }, [leveragePoints, initialPoints]); // Removed onUpdate from dependencies
 
   const handleAddPoint = (pointId: string) => {
     if (selectedPoints.length >= 5) return;
