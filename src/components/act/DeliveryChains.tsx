@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Calendar, AtSign, Bell, Check, ChevronDown, Plus, Search, Users, Filter, Clock, ArrowRight, Download, Share2, X, Send, Video, ExternalLink } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
@@ -197,7 +196,7 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
         title: backendTask.title,
         status: backendTask.status,
         assignee: backendTask.assignee,
-        assigneeAvatar: backendTask.assignee_avatar || undefined,
+        assigneeAvatar: backendTask.assignee_avatar,
         assigneeInitial: backendTask.assignee_initial || backendTask.assignee.split(' ').map(n => n[0]).join('').toUpperCase(),
         dueDate: backendTask.due_date || new Date().toISOString().split('T')[0],
         needsApproval: backendTask.needs_approval,
@@ -227,12 +226,16 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
 
   // Function to toggle task expansion
   const toggleTaskExpansion = (taskId: string) => {
-    // Implementation for task expansion
+    
+
+    
   };
 
   // Function to toggle chat panel
   const toggleChatPanel = (taskId: string) => {
-    // Implementation for chat panel
+    
+
+    
   };
 
   // Get color based on task status
@@ -340,33 +343,8 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
       const task = lane.tasks.find(t => t.id === taskId);
       if (task) return task;
     }
-    
-    // If not found in merged lanes, check backend tasks and map to frontend interface
-    if (backendTasks) {
-      const backendTask = backendTasks.find(t => t.id === taskId);
-      if (backendTask) {
-        // Map backend task to frontend Task interface
-        const mappedTask: Task = {
-          id: backendTask.id,
-          title: backendTask.title,
-          status: backendTask.status,
-          assignee: backendTask.assignee,
-          assigneeAvatar: backendTask.assignee_avatar || undefined,
-          assigneeInitial: backendTask.assignee_initial || backendTask.assignee.split(' ').map(n => n[0]).join('').toUpperCase(),
-          dueDate: backendTask.due_date || new Date().toISOString().split('T')[0],
-          needsApproval: backendTask.needs_approval,
-          teamsChatHistory: parseChatHistory(backendTask.teams_chat_history),
-          dependencies: backendTask.dependencies || [],
-          ganttStart: backendTask.gantt_start || 0,
-          ganttDuration: backendTask.gantt_duration || 7
-        };
-        return mappedTask;
-      }
-    }
-    
     return null;
   };
-  
   const handleCreateTask = (laneId: string, laneTitle: string) => {
     setSelectedLaneForTask({
       id: laneId,
@@ -374,7 +352,6 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
     });
     setShowCreateTaskModal(true);
   };
-  
   const handleCloseTaskModal = () => {
     setShowCreateTaskModal(false);
     setSelectedLaneForTask(null);
@@ -382,7 +359,6 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
 
   // Handle task click to open details modal
   const handleTaskClick = (taskId: string) => {
-    console.log('Task clicked:', taskId);
     setSelectedTaskId(taskId);
     setShowTaskDetailsModal(true);
   };

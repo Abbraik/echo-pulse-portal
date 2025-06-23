@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { X, Video, Users, AtSign, ExternalLink, Calendar, MessageSquare, Send, Check, Bell } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -45,7 +46,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     needs_approval: false
   });
 
-  // Find the current task - ensure we're looking for the right task
+  // Find the current task
   const currentTask = tasks?.find(task => task.id === taskId);
 
   useEffect(() => {
@@ -61,13 +62,6 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     }
   }, [currentTask]);
 
-  // Add debug logging
-  useEffect(() => {
-    console.log('TaskDetailsModal - taskId:', taskId);
-    console.log('TaskDetailsModal - tasks:', tasks);
-    console.log('TaskDetailsModal - currentTask:', currentTask);
-  }, [taskId, tasks, currentTask]);
-
   const handleSaveTask = async () => {
     if (!taskId) return;
     
@@ -79,7 +73,6 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
         description: "Task details have been saved successfully.",
       });
     } catch (error) {
-      console.error('Error updating task:', error);
       toast({
         title: "Error",
         description: "Failed to update task. Please try again.",
@@ -128,7 +121,6 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
         description: "Your message has been added to the Teams chat.",
       });
     } catch (error) {
-      console.error('Error sending message:', error);
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
@@ -162,7 +154,6 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
         description: `@${mentionInput} has been notified`,
       });
     } catch (error) {
-      console.error('Error sending mention:', error);
       toast({
         title: "Error",
         description: "Failed to send mention. Please try again.",
@@ -183,23 +174,8 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   // Parse chat history safely
   const chatHistory = parseChatHistory(currentTask?.teams_chat_history);
 
-  // Show loading or no task message
-  if (!isOpen) return null;
-
   if (!currentTask) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-md bg-black/90 border-white/20 backdrop-blur-xl">
-          <DialogHeader>
-            <DialogTitle className="text-white">Task Not Found</DialogTitle>
-          </DialogHeader>
-          <p className="text-gray-400">
-            {isLoading ? 'Loading task details...' : 'The selected task could not be found.'}
-          </p>
-          <Button onClick={onClose} className="mt-4">Close</Button>
-        </DialogContent>
-      </Dialog>
-    );
+    return null;
   }
 
   return (
