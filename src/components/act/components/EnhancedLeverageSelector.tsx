@@ -1,10 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Star, Save, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Star } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useLeveragePoints, useUpdateBundleLeverage } from '../hooks/useLeveragePoints';
+import { useLeveragePoints } from '../hooks/useLeveragePoints';
 import type { LeveragePoint, LeveragePointChipData } from '../types/leverage-types';
 import LeveragePointChip from './LeveragePointChip';
 
@@ -21,10 +20,8 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
 }) => {
   const [selectedPoints, setSelectedPoints] = useState<LeveragePointChipData[]>([]);
   const [selectedValue, setSelectedValue] = useState<string>('');
-  const [hasChanges, setHasChanges] = useState(false);
   
   const { data: leveragePoints = [], isLoading } = useLeveragePoints();
-  const updateMutation = useUpdateBundleLeverage();
 
   // Add debugging
   console.log('EnhancedLeverageSelector - bundleId:', bundleId);
@@ -66,7 +63,6 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
       }];
       setSelectedPoints(newPoints);
       setSelectedValue('');
-      setHasChanges(true);
       onUpdate?.(newPoints.map(p => p.id));
       console.log('Added point:', point.name, 'New selection:', newPoints);
     }
@@ -75,40 +71,8 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
   const handleRemovePoint = (pointId: string) => {
     const newPoints = selectedPoints.filter(sp => sp.id !== pointId);
     setSelectedPoints(newPoints);
-    setHasChanges(true);
     onUpdate?.(newPoints.map(p => p.id));
     console.log('Removed point:', pointId, 'New selection:', newPoints);
-  };
-
-  const handleSave = async () => {
-    const pointIds = selectedPoints.map(p => p.id);
-    try {
-      await updateMutation.mutateAsync({ bundleId, points: pointIds });
-      setHasChanges(false);
-      onUpdate?.(pointIds);
-    } catch (error) {
-      console.error('Failed to save leverage points:', error);
-    }
-  };
-
-  const handleReset = () => {
-    // Reset to initial points
-    if (leveragePoints.length > 0 && initialPoints) {
-      const chips = initialPoints
-        .map(pointId => {
-          const point = leveragePoints.find(p => p.id === pointId);
-          return point ? {
-            id: point.id,
-            name: point.name,
-            recommended: point.recommended
-          } : null;
-        })
-        .filter((chip): chip is LeveragePointChipData => chip !== null);
-      
-      setSelectedPoints(chips);
-      setHasChanges(false);
-      onUpdate?.(chips.map(c => c.id));
-    }
   };
 
   const availablePoints = leveragePoints.filter(
@@ -135,26 +99,6 @@ const EnhancedLeverageSelector: React.FC<EnhancedLeverageSelectorProps> = ({
           <p className="text-sm text-gray-300">
             Select up to 5 Meadows' Leverage Points ({leveragePoints.length} available)
           </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            disabled={!hasChanges}
-            className="bg-amber-500/20 border-amber-400/30 text-amber-200 hover:bg-amber-500/30"
-          >
-            <RotateCcw className="h-4 w-4 mr-1" />
-            Reset
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!hasChanges || updateMutation.isPending}
-            className="bg-blue-500/80 hover:bg-blue-600/80 text-white border-0"
-          >
-            <Save className="h-4 w-4 mr-1" />
-            Save
-          </Button>
         </div>
       </div>
 

@@ -10,6 +10,7 @@ import LeveragePointDescriptions from '../../components/LeveragePointDescription
 import TaskGenerationModal from '../../components/TaskGenerationModal';
 import { useLeveragePoints } from '../../hooks/useLeveragePoints';
 import { useTaskGeneration } from '../../hooks/useTaskGeneration';
+import { useRealBundleActions } from '../../hooks/useRealBundles';
 import type { LeveragePointChipData } from '../../types/leverage-types';
 
 interface LeverageTabProps {
@@ -23,6 +24,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
   
   const { data: leveragePoints = [], isLoading, error } = useLeveragePoints();
   const taskGeneration = useTaskGeneration();
+  const { updateBundle } = useRealBundleActions();
 
   // Add debugging
   console.log('LeverageTab - bundle:', bundle);
@@ -36,7 +38,7 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
 
   console.log('LeverageTab - leveragePointIds from bundle:', leveragePointIds);
 
-  const handleLeverageUpdate = (points: string[]) => {
+  const handleLeverageUpdate = async (points: string[]) => {
     console.log('Leverage points updated:', points);
     
     // Update the selected points for description panel
@@ -53,6 +55,19 @@ const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
     
     console.log('Updated chips for description:', updatedChips);
     setSelectedPointsForDescription(updatedChips);
+
+    // Persist the changes to the bundle
+    try {
+      await updateBundle.mutateAsync({
+        bundleId: bundle.id,
+        updates: {
+          leveragePoints: points
+        }
+      });
+      console.log('Bundle leverage points updated successfully');
+    } catch (error) {
+      console.error('Failed to update bundle leverage points:', error);
+    }
   };
 
   const handleGenerateTasks = async () => {
