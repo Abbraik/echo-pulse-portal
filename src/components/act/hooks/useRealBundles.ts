@@ -1,146 +1,113 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Bundle, BundleFormData, mapDatabaseBundleToUI, mapUIBundleToDatabase } from '../types/act-types';
-import { useToast } from '@/hooks/use-toast';
-import { BundleStatus } from '@/types/database';
+import { Bundle } from '../types/act-types';
 
-export const useRealBundles = (statusFilter?: string) => {
+export const useRealBundles = () => {
   return useQuery({
-    queryKey: ['bundles', statusFilter],
-    queryFn: async () => {
-      let query = supabase
+    queryKey: ['bundles'],
+    queryFn: async (): Promise<Bundle[]> => {
+      const { data, error } = await supabase
         .from('bundles')
         .select('*')
         .order('created_at', { ascending: false });
-
-      if (statusFilter && statusFilter !== 'all') {
-        // Type-safe status filtering
-        const validStatuses: BundleStatus[] = ['draft', 'active', 'pilot', 'completed'];
-        if (validStatuses.includes(statusFilter as BundleStatus)) {
-          query = query.eq('status', statusFilter as BundleStatus);
-        }
-      }
-
-      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching bundles:', error);
         throw error;
       }
 
-      return data?.map(mapDatabaseBundleToUI) || [];
-    },
-    retry: 1,
-    staleTime: 30000 // 30 seconds
+      return (data || []).map(bundle => ({
+        id: bundle.id,
+        name: bundle.name,
+        summary: bundle.summary,
+        createdBy: bundle.created_by,
+        leveragePoints: bundle.leverage_points || [], // Include leverage points
+        objectives: bundle.objectives || [],
+        pillars: bundle.pillars || [],
+        geography: bundle.geography || [],
+        tags: bundle.tags || [],
+        status: bundle.status as 'draft' | 'active' | 'pilot' | 'completed',
+        coherence: bundle.coherence || 0,
+        ndiImpact: bundle.ndi_impact || 0,
+        isApproved: bundle.is_approved || false,
+        createdAt: new Date(bundle.created_at),
+        updatedAt: new Date(bundle.updated_at)
+      }));
+    }
   });
 };
 
-export const useRealBundleActions = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  const createBundle = useMutation({
-    mutationFn: async (bundleData: Omit<BundleFormData, 'id'>) => {
-      const dbData = mapUIBundleToDatabase(bundleData);
-      
-      const { data, error } = await supabase
-        .from('bundles')
-        .insert({
-          ...dbData,
-          created_by: 'test-user-id', // In real app, get from auth
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return mapDatabaseBundleToUI(data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bundles'] });
-      toast({
-        title: "Bundle Created",
-        description: "Bundle has been successfully created.",
-      });
-    },
-    onError: (error) => {
-      console.error('Error creating bundle:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create bundle. Please try again.",
-        variant: "destructive",
-      });
-    }
-  });
-
-  const updateBundle = useMutation({
-    mutationFn: async ({ bundleId, updates }: { bundleId: string; updates: Partial<BundleFormData> }) => {
-      const dbUpdates = mapUIBundleToDatabase(updates as BundleFormData);
-      
-      const { data, error } = await supabase
-        .from('bundles')
-        .update({
-          ...dbUpdates,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', bundleId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return mapDatabaseBundleToUI(data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bundles'] });
-      toast({
-        title: "Bundle Updated",
-        description: "Bundle has been successfully updated.",
-      });
-    }
-  });
-
-  const approveBundle = useMutation({
-    mutationFn: async (bundleId: string) => {
-      const { data, error } = await supabase
-        .from('bundles')
-        .update({ 
-          is_approved: true, 
-          status: 'active',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', bundleId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return mapDatabaseBundleToUI(data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bundles'] });
-      toast({
-        title: "Bundle Approved",
-        description: "Bundle has been approved and activated.",
-      });
-    }
-  });
-
-  return { createBundle, updateBundle, approveBundle };
-};
-
-// Single bundle hook for fetching individual bundles
 export const useRealBundle = (bundleId: string) => {
   return useQuery({
     queryKey: ['bundle', bundleId],
-    queryFn: async () => {
+    queryFn: async (): Promise<Bundle | null> => {
+      if (!bundleId) return null;
+      
       const { data, error } = await supabase
         .from('bundles')
         .select('*')
         .eq('id', bundleId)
-        .single();
-      
-      if (error) throw error;
-      return mapDatabaseBundleToUI(data);
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching bundle:', error);
+        throw error;
+      }
+
+      if (!data) return null;
+
+      return {
+        id: data.id,
+        name: data.name,
+        summary: data.summary,
+        createdBy: data.created_by,
+        leveragePoints: data.leverage_points || [], // Include leverage points
+        objectives: data.objectives || [],
+        pillars: data.pillars || [],
+        geography: data.geography || [],
+        tags: data.tags || [],
+        status: data.status as 'draft' | 'active' | 'pilot' | 'completed',
+        coherence: data.coherence || 0,
+        ndiImpact: data.ndi_impact || 0,
+        isApproved: data.is_approved || false,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at)
+      };
     },
-    enabled: !!bundleId,
+    enabled: !!bundleId
+  });
+};
+
+export const useCreateBundle = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (bundleData: Partial<Bundle>) => {
+      const { data, error } = await supabase
+        .from('bundles')
+        .insert([{
+          name: bundleData.name,
+          summary: bundleData.summary,
+          objectives: bundleData.objectives || [],
+          pillars: bundleData.pillars || [],
+          geography: bundleData.geography || [],
+          tags: bundleData.tags || [],
+          leverage_points: bundleData.leveragePoints || [], // Include leverage points
+          status: bundleData.status || 'draft',
+          coherence: bundleData.coherence || 0,
+          ndi_impact: bundleData.ndiImpact || 0,
+          is_approved: bundleData.isApproved || false,
+          created_by: bundleData.createdBy
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bundles'] });
+    }
   });
 };

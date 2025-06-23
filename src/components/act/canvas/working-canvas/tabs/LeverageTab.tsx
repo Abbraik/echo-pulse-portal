@@ -1,42 +1,44 @@
 
 import React from 'react';
-import { Settings } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bundle } from '../../../types/act-types';
+import LeveragePointSelector from '../LeveragePointSelector';
+import CoherenceMatrix from '../CoherenceMatrix';
 
 interface LeverageTabProps {
   bundle: Bundle;
 }
 
 const LeverageTab: React.FC<LeverageTabProps> = ({ bundle }) => {
+  const [leveragePoints, setLeveragePoints] = React.useState<string[]>(bundle.leveragePoints || []);
+
+  const handleLeverageUpdate = (points: string[]) => {
+    setLeveragePoints(points);
+    // Update the bundle object if needed for parent components
+  };
+
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-teal-300">Leverage Points</h3>
-      {bundle.leveragePoints && bundle.leveragePoints.length > 0 ? (
-        <div className="space-y-3">
-          {bundle.leveragePoints.map((point, index) => (
-            <div key={index} className="p-4 bg-white/5 rounded-lg border border-white/10">
-              <div className="flex items-center gap-3 mb-2">
-                <Settings className="h-4 w-4 text-teal-400" />
-                <span className="text-white font-medium">
-                  {typeof point === 'object' ? point.name || `Leverage Point ${index + 1}` : point}
-                </span>
-              </div>
-              {typeof point === 'object' && point.type && (
-                <Badge variant="outline" className="text-xs">
-                  {point.type}
-                </Badge>
-              )}
-            </div>
-          ))}
+    <ScrollArea className="h-full">
+      <div className="space-y-8 p-6">
+        {/* Leverage Point Selector */}
+        <div className="p-6 rounded-xl backdrop-blur-sm bg-white/5 border border-white/10">
+          <LeveragePointSelector
+            bundleId={bundle.id}
+            leveragePoints={leveragePoints}
+            onUpdate={handleLeverageUpdate}
+          />
         </div>
-      ) : (
-        <div className="text-center py-8 text-gray-400">
-          <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>No leverage points identified</p>
+
+        {/* Coherence Matrix */}
+        <div className="p-6 rounded-xl backdrop-blur-sm bg-white/5 border border-white/10">
+          <CoherenceMatrix
+            bundleId={bundle.id}
+            objectives={bundle.objectives || []}
+            leveragePoints={leveragePoints}
+          />
         </div>
-      )}
-    </div>
+      </div>
+    </ScrollArea>
   );
 };
 

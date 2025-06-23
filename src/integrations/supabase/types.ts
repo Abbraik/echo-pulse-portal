@@ -278,6 +278,41 @@ export type Database = {
           },
         ]
       }
+      coherence_scores: {
+        Row: {
+          bundle_id: string
+          created_at: string | null
+          leverage_point: string
+          objective: string
+          score: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          bundle_id: string
+          created_at?: string | null
+          leverage_point: string
+          objective: string
+          score?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          bundle_id?: string
+          created_at?: string | null
+          leverage_point?: string
+          objective?: string
+          score?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coherence_scores_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       file_attachments: {
         Row: {
           content_type: string | null
@@ -551,6 +586,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_coherence_matrix: {
+        Args: { bundle_id: string }
+        Returns: Json
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
@@ -558,6 +597,19 @@ export type Database = {
       has_role: {
         Args: { _role: Database["public"]["Enums"]["user_role"] }
         Returns: boolean
+      }
+      update_bundle_leverage: {
+        Args: { bundle_id: string; point: string }
+        Returns: undefined
+      }
+      update_coherence_score: {
+        Args: {
+          bundle_id: string
+          objective: string
+          leverage_point: string
+          new_score: number
+        }
+        Returns: undefined
       }
     }
     Enums: {
