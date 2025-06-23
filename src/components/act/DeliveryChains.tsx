@@ -387,32 +387,10 @@ const DeliveryChains: React.FC<DeliveryChainsProps> = ({
             </Button>
 
             {/* View mode toggle */}
-            <div className="flex bg-white/5 rounded-lg p-1 mr-2">
-              <button className={`px-3 py-1 rounded-md transition-colors ${activeTab === 'kanban' ? 'bg-white/10' : ''}`} onClick={() => setActiveTab('kanban')}>
-                {t('kanban', {
-                defaultValue: 'Kanban'
-              })}
-              </button>
-              <button className={`px-3 py-1 rounded-md transition-colors ${activeTab === 'gantt' ? 'bg-white/10' : ''}`} onClick={() => setActiveTab('gantt')}>
-                {t('gantt', {
-                defaultValue: 'Gantt'
-              })}
-              </button>
-            </div>
+            
             
             {/* Simple/Pro mode toggle */}
-            <div className="hidden md:flex items-center bg-white/5 rounded-lg p-1">
-              <button className={`px-3 py-1 text-sm rounded-md transition-colors ${displayMode === 'simple' ? 'bg-white/10' : ''}`} onClick={() => setDisplayMode('simple')}>
-                {t('simple', {
-                defaultValue: 'Simple'
-              })}
-              </button>
-              <button className={`px-3 py-1 text-sm rounded-md transition-colors ${displayMode === 'pro' ? 'bg-white/10' : ''}`} onClick={() => setDisplayMode('pro')}>
-                {t('pro', {
-                defaultValue: 'Pro'
-              })}
-              </button>
-            </div>
+            
           </div>
         </div>
         
