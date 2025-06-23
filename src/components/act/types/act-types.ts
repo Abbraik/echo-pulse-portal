@@ -18,6 +18,25 @@ export interface Bundle {
   updatedAt: Date;
 }
 
+export interface BundleTag {
+  name: string;
+  type: 'category' | 'priority' | 'geography' | 'custom';
+}
+
+export interface BundleFormData {
+  id?: string;
+  name: string;
+  summary: string;
+  tags: BundleTag[];
+  objectives: string[];
+  pillars: ('population' | 'resource' | 'services' | 'social')[];
+  geography: string[];
+  status?: 'draft' | 'active' | 'pilot' | 'completed';
+  coherence?: number;
+  ndiImpact?: number;
+  isApproved?: boolean;
+}
+
 export interface DeliveryChain {
   id: string;
   name: string;

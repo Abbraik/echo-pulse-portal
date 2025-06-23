@@ -37,9 +37,13 @@ const CoherenceMatrix: React.FC<CoherenceMatrixProps> = ({
       });
 
       if (error) throw error;
-      setCoherenceData(data || []);
+      
+      // Handle the response properly - it should be an array
+      const parsedData = Array.isArray(data) ? data : [];
+      setCoherenceData(parsedData);
     } catch (error) {
       console.error('Error fetching coherence matrix:', error);
+      setCoherenceData([]);
     }
   };
 
