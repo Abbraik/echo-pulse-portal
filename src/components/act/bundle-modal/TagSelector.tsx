@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { BundleTag } from '../types/act-types';
 
 interface TagSelectorProps {
-  selectedTags: { name: string; type: string; }[];
-  onTagsChange: (tags: { name: string; type: string; }[]) => void;
+  selectedTags: BundleTag[];
+  onTagsChange: (tags: BundleTag[]) => void;
 }
 
 const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagsChange }) => {
@@ -46,13 +47,17 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagsChange })
   
   const handleSelect = (tagName: string) => {
     if (!selectedTags.some(tag => tag.name === tagName)) {
-      onTagsChange([...selectedTags, { name: tagName, type: 'category' }]);
+      const newTag: BundleTag = { 
+        name: tagName, 
+        type: 'category' as const
+      };
+      onTagsChange([...selectedTags, newTag]);
     }
     setInputValue('');
     setOpen(false);
   };
   
-  const handleRemove = (tagToRemove: { name: string; type: string; }) => {
+  const handleRemove = (tagToRemove: BundleTag) => {
     onTagsChange(selectedTags.filter((tag) => tag.name !== tagToRemove.name));
   };
   
@@ -62,7 +67,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagsChange })
       !selectedTags.some(tag => tag.name === inputValue) && 
       !availableTags.includes(inputValue)
     ) {
-      onTagsChange([...selectedTags, { name: inputValue, type: 'custom' }]);
+      const newTag: BundleTag = { 
+        name: inputValue, 
+        type: 'custom' as const
+      };
+      onTagsChange([...selectedTags, newTag]);
       setInputValue('');
       setOpen(false);
     }
