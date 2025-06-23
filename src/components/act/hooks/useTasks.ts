@@ -1,5 +1,6 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 // Define Task interface
 interface Task {
@@ -22,22 +23,26 @@ interface Task {
   gantt_duration?: number; // Days
 }
 
-export const useTasks = () => {
+export const useTasks = (bundleId?: string) => {
   const queryClient = useQueryClient();
 
   const tasksQuery = useQuery({
-    queryKey: ['tasks'],
+    queryKey: ['tasks', bundleId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*');
+      let query = supabase.from('tasks').select('*');
+      
+      if (bundleId) {
+        query = query.eq('bundle_id', bundleId);
+      }
+      
+      const { data, error } = await query;
       if (error) throw error;
       return data as Task[];
     },
   });
 
   const createTaskMutation = useMutation({
-    mutationFn: async (newTask: Omit<Task, 'id'>) => {
+    mutationFn: async (newTask: Omit<Task, 'id'> & { bundle_id?: string }) => {
       const { data, error } = await supabase
         .from('tasks')
         .insert([newTask])
@@ -51,9 +56,10 @@ export const useTasks = () => {
     },
   });
 
-  const createTask = async (newTask: Omit<Task, 'id'>) => {
+  const createTask = async (newTask: Omit<Task, 'id'> & { bundle_id?: string }) => {
     return createTaskMutation.mutateAsync(newTask);
   };
+
   const updateTaskMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Task> }) => {
       const { data, error } = await supabase
@@ -78,6 +84,7 @@ export const useTasks = () => {
   return {
     tasks: tasksQuery.data || [],
     isLoading: tasksQuery.isLoading || createTaskMutation.isPending || updateTaskMutation.isPending,
+    isCreating: createTaskMutation.isPending,
     error: tasksQuery.error,
     createTask,
     updateTask,
