@@ -1,8 +1,9 @@
 
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-// Define Task interface
+// Define Task interface to match database schema
 interface Task {
   id: string;
   title: string;
@@ -23,6 +24,27 @@ interface Task {
   gantt_duration?: number; // Days
 }
 
+// Database task type (what we get from Supabase)
+interface DatabaseTask {
+  id: string;
+  title: string;
+  status: string;
+  assignee: string;
+  assignee_avatar?: string;
+  assignee_initial?: string;
+  due_date?: string;
+  needs_approval: boolean;
+  teams_chat_history?: any; // JSON type from database
+  description?: string;
+  dependencies?: string[];
+  gantt_start?: number;
+  gantt_duration?: number;
+  bundle_id?: string;
+  created_at: string;
+  updated_at: string;
+  created_by?: string;
+}
+
 export const useTasks = (bundleId?: string) => {
   const queryClient = useQueryClient();
 
@@ -37,7 +59,23 @@ export const useTasks = (bundleId?: string) => {
       
       const { data, error } = await query;
       if (error) throw error;
-      return data as Task[];
+      
+      // Transform database tasks to our Task interface
+      return (data as DatabaseTask[]).map(task => ({
+        id: task.id,
+        title: task.title,
+        status: task.status as 'to-do' | 'in-progress' | 'completed',
+        assignee: task.assignee,
+        assignee_avatar: task.assignee_avatar,
+        assignee_initial: task.assignee_initial,
+        due_date: task.due_date,
+        needs_approval: task.needs_approval,
+        teams_chat_history: Array.isArray(task.teams_chat_history) ? task.teams_chat_history : [],
+        description: task.description,
+        dependencies: task.dependencies || [],
+        gantt_start: task.gantt_start || 0,
+        gantt_duration: task.gantt_duration || 7,
+      })) as Task[];
     },
   });
 
@@ -91,3 +129,4 @@ export const useTasks = (bundleId?: string) => {
     refetch: tasksQuery.refetch,
   };
 };
+
