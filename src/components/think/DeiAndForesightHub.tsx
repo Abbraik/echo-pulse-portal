@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -36,7 +35,7 @@ interface DeiAndForesightHubProps {
   metrics: DeiMetrics;
   scenarios: any[];
   onSaveScenario: (scenario: any) => void;
-  onSelectScenario: (id: number) => void;
+  onSelectScenario: (id: string) => void; // Changed from number to string
 }
 
 const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({

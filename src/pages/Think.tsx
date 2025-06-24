@@ -15,11 +15,22 @@ const Think = () => {
   const [currentMetrics, setCurrentMetrics] = useState({});
   const [scenarios, setScenarios] = useState([]);
 
-  // Mock data for required props
+  // Enhanced mock data for DEI metrics with proper structure
   const mockMetrics = {
-    stability: 75,
-    resilience: 68,
-    adaptability: 82
+    overall: 75,
+    pillars: {
+      population: { value: 72, trend: [70, 71, 72, 73, 72] },
+      resources: { value: 68, trend: [65, 66, 67, 68, 68] },
+      goods: { value: 82, trend: [80, 81, 82, 83, 82] },
+      social: { value: 78, trend: [75, 76, 77, 78, 78] }
+    },
+    equilibriumBands: {
+      overall: { min: 70, max: 85 },
+      population: { min: 65, max: 80 },
+      resources: { min: 60, max: 75 },
+      goods: { min: 75, max: 90 },
+      social: { min: 70, max: 85 }
+    }
   };
 
   const mockScenarios = [
@@ -28,12 +39,24 @@ const Think = () => {
   ];
 
   const mockCldData = { nodes: [], edges: [] };
-  const mockSnaData = { actors: [], connections: [] };
+  
+  // Enhanced SNA data with proper structure
+  const mockSnaData = {
+    nodes: [],
+    edges: [],
+    metrics: {
+      density: 0.25,
+      avgClustering: 0.4,
+      avgPathLength: 2.8,
+      centralization: 0.6
+    }
+  };
 
   const handleSaveScenario = (scenario: any) => {
     console.log('Saving scenario:', scenario);
   };
 
+  // Fixed to handle string IDs consistently
   const handleSelectScenario = (scenarioId: string) => {
     console.log('Selected scenario:', scenarioId);
   };
