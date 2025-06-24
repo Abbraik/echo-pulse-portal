@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './hooks/use-theme'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/toaster'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import Think from './pages/Think'
 import Act from './pages/Act'
 import Monitor from './pages/Monitor'
@@ -26,19 +27,21 @@ function App() {
       <DemoProvider>
         <BrowserRouter>
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-              <Navbar onLogout={handleLogout} />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/think" element={<Think />} />
-                <Route path="/act" element={<Act />} />
-                <Route path="/monitor" element={<Monitor />} />
-                <Route path="/innovate" element={<Innovate />} />
-                <Route path="/learn" element={<Learn />} />
-              </Routes>
-            </div>
-            <DemoSystem />
-            <Toaster />
+            <TooltipProvider>
+              <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+                <Navbar onLogout={handleLogout} />
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/think" element={<Think />} />
+                  <Route path="/act" element={<Act />} />
+                  <Route path="/monitor" element={<Monitor />} />
+                  <Route path="/innovate" element={<Innovate />} />
+                  <Route path="/learn" element={<Learn />} />
+                </Routes>
+              </div>
+              <DemoSystem />
+              <Toaster />
+            </TooltipProvider>
           </ThemeProvider>
         </BrowserRouter>
       </DemoProvider>
