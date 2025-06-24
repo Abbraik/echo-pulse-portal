@@ -35,7 +35,7 @@ interface DeiAndForesightHubProps {
   metrics: DeiMetrics;
   scenarios: any[];
   onSaveScenario: (scenario: any) => void;
-  onSelectScenario: (id: string) => void; // Changed from number to string
+  onSelectScenario: (id: string) => void;
 }
 
 const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({

@@ -16,14 +16,11 @@ interface TabbedContentSectionProps {
   currentMetrics: any;
   scenarios: any[];
   onSaveScenario: (scenario: any) => void;
-  onSelectScenario: (id: number) => void;
-  mockSnaData: SNAData;
-  onHighlightActors: (actorIds: string[]) => void;
-  mockSensitivity: any[];
-  mockExecutionImpact: any;
-  onStrategyBuilderCompute: (approach: string, objectiveIds?: number[]) => void;
-  pathways: ExecutionPathway[];
-  onAdoptPathway: (pathway: ExecutionPathway) => void;
+  onSelectScenario: (id: string) => void; // Changed from number to string
+  cldData: any;
+  snaData: SNAData;
+  leveragePoints: any[];
+  objectives: any[];
 }
 
 const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
@@ -33,13 +30,10 @@ const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
   scenarios,
   onSaveScenario,
   onSelectScenario,
-  mockSnaData,
-  onHighlightActors,
-  mockSensitivity,
-  mockExecutionImpact,
-  onStrategyBuilderCompute,
-  pathways,
-  onAdoptPathway
+  cldData,
+  snaData,
+  leveragePoints,
+  objectives
 }) => {
   const { t } = useTranslation();
 
@@ -119,8 +113,8 @@ const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
             }}
           >
             <SnaAnalysisPanel 
-              snaData={mockSnaData}
-              onHighlightActors={onHighlightActors}
+              snaData={snaData}
+              onHighlightActors={() => {}}
             />
           </motion.div>
         </TabsContent>
@@ -147,16 +141,16 @@ const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
               {t("strategyBuilder").toUpperCase()}
             </motion.h2>
             <StrategyBuilder 
-              sensitivityParameters={mockSensitivity} 
-              executionImpact={mockExecutionImpact}
-              onCompute={onStrategyBuilderCompute}
+              sensitivityParameters={[]} 
+              executionImpact={{}}
+              onCompute={() => {}}
             />
             
             {/* SNA-Driven Execution Pathways */}
             <ExecutionPathwayPanel 
-              pathways={pathways} 
-              onHighlightPathway={onHighlightActors}
-              onAdoptPathway={onAdoptPathway}
+              pathways={[]} 
+              onHighlightPathway={() => {}}
+              onAdoptPathway={() => {}}
             />
           </motion.div>
         </TabsContent>
