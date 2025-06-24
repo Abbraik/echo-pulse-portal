@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface DemoStep {
@@ -143,6 +142,26 @@ const DEMO_SCENARIOS: DemoScenario[] = [
         }
       },
       {
+        id: 'learn-pattern-analysis',
+        title: 'LEARN → Pattern Analysis & Knowledge Extraction',
+        description: 'Extract insights from resource management patterns and build institutional knowledge for future scenarios',
+        detailedDescription: 'The Learn zone helps you extract valuable insights from your resource management activities and build institutional knowledge. You will analyze patterns from monitoring data, identify successful intervention strategies, and create reusable knowledge assets for future scenarios.',
+        zone: 'learn',
+        targetElement: '[data-demo="pattern-intelligence"]',
+        position: 'right',
+        content: {
+          highlights: ['Pattern recognition algorithms', 'Knowledge graph building', 'Lesson extraction'],
+          instructions: [
+            'Access the Pattern Intelligence layer',
+            'Review identified patterns from resource monitoring',
+            'Analyze correlation between interventions and outcomes',
+            'Create knowledge cards for successful strategies',
+            'Build connections in the knowledge graph'
+          ],
+          expectedOutcome: 'You will have documented insights and created reusable knowledge that can inform future resource management decisions and strategies.'
+        }
+      },
+      {
         id: 'innovate-simulation',
         title: 'Innovate & Simulate',
         description: 'Test new approaches through simulation and promote successful scenarios to broader implementation',
@@ -262,6 +281,26 @@ const DEMO_SCENARIOS: DemoScenario[] = [
             'Assess impact on population projections'
           ],
           expectedOutcome: 'You will be able to detect early warning signs of demographic instability and understand how social factors like marriage rates affect overall population dynamics.'
+        }
+      },
+      {
+        id: 'demographic-learning',
+        title: 'LEARN → Demographic Pattern Learning',
+        description: 'Analyze demographic intervention outcomes and build predictive models for future population policy',
+        detailedDescription: 'Demographic policy requires continuous learning from intervention outcomes. You will analyze the effectiveness of different population policies, identify successful intervention patterns, and build predictive models that can guide future demographic strategy.',
+        zone: 'learn',
+        targetElement: '[data-demo="demographic-patterns"]',
+        position: 'left',
+        content: {
+          highlights: ['Demographic outcome analysis', 'Policy effectiveness patterns', 'Predictive modeling'],
+          instructions: [
+            'Review demographic intervention outcomes',
+            'Identify patterns in successful population policies',
+            'Analyze correlation between interventions and birth rate changes',
+            'Build predictive models for policy impact',
+            'Document lessons learned for future use'
+          ],
+          expectedOutcome: 'You will have evidence-based insights into demographic policy effectiveness and predictive models that can guide future population interventions.'
         }
       },
       {
