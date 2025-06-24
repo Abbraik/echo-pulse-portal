@@ -11,10 +11,15 @@ import Innovate from './pages/Innovate'
 import Learn from './pages/Learn'
 import HomePage from './pages/HomePage'
 import { DemoProvider } from './hooks/use-demo'
-import { DemoSystem } from '@/components/demo/DemoSystem';
+import { DemoSystem } from '@/components/demo/DemoSystem'
+import Navbar from './components/layout/Navbar'
 
 function App() {
   const queryClient = new QueryClient()
+
+  const handleLogout = () => {
+    console.log('Logout clicked')
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -22,6 +27,7 @@ function App() {
         <BrowserRouter>
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+              <Navbar onLogout={handleLogout} />
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/think" element={<Think />} />
