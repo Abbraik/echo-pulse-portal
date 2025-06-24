@@ -6,7 +6,7 @@ import { DemoAPI } from '../api/demo-endpoints';
 import { useEffect } from 'react';
 
 export const useDemoIntegration = () => {
-  const { isDemoMode, currentScenario } = useDemo();
+  const { isDemoMode, currentScenario, isActive, getCurrentStep } = useDemo();
   const demoData = useDemoData();
 
   // Sync demo API state with demo context
@@ -20,7 +20,7 @@ export const useDemoIntegration = () => {
     return true;
   };
 
-  // Wrapper functions for data fetching that switch between demo and real data
+  // Enhanced data fetching with demo integration
   const getScenarios = async () => {
     if (shouldUseDemoData('scenarios')) {
       return DemoAPI.getScenarios();
@@ -53,14 +53,65 @@ export const useDemoIntegration = () => {
     return [];
   };
 
+  const getSNAData = async () => {
+    if (shouldUseDemoData('sna')) {
+      return DemoAPI.getSNAData();
+    }
+    return null;
+  };
+
+  const getLoopAnalysis = async () => {
+    if (shouldUseDemoData('loops')) {
+      return DemoAPI.getLoopAnalysis();
+    }
+    return null;
+  };
+
+  const getAnomalies = async () => {
+    if (shouldUseDemoData('anomalies')) {
+      return DemoAPI.getAnomalies();
+    }
+    return [];
+  };
+
+  const getClaims = async () => {
+    if (shouldUseDemoData('claims')) {
+      return DemoAPI.getClaims();
+    }
+    return [];
+  };
+
+  // Demo step helpers
+  const getCurrentStepData = () => {
+    return getCurrentStep();
+  };
+
+  const isCurrentStep = (stepId: string) => {
+    const currentStep = getCurrentStep();
+    return currentStep?.id === stepId;
+  };
+
+  const isInDemoZone = (zoneName: string) => {
+    const currentStep = getCurrentStep();
+    return currentStep?.zone === zoneName;
+  };
+
   return {
     isDemoMode,
+    isActive,
     currentScenario,
     shouldUseDemoData,
     getScenarios,
     getHealthMetrics,
     getBundles,
     getTasks,
+    getSNAData,
+    getLoopAnalysis,
+    getAnomalies,
+    getClaims,
+    getCurrentStepData,
+    isCurrentStep,
+    isInDemoZone,
     demoData: demoData.demoData
   };
 };

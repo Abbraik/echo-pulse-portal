@@ -285,7 +285,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
   };
 
   return (
-    <GlassCard className="p-6">
+    <GlassCard className="p-6" data-demo="foresight-panel">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center">
           <div className="p-2 rounded-xl bg-teal-500/20 text-teal-400 mr-3">
@@ -298,7 +298,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         
         <div className="flex items-center gap-4">
           {hasTargets && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" data-demo="foresight-sliders">
               <Badge variant="secondary" className="bg-teal-500/20 text-teal-400">
                 {pillarsWithTargets.length} {t('targetsSet')}
               </Badge>
@@ -337,6 +337,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
                 <TabsTrigger 
                   value="loopAnalysis" 
                   className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
+                  data-demo="sna-tab"
                 >
                   <Network className="mr-2 h-4 w-4" />
                   {t("loopAnalysis").toUpperCase()}
@@ -385,11 +386,13 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
           onSelectScenario={onSelectScenario}
         />
       ) : (
-        <LoopAnalysisTab 
-          hasTargets={hasTargets}
-          onPromoteToAct={handlePromoteToAct}
-          onAdjustLever={handleAdjustLever}
-        />
+        <div data-demo="loop-analysis">
+          <LoopAnalysisTab 
+            hasTargets={hasTargets}
+            onPromoteToAct={handlePromoteToAct}
+            onAdjustLever={handleAdjustLever}
+          />
+        </div>
       )}
       
       {/* Target Setting Modal */}

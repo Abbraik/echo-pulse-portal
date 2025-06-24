@@ -59,6 +59,7 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.6, ease: 'easeInOut' }}
+          data-demo="innovation-canvas"
         >
           <div className="w-full h-full glass-panel-cinematic rounded-2xl flex flex-col relative overflow-hidden">
             {/* Enhanced Header */}
@@ -76,7 +77,7 @@ export const WorkingCanvasContainer: React.FC<WorkingCanvasContainerProps> = ({
             />
 
             {/* Main Content Area - Flex Container */}
-            <div className="flex-1 relative overflow-hidden min-h-0">
+            <div className="flex-1 relative overflow-hidden min-h-0" data-demo="experiment-canvas">
               <div className="absolute inset-0 flex">
                 <div className="working-canvas-content-container">
                   <WorkingCanvasContent

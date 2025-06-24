@@ -69,7 +69,7 @@ export const InnovateDesignHub: React.FC<InnovateDesignHubProps> = ({ mode }) =>
       </div>
 
       {/* Right side: Enhanced Dynamic workspace */}
-      <div className="w-[75%] min-h-0 relative">
+      <div className="w-[75%] min-h-0 relative" data-demo="bundle-wizard">
         <GlassCard className="h-full relative overflow-hidden">
           <AnimatePresence mode="wait">
             {selectedItem ? (
