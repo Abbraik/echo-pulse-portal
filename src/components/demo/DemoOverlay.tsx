@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Play, RotateCcw, MapPin, Eye, BookOpen, Target, Lightbulb } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, RotateCcw, MapPin, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -20,14 +20,14 @@ const DemoOverlay: React.FC = () => {
     nextStep,
     previousStep,
     exitDemo,
-    toggleDemoMode
+    startScenario,
+    skipToStep
   } = useDemo();
 
   const navigate = useNavigate();
   const location = useLocation();
   const [highlightElement, setHighlightElement] = useState<HTMLElement | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
-  const [showDetailedView, setShowDetailedView] = useState(false);
 
   const currentStepData = getCurrentStep();
   const currentScenarioData = scenarios.find(s => s.id === currentScenario);
@@ -112,18 +112,11 @@ const DemoOverlay: React.FC = () => {
 
   const handleStepNavigation = (direction: 'next' | 'previous') => {
     setHighlightElement(null);
-    setShowDetailedView(false);
     if (direction === 'next') {
       nextStep();
     } else {
       previousStep();
     }
-  };
-
-  const handleExitDemo = () => {
-    setShowDetailedView(false);
-    exitDemo();
-    toggleDemoMode();
   };
 
   if (!isDemoMode) return null;
@@ -182,7 +175,7 @@ const DemoOverlay: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleExitDemo}
+                  onClick={exitDemo}
                   className="text-white hover:bg-white/10"
                 >
                   <X className="h-5 w-5" />
@@ -205,7 +198,7 @@ const DemoOverlay: React.FC = () => {
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[1002] max-w-4xl w-full mx-4"
+              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[1002] max-w-3xl w-full mx-4"
             >
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl">
                 {/* Enhanced Progress Bar */}
@@ -247,75 +240,13 @@ const DemoOverlay: React.FC = () => {
                         Element Found
                       </Badge>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowDetailedView(!showDetailedView)}
-                      className="ml-auto text-white/70 hover:text-white hover:bg-white/10"
-                    >
-                      <BookOpen className="h-4 w-4 mr-1" />
-                      {showDetailedView ? 'Hide' : 'Show'} Details
-                    </Button>
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">
                     {currentStepData.title}
                   </h3>
-                  
-                  {!showDetailedView ? (
-                    <p className="text-gray-300 leading-relaxed">
-                      {currentStepData.description}
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      <p className="text-gray-300 leading-relaxed">
-                        {currentStepData.detailedDescription}
-                      </p>
-                      
-                      {currentStepData.content && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                          {currentStepData.content.highlights && (
-                            <div className="bg-white/5 rounded-lg p-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Target className="h-4 w-4 text-yellow-400" />
-                                <span className="text-sm font-semibold text-yellow-400">Key Focus</span>
-                              </div>
-                              <ul className="text-xs text-gray-300 space-y-1">
-                                {currentStepData.content.highlights.map((highlight, index) => (
-                                  <li key={index}>• {highlight}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          
-                          {currentStepData.content.instructions && (
-                            <div className="bg-white/5 rounded-lg p-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Play className="h-4 w-4 text-blue-400" />
-                                <span className="text-sm font-semibold text-blue-400">Instructions</span>
-                              </div>
-                              <ul className="text-xs text-gray-300 space-y-1">
-                                {currentStepData.content.instructions.map((instruction, index) => (
-                                  <li key={index}>• {instruction}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          
-                          {currentStepData.content.expectedOutcome && (
-                            <div className="bg-white/5 rounded-lg p-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Lightbulb className="h-4 w-4 text-green-400" />
-                                <span className="text-sm font-semibold text-green-400">Expected Outcome</span>
-                              </div>
-                              <p className="text-xs text-gray-300 leading-relaxed">
-                                {currentStepData.content.expectedOutcome}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <p className="text-gray-300 leading-relaxed">
+                    {currentStepData.description}
+                  </p>
                 </div>
 
                 {/* Enhanced Navigation Controls */}
@@ -335,10 +266,10 @@ const DemoOverlay: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={handleExitDemo}
+                      onClick={exitDemo}
                       className="bg-white/10 border-white/20 text-white hover:bg-red-500/20 hover:border-red-400/50"
                     >
-                      <X className="h-4 w-4 mr-1" />
+                      <RotateCcw className="h-4 w-4 mr-1" />
                       Exit Demo
                     </Button>
                   </div>
