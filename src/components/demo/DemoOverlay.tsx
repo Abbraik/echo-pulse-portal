@@ -127,7 +127,7 @@ const DemoOverlay: React.FC = () => {
     }
   };
 
-  // Parse step description into structured sections
+  // Parse step description into structured sections with more compact format
   const parseStepDescription = (description: string) => {
     const sections = description.split('**').filter(Boolean);
     const parsedSections: { [key: string]: string } = {};
@@ -143,33 +143,33 @@ const DemoOverlay: React.FC = () => {
     return parsedSections;
   };
 
-  const renderStructuredDescription = (description: string) => {
+  const renderCompactDescription = (description: string) => {
     const sections = parseStepDescription(description);
     
     return (
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Context Section */}
         {sections.Context && (
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
               <Lightbulb className="h-4 w-4 text-blue-400" />
-              <h4 className="font-semibold text-blue-400">Context</h4>
+              <h4 className="font-semibold text-blue-400 text-sm">Context</h4>
             </div>
-            <p className="text-gray-300 text-sm leading-relaxed">{sections.Context}</p>
+            <p className="text-gray-300 text-xs leading-relaxed">{sections.Context}</p>
           </div>
         )}
 
         {/* What You'll Do Section */}
         {sections["What You'll Do"] && (
-          <div className="bg-teal-500/10 border border-teal-500/20 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="bg-teal-500/10 border border-teal-500/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
               <Target className="h-4 w-4 text-teal-400" />
-              <h4 className="font-semibold text-teal-400">What You'll Do</h4>
+              <h4 className="font-semibold text-teal-400 text-sm">What You'll Do</h4>
             </div>
-            <div className="text-gray-300 text-sm leading-relaxed">
-              {sections["What You'll Do"].split('•').filter(Boolean).map((item, index) => (
-                <div key={index} className="flex items-start gap-2 mb-2">
-                  <ArrowRight className="h-3 w-3 text-teal-400 mt-1 flex-shrink-0" />
+            <div className="text-gray-300 text-xs leading-relaxed">
+              {sections["What You'll Do"].split('•').filter(Boolean).slice(0, 3).map((item, index) => (
+                <div key={index} className="flex items-start gap-2 mb-1">
+                  <ArrowRight className="h-3 w-3 text-teal-400 mt-0.5 flex-shrink-0" />
                   <span>{item.trim()}</span>
                 </div>
               ))}
@@ -179,18 +179,18 @@ const DemoOverlay: React.FC = () => {
 
         {/* Key Actions Section */}
         {sections["Key Actions"] && (
-          <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
               <Play className="h-4 w-4 text-purple-400" />
-              <h4 className="font-semibold text-purple-400">Key Actions</h4>
+              <h4 className="font-semibold text-purple-400 text-sm">Key Actions</h4>
             </div>
-            <div className="text-gray-300 text-sm leading-relaxed space-y-2">
-              {sections["Key Actions"].split(/\d+\./).filter(Boolean).map((action, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <div className="bg-purple-500/20 text-purple-400 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+            <div className="text-gray-300 text-xs leading-relaxed space-y-1">
+              {sections["Key Actions"].split(/\d+\./).filter(Boolean).slice(0, 3).map((action, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="bg-purple-500/20 text-purple-400 rounded-full w-4 h-4 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
                     {index + 1}
                   </div>
-                  <span>{action.trim()}</span>
+                  <span className="text-xs">{action.trim()}</span>
                 </div>
               ))}
             </div>
@@ -199,15 +199,15 @@ const DemoOverlay: React.FC = () => {
 
         {/* Expected Outcomes Section */}
         {sections["Expected Outcomes"] && (
-          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
               <CheckCircle className="h-4 w-4 text-green-400" />
-              <h4 className="font-semibold text-green-400">Expected Outcomes</h4>
+              <h4 className="font-semibold text-green-400 text-sm">Expected Outcomes</h4>
             </div>
-            <div className="text-gray-300 text-sm leading-relaxed">
-              {sections["Expected Outcomes"].split('•').filter(Boolean).map((outcome, index) => (
-                <div key={index} className="flex items-start gap-2 mb-2">
-                  <CheckCircle className="h-3 w-3 text-green-400 mt-1 flex-shrink-0" />
+            <div className="text-gray-300 text-xs leading-relaxed">
+              {sections["Expected Outcomes"].split('•').filter(Boolean).slice(0, 3).map((outcome, index) => (
+                <div key={index} className="flex items-start gap-2 mb-1">
+                  <CheckCircle className="h-3 w-3 text-green-400 mt-0.5 flex-shrink-0" />
                   <span>{outcome.trim()}</span>
                 </div>
               ))}
@@ -292,17 +292,17 @@ const DemoOverlay: React.FC = () => {
             {/* Backdrop overlay */}
             <div className="fixed inset-0 bg-black/30 backdrop-blur-[1px] z-[1000] pointer-events-none" />
             
-            {/* Step Instructions Panel */}
+            {/* Step Instructions Panel - Adjusted height to fit content */}
             <motion.div
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[1002] max-w-5xl w-full mx-4"
+              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[1002] max-w-6xl w-full mx-4"
             >
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[75vh]">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-teal-600/20 to-blue-600/20 border-b border-white/10 p-6">
-                  <div className="flex items-center justify-between mb-4">
+                <div className="bg-gradient-to-r from-teal-600/20 to-blue-600/20 border-b border-white/10 p-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <MapPin className="h-5 w-5 text-teal-400" />
                       <Badge variant="outline" className="text-teal-400 border-teal-400/50 font-medium px-3 py-1">
@@ -323,15 +323,15 @@ const DemoOverlay: React.FC = () => {
                   </div>
                   
                   {/* Progress Bar */}
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <Progress value={progress} className="h-2 bg-white/10" />
                     {/* Step indicators */}
-                    <div className="flex justify-between mt-3">
+                    <div className="flex justify-between mt-2">
                       {currentScenarioData?.steps.map((_, index) => (
                         <button
                           key={index}
                           onClick={() => skipToStep(index)}
-                          className={`w-3 h-3 rounded-full transition-all ${
+                          className={`w-2 h-2 rounded-full transition-all ${
                             index === currentStep 
                               ? 'bg-teal-400 scale-125 shadow-lg shadow-teal-400/50' 
                               : index < currentStep 
@@ -343,18 +343,18 @@ const DemoOverlay: React.FC = () => {
                     </div>
                   </div>
 
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 className="text-xl font-bold text-white">
                     {currentStepData.title}
                   </h3>
                 </div>
 
-                {/* Content */}
-                <div className="p-6 max-h-96 overflow-y-auto">
-                  {renderStructuredDescription(currentStepData.description)}
+                {/* Content - Compact layout to avoid scrolling */}
+                <div className="p-4">
+                  {renderCompactDescription(currentStepData.description)}
                 </div>
 
                 {/* Footer */}
-                <div className="bg-white/5 border-t border-white/10 p-4 flex items-center justify-between">
+                <div className="bg-white/5 border-t border-white/10 p-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
