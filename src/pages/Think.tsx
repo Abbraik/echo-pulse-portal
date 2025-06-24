@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import ThinkHeader from '@/components/think/ThinkHeader';
 import ThinkBackground from '@/components/think/ThinkBackground';
@@ -82,7 +81,6 @@ const Think = () => {
                 setActiveTab={setActiveTab}
                 currentMetrics={currentMetrics}
                 scenarios={scenarios}
-                onUpdateMetrics={setCurrentMetrics}
                 onSaveScenario={handleSaveScenario}
                 onSelectScenario={handleSelectScenario}
                 cldData={mockCldData}

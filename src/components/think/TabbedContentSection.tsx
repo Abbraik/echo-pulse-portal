@@ -9,6 +9,7 @@ import SnaAnalysisPanel from './SnaAnalysisPanel';
 import StrategyBuilder from './StrategyBuilder';
 import ExecutionPathwayPanel from './ExecutionPathwayPanel';
 import { SNAData, ExecutionPathway } from './types/sna-types';
+import { ExecutionImpact } from './types/execution-types';
 
 interface TabbedContentSectionProps {
   activeTab: string;
@@ -16,7 +17,7 @@ interface TabbedContentSectionProps {
   currentMetrics: any;
   scenarios: any[];
   onSaveScenario: (scenario: any) => void;
-  onSelectScenario: (id: string) => void; // Changed from number to string
+  onSelectScenario: (id: string) => void;
   cldData: any;
   snaData: SNAData;
   leveragePoints: any[];
@@ -36,6 +37,12 @@ const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
   objectives
 }) => {
   const { t } = useTranslation();
+
+  const mockExecutionImpact: ExecutionImpact = {
+    bundlesAffected: 0,
+    budgetChange: 0,
+    timelineShift: 0
+  };
 
   return (
     <motion.div
@@ -142,7 +149,7 @@ const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
             </motion.h2>
             <StrategyBuilder 
               sensitivityParameters={[]} 
-              executionImpact={{}}
+              executionImpact={mockExecutionImpact}
               onCompute={() => {}}
             />
             
