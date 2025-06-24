@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import CommandBar from '@/components/act/CommandBar';
-import { DetailView } from '@/pages/Act';
+import { DetailView } from '@/components/act/types/detail-view-types';
 
 interface ActCommandSectionProps {
   onAction: (action: DetailView) => void;

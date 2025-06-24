@@ -20,7 +20,8 @@ const DemoOverlay: React.FC = () => {
     nextStep,
     previousStep,
     exitDemo,
-    toggleDemoMode
+    toggleDemoMode,
+    skipToStep
   } = useDemo();
 
   const navigate = useNavigate();
