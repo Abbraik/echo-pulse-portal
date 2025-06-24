@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -76,61 +75,64 @@ const DeiCompositeModal: React.FC<DeiCompositeModalProps> = ({
     });
   }, []);
 
-  // Prepare pillar data for the radial charts
+  // Prepare pillar data for the radial charts with safe access
   const pillarData = [
     {
       id: 'population',
       name: t('populationPillar'),
-      value: pillars.population.value,
-      minBand: equilibriumBands.population.min,
-      maxBand: equilibriumBands.population.max,
-      subIndicators: pillars.population.subIndicators.slice(0, 3),
+      value: pillars?.population?.value || 0,
+      minBand: equilibriumBands?.population?.min || 65,
+      maxBand: equilibriumBands?.population?.max || 80,
+      subIndicators: pillars?.population?.subIndicators?.slice(0, 3) || [],
       icon: '👥',
       color: 'from-blue-400 to-blue-600',
     },
     {
       id: 'resources',
       name: t('resourcesPillar'),
-      value: pillars.resources.value,
-      minBand: equilibriumBands.resources.min,
-      maxBand: equilibriumBands.resources.max,
-      subIndicators: pillars.resources.subIndicators.slice(0, 3),
+      value: pillars?.resources?.value || 0,
+      minBand: equilibriumBands?.resources?.min || 60,
+      maxBand: equilibriumBands?.resources?.max || 75,
+      subIndicators: pillars?.resources?.subIndicators?.slice(0, 3) || [],
       icon: '🌱',
       color: 'from-emerald-400 to-emerald-600',
     },
     {
       id: 'goods',
       name: t('goodsPillar'),
-      value: pillars.goods.value,
-      minBand: equilibriumBands.goods.min,
-      maxBand: equilibriumBands.goods.max,
-      subIndicators: pillars.goods.subIndicators.slice(0, 3),
+      value: pillars?.goods?.value || 0,
+      minBand: equilibriumBands?.goods?.min || 75,
+      maxBand: equilibriumBands?.goods?.max || 90,
+      subIndicators: pillars?.goods?.subIndicators?.slice(0, 3) || [],
       icon: '📦',
       color: 'from-amber-400 to-amber-600',
     },
     {
       id: 'social',
       name: t('socialPillar'),
-      value: pillars.social.value,
-      minBand: equilibriumBands.social.min,
-      maxBand: equilibriumBands.social.max,
-      subIndicators: pillars.social.subIndicators.slice(0, 3),
+      value: pillars?.social?.value || 0,
+      minBand: equilibriumBands?.social?.min || 70,
+      maxBand: equilibriumBands?.social?.max || 85,
+      subIndicators: pillars?.social?.subIndicators?.slice(0, 3) || [],
       icon: '🤝',
       color: 'from-purple-400 to-purple-600',
     },
   ];
 
-  // Collect all sub-indicators for the table
+  // Collect all sub-indicators for the table with safe access
   const allSubIndicators = React.useMemo(() => {
     const indicators: any[] = [];
-    Object.keys(pillars).forEach((key) => {
+    Object.keys(pillars || {}).forEach((key) => {
       const pillarKey = key as keyof typeof pillars;
-      pillars[pillarKey].subIndicators.forEach((indicator: any) => {
-        indicators.push({
-          ...indicator,
-          pillar: t(`${pillarKey}Pillar`),
+      const pillarData = pillars?.[pillarKey];
+      if (pillarData?.subIndicators) {
+        pillarData.subIndicators.forEach((indicator: any) => {
+          indicators.push({
+            ...indicator,
+            pillar: t(`${pillarKey}Pillar`),
+          });
         });
-      });
+      }
     });
     return indicators;
   }, [pillars, t]);
