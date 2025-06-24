@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -41,7 +40,7 @@ interface DeiAndForesightHubProps {
 
 const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
   metrics,
-  scenarios,
+  scenarios = [],
   onSaveScenario,
   onSelectScenario
 }) => {
@@ -54,11 +53,29 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
   const [hasTargets, setHasTargets] = useState(false);
   const [pillarsWithTargets, setPillarsWithTargets] = useState<string[]>([]);
 
+  // Add null checking and default values for metrics
+  const safeMetrics = metrics || {
+    overall: 0,
+    pillars: {
+      population: { value: 0 },
+      resources: { value: 0 },
+      goods: { value: 0 },
+      social: { value: 0 }
+    },
+    equilibriumBands: {
+      overall: { min: 0, max: 100 },
+      population: { min: 0, max: 100 },
+      resources: { min: 0, max: 100 },
+      goods: { min: 0, max: 100 },
+      social: { min: 0, max: 100 }
+    }
+  };
+
   // Enhanced sub-indicators for each pillar
   const enhancedPillars = {
     population: {
       name: t('populationDynamics'),
-      value: metrics.pillars.population.value,
+      value: safeMetrics.pillars?.population?.value || 0,
       subIndicators: [
         {
           name: 'Population Deviation',
@@ -96,7 +113,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     },
     resources: {
       name: t('resourceMarket'),
-      value: metrics.pillars.resources.value,
+      value: safeMetrics.pillars?.resources?.value || 0,
       subIndicators: [
         {
           name: 'Stock vs Target',
@@ -134,7 +151,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     },
     goods: {
       name: t('productsServicesMarket'),
-      value: metrics.pillars.goods.value,
+      value: safeMetrics.pillars?.goods?.value || 0,
       subIndicators: [
         {
           name: 'Supply-Demand Gap',
@@ -164,7 +181,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     },
     social: {
       name: t('socialOutcomes'),
-      value: metrics.pillars.social.value,
+      value: safeMetrics.pillars?.social?.value || 0,
       subIndicators: [
         {
           name: 'Employment Rate',
@@ -353,11 +370,11 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
           {/* Overall DEI Indicator */}
           <div className="flex justify-center mb-8">
             <OverallDeiIndicator 
-              value={metrics.overall} 
-              minBand={metrics.equilibriumBands.overall.min} 
-              maxBand={metrics.equilibriumBands.overall.max}
-              pillars={metrics.pillars}
-              equilibriumBands={metrics.equilibriumBands}
+              value={safeMetrics.overall} 
+              minBand={safeMetrics.equilibriumBands?.overall?.min || 0} 
+              maxBand={safeMetrics.equilibriumBands?.overall?.max || 100}
+              pillars={safeMetrics.pillars}
+              equilibriumBands={safeMetrics.equilibriumBands}
             />
           </div>
           
@@ -375,11 +392,11 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
           </div>
           
           {/* DEI Foresight Tab */}
-          <DeiForesightTab metrics={metrics} scenarios={scenarios} />
+          <DeiForesightTab metrics={safeMetrics} scenarios={scenarios} />
         </div>
       ) : activeView === 'simulation' ? (
         <EnhancedSimulationTab 
-          metrics={metrics} 
+          metrics={safeMetrics} 
           scenarios={scenarios}
           pillars={enhancedPillars}
           onSaveScenario={onSaveScenario}
