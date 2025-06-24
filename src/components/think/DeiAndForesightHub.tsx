@@ -355,7 +355,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
               value={metrics.overall} 
               minBand={metrics.equilibriumBands.overall.min} 
               maxBand={metrics.equilibriumBands.overall.max}
-              pillars={metrics.pillars}
+              pillars={enhancedPillars}
               equilibriumBands={metrics.equilibriumBands}
             />
           </div>
