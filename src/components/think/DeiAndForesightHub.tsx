@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -252,8 +251,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         indicator.target = target;
         
         // Track pillars with targets
-        if (!pill
-arsWithTargets.includes(selectedIndicator.pillar)) {
+        if (!pillarsWithTargets.includes(selectedIndicator.pillar)) {
           setPillarsWithTargets([...pillarsWithTargets, selectedIndicator.pillar]);
         }
         
