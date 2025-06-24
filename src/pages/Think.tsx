@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import ThinkHeader from '@/components/think/ThinkHeader';
 import ThinkBackground from '@/components/think/ThinkBackground';
