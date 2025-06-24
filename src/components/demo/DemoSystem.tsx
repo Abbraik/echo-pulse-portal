@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DemoOverlay } from './DemoOverlay';
+import DemoOverlay from './DemoOverlay';
 import { DemoControlPanel } from './DemoControlPanel';
 import { DemoNotifications } from './DemoNotifications';
 import { useDemoManager } from '@/hooks/use-demo-manager';
