@@ -77,12 +77,13 @@ const DemoOverlay: React.FC = () => {
           ],
           'loop-sna-analysis': [
             '[data-demo="sna-tab"]',
-            'button[data-value="loopAnalysis"]',
-            '[role="tab"]:has([data-demo="sna-tab"])',
+            'button[data-demo="sna-tab"]',
+            '[role="tab"][data-demo="sna-tab"]',
             'button:has(.lucide-network)'
           ],
           'strategy-builder': [
             '[data-demo="strategy-builder"]',
+            '[data-demo="foresight-sliders"]',
             'button:has(.lucide-target)',
             '.bg-gradient-to-r.from-teal-600'
           ]
@@ -289,7 +290,7 @@ const DemoOverlay: React.FC = () => {
   return (
     <>
       {/* Enhanced CSS Animation */}
-      <style jsx>{`
+      <style>{`
         .demo-highlight-active {
           box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.8), 
                       0 0 0 6px rgba(20, 184, 166, 0.4), 
@@ -371,7 +372,7 @@ const DemoOverlay: React.FC = () => {
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-4 left-1/2 transform -translate-x-[55%] z-[1002] max-w-5xl w-full mx-4"
+              className="fixed bottom-4 left-1/2 transform -translate-x-[50%] z-[1002] max-w-5xl w-full mx-4"
             >
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-[70vh]">
                 {/* Header */}
