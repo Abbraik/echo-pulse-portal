@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { ArrowRight, Brain, Activity, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/ui/glass-card';
 import { useTranslation } from '@/hooks/use-translation';
 import { motion } from 'framer-motion';
-import { DetailView } from '@/components/act/types/detail-view-types';
+import { DetailView } from '@/pages/Act';
 
 interface CommandBarProps {
   onAction: (action: DetailView) => void;

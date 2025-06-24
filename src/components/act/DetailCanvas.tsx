@@ -4,7 +4,7 @@ import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useTranslation } from '@/hooks/use-translation';
-import { DetailView } from '@/components/act/types/detail-view-types';
+import { DetailView } from '@/pages/Act';
 import { motion, AnimatePresence } from 'framer-motion';
 import BundleView from './BundleView';
 import ActWorkingCanvas from './canvas/ActWorkingCanvas';

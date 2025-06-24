@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import BundlesRail from '@/components/act/BundlesRail';
 import DetailCanvas from '@/components/act/DetailCanvas';
 import { Bundle } from '@/components/act/types/act-types';
-import { DetailView } from '@/components/act/types/detail-view-types';
+import { DetailView } from '@/pages/Act';
 
 interface ActMainContentProps {
   selectedBundle: Bundle | null;

@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DeliveryChains from '@/components/act/DeliveryChains';
-import { DetailView } from '@/components/act/types/detail-view-types';
+import { DetailView } from '@/pages/Act';
 
 interface ActDeliverySectionProps {
   detailView: DetailView;

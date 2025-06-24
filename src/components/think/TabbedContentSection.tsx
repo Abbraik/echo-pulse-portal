@@ -9,7 +9,6 @@ import SnaAnalysisPanel from './SnaAnalysisPanel';
 import StrategyBuilder from './StrategyBuilder';
 import ExecutionPathwayPanel from './ExecutionPathwayPanel';
 import { SNAData, ExecutionPathway } from './types/sna-types';
-import { ExecutionImpact } from './types/execution-types';
 
 interface TabbedContentSectionProps {
   activeTab: string;
@@ -17,11 +16,14 @@ interface TabbedContentSectionProps {
   currentMetrics: any;
   scenarios: any[];
   onSaveScenario: (scenario: any) => void;
-  onSelectScenario: (id: string) => void;
-  cldData: any;
-  snaData: SNAData;
-  leveragePoints: any[];
-  objectives: any[];
+  onSelectScenario: (id: number) => void;
+  mockSnaData: SNAData;
+  onHighlightActors: (actorIds: string[]) => void;
+  mockSensitivity: any[];
+  mockExecutionImpact: any;
+  onStrategyBuilderCompute: (approach: string, objectiveIds?: number[]) => void;
+  pathways: ExecutionPathway[];
+  onAdoptPathway: (pathway: ExecutionPathway) => void;
 }
 
 const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
@@ -31,18 +33,15 @@ const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
   scenarios,
   onSaveScenario,
   onSelectScenario,
-  cldData,
-  snaData,
-  leveragePoints,
-  objectives
+  mockSnaData,
+  onHighlightActors,
+  mockSensitivity,
+  mockExecutionImpact,
+  onStrategyBuilderCompute,
+  pathways,
+  onAdoptPathway
 }) => {
   const { t } = useTranslation();
-
-  const mockExecutionImpact: ExecutionImpact = {
-    bundlesAffected: 0,
-    budgetChange: 0,
-    timelineShift: 0
-  };
 
   return (
     <motion.div
@@ -120,8 +119,8 @@ const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
             }}
           >
             <SnaAnalysisPanel 
-              snaData={snaData}
-              onHighlightActors={() => {}}
+              snaData={mockSnaData}
+              onHighlightActors={onHighlightActors}
             />
           </motion.div>
         </TabsContent>
@@ -148,16 +147,16 @@ const TabbedContentSection: React.FC<TabbedContentSectionProps> = ({
               {t("strategyBuilder").toUpperCase()}
             </motion.h2>
             <StrategyBuilder 
-              sensitivityParameters={[]} 
+              sensitivityParameters={mockSensitivity} 
               executionImpact={mockExecutionImpact}
-              onCompute={() => {}}
+              onCompute={onStrategyBuilderCompute}
             />
             
             {/* SNA-Driven Execution Pathways */}
             <ExecutionPathwayPanel 
-              pathways={[]} 
-              onHighlightPathway={() => {}}
-              onAdoptPathway={() => {}}
+              pathways={pathways} 
+              onHighlightPathway={onHighlightActors}
+              onAdoptPathway={onAdoptPathway}
             />
           </motion.div>
         </TabsContent>

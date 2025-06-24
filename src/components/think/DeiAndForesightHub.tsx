@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -35,7 +36,7 @@ interface DeiAndForesightHubProps {
   metrics: DeiMetrics;
   scenarios: any[];
   onSaveScenario: (scenario: any) => void;
-  onSelectScenario: (id: string) => void;
+  onSelectScenario: (id: number) => void;
 }
 
 const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
@@ -53,11 +54,11 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
   const [hasTargets, setHasTargets] = useState(false);
   const [pillarsWithTargets, setPillarsWithTargets] = useState<string[]>([]);
 
-  // Enhanced sub-indicators for each pillar with safe access to metrics
+  // Enhanced sub-indicators for each pillar
   const enhancedPillars = {
     population: {
       name: t('populationDynamics'),
-      value: metrics?.pillars?.population?.value || 0,
+      value: metrics.pillars.population.value,
       subIndicators: [
         {
           name: 'Population Deviation',
@@ -95,7 +96,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     },
     resources: {
       name: t('resourceMarket'),
-      value: metrics?.pillars?.resources?.value || 0,
+      value: metrics.pillars.resources.value,
       subIndicators: [
         {
           name: 'Stock vs Target',
@@ -133,7 +134,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     },
     goods: {
       name: t('productsServicesMarket'),
-      value: metrics?.pillars?.goods?.value || 0,
+      value: metrics.pillars.goods.value,
       subIndicators: [
         {
           name: 'Supply-Demand Gap',
@@ -163,7 +164,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     },
     social: {
       name: t('socialOutcomes'),
-      value: metrics?.pillars?.social?.value || 0,
+      value: metrics.pillars.social.value,
       subIndicators: [
         {
           name: 'Employment Rate',
@@ -352,11 +353,11 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
           {/* Overall DEI Indicator */}
           <div className="flex justify-center mb-8">
             <OverallDeiIndicator 
-              value={metrics?.overall || 0} 
-              minBand={metrics?.equilibriumBands?.overall?.min || 70} 
-              maxBand={metrics?.equilibriumBands?.overall?.max || 85}
-              pillars={enhancedPillars}
-              equilibriumBands={metrics?.equilibriumBands || {}}
+              value={metrics.overall} 
+              minBand={metrics.equilibriumBands.overall.min} 
+              maxBand={metrics.equilibriumBands.overall.max}
+              pillars={metrics.pillars}
+              equilibriumBands={metrics.equilibriumBands}
             />
           </div>
           
