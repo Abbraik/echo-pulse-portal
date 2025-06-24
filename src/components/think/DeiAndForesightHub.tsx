@@ -53,11 +53,11 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
   const [hasTargets, setHasTargets] = useState(false);
   const [pillarsWithTargets, setPillarsWithTargets] = useState<string[]>([]);
 
-  // Enhanced sub-indicators for each pillar
+  // Enhanced sub-indicators for each pillar with safe access to metrics
   const enhancedPillars = {
     population: {
       name: t('populationDynamics'),
-      value: metrics.pillars.population.value,
+      value: metrics?.pillars?.population?.value || 0,
       subIndicators: [
         {
           name: 'Population Deviation',
@@ -95,7 +95,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     },
     resources: {
       name: t('resourceMarket'),
-      value: metrics.pillars.resources.value,
+      value: metrics?.pillars?.resources?.value || 0,
       subIndicators: [
         {
           name: 'Stock vs Target',
@@ -133,7 +133,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     },
     goods: {
       name: t('productsServicesMarket'),
-      value: metrics.pillars.goods.value,
+      value: metrics?.pillars?.goods?.value || 0,
       subIndicators: [
         {
           name: 'Supply-Demand Gap',
@@ -163,7 +163,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
     },
     social: {
       name: t('socialOutcomes'),
-      value: metrics.pillars.social.value,
+      value: metrics?.pillars?.social?.value || 0,
       subIndicators: [
         {
           name: 'Employment Rate',
@@ -352,11 +352,11 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
           {/* Overall DEI Indicator */}
           <div className="flex justify-center mb-8">
             <OverallDeiIndicator 
-              value={metrics.overall} 
-              minBand={metrics.equilibriumBands.overall.min} 
-              maxBand={metrics.equilibriumBands.overall.max}
+              value={metrics?.overall || 0} 
+              minBand={metrics?.equilibriumBands?.overall?.min || 70} 
+              maxBand={metrics?.equilibriumBands?.overall?.max || 85}
               pillars={enhancedPillars}
-              equilibriumBands={metrics.equilibriumBands}
+              equilibriumBands={metrics?.equilibriumBands || {}}
             />
           </div>
           
