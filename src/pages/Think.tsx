@@ -65,18 +65,25 @@ const Think = () => {
     <div className="relative min-h-screen">
       <ThinkBackground />
       <div className="relative z-10">
-        <ThinkHeader hideHeader={hideHeader} />
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-screen">
-            {/* Main Content */}
-            <div className="lg:col-span-8 space-y-8">
-              <DemoContextPanel />
+        {!hideHeader && <ThinkHeader hideHeader={hideHeader} />}
+        
+        <main className="container mx-auto px-4 py-8">
+          {/* Demo Context Panel - positioned at the top */}
+          <DemoContextPanel />
+          
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-3 space-y-6">
+              {/* DEI and Foresight Hub */}
               <DeiAndForesightHub 
                 metrics={mockMetrics}
                 scenarios={mockScenarios}
                 onSaveScenario={handleSaveScenario}
                 onSelectScenario={handleSelectScenario}
               />
+              
+              {/* Tabbed Content Section */}
               <TabbedContentSection 
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
@@ -89,18 +96,24 @@ const Think = () => {
                 leveragePoints={[]}
                 objectives={[]}
               />
+              
+              {/* System Framing Studio */}
               <SystemFramingStudio 
                 cldData={mockCldData}
                 snaData={mockSnaData}
               />
             </div>
             
-            {/* AI Advisor Sidebar */}
-            <div className="lg:col-span-4">
-              <AiAdvisorSidebar />
+            {/* Right Column - AI Advisor Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-8">
+                <AiAdvisorSidebar />
+              </div>
             </div>
           </div>
-        </div>
+        </main>
+        
+        {/* Footer CTA */}
         <FooterCTA />
       </div>
     </div>
