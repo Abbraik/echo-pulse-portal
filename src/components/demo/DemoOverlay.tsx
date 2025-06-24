@@ -58,12 +58,90 @@ const DemoOverlay: React.FC = () => {
     }
   }, [isActive, currentStepData, navigate, location.pathname, isNavigating]);
 
-  // Enhanced element highlighting with pulse animation
+  // Enhanced element highlighting with multiple fallback selectors
   useEffect(() => {
-    if (isActive && currentStepData?.targetElement && !isNavigating) {
+    if (isActive && currentStepData && !isNavigating) {
       // Wait for navigation to complete
       const timer = setTimeout(() => {
-        const element = document.querySelector(currentStepData.targetElement!);
+        let element = null;
+        
+        // Try primary target element first
+        if (currentStepData.targetElement) {
+          element = document.querySelector(currentStepData.targetElement);
+        }
+        
+        // Fallback selectors based on step ID for better targeting
+        if (!element) {
+          const stepId = currentStepData.id;
+          const fallbackSelectors = [
+            // Think zone selectors
+            ...(stepId.includes('foresight') ? [
+              '[data-demo="foresight-sliders"]',
+              'button:contains("Apply Targets")',
+              '.bg-gradient-to-r.from-teal-600',
+              'input[type="range"]',
+              '.slider'
+            ] : []),
+            
+            ...(stepId.includes('sna') || stepId.includes('loop') ? [
+              '[data-demo="sna-tab"]',
+              'button:contains("LOOP ANALYSIS")',
+              '[role="tab"]:contains("Loop")',
+              '.network-view',
+              '.cytoscape-container'
+            ] : []),
+            
+            ...(stepId.includes('strategy') ? [
+              '[data-demo="strategy-builder"]',
+              'button:contains("Strategy Builder")',
+              '.strategy-section',
+              '.objectives-list'
+            ] : []),
+            
+            // Act zone selectors
+            ...(stepId.includes('bundle') ? [
+              '[data-demo="bundle-wizard"]',
+              'button:contains("Bundle")',
+              '.bundle-creation',
+              '.delivery-section'
+            ] : []),
+            
+            // Monitor zone selectors
+            ...(stepId.includes('treemap') || stepId.includes('monitor') ? [
+              '[data-demo="treemap-view"]',
+              '.treemap-container',
+              '.sector-view',
+              '.monitoring-panel'
+            ] : []),
+            
+            // Learn zone selectors
+            ...(stepId.includes('knowledge') || stepId.includes('learn') ? [
+              '[data-demo="knowledge-graph"]',
+              '.knowledge-section',
+              '.learning-panel'
+            ] : []),
+            
+            // Innovate zone selectors
+            ...(stepId.includes('innovation') || stepId.includes('experiment') ? [
+              '[data-demo="innovation-canvas"]',
+              '[data-demo="experiment-canvas"]',
+              '.innovation-section',
+              '.experiment-panel'
+            ] : []),
+            
+            // General fallbacks
+            'main section:first-child',
+            '.main-content',
+            '.primary-panel',
+            'main'
+          ];
+          
+          for (const selector of fallbackSelectors) {
+            element = document.querySelector(selector);
+            if (element) break;
+          }
+        }
+        
         if (element) {
           setHighlightElement(element as HTMLElement);
           // Enhanced scroll into view
@@ -73,7 +151,12 @@ const DemoOverlay: React.FC = () => {
             inline: 'center' 
           });
         } else {
-          console.warn(`Demo target element not found: ${currentStepData.targetElement}`);
+          console.warn(`Demo target element not found for step: ${currentStepData.id}`);
+          // Highlight the main content area as final fallback
+          const mainElement = document.querySelector('main') || document.querySelector('.main-content');
+          if (mainElement) {
+            setHighlightElement(mainElement as HTMLElement);
+          }
         }
       }, 800);
 
@@ -286,18 +369,18 @@ const DemoOverlay: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Enhanced Active Demo Overlay */}
+        {/* Enhanced Active Demo Overlay - Adjusted positioning */}
         {isActive && currentStepData && (
           <>
             {/* Backdrop overlay */}
             <div className="fixed inset-0 bg-black/30 backdrop-blur-[1px] z-[1000] pointer-events-none" />
             
-            {/* Step Instructions Panel - Adjusted height to fit content */}
+            {/* Step Instructions Panel - Moved slightly left and adjusted positioning */}
             <motion.div
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[1002] max-w-6xl w-full mx-4"
+              className="fixed bottom-6 left-1/2 transform -translate-x-[55%] z-[1002] max-w-6xl w-full mx-4"
             >
               <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[75vh]">
                 {/* Header */}
