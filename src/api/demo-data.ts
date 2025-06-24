@@ -36,6 +36,10 @@ export const DEMO_DATASETS = {
         { id: 'distribution', label: 'Distribution Networks', type: 'connector', centrality: 0.68 }
       ]
     },
+    loopAnalysis: {
+      R2: { name: 'Resource Extraction Loop', strength: 0.78, status: 'active' },
+      B4: { name: 'Resource Constraint Loop', strength: 0.82, status: 'balancing' }
+    },
     bundles: [
       {
         id: 'resource-bundle-demo',
@@ -73,6 +77,11 @@ export const DEMO_DATASETS = {
           naturalGrowthBalance: { min: 0.8, max: 1.2, current: 1.0 },
           populationDeviation: { min: -5, max: 5, current: 2.3 },
           socialCohesion: { min: 0.6, max: 1.0, current: 0.78 }
+        },
+        results: {
+          deiComposite: 0.79,
+          systemStability: 0.81,
+          projectedOutcome: 'Population stability achievable'
         }
       }
     ],
@@ -81,6 +90,16 @@ export const DEMO_DATASETS = {
       { id: '7', zone: 'MONITOR', name: 'Population Deviation', value: 2.3, target: 0, timestamp: new Date().toISOString() },
       { id: '8', zone: 'MONITOR', name: 'Social Cohesion', value: 0.78, target: 0.9, timestamp: new Date().toISOString() }
     ],
+    snaData: {
+      bottleneck: 'Education Ministry',
+      criticalPath: ['Population Planning', 'Education Ministry', 'Social Services'],
+      networkHealth: 0.68,
+      nodes: [
+        { id: 'education-ministry', label: 'Education Ministry', type: 'bottleneck', centrality: 0.82 },
+        { id: 'population-planning', label: 'Population Planning', type: 'hub', centrality: 0.75 },
+        { id: 'social-services', label: 'Social Services', type: 'connector', centrality: 0.71 }
+      ]
+    },
     loopAnalysis: {
       R3: { name: 'Marriage Rate Loop', strength: 0.85, status: 'active' },
       R6: { name: 'Education-Employment Loop', strength: 0.92, status: 'active' }
