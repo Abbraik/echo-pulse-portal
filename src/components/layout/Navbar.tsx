@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe, Search, X } from 'lucide-react';
+import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe, Search, X, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useUIContent } from '@/hooks/use-ui-content';
+import { useDemo } from '@/hooks/use-demo';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavbarProps {
@@ -30,6 +31,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const { getContent } = useUIContent('global', 'navigation');
   const [notifications] = useState(3);
   const [isHovering, setIsHovering] = useState<string | null>(null);
+  const { isDemoMode, toggleDemoMode } = useDemo();
 
   // Listen for scroll events
   useEffect(() => {
@@ -151,6 +153,30 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
 
             {/* Utility Icons */}
             <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-4 ${isRTL ? 'space-x-reverse' : ''}`}>
+              {/* Demo Mode Toggle */}
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleDemoMode}
+                  className={`rounded-full hover:bg-white/5 dark:hover:bg-white/5 ${
+                    isDemoMode ? 'bg-teal-500/20 text-teal-400' : 'text-gray-600 dark:text-gray-300'
+                  }`}
+                  aria-label="Toggle Demo Mode"
+                >
+                  <Play size={18} className={isDemoMode ? 'text-teal-400' : ''} />
+                </Button>
+                {isDemoMode && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 h-3 w-3 bg-teal-500 rounded-full flex items-center justify-center"
+                  >
+                    <div className="h-1.5 w-1.5 bg-white rounded-full" />
+                  </motion.div>
+                )}
+              </div>
+
               {/* Search Button */}
               <Button
                 variant="ghost"
@@ -256,6 +282,18 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300">{t('profile')}</DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300">{t('settings')}</DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300">{t('support')}</DropdownMenuItem>
+                  <DropdownMenuSeparator className={
+                    resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300'
+                  } />
+                  <DropdownMenuItem 
+                    onClick={toggleDemoMode}
+                    className={`cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 ${
+                      isDemoMode ? 'text-teal-400' : 'text-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    {isDemoMode ? 'Exit Demo Mode' : 'Enter Demo Mode'}
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator className={
                     resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300'
                   } />

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,8 @@ import Monitor from "./pages/Monitor";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import SecretaryGeneralDashboard from "./pages/SecretaryGeneralDashboard";
+import { DemoProvider } from "@/hooks/use-demo";
+import DemoOverlay from "@/components/demo/DemoOverlay";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,18 +46,21 @@ const AppContent = () => {
         {!user ? (
           <Login />
         ) : (
-          <Routes>
-            <Route path="/" element={<MainLayout />}>
-              <Route index element={<HomePage />} />
-              <Route path="/think" element={<Think />} />
-              <Route path="/act" element={<Act />} />
-              <Route path="/learn" element={<Learn />} />
-              <Route path="/innovate" element={<Innovate />} />
-              <Route path="/monitor" element={<Monitor />} />
-              <Route path="/secretary-general" element={<SecretaryGeneralDashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
+          <DemoProvider>
+            <Routes>
+              <Route path="/" element={<MainLayout />}>
+                <Route index element={<HomePage />} />
+                <Route path="/think" element={<Think />} />
+                <Route path="/act" element={<Act />} />
+                <Route path="/learn" element={<Learn />} />
+                <Route path="/innovate" element={<Innovate />} />
+                <Route path="/monitor" element={<Monitor />} />
+                <Route path="/secretary-general" element={<SecretaryGeneralDashboard />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+            <DemoOverlay />
+          </DemoProvider>
         )}
       </AnimatePresence>
     </BrowserRouter>
