@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Layout, Network, BarChart3, ArrowRight, Target, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -251,7 +252,8 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         indicator.target = target;
         
         // Track pillars with targets
-        if (!pillarsWithTargets.includes(selectedIndicator.pillar)) {
+        if (!pill
+arsWithTargets.includes(selectedIndicator.pillar)) {
           setPillarsWithTargets([...pillarsWithTargets, selectedIndicator.pillar]);
         }
         
@@ -302,7 +304,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
   };
 
   return (
-    <GlassCard className="p-6" data-demo="foresight-panel">
+    <GlassCard className="p-6 dei-foresight-hub" data-demo="foresight-panel">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center">
           <div className="p-2 rounded-xl bg-teal-500/20 text-teal-400 mr-3">
@@ -323,6 +325,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
                 onClick={handleApplyTargets}
                 className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700"
                 size="sm"
+                data-demo="strategy-builder"
               >
                 <Target size={16} className="mr-1" />
                 {t('applyTargets')}

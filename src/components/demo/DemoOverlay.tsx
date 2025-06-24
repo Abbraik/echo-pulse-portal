@@ -58,115 +58,105 @@ const DemoOverlay: React.FC = () => {
     }
   }, [isActive, currentStepData, navigate, location.pathname, isNavigating]);
 
-  // Enhanced element highlighting with multiple fallback selectors
+  // Enhanced element highlighting with better selectors
   useEffect(() => {
     if (isActive && currentStepData && !isNavigating) {
       // Wait for navigation to complete
       const timer = setTimeout(() => {
         let element = null;
+        const stepId = currentStepData.id;
         
-        // Try primary target element first
-        if (currentStepData.targetElement) {
-          element = document.querySelector(currentStepData.targetElement);
+        console.log('Demo: Looking for element for step:', stepId);
+        
+        // Enhanced selectors based on step content
+        const selectorMap: { [key: string]: string[] } = {
+          'think-foresight': [
+            '[data-demo="foresight-panel"]',
+            '.dei-foresight-hub',
+            'h2:contains("DEI & FORESIGHT HUB")',
+            '.glass-card'
+          ],
+          'loop-sna-analysis': [
+            '[data-demo="sna-tab"]',
+            'button[data-state="inactive"]:contains("LOOP ANALYSIS")',
+            '[role="tab"]:contains("Loop")',
+            '[data-value="loopAnalysis"]'
+          ],
+          'strategy-builder': [
+            '[data-demo="strategy-builder"]',
+            'button:contains("Apply Targets")',
+            '.bg-gradient-to-r.from-teal-600',
+            '[data-demo="foresight-sliders"]'
+          ]
+        };
+        
+        // Get selectors for current step
+        const selectors = selectorMap[stepId] || [];
+        
+        // Try each selector until we find an element
+        for (const selector of selectors) {
+          try {
+            if (selector.includes('contains')) {
+              // Handle text-based selectors
+              const elements = document.querySelectorAll(selector.split(':contains')[0]);
+              for (const el of elements) {
+                const text = selector.match(/contains\("([^"]+)"\)/)?.[1];
+                if (text && el.textContent?.includes(text)) {
+                  element = el;
+                  break;
+                }
+              }
+            } else {
+              element = document.querySelector(selector);
+            }
+            
+            if (element) {
+              console.log('Demo: Found element with selector:', selector);
+              break;
+            }
+          } catch (e) {
+            console.warn('Demo: Invalid selector:', selector, e);
+          }
         }
         
-        // Fallback selectors based on step ID for better targeting
+        // Fallback selectors
         if (!element) {
-          const stepId = currentStepData.id;
           const fallbackSelectors = [
-            // Think zone selectors
-            ...(stepId.includes('foresight') ? [
-              '[data-demo="foresight-sliders"]',
-              'button:contains("Apply Targets")',
-              '.bg-gradient-to-r.from-teal-600',
-              'input[type="range"]',
-              '.slider'
-            ] : []),
-            
-            ...(stepId.includes('sna') || stepId.includes('loop') ? [
-              '[data-demo="sna-tab"]',
-              'button:contains("LOOP ANALYSIS")',
-              '[role="tab"]:contains("Loop")',
-              '.network-view',
-              '.cytoscape-container'
-            ] : []),
-            
-            ...(stepId.includes('strategy') ? [
-              '[data-demo="strategy-builder"]',
-              'button:contains("Strategy Builder")',
-              '.strategy-section',
-              '.objectives-list'
-            ] : []),
-            
-            // Act zone selectors
-            ...(stepId.includes('bundle') ? [
-              '[data-demo="bundle-wizard"]',
-              'button:contains("Bundle")',
-              '.bundle-creation',
-              '.delivery-section'
-            ] : []),
-            
-            // Monitor zone selectors
-            ...(stepId.includes('treemap') || stepId.includes('monitor') ? [
-              '[data-demo="treemap-view"]',
-              '.treemap-container',
-              '.sector-view',
-              '.monitoring-panel'
-            ] : []),
-            
-            // Learn zone selectors
-            ...(stepId.includes('knowledge') || stepId.includes('learn') ? [
-              '[data-demo="knowledge-graph"]',
-              '.knowledge-section',
-              '.learning-panel'
-            ] : []),
-            
-            // Innovate zone selectors
-            ...(stepId.includes('innovation') || stepId.includes('experiment') ? [
-              '[data-demo="innovation-canvas"]',
-              '[data-demo="experiment-canvas"]',
-              '.innovation-section',
-              '.experiment-panel'
-            ] : []),
-            
-            // General fallbacks
+            '.glass-card',
+            '[role="tablist"]',
             'main section:first-child',
             '.main-content',
-            '.primary-panel',
             'main'
           ];
           
           for (const selector of fallbackSelectors) {
             element = document.querySelector(selector);
-            if (element) break;
+            if (element) {
+              console.log('Demo: Using fallback selector:', selector);
+              break;
+            }
           }
         }
         
         if (element) {
           setHighlightElement(element as HTMLElement);
-          // Enhanced scroll into view
           element.scrollIntoView({ 
             behavior: 'smooth', 
             block: 'center',
             inline: 'center' 
           });
         } else {
-          console.warn(`Demo target element not found for step: ${currentStepData.id}`);
-          // Highlight the main content area as final fallback
-          const mainElement = document.querySelector('main') || document.querySelector('.main-content');
-          if (mainElement) {
-            setHighlightElement(mainElement as HTMLElement);
-          }
+          console.warn(`Demo: No target element found for step: ${stepId}`);
         }
-      }, 800);
+      }, 1200); // Increased delay to ensure DOM is ready
 
       return () => clearTimeout(timer);
     } else {
       setHighlightElement(null);
     }
-  }, [isActive, currentStepData, isNavigating]);
+  }, [isActive, currentStepData, isNavigating, location.pathname]);
 
-  // Enhanced highlight styles with animation
+  // Enhanced highlight styles with stronger visual emphasis
   useEffect(() => {
     if (highlightElement) {
       const originalStyles = {
@@ -175,13 +165,16 @@ const DemoOverlay: React.FC = () => {
         boxShadow: highlightElement.style.boxShadow,
         borderRadius: highlightElement.style.borderRadius,
         animation: highlightElement.style.animation,
-        transform: highlightElement.style.transform
+        transform: highlightElement.style.transform,
+        outline: highlightElement.style.outline
       };
 
+      // Apply stronger highlighting
       highlightElement.style.position = 'relative';
       highlightElement.style.zIndex = '1001';
-      highlightElement.style.boxShadow = '0 0 0 4px rgba(20, 184, 166, 0.6), 0 0 20px rgba(20, 184, 166, 0.4)';
-      highlightElement.style.borderRadius = '12px';
+      highlightElement.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.8), 0 0 0 6px rgba(20, 184, 166, 0.4), 0 0 30px rgba(20, 184, 166, 0.6)';
+      highlightElement.style.borderRadius = '16px';
+      highlightElement.style.outline = '2px solid rgba(20, 184, 166, 0.9)';
       highlightElement.style.animation = 'demo-pulse 2s infinite';
       highlightElement.style.transform = 'scale(1.02)';
 
@@ -204,13 +197,12 @@ const DemoOverlay: React.FC = () => {
 
   const handleExitDemo = () => {
     exitDemo();
-    // Also disable demo mode if user explicitly exits
     if (isDemoMode) {
       toggleDemoMode();
     }
   };
 
-  // Parse step description into structured sections with more compact format
+  // Parse step description into structured sections
   const parseStepDescription = (description: string) => {
     const sections = description.split('**').filter(Boolean);
     const parsedSections: { [key: string]: string } = {};
@@ -230,7 +222,7 @@ const DemoOverlay: React.FC = () => {
     const sections = parseStepDescription(description);
     
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {/* Context Section */}
         {sections.Context && (
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
@@ -250,7 +242,7 @@ const DemoOverlay: React.FC = () => {
               <h4 className="font-semibold text-teal-400 text-sm">What You'll Do</h4>
             </div>
             <div className="text-gray-300 text-xs leading-relaxed">
-              {sections["What You'll Do"].split('•').filter(Boolean).slice(0, 3).map((item, index) => (
+              {sections["What You'll Do"].split('•').filter(Boolean).slice(0, 2).map((item, index) => (
                 <div key={index} className="flex items-start gap-2 mb-1">
                   <ArrowRight className="h-3 w-3 text-teal-400 mt-0.5 flex-shrink-0" />
                   <span>{item.trim()}</span>
@@ -268,7 +260,7 @@ const DemoOverlay: React.FC = () => {
               <h4 className="font-semibold text-purple-400 text-sm">Key Actions</h4>
             </div>
             <div className="text-gray-300 text-xs leading-relaxed space-y-1">
-              {sections["Key Actions"].split(/\d+\./).filter(Boolean).slice(0, 3).map((action, index) => (
+              {sections["Key Actions"].split(/\d+\./).filter(Boolean).slice(0, 2).map((action, index) => (
                 <div key={index} className="flex items-start gap-2">
                   <div className="bg-purple-500/20 text-purple-400 rounded-full w-4 h-4 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
                     {index + 1}
@@ -288,7 +280,7 @@ const DemoOverlay: React.FC = () => {
               <h4 className="font-semibold text-green-400 text-sm">Expected Outcomes</h4>
             </div>
             <div className="text-gray-300 text-xs leading-relaxed">
-              {sections["Expected Outcomes"].split('•').filter(Boolean).slice(0, 3).map((outcome, index) => (
+              {sections["Expected Outcomes"].split('•').filter(Boolean).slice(0, 2).map((outcome, index) => (
                 <div key={index} className="flex items-start gap-2 mb-1">
                   <CheckCircle className="h-3 w-3 text-green-400 mt-0.5 flex-shrink-0" />
                   <span>{outcome.trim()}</span>
@@ -314,11 +306,11 @@ const DemoOverlay: React.FC = () => {
         {`
           @keyframes demo-pulse {
             0%, 100% { 
-              box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.6), 0 0 20px rgba(20, 184, 166, 0.4);
+              box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.8), 0 0 0 6px rgba(20, 184, 166, 0.4), 0 0 30px rgba(20, 184, 166, 0.6);
               transform: scale(1.02);
             }
             50% { 
-              box-shadow: 0 0 0 8px rgba(20, 184, 166, 0.8), 0 0 32px rgba(20, 184, 166, 0.6);
+              box-shadow: 0 0 0 6px rgba(20, 184, 166, 1), 0 0 0 12px rgba(20, 184, 166, 0.6), 0 0 40px rgba(20, 184, 166, 0.8);
               transform: scale(1.03);
             }
           }
@@ -369,20 +361,20 @@ const DemoOverlay: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Enhanced Active Demo Overlay - Adjusted positioning */}
+        {/* Enhanced Active Demo Overlay - Better positioning */}
         {isActive && currentStepData && (
           <>
             {/* Backdrop overlay */}
-            <div className="fixed inset-0 bg-black/30 backdrop-blur-[1px] z-[1000] pointer-events-none" />
+            <div className="fixed inset-0 bg-black/20 backdrop-blur-[1px] z-[1000] pointer-events-none" />
             
-            {/* Step Instructions Panel - Moved slightly left and adjusted positioning */}
+            {/* Step Instructions Panel - Improved positioning */}
             <motion.div
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-6 left-1/2 transform -translate-x-[55%] z-[1002] max-w-6xl w-full mx-4"
+              className="fixed bottom-4 left-1/2 transform -translate-x-[60%] z-[1002] max-w-5xl w-full mx-4"
             >
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[75vh]">
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-[70vh]">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-teal-600/20 to-blue-600/20 border-b border-white/10 p-4">
                   <div className="flex items-center justify-between mb-3">
@@ -394,7 +386,7 @@ const DemoOverlay: React.FC = () => {
                       {highlightElement && (
                         <Badge variant="outline" className="text-green-400 border-green-400/50">
                           <Eye className="h-3 w-3 mr-1" />
-                          Element Found
+                          Highlighted
                         </Badge>
                       )}
                     </div>
@@ -431,8 +423,8 @@ const DemoOverlay: React.FC = () => {
                   </h3>
                 </div>
 
-                {/* Content - Compact layout to avoid scrolling */}
-                <div className="p-4">
+                {/* Content - Compact layout */}
+                <div className="p-4 max-h-[300px] overflow-y-auto">
                   {renderCompactDescription(currentStepData.description)}
                 </div>
 
