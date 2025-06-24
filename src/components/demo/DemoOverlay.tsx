@@ -68,25 +68,23 @@ const DemoOverlay: React.FC = () => {
         
         console.log('Demo: Looking for element for step:', stepId);
         
-        // Enhanced selectors based on step content
+        // Step-specific selectors that match the actual DOM structure
         const selectorMap: { [key: string]: string[] } = {
           'think-foresight': [
             '[data-demo="foresight-panel"]',
             '.dei-foresight-hub',
-            'h2:contains("DEI & FORESIGHT HUB")',
             '.glass-card'
           ],
           'loop-sna-analysis': [
             '[data-demo="sna-tab"]',
-            'button[data-state="inactive"]:contains("LOOP ANALYSIS")',
-            '[role="tab"]:contains("Loop")',
-            '[data-value="loopAnalysis"]'
+            'button[data-value="loopAnalysis"]',
+            '[role="tab"]:has([data-demo="sna-tab"])',
+            'button:has(.lucide-network)'
           ],
           'strategy-builder': [
             '[data-demo="strategy-builder"]',
-            'button:contains("Apply Targets")',
-            '.bg-gradient-to-r.from-teal-600',
-            '[data-demo="foresight-sliders"]'
+            'button:has(.lucide-target)',
+            '.bg-gradient-to-r.from-teal-600'
           ]
         };
         
@@ -96,20 +94,7 @@ const DemoOverlay: React.FC = () => {
         // Try each selector until we find an element
         for (const selector of selectors) {
           try {
-            if (selector.includes('contains')) {
-              // Handle text-based selectors
-              const elements = document.querySelectorAll(selector.split(':contains')[0]);
-              for (const el of elements) {
-                const text = selector.match(/contains\("([^"]+)"\)/)?.[1];
-                if (text && el.textContent?.includes(text)) {
-                  element = el;
-                  break;
-                }
-              }
-            } else {
-              element = document.querySelector(selector);
-            }
-            
+            element = document.querySelector(selector);
             if (element) {
               console.log('Demo: Found element with selector:', selector);
               break;
@@ -119,7 +104,7 @@ const DemoOverlay: React.FC = () => {
           }
         }
         
-        // Fallback selectors
+        // Fallback selectors if specific ones don't work
         if (!element) {
           const fallbackSelectors = [
             '.glass-card',
@@ -140,6 +125,7 @@ const DemoOverlay: React.FC = () => {
         
         if (element) {
           setHighlightElement(element as HTMLElement);
+          // Scroll element into view smoothly
           element.scrollIntoView({ 
             behavior: 'smooth', 
             block: 'center',
@@ -147,6 +133,7 @@ const DemoOverlay: React.FC = () => {
           });
         } else {
           console.warn(`Demo: No target element found for step: ${stepId}`);
+          setHighlightElement(null);
         }
       }, 1200); // Increased delay to ensure DOM is ready
 
@@ -166,22 +153,22 @@ const DemoOverlay: React.FC = () => {
         borderRadius: highlightElement.style.borderRadius,
         animation: highlightElement.style.animation,
         transform: highlightElement.style.transform,
-        outline: highlightElement.style.outline
+        outline: highlightElement.style.outline,
+        transition: highlightElement.style.transition
       };
 
-      // Apply stronger highlighting
+      // Apply stronger highlighting with proper CSS class
       highlightElement.style.position = 'relative';
       highlightElement.style.zIndex = '1001';
-      highlightElement.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.8), 0 0 0 6px rgba(20, 184, 166, 0.4), 0 0 30px rgba(20, 184, 166, 0.6)';
-      highlightElement.style.borderRadius = '16px';
-      highlightElement.style.outline = '2px solid rgba(20, 184, 166, 0.9)';
-      highlightElement.style.animation = 'demo-pulse 2s infinite';
-      highlightElement.style.transform = 'scale(1.02)';
+      highlightElement.style.transition = 'all 0.3s ease-in-out';
+      highlightElement.classList.add('demo-highlight-active');
 
       return () => {
+        // Restore original styles
         Object.entries(originalStyles).forEach(([property, value]) => {
           (highlightElement.style as any)[property] = value;
         });
+        highlightElement.classList.remove('demo-highlight-active');
       };
     }
   }, [highlightElement]);
@@ -302,29 +289,41 @@ const DemoOverlay: React.FC = () => {
   return (
     <>
       {/* Enhanced CSS Animation */}
-      <style>
-        {`
-          @keyframes demo-pulse {
-            0%, 100% { 
-              box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.8), 0 0 0 6px rgba(20, 184, 166, 0.4), 0 0 30px rgba(20, 184, 166, 0.6);
-              transform: scale(1.02);
-            }
-            50% { 
-              box-shadow: 0 0 0 6px rgba(20, 184, 166, 1), 0 0 0 12px rgba(20, 184, 166, 0.6), 0 0 40px rgba(20, 184, 166, 0.8);
-              transform: scale(1.03);
-            }
+      <style jsx>{`
+        .demo-highlight-active {
+          box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.8), 
+                      0 0 0 6px rgba(20, 184, 166, 0.4), 
+                      0 0 30px rgba(20, 184, 166, 0.6) !important;
+          border-radius: 12px !important;
+          outline: 2px solid rgba(20, 184, 166, 0.9) !important;
+          animation: demo-pulse 2s infinite !important;
+          transform: scale(1.02) !important;
+        }
+        
+        @keyframes demo-pulse {
+          0%, 100% { 
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.8), 
+                        0 0 0 6px rgba(20, 184, 166, 0.4), 
+                        0 0 30px rgba(20, 184, 166, 0.6);
+            transform: scale(1.02);
           }
-          
-          @keyframes demo-fade-in {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translate(0); }
+          50% { 
+            box-shadow: 0 0 0 6px rgba(20, 184, 166, 1), 
+                        0 0 0 12px rgba(20, 184, 166, 0.6), 
+                        0 0 40px rgba(20, 184, 166, 0.8);
+            transform: scale(1.03);
           }
-          
-          .demo-highlight-enter {
-            animation: demo-fade-in 0.5s ease-out;
-          }
-        `}
-      </style>
+        }
+        
+        @keyframes demo-fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .demo-highlight-enter {
+          animation: demo-fade-in 0.5s ease-out;
+        }
+      `}</style>
 
       <AnimatePresence>
         {/* Enhanced Scenario Selection Modal */}
@@ -372,7 +371,7 @@ const DemoOverlay: React.FC = () => {
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-4 left-1/2 transform -translate-x-[60%] z-[1002] max-w-5xl w-full mx-4"
+              className="fixed bottom-4 left-1/2 transform -translate-x-[55%] z-[1002] max-w-5xl w-full mx-4"
             >
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden max-h-[70vh]">
                 {/* Header */}

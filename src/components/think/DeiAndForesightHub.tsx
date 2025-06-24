@@ -315,7 +315,7 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
         
         <div className="flex items-center gap-4">
           {hasTargets && (
-            <div className="flex items-center gap-2" data-demo="foresight-sliders">
+            <div className="flex items-center gap-2">
               <Badge variant="secondary" className="bg-teal-500/20 text-teal-400">
                 {pillarsWithTargets.length} {t('targetsSet')}
               </Badge>
@@ -356,8 +356,9 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
                   value="loopAnalysis" 
                   className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
                   data-demo="sna-tab"
+                  data-value="loopAnalysis"
                 >
-                  <Network className="mr-2 h-4 w-4" />
+                  <Network className="mr-2 h-4 w-4" data-demo="sna-tab" />
                   {t("loopAnalysis").toUpperCase()}
                 </TabsTrigger>
               </TabsList>
