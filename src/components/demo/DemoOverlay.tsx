@@ -20,7 +20,7 @@ const DemoOverlay: React.FC = () => {
     nextStep,
     previousStep,
     exitDemo,
-    startScenario,
+    toggleDemoMode,
     skipToStep
   } = useDemo();
 
@@ -47,10 +47,10 @@ const DemoOverlay: React.FC = () => {
         navigate('/act');
       } else if (targetZone === 'monitor' && !currentPath.includes('/monitor')) {
         navigate('/monitor');
-      } else if (targetZone === 'innovate' && !currentPath.includes('/innovate')) {
-        navigate('/innovate');
       } else if (targetZone === 'learn' && !currentPath.includes('/learn')) {
         navigate('/learn');
+      } else if (targetZone === 'innovate' && !currentPath.includes('/innovate')) {
+        navigate('/innovate');
       }
       
       // Reset navigation flag after a delay
@@ -119,6 +119,14 @@ const DemoOverlay: React.FC = () => {
     }
   };
 
+  const handleExitDemo = () => {
+    exitDemo();
+    // Also disable demo mode if user explicitly exits
+    if (isDemoMode) {
+      toggleDemoMode();
+    }
+  };
+
   if (!isDemoMode) return null;
 
   const progress = currentScenarioData 
@@ -175,7 +183,7 @@ const DemoOverlay: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={exitDemo}
+                  onClick={handleExitDemo}
                   className="text-white hover:bg-white/10"
                 >
                   <X className="h-5 w-5" />
@@ -198,7 +206,7 @@ const DemoOverlay: React.FC = () => {
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[1002] max-w-3xl w-full mx-4"
+              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[1002] max-w-4xl w-full mx-4"
             >
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl">
                 {/* Enhanced Progress Bar */}
@@ -241,10 +249,10 @@ const DemoOverlay: React.FC = () => {
                       </Badge>
                     )}
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">
+                  <h3 className="text-xl font-bold text-white mb-3">
                     {currentStepData.title}
                   </h3>
-                  <p className="text-gray-300 leading-relaxed">
+                  <p className="text-gray-300 leading-relaxed text-sm">
                     {currentStepData.description}
                   </p>
                 </div>
@@ -266,7 +274,7 @@ const DemoOverlay: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={exitDemo}
+                      onClick={handleExitDemo}
                       className="bg-white/10 border-white/20 text-white hover:bg-red-500/20 hover:border-red-400/50"
                     >
                       <RotateCcw className="h-4 w-4 mr-1" />
