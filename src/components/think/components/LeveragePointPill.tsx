@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
@@ -45,30 +44,28 @@ const LeveragePointPill: React.FC<LeveragePointPillProps> = ({
   };
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <motion.button
-            className={`px-2 py-1 rounded-full text-xs border ${getColorClass()} transition-colors`}
-            onClick={onClick}
-            whileTap={{ scale: 0.95 }}
-            animate={isSelected ? { 
-              scale: [1, 1.05, 1],
-              transition: { 
-                duration: 0.5, 
-                repeat: 0, 
-                ease: "easeInOut" 
-              }
-            } : {}}
-          >
-            #{leveragePoint.id} {leveragePoint.title}
-          </motion.button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p className="text-xs max-w-[200px]">{leveragePoint.rationale}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <motion.button
+          className={`px-2 py-1 rounded-full text-xs border ${getColorClass()} transition-colors`}
+          onClick={onClick}
+          whileTap={{ scale: 0.95 }}
+          animate={isSelected ? { 
+            scale: [1, 1.05, 1],
+            transition: { 
+              duration: 0.5, 
+              repeat: 0, 
+              ease: "easeInOut" 
+            }
+          } : {}}
+        >
+          #{leveragePoint.id} {leveragePoint.title}
+        </motion.button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">
+        <p className="text-xs max-w-[200px]">{leveragePoint.rationale}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };
 
