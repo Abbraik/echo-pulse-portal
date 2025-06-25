@@ -34,17 +34,37 @@ const BundleSummaryCard: React.FC<BundleSummaryCardProps> = ({ bundle }) => {
     }).format(budget);
   };
 
-  const getBundleDetails = () => {
+  const getBundleDetails = async () => {
     // Check if this is a demo bundle and get additional details
-    if (demoIntegration.isDemoMode && demoIntegration.demoData) {
-      const allBundles = demoIntegration.demoData.getAllBundles();
+    if (demoIntegration.isDemoMode) {
+      const allBundles = await demoIntegration.getBundles();
       const demoBundle = allBundles.find(b => b.id === bundle.id);
       return demoBundle;
     }
     return null;
   };
 
-  const demoBundle = getBundleDetails();
+  // For now, we'll use a simpler approach since we can't use async in render
+  const getDemoBundleSync = () => {
+    if (demoIntegration.isDemoMode && demoIntegration.demoData) {
+      // Access the demo data directly from the centralized store
+      const resourceData = demoIntegration.demoData.datasets?.['resource-management'];
+      const birthRateData = demoIntegration.demoData.datasets?.['birth-rate-stability'];
+      
+      let demoBundle = null;
+      if (resourceData?.bundles) {
+        demoBundle = resourceData.bundles.find(b => b.id === bundle.id);
+      }
+      if (!demoBundle && birthRateData?.bundles) {
+        demoBundle = birthRateData.bundles.find(b => b.id === bundle.id);
+      }
+      
+      return demoBundle;
+    }
+    return null;
+  };
+
+  const demoBundle = getDemoBundleSync();
 
   return (
     <GlassCard className={`mb-6 p-6 overflow-hidden relative bg-gradient-to-r ${getBackgroundGradient(bundle.coherence)}`}>
