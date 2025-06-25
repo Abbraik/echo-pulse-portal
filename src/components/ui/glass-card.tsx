@@ -2,7 +2,6 @@
 import React from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useDemoIntegration } from '@/hooks/use-demo-integration';
 
 interface GlassCardProps extends Omit<HTMLMotionProps<"div">, "children"> {
   variant?: 'default' | 'deep' | 'dark';
@@ -22,12 +21,10 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
     layoutId,
     ...props 
   }, ref) => {
-    const demoIntegration = useDemoIntegration();
-    
     const variantClasses = {
-      default: demoIntegration.isDemoMode ? 'glass-panel-no-blur' : 'glass-panel',
-      deep: demoIntegration.isDemoMode ? 'glass-panel-deep-no-blur' : 'glass-panel-deep',
-      dark: demoIntegration.isDemoMode ? 'glass-panel-dark-no-blur' : 'glass-panel-dark'
+      default: 'glass-panel',
+      deep: 'glass-panel-deep',
+      dark: 'glass-panel-dark'
     };
 
     return (
