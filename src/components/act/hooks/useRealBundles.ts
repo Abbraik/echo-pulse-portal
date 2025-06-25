@@ -1,9 +1,47 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Bundle } from '../types/act-types';
+import { useDemoIntegration } from '@/hooks/use-demo-integration';
+import { DEMO_DATASETS } from '@/api/demo-data';
 
-// Mock bundles data with leverage points
+// Convert demo bundle to Act Bundle format
+const convertDemoBundleToActBundle = (demoBundle: any): Bundle => {
+  return {
+    id: demoBundle.id,
+    name: demoBundle.name,
+    summary: demoBundle.description,
+    createdBy: "Demo User",
+    leveragePoints: demoBundle.leveragePoints || [],
+    objectives: demoBundle.objectives || [],
+    pillars: ["Resource Management", "Population Stability", "Environmental"],
+    geography: ["National", "Regional"],
+    tags: demoBundle.name.toLowerCase().includes('resource') ? ['resource', 'sustainability'] :
+          demoBundle.name.toLowerCase().includes('population') ? ['population', 'social'] : ['demo'],
+    status: demoBundle.status as 'draft' | 'active' | 'pilot' | 'completed',
+    coherence: demoBundle.coherence || 75,
+    ndiImpact: 75.5,
+    isApproved: demoBundle.status === 'active',
+    createdAt: new Date("2025-06-16T05:40:57.466Z"),
+    updatedAt: new Date("2025-06-16T05:40:57.466Z")
+  };
+};
+
+// Get demo bundles from all scenarios
+const getDemoBundles = (): Bundle[] => {
+  const allBundles: Bundle[] = [];
+  
+  Object.values(DEMO_DATASETS).forEach(dataset => {
+    if (dataset.bundles) {
+      dataset.bundles.forEach(bundle => {
+        allBundles.push(convertDemoBundleToActBundle(bundle));
+      });
+    }
+  });
+  
+  return allBundles;
+};
+
+// Mock bundles data with leverage points (fallback for non-demo mode)
 const mockBundles: Bundle[] = [
   {
     id: "6aa7593a-f2e6-4a0a-aace-c652bfa68925",
@@ -71,28 +109,46 @@ const mockBundles: Bundle[] = [
 ];
 
 export const useRealBundles = (statusFilter?: string) => {
+  const demoIntegration = useDemoIntegration();
+  
   return useQuery({
-    queryKey: ['bundles', statusFilter],
+    queryKey: ['bundles', statusFilter, demoIntegration.isDemoMode],
     queryFn: async (): Promise<Bundle[]> => {
-      // For now, return mock data instead of making real API calls
-      // In production, this would fetch from Supabase
-      let filteredBundles = mockBundles;
+      // Use demo data if in demo mode
+      let bundles: Bundle[] = [];
       
-      if (statusFilter && statusFilter !== 'all') {
-        filteredBundles = mockBundles.filter(bundle => bundle.status === statusFilter);
+      if (demoIntegration.isDemoMode) {
+        bundles = getDemoBundles();
+      } else {
+        // For now, return mock data instead of making real API calls
+        // In production, this would fetch from Supabase
+        bundles = mockBundles;
       }
       
-      return filteredBundles;
+      if (statusFilter && statusFilter !== 'all') {
+        bundles = bundles.filter(bundle => bundle.status === statusFilter);
+      }
+      
+      return bundles;
     }
   });
 };
 
 export const useRealBundle = (bundleId: string) => {
+  const demoIntegration = useDemoIntegration();
+  
   return useQuery({
-    queryKey: ['bundle', bundleId],
+    queryKey: ['bundle', bundleId, demoIntegration.isDemoMode],
     queryFn: async (): Promise<Bundle | null> => {
-      // Find the bundle in mock data
-      const bundle = mockBundles.find(b => b.id === bundleId);
+      let bundles: Bundle[] = [];
+      
+      if (demoIntegration.isDemoMode) {
+        bundles = getDemoBundles();
+      } else {
+        bundles = mockBundles;
+      }
+      
+      const bundle = bundles.find(b => b.id === bundleId);
       return bundle || null;
     }
   });

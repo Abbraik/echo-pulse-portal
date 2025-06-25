@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/hooks/use-translation';
 import { Bundle } from '../types/act-types';
 import { useRealBundleActions } from '../hooks/useRealBundles';
+import { useDemoIntegration } from '@/hooks/use-demo-integration';
 
 interface BundleSummaryCardProps {
   bundle: Bundle;
@@ -15,6 +16,7 @@ interface BundleSummaryCardProps {
 const BundleSummaryCard: React.FC<BundleSummaryCardProps> = ({ bundle }) => {
   const { t } = useTranslation();
   const { approveBundle } = useRealBundleActions();
+  const demoIntegration = useDemoIntegration();
 
   const getBackgroundGradient = (coherence: number) => {
     if (coherence >= 80) return 'from-green-500/20 to-transparent';
@@ -22,13 +24,43 @@ const BundleSummaryCard: React.FC<BundleSummaryCardProps> = ({ bundle }) => {
     return 'from-rose-500/20 to-transparent';
   };
 
+  const formatBudget = (budget?: number) => {
+    if (!budget) return 'Not specified';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(budget);
+  };
+
+  const getBundleDetails = () => {
+    // Check if this is a demo bundle and get additional details
+    if (demoIntegration.isDemoMode && demoIntegration.demoData) {
+      const allBundles = demoIntegration.demoData.getAllBundles();
+      const demoBundle = allBundles.find(b => b.id === bundle.id);
+      return demoBundle;
+    }
+    return null;
+  };
+
+  const demoBundle = getBundleDetails();
+
   return (
     <GlassCard className={`mb-6 p-6 overflow-hidden relative bg-gradient-to-r ${getBackgroundGradient(bundle.coherence)}`}>
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="lg:w-3/5 space-y-4">
-          <div className="text-sm text-gray-400 mb-2">
-            {t('updatedAgo')}: {new Date(bundle.updatedAt).toLocaleDateString()}
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-gray-400">
+              {t('updatedAgo')}: {new Date(bundle.updatedAt).toLocaleDateString()}
+            </div>
+            {demoIntegration.isDemoMode && (
+              <Badge variant="outline" className="text-xs bg-teal-500/20 text-teal-400 border-teal-500/30">
+                Demo Bundle
+              </Badge>
+            )}
           </div>
+          
           <p className="text-base leading-relaxed text-gray-300">
             {bundle.summary || 'No summary available for this bundle.'}
           </p>
@@ -49,12 +81,32 @@ const BundleSummaryCard: React.FC<BundleSummaryCardProps> = ({ bundle }) => {
             </div>
             
             <div className="glass-panel p-4 rounded-lg">
-              <div className="text-xs text-gray-400 mb-1">{t('status')}</div>
-              <div className="text-md font-medium text-white capitalize">
-                {bundle.status}
+              <div className="text-xs text-gray-400 mb-1">
+                {demoBundle?.budget ? 'Budget' : t('status')}
+              </div>
+              <div className="text-md font-medium text-white">
+                {demoBundle?.budget ? formatBudget(demoBundle.budget) : bundle.status}
               </div>
             </div>
           </div>
+
+          {/* Demo-specific additional info */}
+          {demoBundle && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              {demoBundle.timeline && (
+                <div className="glass-panel p-3 rounded-lg">
+                  <div className="text-xs text-gray-400 mb-1">Timeline</div>
+                  <div className="text-sm text-white">{demoBundle.timeline}</div>
+                </div>
+              )}
+              {demoBundle.stakeholders && (
+                <div className="glass-panel p-3 rounded-lg">
+                  <div className="text-xs text-gray-400 mb-1">Key Stakeholders</div>
+                  <div className="text-sm text-white">{demoBundle.stakeholders.join(', ')}</div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
         
         <div className="lg:w-2/5 space-y-4">
@@ -72,6 +124,22 @@ const BundleSummaryCard: React.FC<BundleSummaryCardProps> = ({ bundle }) => {
               >
                 {bundle.status}
               </Badge>
+            </div>
+          </div>
+
+          {/* Objectives */}
+          <div>
+            <div className="text-xs text-gray-400 mb-2">Objectives</div>
+            <div className="space-y-1">
+              {bundle.objectives && bundle.objectives.length > 0 ? (
+                bundle.objectives.slice(0, 3).map((objective, idx) => (
+                  <div key={idx} className="text-sm text-gray-300 bg-white/5 rounded px-2 py-1">
+                    {objective}
+                  </div>
+                ))
+              ) : (
+                <span className="text-gray-400 text-sm">No objectives defined</span>
+              )}
             </div>
           </div>
           
