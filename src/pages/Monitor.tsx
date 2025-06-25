@@ -43,7 +43,7 @@ const Monitor: React.FC = () => {
           <MonitorHeader />
 
           {/* Main Content Container */}
-          <div className="flex-1 flex flex-col max-w-7xl mx-auto px-4 pb-4 relative z-10 w-full">
+          <div className="flex-1 flex flex-col max-w-7xl mx-auto px-4 pb-6 relative z-10 w-full gap-4 overflow-hidden">
             <ViewTogglePanel
               activeView={activeView}
               setActiveView={setActiveView}
@@ -55,16 +55,22 @@ const Monitor: React.FC = () => {
               onChartTypeChange={setChartType}
             />
 
-            <MainVisualizationArea
-              activeView={activeView}
-              timeRange={timeRange}
-              domainFilter={domainFilter}
-              chartType={chartType}
-              isFullscreen={isFullscreen}
-              setIsFullscreen={setIsFullscreen}
-            />
+            <div className="flex-1 flex flex-col gap-4 min-h-0">
+              <div className="flex-1 min-h-0">
+                <MainVisualizationArea
+                  activeView={activeView}
+                  timeRange={timeRange}
+                  domainFilter={domainFilter}
+                  chartType={chartType}
+                  isFullscreen={isFullscreen}
+                  setIsFullscreen={setIsFullscreen}
+                />
+              </div>
 
-            <AlertsAnomalySection />
+              <div className="flex-shrink-0">
+                <AlertsAnomalySection />
+              </div>
+            </div>
           </div>
         </motion.div>
       </AnimatedPage>

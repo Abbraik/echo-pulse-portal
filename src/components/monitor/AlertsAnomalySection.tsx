@@ -20,10 +20,11 @@ const AlertsAnomalySection: React.FC = () => {
   return (
     <motion.div
       variants={itemVariants}
-      className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[30vh] flex-shrink-0"
+      className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-0 flex-shrink-0"
+      style={{ height: 'calc(30vh - 2rem)', maxHeight: '400px', minHeight: '300px' }}
     >
       <motion.div 
-        className="lg:col-span-2"
+        className="lg:col-span-2 h-full"
         whileHover={{ 
           y: -2,
           boxShadow: "0 15px 30px rgba(0, 0, 0, 0.3)"
@@ -35,6 +36,7 @@ const AlertsAnomalySection: React.FC = () => {
         </div>
       </motion.div>
       <motion.div
+        className="h-full"
         whileHover={{ 
           y: -2,
           boxShadow: "0 15px 30px rgba(0, 0, 0, 0.3)"
