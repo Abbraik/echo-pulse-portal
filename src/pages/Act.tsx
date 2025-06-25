@@ -14,6 +14,7 @@ import ActMainContent from '@/components/act/layout/ActMainContent';
 import ActDeliverySection from '@/components/act/layout/ActDeliverySection';
 import ActPlaybooksSection from '@/components/act/layout/ActPlaybooksSection';
 import ActScrollToTop from '@/components/act/layout/ActScrollToTop';
+import { useDemoIntegration } from '@/hooks/use-demo-integration';
 
 // View states for the main detail canvas
 export type DetailView = 'assign-leverage' | 're-optimize' | 'launch-delivery' | 'default';
@@ -24,6 +25,9 @@ const Act: React.FC = () => {
   
   // Initialize test user for development
   useTestUser();
+  
+  // Demo integration
+  const demoIntegration = useDemoIntegration();
   
   // Track the active detail view based on command bar actions
   const [detailView, setDetailView] = useState<DetailView>('default');

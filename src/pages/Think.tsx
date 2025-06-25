@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AnimatedPage } from '@/components/ui/motion';
 import { useTranslation } from '@/hooks/use-translation';
@@ -11,52 +10,56 @@ import SystemFramingSection from '@/components/think/SystemFramingSection';
 import TabbedContentSection from '@/components/think/TabbedContentSection';
 import FooterCTA from '@/components/think/FooterCTA';
 import AiAdvisorSection from '@/components/think/AiAdvisorSection';
+import { useDemoIntegration } from '@/hooks/use-demo-integration';
 
-// Mock data for DEI metrics and scenarios
+// Demo-consistent DEI metrics
 const mockDEIMetrics = { 
-  overall: 74,
+  overall: 82,
   pillars: {
     population: {
       value: 78,
       subIndicators: [
-        { name: 'Fertility Rate', value: 2.1, trend: [2.0, 2.1, 2.1, 2.2, 2.1] },
-        { name: 'Age-Dependency Ratio', value: 52, trend: [55, 54, 53, 52, 52] },
-        { name: 'Migration Volatility', value: 18, trend: [22, 20, 19, 18, 18] },
-        { name: 'Population Growth Stability', value: 76, trend: [72, 73, 75, 76, 76] }
+        { name: 'Population Deviation', value: -2.5, trend: [-3.2, -2.8, -2.5, -2.3, -2.5] },
+        { name: 'Structure Deviation', value: 15.2, trend: [16.1, 15.8, 15.5, 15.2, 15.2] },
+        { name: 'Natural Growth Balance', value: 1.2, trend: [1.1, 1.15, 1.18, 1.2, 1.2] },
+        { name: 'Growth Volatility', value: 0.8, trend: [1.2, 1.0, 0.9, 0.8, 0.8] }
       ]
     },
     resources: {
       value: 65,
       subIndicators: [
-        { name: 'Water Consumption per Capita', value: 130, trend: [145, 140, 135, 132, 130] },
-        { name: 'Energy Use per GDP', value: 68, trend: [72, 70, 69, 68, 68] },
-        { name: 'Agricultural Yield Index', value: 72, trend: [68, 69, 70, 71, 72] }
+        { name: 'Stock vs Target', value: 0.85, trend: [0.82, 0.83, 0.84, 0.85, 0.85] },
+        { name: 'Renewal vs Consumption', value: 1.1, trend: [1.05, 1.07, 1.08, 1.1, 1.1] },
+        { name: 'Extraction Pressure', value: 0.25, trend: [0.28, 0.27, 0.26, 0.25, 0.25] },
+        { name: 'Smoothed Price', value: 245.6, trend: [250.2, 248.1, 246.8, 245.6, 245.6] }
       ]
     },
     goods: {
       value: 82,
       subIndicators: [
-        { name: 'Manufacturing Output Growth', value: 3.2, trend: [2.9, 3.0, 3.1, 3.2, 3.2] },
-        { name: 'Service Sector Resilience Index', value: 79, trend: [75, 76, 78, 79, 79] },
-        { name: 'Supply-Chain Robustness', value: 81, trend: [77, 78, 79, 80, 81] }
+        { name: 'Supply-Demand Gap', value: 0.05, trend: [0.08, 0.07, 0.06, 0.05, 0.05] },
+        { name: 'Price Deviation', value: -0.03, trend: [-0.05, -0.04, -0.03, -0.03, -0.03] },
+        { name: 'Capacity Utilization', value: 0.78, trend: [0.75, 0.76, 0.77, 0.78, 0.78] }
       ]
     },
     social: {
-      value: 71,
+      value: 74,
       subIndicators: [
-        { name: 'Education Attainment Rate', value: 74, trend: [70, 71, 73, 74, 74] },
-        { name: 'Health Service Coverage', value: 82, trend: [78, 79, 80, 81, 82] },
-        { name: 'Social Cohesion Index', value: 68, trend: [64, 65, 66, 67, 68] },
-        { name: 'Trust Index', value: 72, trend: [68, 69, 70, 71, 72] }
+        { name: 'Employment Rate', value: 74.2, trend: [72.8, 73.2, 73.8, 74.2, 74.2] },
+        { name: 'Education Completion', value: 88.5, trend: [87.1, 87.8, 88.2, 88.5, 88.5] },
+        { name: 'Health Index', value: 82.1, trend: [80.5, 81.2, 81.8, 82.1, 82.1] },
+        { name: 'Living Conditions', value: 76.3, trend: [74.8, 75.5, 76.0, 76.3, 76.3] },
+        { name: 'Household Revenue', value: 12450, trend: [12100, 12250, 12350, 12450, 12450] },
+        { name: 'Environmental Quality', value: 68.7, trend: [67.2, 67.8, 68.3, 68.7, 68.7] }
       ]
     }
   },
   equilibriumBands: {
-    overall: { min: 70, max: 85 },
-    population: { min: 75, max: 85 },
-    resources: { min: 60, max: 80 },
-    goods: { min: 70, max: 90 },
-    social: { min: 65, max: 85 },
+    overall: { min: 78, max: 85 },
+    population: { min: 75, max: 82 },
+    resources: { min: 62, max: 78 },
+    goods: { min: 78, max: 88 },
+    social: { min: 70, max: 80 },
   }
 };
 
@@ -99,43 +102,43 @@ const mockSnaData: SNAData = {
   }
 };
 
-// All potential execution pathways
+// Updated execution pathways to match demo scenarios
 const allMockPathways: ExecutionPathway[] = [
   {
     id: 'path1',
-    title: 'Energy Policy Reform',
-    description: 'Coordinate across agencies to reform energy subsidy structure',
-    actors: ['MOF', 'ADNOC', 'EAD'],
+    title: 'Resource Optimization Bundle',
+    description: 'Reduce extraction pressure by 20% and increase renewal ratio to 1.2',
+    actors: ['MOE', 'ADNOC', 'EAD'],
     coordinationTime: 8,
     impact: 4.2,
-    relatedObjectives: [2]
-  },
-  {
-    id: 'path2',
-    title: 'Environmental Standards',
-    description: 'Establish integrated environmental standards across sectors',
-    actors: ['EAD', 'UAEU', 'MOE'],
-    coordinationTime: 6,
-    impact: 3.8,
     relatedObjectives: [1]
   },
   {
-    id: 'path3',
-    title: 'Transportation Initiative',
-    description: 'Develop sustainable transportation initiative with key stakeholders',
-    actors: ['DMT', 'RTA', 'EAD'],
+    id: 'path2',
+    title: 'Population Stability Initiative',
+    description: 'Achieve ±3% Population Deviation and increase Social Cohesion to 0.9',
+    actors: ['MOF', 'MOE', 'UAEU'],
     coordinationTime: 12,
-    impact: 5.1,
-    relatedObjectives: []
+    impact: 4.5,
+    relatedObjectives: [2]
   },
   {
-    id: 'path4',
-    title: 'Water Resource Strategy',
+    id: 'path3',
+    title: 'Water Resource Management',
     description: 'Implement advanced water recycling systems in cooperation with key agencies',
     actors: ['EAD', 'MOE', 'UAEU'],
     coordinationTime: 7,
     impact: 4.0,
     relatedObjectives: [1]
+  },
+  {
+    id: 'path4',
+    title: 'Digital Matchmaking Platform',
+    description: 'Research and develop digital solutions for marriage rate enhancement',
+    actors: ['MOF', 'UAEU', 'DMT'],
+    coordinationTime: 10,
+    impact: 3.8,
+    relatedObjectives: [2]
   },
   {
     id: 'path5',
@@ -144,38 +147,30 @@ const allMockPathways: ExecutionPathway[] = [
     actors: ['ADNOC', 'MOE', 'EDB'],
     coordinationTime: 10,
     impact: 4.5,
-    relatedObjectives: [2]
-  },
-  {
-    id: 'path6',
-    title: 'Population Growth Management',
-    description: 'Design and implement family support programs for population stability',
-    actors: ['MOF', 'MOE', 'UAEU'],
-    coordinationTime: 14,
-    impact: 3.5,
-    relatedObjectives: [3]
+    relatedObjectives: [1]
   }
 ];
 
-// Initial mockScenarios
+// Updated scenarios to match demo data
 const mockScenarios = [
-  { id: 1, name: "Baseline", date: "2025-01-01", probability: 0.4, sparkline: [65, 68, 72, 78, 76] },
-  { id: 2, name: "Optimistic", date: "2025-02-15", probability: 0.2, sparkline: [65, 70, 75, 82, 88] },
-  { id: 3, name: "Pessimistic", date: "2025-03-10", probability: 0.4, sparkline: [65, 62, 58, 55, 52] },
+  { id: 1, name: "Resource Management Demo", date: "2025-01-01", probability: 0.6, sparkline: [65, 68, 72, 78, 82] },
+  { id: 2, name: "Birth-Rate Stability Demo", date: "2025-02-15", probability: 0.4, sparkline: [65, 70, 75, 79, 81] },
+  { id: 3, name: "Baseline Scenario", date: "2025-03-10", probability: 0.3, sparkline: [65, 62, 58, 60, 65] },
 ];
 
+// Updated sensitivity data to match demo focus
 const mockSensitivity = [
-  { parameter: "Water Tariff", delta: 8, impact: 34 },
-  { parameter: "Migration Policy", delta: 5, impact: 28 },
-  { parameter: "Educational Investment", delta: 12, impact: 25 },
-  { parameter: "Energy Subsidies", delta: -7, impact: 22 },
-  { parameter: "Healthcare Access", delta: 9, impact: 20 },
+  { parameter: "Resource Stock Target", delta: 12, impact: 38 },
+  { parameter: "Extraction Pressure Control", delta: -8, impact: 32 },
+  { parameter: "Population Growth Balance", delta: 6, impact: 28 },
+  { parameter: "Marriage Rate Incentives", delta: 9, impact: 25 },
+  { parameter: "Renewal vs Consumption Ratio", delta: 7, impact: 22 },
 ];
 
 const mockExecutionImpact = {
-  bundlesAffected: 7,
-  budgetChange: 45000000,
-  timelineShift: 4,
+  bundlesAffected: 5,
+  budgetChange: 38000000,
+  timelineShift: 6,
 };
 
 const ThinkPage: React.FC = () => {
@@ -190,8 +185,9 @@ const ThinkPage: React.FC = () => {
   const [selectedObjectives, setSelectedObjectives] = useState<number[]>([1]);
   const [activeTab, setActiveTab] = useState('dei');
   const [showAiAdvisor, setShowAiAdvisor] = useState(false);
+  
+  const demoIntegration = useDemoIntegration();
 
-  // Handle scroll behavior for header
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -219,7 +215,6 @@ const ThinkPage: React.FC = () => {
     };
   }, [lastScrollY, hideHeader]);
 
-  // Handle saving a new scenario
   const handleSaveScenario = (newScenario: any) => {
     const id = scenarios.length > 0 ? Math.max(...scenarios.map(s => s.id)) + 1 : 1;
     const scenarioToAdd = {
@@ -238,7 +233,6 @@ const ThinkPage: React.FC = () => {
     });
   };
 
-  // Handle updating metrics when a scenario is selected
   const handleScenarioSelect = (selectedScenarioId: number) => {
     const selectedScenario = scenarios.find(s => s.id === selectedScenarioId);
     if (!selectedScenario) return;
@@ -266,12 +260,10 @@ const ThinkPage: React.FC = () => {
     });
   };
   
-  // Handle highlighting actors in the network
   const handleHighlightActors = (actorIds: string[]) => {
     setHighlightedActors(actorIds);
   };
   
-  // Handle approach and objective changes - update pathways based on selected approach
   useEffect(() => {
     console.log("Effect triggered: Objectives or approach changed", { 
       selectedObjectives, 
@@ -317,7 +309,6 @@ const ThinkPage: React.FC = () => {
     setPathways(filteredPathways);
   }, [activeApproach, selectedObjectives]);
   
-  // Handle adopting a pathway
   const handleAdoptPathway = (pathway: ExecutionPathway) => {
     toast({
       title: t("pathwayAdopted"),
