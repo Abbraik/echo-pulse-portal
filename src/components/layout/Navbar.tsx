@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe, Search, X, Play } from 'lucide-react';
+import { ViewToggle } from './ViewToggle';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -153,6 +154,9 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
 
             {/* Utility Icons */}
             <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-4 ${isRTL ? 'space-x-reverse' : ''}`}>
+              {/* View Toggle */}
+              <ViewToggle />
+
               {/* Demo Mode Toggle */}
               <div className="relative">
                 <Button

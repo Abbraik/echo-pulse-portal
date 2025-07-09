@@ -165,6 +165,11 @@ export type Database = {
           id: string
           metadata: Json | null
           opened_at: string | null
+          origin_entity_id: string
+          origin_zone: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
           status: Database["public"]["Enums"]["claim_status"]
           task_id: string
           zone: Database["public"]["Enums"]["zone_name"]
@@ -176,6 +181,11 @@ export type Database = {
           id?: string
           metadata?: Json | null
           opened_at?: string | null
+          origin_entity_id?: string
+          origin_zone?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           status?: Database["public"]["Enums"]["claim_status"]
           task_id: string
           zone: Database["public"]["Enums"]["zone_name"]
@@ -187,6 +197,11 @@ export type Database = {
           id?: string
           metadata?: Json | null
           opened_at?: string | null
+          origin_entity_id?: string
+          origin_zone?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           status?: Database["public"]["Enums"]["claim_status"]
           task_id?: string
           zone?: Database["public"]["Enums"]["zone_name"]
@@ -686,6 +701,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_task: {
+        Args: { claim_id: string }
+        Returns: undefined
+      }
       get_coherence_matrix: {
         Args: { bundle_id: string }
         Returns: Json
@@ -701,6 +720,14 @@ export type Database = {
       has_role: {
         Args: { _role: Database["public"]["Enums"]["user_role"] }
         Returns: boolean
+      }
+      release_task: {
+        Args: { claim_id: string }
+        Returns: undefined
+      }
+      resolve_task: {
+        Args: { claim_id: string; notes?: string }
+        Returns: undefined
       }
       update_bundle_leverage: {
         Args:

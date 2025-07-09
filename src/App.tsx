@@ -11,6 +11,8 @@ import Monitor from './pages/Monitor'
 import Innovate from './pages/Innovate'
 import Learn from './pages/Learn'
 import HomePage from './pages/HomePage'
+import ClaimantPage from './pages/ClaimantPage'
+import SecretaryGeneralDashboard from './pages/SecretaryGeneralDashboard'
 import { DemoProvider } from './hooks/use-demo'
 import { DemoSystem } from '@/components/demo/DemoSystem'
 import Navbar from './components/layout/Navbar'
@@ -37,6 +39,8 @@ function App() {
                   <Route path="/monitor" element={<Monitor />} />
                   <Route path="/innovate" element={<Innovate />} />
                   <Route path="/learn" element={<Learn />} />
+                  <Route path="/claims" element={<ClaimantPage />} />
+                  <Route path="/sg" element={<SecretaryGeneralDashboard />} />
                 </Routes>
               </div>
               <DemoSystem />
