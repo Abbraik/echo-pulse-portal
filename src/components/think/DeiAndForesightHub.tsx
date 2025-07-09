@@ -15,9 +15,6 @@ import EnhancedSimulationTab from '@/components/think/EnhancedSimulationTab';
 import { EnhancedPillarCard } from '@/components/think/components/EnhancedPillarCard';
 import { TargetSettingModal } from '@/components/think/components/TargetSettingModal';
 import LoopAnalysisTab from '@/components/think/LoopAnalysisTab';
-import ScenarioViewer from '@/components/think/enhanced/ScenarioViewer';
-import SimulationSliders from '@/components/think/enhanced/SimulationSliders';
-import EquilibriumBandWizard from '@/components/think/enhanced/EquilibriumBandWizard';
 
 interface SubIndicator {
   name: string;
@@ -55,20 +52,6 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
   } | null>(null);
   const [hasTargets, setHasTargets] = useState(false);
   const [pillarsWithTargets, setPillarsWithTargets] = useState<string[]>([]);
-  const [selectedScenario, setSelectedScenario] = useState(scenarios[0] || {
-    id: 1,
-    name: "Baseline Scenario",
-    date: "2025-01-15",
-    probability: 0.7,
-    sparkline: [65, 68, 72, 78, 76],
-    indicators: {
-      dei: 82,
-      resourceStock: 75,
-      populationVolatility: 28
-    }
-  });
-  const [isBandWizardOpen, setIsBandWizardOpen] = useState(false);
-  const [equilibriumBands, setEquilibriumBands] = useState<any[]>([]);
 
   // Add null checking and default values for metrics
   const safeMetrics = metrics || {
@@ -360,14 +343,14 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
                   className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
                 >
                   <Layout className="mr-2 h-4 w-4" />
-                  {t("scenarioViewer").toUpperCase()}
+                  {t("overview").toUpperCase()}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="simulation" 
                   className={`rounded-full px-4 py-1.5 data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400`}
                 >
                   <Play className="mr-2 h-4 w-4" />
-                  {t("simulationSliders").toUpperCase()}
+                  {t("simulation").toUpperCase()}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="loopAnalysis" 
@@ -386,47 +369,40 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
       
       {activeView === 'overview' ? (
         <div>
-          <ScenarioViewer
-            scenarios={scenarios.map(s => ({
-              ...s,
-              indicators: {
-                dei: safeMetrics.overall,
-                resourceStock: safeMetrics.pillars?.resources?.value || 0,
-                populationVolatility: Math.abs(safeMetrics.pillars?.population?.value - 50) || 0
-              }
-            }))}
-            selectedScenario={selectedScenario}
-            onScenarioChange={setSelectedScenario}
-          />
-          
-          <div className="mt-6">
-            <Button
-              onClick={() => setIsBandWizardOpen(true)}
-              className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700"
-            >
-              <Target className="w-4 h-4 mr-2" />
-              {t('equilibriumBandWizard')}
-            </Button>
+          {/* Overall DEI Indicator */}
+          <div className="flex justify-center mb-8">
+            <OverallDeiIndicator 
+              value={safeMetrics.overall} 
+              minBand={safeMetrics.equilibriumBands?.overall?.min || 0} 
+              maxBand={safeMetrics.equilibriumBands?.overall?.max || 100}
+              pillars={safeMetrics.pillars}
+              equilibriumBands={safeMetrics.equilibriumBands}
+            />
           </div>
+          
+          {/* Enhanced Pillar Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {Object.entries(enhancedPillars).map(([key, pillar]) => (
+              <EnhancedPillarCard
+                key={key}
+                pillarKey={key}
+                pillar={pillar}
+                onIndicatorClick={handleIndicatorClick}
+                hasTargets={pillarsWithTargets.includes(key)}
+              />
+            ))}
+          </div>
+          
+          {/* DEI Foresight Tab */}
+          <DeiForesightTab metrics={safeMetrics} scenarios={scenarios} />
         </div>
       ) : activeView === 'simulation' ? (
-        <SimulationSliders
-          indicators={Object.values(enhancedPillars).flatMap(pillar => 
-            pillar.subIndicators.map(indicator => ({
-              ...indicator,
-              pillar: pillar.name,
-              min: indicator.value * 0.5,
-              max: indicator.value * 1.5,
-              equilibriumMin: indicator.value * 0.8,
-              equilibriumMax: indicator.value * 1.2
-            }))
-          )}
-          onValueChange={(name, value) => {
-            console.log(`${name} changed to ${value}`);
-          }}
-          onRealTimeUpdate={(updates) => {
-            console.log('Real-time updates:', updates);
-          }}
+        <EnhancedSimulationTab 
+          metrics={safeMetrics} 
+          scenarios={scenarios}
+          pillars={enhancedPillars}
+          onSaveScenario={onSaveScenario}
+          onSelectScenario={onSelectScenario}
         />
       ) : (
         <div data-demo="loop-analysis">
@@ -448,18 +424,6 @@ const DeiAndForesightHub: React.FC<DeiAndForesightHubProps> = ({
           onSave={handleTargetSave}
         />
       )}
-
-      {/* Equilibrium Band Wizard */}
-      <EquilibriumBandWizard
-        open={isBandWizardOpen}
-        onOpenChange={setIsBandWizardOpen}
-        chartData={selectedScenario?.sparkline || [65, 68, 72, 78, 76]}
-        timeLabels={['Jan', 'Feb', 'Mar', 'Apr', 'May']}
-        onConfirm={(bands) => {
-          setEquilibriumBands(bands);
-          console.log('Equilibrium bands set:', bands);
-        }}
-      />
     </GlassCard>
   );
 };

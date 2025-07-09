@@ -13,8 +13,6 @@ import { Actor, Connection, SNAMetrics } from './types/sna-types';
 import CytoscapeView from './components/CytoscapeView';
 import SparklineChart from './components/SparklineChart';
 import NetworkView from './components/NetworkView';
-import IsometricCLDCanvas from './enhanced/IsometricCLDCanvas';
-import LayerManager from './enhanced/LayerManager';
 
 // Mock data for the SNA analysis
 const mockSNAData = {
@@ -119,11 +117,6 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
     centralization: false,
   });
   const [highlightedActors, setHighlightedActors] = useState<string[]>([]);
-  const [layers, setLayers] = useState([
-    { id: 'base', name: 'Base Loop', visible: true, elements: ['node1', 'node2'], color: '#14b8a6', order: 0 },
-    { id: 'data', name: 'Data Flows', visible: true, elements: ['edge1', 'edge2'], color: '#3b82f6', order: 1 },
-    { id: 'annotations', name: 'Annotations', visible: false, elements: [], color: '#8b5cf6', order: 2 }
-  ]);
 
   const handleSave = () => {
     console.log('Saving system frame...');
@@ -238,38 +231,17 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = ({ cldData, snaD
           {activeTab === 'cld' ? (
             <motion.div
               key="cld"
-              className="w-full h-full relative"
+              className="w-full h-full"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              <IsometricCLDCanvas
-                nodes={mockNodes.map(node => ({
-                  ...node,
-                  x: (Math.random() - 0.5) * 400,
-                  y: (Math.random() - 0.5) * 300,
-                  z: 0,
-                  type: 'variable' as const,
-                  connections: mockEdges.filter(e => e.source === node.id).map(e => e.target)
-                }))}
-                onNodeUpdate={(updatedNodes) => {
-                  console.log('Nodes updated:', updatedNodes);
-                }}
-                onToolChange={(tool) => {
-                  console.log('Tool changed:', tool);
-                }}
-              />
-              
-              <LayerManager
-                layers={layers}
-                onLayerUpdate={setLayers}
-                onLayerVisibilityChange={(layerId, visible) => {
-                  setLayers(prev => prev.map(layer => 
-                    layer.id === layerId ? { ...layer, visible } : layer
-                  ));
-                }}
-                floating={true}
+              <CytoscapeView 
+                nodes={mockNodes} 
+                edges={mockEdges} 
+                onNodeClick={handleCyNodeClick}
+                cyRef={cyRef}
               />
             </motion.div>
           ) : (

@@ -338,7 +338,7 @@ const ThinkPage: React.FC = () => {
   };
 
   return (
-    <div className="think-page flex flex-col h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       <ParticlesBackground 
         count={60}
         colorStart="#14B8A6"
@@ -352,8 +352,12 @@ const ThinkPage: React.FC = () => {
       <AnimatedPage>
         <ThinkHeader hideHeader={hideHeader} />
         
-        <div className="think-content flex-1 grid grid-rows-[auto_1fr_auto] gap-6 max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
-          {/* Row 1: DEI & Foresight Hub */}
+        <div className="max-w-[1440px] mx-auto px-6 pb-8 relative z-10">
+          <SystemFramingSection 
+            mockSnaData={mockSnaData}
+            mockCldData={mockCldData}
+          />
+
           <TabbedContentSection
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -370,17 +374,6 @@ const ThinkPage: React.FC = () => {
             onAdoptPathway={handleAdoptPathway}
           />
 
-          {/* Row 2: System Framing Studio & SNA Analysis */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SystemFramingSection 
-              mockSnaData={mockSnaData}
-              mockCldData={mockCldData}
-            />
-            
-            {/* SNA Analysis will be integrated in TabbedContentSection */}
-          </div>
-
-          {/* Row 3: Strategy Builder Preview */}
           <FooterCTA />
         </div>
         
