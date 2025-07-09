@@ -32,6 +32,17 @@ const ScenarioViewer: React.FC<ScenarioViewerProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  // Add safety checks for selectedScenario
+  if (!selectedScenario || !selectedScenario.indicators) {
+    return (
+      <GlassCard className="p-6" variant="deep">
+        <div className="text-center text-gray-400">
+          <p>No scenario selected</p>
+        </div>
+      </GlassCard>
+    );
+  }
+
   const MiniGauge: React.FC<{ value: number; label: string; color: string }> = ({ value, label, color }) => (
     <motion.div
       className="flex flex-col items-center p-3 rounded-xl bg-white/5 border border-white/10"
