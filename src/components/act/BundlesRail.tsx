@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/utils/logger';
+import { validateBundleForm } from '@/utils/validation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Filter, Search, MoreVertical, Archive, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
@@ -77,24 +79,24 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   };
 
   const handleCreateBundle = () => {
-    console.log('Create bundle clicked');
+    logger.action('Create bundle clicked');
     setEditingBundle(null);
     setIsModalOpen(true);
   };
 
   const handleEditBundle = (bundle: Bundle) => {
-    console.log('Edit bundle clicked:', bundle.id);
+    logger.action('Edit bundle clicked', { bundleId: bundle.id });
     setEditingBundle(bundle);
     setIsModalOpen(true);
   };
 
   const handleBundleClick = (bundle: Bundle) => {
-    console.log('Bundle selected:', bundle.id, bundle.name);
+    logger.action('Bundle selected', { bundleId: bundle.id, bundleName: bundle.name });
     onBundleSelect(bundle);
   };
 
   const handleSaveBundle = (bundleData: BundleFormData) => {
-    console.log('Saving bundle:', bundleData);
+    logger.action('Saving bundle', bundleData);
     
     if (editingBundle) {
       updateBundle.mutateAsync({
@@ -128,7 +130,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           description: "Bundle has been successfully updated."
         });
       }).catch((error) => {
-        console.error('Error updating bundle:', error);
+        logger.error('Error updating bundle', error);
         toast({
           title: "Error",
           description: "Failed to update bundle.",
@@ -164,7 +166,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
           description: "Bundle has been successfully created."
         });
       }).catch((error) => {
-        console.error('Error creating bundle:', error);
+        logger.error('Error creating bundle', error);
         toast({
           title: "Error",
           description: "Failed to create bundle.",
@@ -177,7 +179,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
   };
 
   const handleApproveBundle = (bundleId: string) => {
-    console.log('Approve bundle clicked:', bundleId);
+    logger.action('Approve bundle clicked', { bundleId });
     
     approveBundle.mutateAsync(bundleId).then(() => {
       toast({
@@ -185,7 +187,7 @@ const BundlesRail: React.FC<BundlesRailProps> = ({
         description: "Bundle has been approved and activated."
       });
     }).catch((error) => {
-      console.error('Error approving bundle:', error);
+      logger.error('Error approving bundle', error);
       toast({
         title: "Error",
         description: "Failed to approve bundle.",

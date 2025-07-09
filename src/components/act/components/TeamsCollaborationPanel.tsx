@@ -1,5 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTeamsIntegration } from '@/hooks/useTeamsIntegration';
+import { logger } from '@/utils/logger';
 import { 
   MessageSquare, 
   FileText, 

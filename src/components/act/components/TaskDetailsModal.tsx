@@ -1,5 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTeamsIntegration } from '@/hooks/useTeamsIntegration';
+import { logger } from '@/utils/logger';
 import { X, Video, Users, AtSign, ExternalLink, Calendar, MessageSquare, Send, Check, Bell } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
