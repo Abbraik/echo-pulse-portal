@@ -23,12 +23,12 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({ filter, onChan
       </div>
       
       <div className="grid grid-cols-3 gap-2">
-        <Select value={filter.zone || ''} onValueChange={(value) => onChange({ zone: value || undefined })}>
+        <Select value={filter.zone || 'all'} onValueChange={(value) => onChange({ zone: value === 'all' ? undefined : value })}>
           <SelectTrigger className="glass-input">
             <SelectValue placeholder="Zone" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Zones</SelectItem>
+            <SelectItem value="all">All Zones</SelectItem>
             <SelectItem value="THINK">Think</SelectItem>
             <SelectItem value="ACT">Act</SelectItem>
             <SelectItem value="MONITOR">Monitor</SelectItem>
@@ -37,24 +37,24 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({ filter, onChan
           </SelectContent>
         </Select>
 
-        <Select value={filter.status || ''} onValueChange={(value) => onChange({ status: value || undefined })}>
+        <Select value={filter.status || 'all'} onValueChange={(value) => onChange({ status: value === 'all' ? undefined : value })}>
           <SelectTrigger className="glass-input">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Status</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="open">Open</SelectItem>
             <SelectItem value="assigned">Assigned</SelectItem>
             <SelectItem value="closed">Closed</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select value={filter.originZone || ''} onValueChange={(value) => onChange({ originZone: value || undefined })}>
+        <Select value={filter.originZone || 'all'} onValueChange={(value) => onChange({ originZone: value === 'all' ? undefined : value })}>
           <SelectTrigger className="glass-input">
             <SelectValue placeholder="Origin" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Origins</SelectItem>
+            <SelectItem value="all">All Origins</SelectItem>
             <SelectItem value="THINK">Think</SelectItem>
             <SelectItem value="ACT">Act</SelectItem>
             <SelectItem value="MONITOR">Monitor</SelectItem>
