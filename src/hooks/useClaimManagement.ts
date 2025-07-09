@@ -1,69 +1,50 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useCallback } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { EnhancedClaim, ClaimFilter } from '@/types/claims';
 import { useToast } from '@/components/ui/use-toast';
 import { logger } from '@/utils/logger';
+import { useMockClaims } from './useMockClaims';
 
 export const useClaimManagement = (initialFilter?: ClaimFilter) => {
+  const { claims: mockClaims, updateClaimStatus } = useMockClaims();
   const [selectedClaim, setSelectedClaim] = useState<EnhancedClaim | null>(null);
   const [filter, setFilter] = useState<ClaimFilter>(initialFilter || {});
-  const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Fetch claims with real-time updates
-  const { data: claims = [], isLoading, refetch } = useQuery({
+  // Filter claims based on current filter state
+  const filteredClaims = mockClaims.filter(claim => {
+    if (filter.zone && claim.zone !== filter.zone) return false;
+    if (filter.status && claim.status !== filter.status) return false;
+    if (filter.originZone && claim.originZone !== filter.originZone) return false;
+    if (filter.search) {
+      const searchLower = filter.search.toLowerCase();
+      return (
+        claim.taskId.toLowerCase().includes(searchLower) ||
+        claim.zone.toLowerCase().includes(searchLower) ||
+        claim.originZone.toLowerCase().includes(searchLower)
+      );
+    }
+    return true;
+  });
+
+  // Mock query for consistency with the interface
+  const { data: claims = [], isLoading } = useQuery({
     queryKey: ['claims', filter],
     queryFn: async () => {
-      let query = supabase
-        .from('claims')
-        .select('*')
-        .order('opened_at', { ascending: false });
-
-      if (filter.zone) {
-        query = query.eq('zone', filter.zone as any);
-      }
-      if (filter.status) {
-        query = query.eq('status', filter.status as any);
-      }
-      if (filter.originZone) {
-        query = query.eq('origin_zone', filter.originZone);
-      }
-
-      const { data, error } = await query;
-      
-      if (error) {
-        logger.error('Failed to fetch claims', error);
-        throw error;
-      }
-
-      return data?.map(row => ({
-        id: row.id,
-        zone: row.zone,
-        taskId: row.task_id,
-        status: row.status,
-        claimedBy: row.claimed_by,
-        openedAt: new Date(row.opened_at),
-        closedAt: row.closed_at ? new Date(row.closed_at) : undefined,
-        originZone: row.origin_zone,
-        originEntityId: row.origin_entity_id,
-        resolutionNotes: row.resolution_notes,
-        resolvedBy: row.resolved_by,
-        resolvedAt: row.resolved_at ? new Date(row.resolved_at) : undefined,
-        metadata: row.metadata || {},
-        createdAt: new Date(row.created_at)
-      })) as EnhancedClaim[];
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return filteredClaims;
     },
+    initialData: filteredClaims
   });
 
   // Claim action mutations
   const claimTask = useMutation({
     mutationFn: async (claimId: string) => {
-      const { error } = await supabase.rpc('claim_task', { claim_id: claimId });
-      if (error) throw error;
+      updateClaimStatus(claimId, 'assigned', 'demo-user');
+      logger.action('Demo: Claiming task', { claimId });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['claims'] });
       toast({ title: "Claim assigned successfully" });
     },
     onError: (error: Error) => {
@@ -77,11 +58,10 @@ export const useClaimManagement = (initialFilter?: ClaimFilter) => {
 
   const releaseTask = useMutation({
     mutationFn: async (claimId: string) => {
-      const { error } = await supabase.rpc('release_task', { claim_id: claimId });
-      if (error) throw error;
+      updateClaimStatus(claimId, 'open');
+      logger.action('Demo: Releasing task', { claimId });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['claims'] });
       toast({ title: "Claim released successfully" });
     },
     onError: (error: Error) => {
@@ -95,14 +75,10 @@ export const useClaimManagement = (initialFilter?: ClaimFilter) => {
 
   const resolveTask = useMutation({
     mutationFn: async ({ claimId, notes }: { claimId: string; notes?: string }) => {
-      const { error } = await supabase.rpc('resolve_task', { 
-        claim_id: claimId, 
-        notes: notes || null 
-      });
-      if (error) throw error;
+      updateClaimStatus(claimId, 'closed', 'demo-user');
+      logger.action('Demo: Resolving task', { claimId, notes });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['claims'] });
       toast({ title: "Claim resolved successfully" });
       setSelectedClaim(null);
     },
@@ -114,24 +90,6 @@ export const useClaimManagement = (initialFilter?: ClaimFilter) => {
       });
     },
   });
-
-  // Real-time subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel('claims-changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'claims' },
-        () => {
-          logger.debug('Claims updated, refetching...');
-          refetch();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [refetch]);
 
   const updateFilter = useCallback((newFilter: Partial<ClaimFilter>) => {
     setFilter(prev => ({ ...prev, ...newFilter }));
@@ -149,6 +107,6 @@ export const useClaimManagement = (initialFilter?: ClaimFilter) => {
       release: releaseTask.mutate,
       resolve: resolveTask.mutate,
     },
-    refetch
+    refetch: () => Promise.resolve()
   };
 };

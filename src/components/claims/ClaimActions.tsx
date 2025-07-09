@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { EnhancedClaim } from '@/types/claims';
-import { useAuth } from '@/hooks/use-auth';
+// import { useAuth } from '@/hooks/use-auth'; // Disabled for demo
 
 interface ClaimActionsProps {
   claim: EnhancedClaim;
@@ -21,7 +21,8 @@ export const ClaimActions: React.FC<ClaimActionsProps> = ({
 }) => {
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [showResolveDialog, setShowResolveDialog] = useState(false);
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Disabled for demo
+  const user = { id: 'demo-user' }; // Mock user for demo
 
   const canClaim = claim.status === 'open';
   const canRelease = claim.status === 'assigned' && claim.claimedBy === user?.id;
