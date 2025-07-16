@@ -16,10 +16,15 @@ export interface Link {
   layer: string
 }
 
+export interface Layer {
+  name: string
+  visible: boolean
+}
+
 interface PresentState {
   nodes: Node[]
   links: Link[]
-  layers: string[]
+  layers: Layer[]
 }
 
 export interface CLDState {
@@ -32,6 +37,9 @@ export interface CLDState {
   addLink(link: Link): void
   removeLink(id: string): void
   toggleLayer(name: string): void
+  addLayer(name: string): void
+  renameLayer(oldName: string, newName: string): void
+  setNodeLayer(id: string, layer: string): void
   undo(): void
   redo(): void
 }
@@ -39,7 +47,7 @@ export interface CLDState {
 const initialState: PresentState = {
   nodes: [],
   links: [],
-  layers: ['Base Loops']
+  layers: [{ name: 'Base Loops', visible: true }]
 }
 
 export const useCLDStore = create<CLDState>((set, get) => ({
@@ -51,7 +59,10 @@ export const useCLDStore = create<CLDState>((set, get) => ({
         past: [...state.past, state.present],
         present: {
           ...state.present,
-          nodes: [...state.present.nodes, node]
+          nodes: [...state.present.nodes, node],
+          layers: state.present.layers.some((l) => l.name === node.layer)
+            ? state.present.layers
+            : [...state.present.layers, { name: node.layer, visible: true }]
         },
         future: []
       })),
@@ -83,7 +94,10 @@ export const useCLDStore = create<CLDState>((set, get) => ({
         past: [...state.past, state.present],
         present: {
           ...state.present,
-          links: [...state.present.links, link]
+          links: [...state.present.links, link],
+          layers: state.present.layers.some((l) => l.name === link.layer)
+            ? state.present.layers
+            : [...state.present.layers, { name: link.layer, visible: true }]
         },
         future: []
       })),
@@ -101,9 +115,54 @@ export const useCLDStore = create<CLDState>((set, get) => ({
         past: [...state.past, state.present],
         present: {
           ...state.present,
-          layers: state.present.layers.includes(name)
-            ? state.present.layers.filter((l) => l !== name)
-            : [...state.present.layers, name]
+          layers: state.present.layers.map((l) =>
+            l.name === name ? { ...l, visible: !l.visible } : l
+          )
+        },
+        future: []
+      })),
+
+    addLayer: (name) =>
+      set((state) => ({
+        past: [...state.past, state.present],
+        present: {
+          ...state.present,
+          layers: state.present.layers.some((l) => l.name === name)
+            ? state.present.layers
+            : [...state.present.layers, { name, visible: true }]
+        },
+        future: []
+      })),
+
+    renameLayer: (oldName, newName) =>
+      set((state) => ({
+        past: [...state.past, state.present],
+        present: {
+          ...state.present,
+          layers: state.present.layers.map((l) =>
+            l.name === oldName ? { ...l, name: newName } : l
+          ),
+          nodes: state.present.nodes.map((n) =>
+            n.layer === oldName ? { ...n, layer: newName } : n
+          ),
+          links: state.present.links.map((l) =>
+            l.layer === oldName ? { ...l, layer: newName } : l
+          )
+        },
+        future: []
+      })),
+
+    setNodeLayer: (id, layer) =>
+      set((state) => ({
+        past: [...state.past, state.present],
+        present: {
+          ...state.present,
+          nodes: state.present.nodes.map((n) =>
+            n.id === id ? { ...n, layer } : n
+          ),
+          layers: state.present.layers.some((l) => l.name === layer)
+            ? state.present.layers
+            : [...state.present.layers, { name: layer, visible: true }]
         },
         future: []
       })),

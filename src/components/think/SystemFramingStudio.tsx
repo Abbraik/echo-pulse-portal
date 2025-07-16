@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Html } from '@react-three/drei'
 import * as THREE from 'three'
-import { useCLDStore, Node as CLDNodeType, Link as CLDLinkType } from '@/store/cldStore'
+import { useCLDStore, Node as CLDNodeType, Link as CLDLinkType, Layer } from '@/store/cldStore'
 import { Button } from '@/components/ui/button'
 import { GlassCard } from '@/components/ui/glass-card'
 import { Plus, Link2, Undo2, Redo2, Layers, LayoutGrid } from 'lucide-react'
@@ -15,10 +15,9 @@ function GridHelper({ visible }: { visible: boolean }) {
   return visible ? <gridHelper ref={grid} args={[200, 20, '#2dd4bf', '#374151']} /> : null
 }
 
-function CLDNode({ node, onSelect }: { node: CLDNodeType; onSelect(id: string): void }) {
+function CLDNode({ node, onSelect, onContextMenu: openMenu }: { node: CLDNodeType; onSelect(id: string): void; onContextMenu(id: string, x: number, y: number): void }) {
   const ref = useRef<THREE.Mesh>(null)
   const moveNode = useCLDStore((s) => s.moveNode)
-  const removeNode = useCLDStore((s) => s.removeNode)
   const [drag, setDrag] = useState(false)
 
   const onPointerDown = (e: any) => {
@@ -39,7 +38,8 @@ function CLDNode({ node, onSelect }: { node: CLDNodeType; onSelect(id: string): 
 
   const onContextMenu = (e: any) => {
     e.stopPropagation()
-    removeNode(node.id)
+    e.preventDefault()
+    openMenu(node.id, e.clientX, e.clientY)
   }
 
   return (
@@ -84,31 +84,68 @@ interface SystemFramingStudioProps {
 
 const SystemFramingStudio: React.FC<SystemFramingStudioProps> = () => {
   const { nodes, links } = useCLDStore((s) => s.present)
+  const layers = useCLDStore((s) => s.present.layers)
   const addNode = useCLDStore((s) => s.addNode)
   const addLink = useCLDStore((s) => s.addLink)
+  const toggleLayer = useCLDStore((s) => s.toggleLayer)
+  const addLayerStore = useCLDStore((s) => s.addLayer)
+  const setNodeLayer = useCLDStore((s) => s.setNodeLayer)
   const undo = useCLDStore((s) => s.undo)
   const redo = useCLDStore((s) => s.redo)
   const [connectorFrom, setConnectorFrom] = useState<string | null>(null)
   const [showGrid, setShowGrid] = useState(true)
   const [showLayers, setShowLayers] = useState(false)
+  const [newLayer, setNewLayer] = useState('')
+  const [contextNode, setContextNode] = useState<string | null>(null)
+  const [contextPos, setContextPos] = useState<{ x: number; y: number } | null>(null)
 
   const handleAddNode = () => {
     const id = Math.random().toString(36).substring(2, 9)
-    addNode({ id, x: 0, y: 0, label: `Node ${nodes.length + 1}`, layer: 'Base Loops' })
+    const layerName = layers[0]?.name || 'Base Loops'
+    addNode({ id, x: 0, y: 0, label: `Node ${nodes.length + 1}`, layer: layerName })
+  }
+
+  const handleNodeContextMenu = (id: string, x: number, y: number) => {
+    setContextNode(id)
+    setContextPos({ x, y })
   }
 
   const handleNodeClick = (id: string) => {
     if (connectorFrom) {
       const linkId = Math.random().toString(36).substring(2, 9)
-      addLink({ id: linkId, from: connectorFrom, to: id, type: 'reinforcing', layer: 'Base Loops' })
+      const fromNode = nodes.find((n) => n.id === connectorFrom)
+      const layerName = fromNode ? fromNode.layer : layers[0]?.name || 'Base Loops'
+      addLink({ id: linkId, from: connectorFrom, to: id, type: 'reinforcing', layer: layerName })
       setConnectorFrom(null)
     } else {
       setConnectorFrom(id)
     }
   }
 
+  const handleLayerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (contextNode) {
+      setNodeLayer(contextNode, e.target.value)
+      setContextNode(null)
+      setContextPos(null)
+    }
+  }
+
+  const handleAddLayer = () => {
+    if (newLayer.trim()) {
+      addLayerStore(newLayer.trim())
+      setNewLayer('')
+    }
+  }
+
   return (
-    <GlassCard className="relative w-full h-[600px]" variant="deep">
+    <GlassCard
+      className="relative w-full h-[600px]"
+      variant="deep"
+      onClick={() => {
+        setContextNode(null)
+        setContextPos(null)
+      }}
+    >
       <div className="absolute top-2 right-2 z-20 flex gap-2">
         <Button size="sm" variant="outline" onClick={handleAddNode} className="glass-panel-deep">
           <Plus size={16} />
@@ -131,22 +168,62 @@ const SystemFramingStudio: React.FC<SystemFramingStudioProps> = () => {
       </div>
       {showLayers && (
         <div className="absolute top-12 right-2 z-20 glass-panel p-2 text-sm space-y-1">
-          <div className="flex items-center gap-2">
-            <input type="checkbox" checked readOnly />
-            <span>Base Loops</span>
+          {layers.map((l) => (
+            <div key={l.name} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={l.visible}
+                onChange={() => toggleLayer(l.name)}
+              />
+              <span>{l.name}</span>
+            </div>
+          ))}
+          <div className="flex gap-1 pt-1">
+            <input
+              className="glass-input flex-1"
+              value={newLayer}
+              onChange={(e) => setNewLayer(e.target.value)}
+              placeholder="Layer name"
+            />
+            <Button size="sm" variant="outline" onClick={handleAddLayer}>
+              Add
+            </Button>
           </div>
+        </div>
+      )}
+      {contextNode && contextPos && (
+        <div
+          className="absolute z-20 glass-panel p-2 text-sm"
+          style={{ top: contextPos.y, left: contextPos.x }}
+        >
+          <select value={nodes.find((n) => n.id === contextNode)?.layer} onChange={handleLayerChange} className="glass-input">
+            {layers.map((l) => (
+              <option key={l.name} value={l.name}>
+                {l.name}
+              </option>
+            ))}
+          </select>
         </div>
       )}
       <Canvas orthographic camera={{ position: [100, 100, 100], zoom: 20 }}>
         <ambientLight />
         <group rotation={[-Math.PI / 6, Math.PI / 4, 0]}>
           <GridHelper visible={showGrid} />
-          {links.map((l) => (
-            <CLDLink key={l.id} link={l} />
-          ))}
-          {nodes.map((n) => (
-            <CLDNode key={n.id} node={n} onSelect={handleNodeClick} />
-          ))}
+          {links
+            .filter((l) => layers.find((ly) => ly.name === l.layer)?.visible)
+            .map((l) => (
+              <CLDLink key={l.id} link={l} />
+            ))}
+          {nodes
+            .filter((n) => layers.find((ly) => ly.name === n.layer)?.visible)
+            .map((n) => (
+              <CLDNode
+                key={n.id}
+                node={n}
+                onSelect={handleNodeClick}
+                onContextMenu={handleNodeContextMenu}
+              />
+            ))}
         </group>
         <OrbitControls enableRotate={false} />
       </Canvas>
