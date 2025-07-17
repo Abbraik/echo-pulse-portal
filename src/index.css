@@ -250,6 +250,29 @@ html {
   outline-offset: 4px;
 }
 
+/* UI Enhancement Animations */
+@keyframes pulse-metric {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+.pulse-metric {
+  animation: pulse-metric 2s ease-in-out infinite;
+}
+
+/* Smooth transitions for UI elements */
+.smooth-transition {
+  transition: all 200ms ease-in-out;
+}
+
+.drawer-slide {
+  transition: transform 300ms ease-in-out;
+}
+
+.modal-fade {
+  transition: opacity 200ms ease-in-out;
+}
+
 /* Animation keyframes for fishbone elements */
 @keyframes spine-draw {
   from {

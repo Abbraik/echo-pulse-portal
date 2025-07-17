@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Brain } from 'lucide-react';
+import { Brain, Network } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
+import { Button } from '@/components/ui/button';
+import { MetaLoopDrawer } from './MetaLoopDrawer';
 
 interface ThinkHeaderProps {
   hideHeader: boolean;
@@ -10,6 +12,7 @@ interface ThinkHeaderProps {
 
 const ThinkHeader: React.FC<ThinkHeaderProps> = ({ hideHeader }) => {
   const { t } = useTranslation();
+  const [isMetaLoopDrawerOpen, setIsMetaLoopDrawerOpen] = useState(false);
 
   return (
     <motion.header 
@@ -52,7 +55,26 @@ const ThinkHeader: React.FC<ThinkHeaderProps> = ({ hideHeader }) => {
             </motion.p>
           </div>
         </div>
+        
+        {/* Toolbar Actions */}
+        <div className="flex items-center space-x-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsMetaLoopDrawerOpen(true)}
+            className="bg-white/5 border-white/20 text-foreground hover:bg-white/10 hover:border-white/30"
+          >
+            <Network size={16} className="mr-2" />
+            Meta-Loop
+          </Button>
+        </div>
       </div>
+      
+      {/* Meta-Loop Drawer */}
+      <MetaLoopDrawer 
+        isOpen={isMetaLoopDrawerOpen}
+        onClose={() => setIsMetaLoopDrawerOpen(false)}
+      />
     </motion.header>
   );
 };

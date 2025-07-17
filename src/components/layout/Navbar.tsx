@@ -3,6 +3,9 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Menu, User, Bell, ChevronDown, Sun, Moon, Globe, Search, X, Play } from 'lucide-react';
 import { ViewToggle } from './ViewToggle';
 import { Button } from '@/components/ui/button';
+import { PulseBar } from './PulseBar';
+import { RoleToggle, type UserRole } from './RoleToggle';
+import { ReflexEngineStatus } from './ReflexEngineStatus';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +29,8 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const [scrolled, setScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentRole, setCurrentRole] = useState<UserRole>('Champion');
+  const [reflexEngineActive, setReflexEngineActive] = useState(true);
   const location = useLocation();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const { t, language, setLanguage, isRTL } = useTranslation();
@@ -153,7 +158,16 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
             </div>
 
             {/* Utility Icons */}
-            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-4 ${isRTL ? 'space-x-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
+              {/* Role Toggle */}
+              <RoleToggle currentRole={currentRole} onRoleChange={setCurrentRole} />
+              
+              {/* Reflex Engine Status */}
+              <ReflexEngineStatus 
+                isActive={reflexEngineActive} 
+                onToggle={() => setReflexEngineActive(!reflexEngineActive)} 
+              />
+              
               {/* View Toggle */}
               <ViewToggle />
 
