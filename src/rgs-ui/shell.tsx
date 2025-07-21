@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -14,37 +14,57 @@ import RgsMonitorZone from './monitor';
 import RgsInnovateLearnZone from './innovate-learn';
 
 // Home component for new RGS UI
-const RgsHome = () => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.15 }}
-    className="p-6"
-  >
-    <GlassCard className="p-8 text-center" variant="deep">
-      <h1 className="text-3xl font-bold text-primary mb-4">New RGS Interface</h1>
-      <p className="text-muted-foreground mb-6">Modern glassmorphic design with streamlined workflows</p>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Button variant="outline" className="h-20 flex flex-col">
-          <span className="text-lg mb-1">🧠</span>
-          <span>Think</span>
-        </Button>
-        <Button variant="outline" className="h-20 flex flex-col">
-          <span className="text-lg mb-1">⚡</span>
-          <span>Act</span>
-        </Button>
-        <Button variant="outline" className="h-20 flex flex-col">
-          <span className="text-lg mb-1">📊</span>
-          <span>Monitor</span>
-        </Button>
-        <Button variant="outline" className="h-20 flex flex-col">
-          <span className="text-lg mb-1">🚀</span>
-          <span>Innovate</span>
-        </Button>
-      </div>
-    </GlassCard>
-  </motion.div>
-);
+const RgsHome = () => {
+  const navigate = useNavigate();
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.15 }}
+      className="p-6"
+    >
+      <GlassCard className="p-8 text-center" variant="deep">
+        <h1 className="text-3xl font-bold text-primary mb-4">New RGS Interface</h1>
+        <p className="text-muted-foreground mb-6">Modern glassmorphic design with streamlined workflows</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Button 
+            variant="outline" 
+            className="h-20 flex flex-col hover:scale-105 transition-transform"
+            onClick={() => navigate('/think')}
+          >
+            <span className="text-lg mb-1">🧠</span>
+            <span>Think</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            className="h-20 flex flex-col hover:scale-105 transition-transform"
+            onClick={() => navigate('/act')}
+          >
+            <span className="text-lg mb-1">⚡</span>
+            <span>Act</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            className="h-20 flex flex-col hover:scale-105 transition-transform"
+            onClick={() => navigate('/monitor')}
+          >
+            <span className="text-lg mb-1">📊</span>
+            <span>Monitor</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            className="h-20 flex flex-col hover:scale-105 transition-transform"
+            onClick={() => navigate('/innovate')}
+          >
+            <span className="text-lg mb-1">🚀</span>
+            <span>Innovate</span>
+          </Button>
+        </div>
+      </GlassCard>
+    </motion.div>
+  );
+};
 
 const RgsUIShell: React.FC = () => {
   const { flags, toggleFlag } = useFeatureFlags();
