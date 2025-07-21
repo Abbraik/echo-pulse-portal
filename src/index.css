@@ -567,6 +567,35 @@ html {
   }
 
 /* High contrast mode support */
+/* RGS UI Glassmorphism */
+.bg-glass {
+  @apply bg-background/70 backdrop-blur-xl;
+}
+
+/* Feature flag transition animations */
+.feature-flag-fade-enter {
+  opacity: 0;
+}
+
+.feature-flag-fade-enter-active {
+  opacity: 1;
+  transition: opacity 150ms ease-in;
+}
+
+.feature-flag-fade-exit {
+  opacity: 1;
+}
+
+.feature-flag-fade-exit-active {
+  opacity: 0;
+  transition: opacity 150ms ease-in;
+}
+
+/* Smooth transitions for UI elements */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 @media (prefers-contrast: high) {
   .glass-panel-cinematic {
     border: 2px solid rgba(20, 184, 166, 0.8);
