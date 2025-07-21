@@ -62,6 +62,11 @@ interface CLDNode extends Node {
     nodeType: 'stock' | 'flow' | 'connector';
     templateType?: 'population' | 'resource' | 'service';
     comments?: Comment[];
+    backgroundColor?: string;
+    textColor?: string;
+    borderColor?: string;
+    fontSize?: number;
+    fontWeight?: string;
   };
 }
 
@@ -71,6 +76,8 @@ interface CLDEdge extends Edge {
     delay?: string;
     strength: number;
     comments?: Comment[];
+    strokeColor?: string;
+    strokeWidth?: number;
   };
 }
 
@@ -597,6 +604,75 @@ export const CLDStudio: React.FC = () => {
                         </div>
                       </div>
 
+                      {/* Color Controls */}
+                      <div>
+                        <Label className="text-xs">Colors</Label>
+                        <div className="grid grid-cols-3 gap-2 mt-1">
+                          <div>
+                            <Label htmlFor="bg-color" className="text-xs text-muted-foreground">Background</Label>
+                            <Input
+                              id="bg-color"
+                              type="color"
+                              value={selectedNode.data.backgroundColor || '#3b82f6'}
+                              onChange={(e) => updateNodeData(selectedNode.id, { backgroundColor: e.target.value })}
+                              className="h-8 p-1 bg-background/50 border-white/20"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="text-color" className="text-xs text-muted-foreground">Text</Label>
+                            <Input
+                              id="text-color"
+                              type="color"
+                              value={selectedNode.data.textColor || '#ffffff'}
+                              onChange={(e) => updateNodeData(selectedNode.id, { textColor: e.target.value })}
+                              className="h-8 p-1 bg-background/50 border-white/20"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="border-color" className="text-xs text-muted-foreground">Border</Label>
+                            <Input
+                              id="border-color"
+                              type="color"
+                              value={selectedNode.data.borderColor || '#1e40af'}
+                              onChange={(e) => updateNodeData(selectedNode.id, { borderColor: e.target.value })}
+                              className="h-8 p-1 bg-background/50 border-white/20"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Font Controls */}
+                      <div>
+                        <Label className="text-xs">Font Style</Label>
+                        <div className="grid grid-cols-2 gap-2 mt-1">
+                          <div>
+                            <Label htmlFor="font-size" className="text-xs text-muted-foreground">Size</Label>
+                            <Input
+                              id="font-size"
+                              type="number"
+                              min="8"
+                              max="24"
+                              value={selectedNode.data.fontSize || 14}
+                              onChange={(e) => updateNodeData(selectedNode.id, { fontSize: Number(e.target.value) })}
+                              className="bg-background/50 border-white/20"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="font-weight" className="text-xs text-muted-foreground">Weight</Label>
+                            <select
+                              id="font-weight"
+                              value={selectedNode.data.fontWeight || 'normal'}
+                              onChange={(e) => updateNodeData(selectedNode.id, { fontWeight: e.target.value })}
+                              className="w-full h-8 bg-background/50 border border-white/20 rounded text-sm"
+                            >
+                              <option value="normal">Normal</option>
+                              <option value="bold">Bold</option>
+                              <option value="lighter">Light</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
                       <div>
                         <Label className="text-xs">DE-Band Bounds</Label>
                         <div className="grid grid-cols-2 gap-2 mt-1">
@@ -656,6 +732,51 @@ export const CLDStudio: React.FC = () => {
                           className="bg-background/50 border-white/20"
                           placeholder="e.g., 2 months"
                         />
+                      </div>
+
+                      {/* Edge Color Controls */}
+                      <div>
+                        <Label className="text-xs">Edge Style</Label>
+                        <div className="grid grid-cols-2 gap-2 mt-1">
+                          <div>
+                            <Label htmlFor="stroke-color" className="text-xs text-muted-foreground">Color</Label>
+                            <Input
+                              id="stroke-color"
+                              type="color"
+                              value={selectedEdge.data.strokeColor || '#9333ea'}
+                              onChange={(e) => {
+                                setEdges((eds) =>
+                                  eds.map((edge) =>
+                                    edge.id === selectedEdge.id
+                                      ? { ...edge, data: { ...edge.data, strokeColor: e.target.value }, style: { ...edge.style, stroke: e.target.value } }
+                                      : edge
+                                  )
+                                );
+                              }}
+                              className="h-8 p-1 bg-background/50 border-white/20"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="stroke-width" className="text-xs text-muted-foreground">Width</Label>
+                            <Input
+                              id="stroke-width"
+                              type="number"
+                              min="1"
+                              max="10"
+                              value={selectedEdge.data.strokeWidth || 2}
+                              onChange={(e) => {
+                                setEdges((eds) =>
+                                  eds.map((edge) =>
+                                    edge.id === selectedEdge.id
+                                      ? { ...edge, data: { ...edge.data, strokeWidth: Number(e.target.value) }, style: { ...edge.style, strokeWidth: Number(e.target.value) } }
+                                      : edge
+                                  )
+                                );
+                              }}
+                              className="bg-background/50 border-white/20"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
