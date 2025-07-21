@@ -3,6 +3,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface FeatureFlags {
   newRgsUI: boolean;
   newRgsAdvancedSettings: boolean;
+  advancedThinkSettings: boolean;
+  advancedActSettings: boolean;
+  advancedMonitorSettings: boolean;
+  advancedInnovateSettings: boolean;
 }
 
 interface FeatureFlagsContextType {
@@ -16,6 +20,10 @@ const FeatureFlagsContext = createContext<FeatureFlagsContextType | undefined>(u
 const defaultFlags: FeatureFlags = {
   newRgsUI: false,
   newRgsAdvancedSettings: false,
+  advancedThinkSettings: false,
+  advancedActSettings: false,
+  advancedMonitorSettings: false,
+  advancedInnovateSettings: false,
 };
 
 export const FeatureFlagsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
