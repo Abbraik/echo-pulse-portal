@@ -1,3 +1,4 @@
+// ACT Zone Implementation - Fixed drag handle import
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
