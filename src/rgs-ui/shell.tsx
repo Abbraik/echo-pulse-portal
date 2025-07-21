@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -74,7 +74,12 @@ const RgsUIShell: React.FC = () => {
       {/* Header with Settings */}
       <header className="h-16 border-b border-white/10 backdrop-blur-md bg-black/20 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-primary">RGS System</h1>
+          <Link 
+            to="/" 
+            className="text-xl font-bold text-primary hover:text-primary/80 transition-colors cursor-pointer"
+          >
+            RGS System
+          </Link>
           <span className="text-sm text-muted-foreground bg-primary/20 px-2 py-1 rounded">New UI</span>
         </div>
         
