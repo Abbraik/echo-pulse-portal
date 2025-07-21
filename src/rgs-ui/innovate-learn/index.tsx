@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import { 
   Play, 
@@ -12,55 +16,40 @@ import {
   Zap, 
   Download, 
   BookOpen, 
-  Rocket,
-  TrendingUp,
   Clock,
-  Target,
+  TrendingUp,
+  ExternalLink,
+  ChevronDown,
+  Settings,
   FileText,
-  ExternalLink
+  GitBranch
 } from 'lucide-react';
 
 const insightFeed = [
   {
     id: 'insight-001',
-    title: 'Healthcare Access Optimization',
-    description: 'AI-identified pattern suggests 23% improvement through resource redistribution',
-    type: 'optimization',
-    confidence: 87,
-    impact: 'high',
+    title: 'Healthcare system optimization reveals 23% efficiency gain potential',
+    loopRef: 'SDG-3',
     timestamp: '2 hours ago'
   },
   {
     id: 'insight-002', 
-    title: 'Education Quality Enhancement',
-    description: 'Cross-loop analysis reveals correlation between teacher training and outcomes',
-    type: 'correlation',
-    confidence: 92,
-    impact: 'medium',
+    title: 'Education quality patterns correlate with teacher training investment cycles',
+    loopRef: 'SDG-4',
     timestamp: '5 hours ago'
   },
   {
     id: 'insight-003',
-    title: 'Transport Infrastructure Synergy',
-    description: 'Economic development patterns suggest infrastructure investment timing',
-    type: 'timing',
-    confidence: 78,
-    impact: 'high',
+    title: 'Transport infrastructure timing affects economic development trajectories',
+    loopRef: 'SDG-9',
     timestamp: '1 day ago'
   }
 ];
 
 const lastRunData = {
   scenario: 'Healthcare Reform 2024',
-  duration: '6.2 hours',
-  outcomes: 847,
-  confidence: 89,
-  completedAt: '2024-01-15 14:30',
-  keyFindings: [
-    'Resource allocation efficiency +34%',
-    'Patient satisfaction improvement +28%',
-    'System responsiveness increase +41%'
-  ]
+  keyMetric: 'Δ = +34%',
+  chartThumbnail: true
 };
 
 const RgsInnovateLearnZone: React.FC = () => {
@@ -72,206 +61,174 @@ const RgsInnovateLearnZone: React.FC = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="p-6 space-y-6"
+      className="p-6"
     >
-      {/* Insight Feed */}
-      <Card className="bg-glass backdrop-blur-xl rounded-2xl shadow-lg shadow-black/30 border-white/10">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Lightbulb className="h-5 w-5 text-primary" />
-            AI Insight Feed
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {insightFeed.map((insight) => (
-            <motion.div
-              key={insight.id}
-              className="p-4 rounded-lg bg-background/50 border border-white/10 hover:bg-background/70 transition-all cursor-pointer"
-              onClick={() => setSelectedInsight(insight.id)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="font-medium">{insight.title}</h3>
-                <div className="flex gap-2">
-                  <Badge variant={insight.impact === 'high' ? 'default' : 'secondary'}>
-                    {insight.impact}
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    {insight.confidence}% confidence
-                  </Badge>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mb-3">{insight.description}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground flex items-center gap-1">
+      {/* Main Glass Panel with Two-Column Layout */}
+      <div className="p-6 bg-glass backdrop-blur-xl rounded-2xl shadow-lg border-white/10">
+        <div className="grid grid-cols-5 gap-6">
+          
+          {/* Left Column (60%) - Insight Feed */}
+          <div className="col-span-3 space-y-4">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-primary" />
+              Insight Feed
+            </h2>
+            
+            {insightFeed.map((insight) => (
+              <motion.div
+                key={insight.id}
+                className="mb-4 p-4 bg-white/10 rounded-lg transition-all cursor-pointer"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <h3 className="font-medium mb-2">{insight.title}</h3>
+                <Button variant="link" className="text-accent underline p-0 h-auto">
+                  Try Experiment ▶
+                </Button>
+                <div className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {insight.timestamp}
-                </span>
-                <Button variant="outline" size="sm">
-                  <Zap className="h-3 w-3 mr-1" />
-                  Try Experiment
+                  {insight.timestamp} • Loop: {insight.loopRef}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Right Column (40%) - Quick-Run & Last Run */}
+          <div className="col-span-2 space-y-6">
+            
+            {/* Quick-Run Panel */}
+            <div>
+              <h2 className="text-lg mb-2">Run New Experiment</h2>
+              
+              <div className="space-y-2">
+                <select className="w-full mb-2 p-2 rounded-md bg-background/50 border border-white/20 text-sm">
+                  <option>Param X: Policy Impact</option>
+                  <option>Param X: Resource Allocation</option>
+                  <option>Param X: Timeline Optimization</option>
+                </select>
+                
+                <select className="w-full mb-2 p-2 rounded-md bg-background/50 border border-white/20 text-sm">
+                  <option>Param Y: Geographic Scope</option>
+                  <option>Param Y: Stakeholder Groups</option>
+                  <option>Param Y: Budget Constraints</option>
+                </select>
+              </div>
+
+              <div className="flex gap-2 mt-4">
+                <Button className="bg-primary text-white py-2 rounded-xl flex-1">
+                  Run Simulation
+                </Button>
+                <Button variant="link" className="text-primary underline ml-2 text-sm">
+                  Run Shock-Rehearsal ▶
                 </Button>
               </div>
-            </motion.div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Quick-Run Simulation Panel */}
-      <Card className="bg-glass backdrop-blur-xl rounded-2xl shadow-lg shadow-black/30 border-white/10">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Rocket className="h-5 w-5 text-primary" />
-            Quick-Run Simulation
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Scenario Type</label>
-              <select className="w-full p-2 rounded-md bg-background/50 border border-white/20">
-                <option>Policy Impact Assessment</option>
-                <option>Resource Optimization</option>
-                <option>Risk Mitigation</option>
-                <option>Innovation Pathway</option>
-              </select>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Time Horizon</label>
-              <select className="w-full p-2 rounded-md bg-background/50 border border-white/20">
-                <option>6 months</option>
-                <option>1 year</option>
-                <option>2 years</option>
-                <option>5 years</option>
-              </select>
-            </div>
-          </div>
 
-          <div className="flex gap-2">
-            <Button className="flex-1">
-              <Play className="mr-2 h-4 w-4" />
-              Run Simulation
-            </Button>
-            <Button variant="outline" className="whitespace-nowrap">
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Run Shock-Rehearsal ▶
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            {/* Last Run Preview */}
+            <Card className="p-3 bg-white/10 rounded-lg mt-4">
+              <CardContent className="p-0">
+                {/* Thumbnail Chart */}
+                <div className="h-24 w-full mb-3 bg-gradient-to-r from-primary/20 to-accent/20 rounded flex items-center justify-center">
+                  <TrendingUp className="h-8 w-8 text-primary" />
+                </div>
+                
+                <div className="text-center">
+                  <div className="font-medium text-lg">{lastRunData.keyMetric}</div>
+                  <div className="text-sm text-muted-foreground">{lastRunData.scenario}</div>
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Last Run Preview */}
-      <Card className="bg-glass backdrop-blur-xl rounded-2xl shadow-lg shadow-black/30 border-white/10">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-xl font-semibold">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            Last Run Preview
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{lastRunData.scenario}</h3>
-              <p className="text-sm text-muted-foreground">
-                Completed {lastRunData.completedAt} • Duration: {lastRunData.duration}
-              </p>
-            </div>
-            <Badge variant="default" className="bg-green-500/20 text-green-400">
-              {lastRunData.confidence}% accuracy
-            </Badge>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-3 rounded-lg bg-primary/10">
-              <div className="text-lg font-bold text-primary">{lastRunData.outcomes}</div>
-              <div className="text-xs text-muted-foreground">Outcomes Tested</div>
-            </div>
-            <div className="text-center p-3 rounded-lg bg-primary/10">
-              <div className="text-lg font-bold text-green-400">+34%</div>
-              <div className="text-xs text-muted-foreground">Efficiency Gain</div>
-            </div>
-            <div className="text-center p-3 rounded-lg bg-primary/10">
-              <div className="text-lg font-bold text-blue-400">+41%</div>
-              <div className="text-xs text-muted-foreground">Responsiveness</div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium">Key Findings:</h4>
-            <ul className="space-y-1">
-              {lastRunData.keyFindings.map((finding, index) => (
-                <li key={index} className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Target className="h-3 w-3 text-primary" />
-                  {finding}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Export Links */}
-      <Card className="bg-glass backdrop-blur-xl rounded-2xl shadow-lg shadow-black/30 border-white/10">
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="h-12 flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                <span>Export ORS Bundle</span>
-              </div>
-              <span className="text-xs text-muted-foreground">Operational Response Set</span>
-            </Button>
-            <Button variant="outline" className="h-12 flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                <span>Lesson Export</span>
-              </div>
-              <span className="text-xs text-muted-foreground">Knowledge Capture</span>
-            </Button>
-          </div>
-          
-          <Separator className="my-4" />
-          
-          <div className="text-center">
-            <Button size="lg" className="w-full h-12 text-lg font-semibold">
-              <Play className="mr-2 h-5 w-5" />
-              Run Simulation
-            </Button>
-            <p className="text-sm text-muted-foreground mt-2">
-              Launch comprehensive scenario analysis with selected parameters
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Advanced Simulation Options */}
-      {flags.newRgsAdvancedSettings && (
-        <Card className="bg-glass backdrop-blur-xl rounded-2xl shadow-lg shadow-black/30 border-white/10">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-xl font-semibold">
-              <FileText className="h-5 w-5 text-primary" />
-              Advanced Options
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline">
-                <Target className="mr-2 h-4 w-4" />
-                Advanced Parameters
+            {/* Export Links */}
+            <div className="space-y-2 text-sm">
+              <Button variant="link" className="p-0 h-auto text-accent underline">
+                <Download className="h-3 w-3 mr-1" />
+                Export ORS Bundle
               </Button>
-              <Button variant="outline">
-                <BookOpen className="mr-2 h-4 w-4" />
-                Knowledge Graph
+              <br />
+              <Button variant="link" className="p-0 h-auto text-accent underline">
+                <FileText className="h-3 w-3 mr-1" />
+                Download Lesson Summary
               </Button>
             </div>
-            <Button variant="outline" className="w-full">
-              <FileText className="mr-2 h-4 w-4" />
-              Experiment Template Manager
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </div>
+
+        {/* Advanced Settings Accordion */}
+        <Accordion type="single" collapsible className="mt-6">
+          <AccordionItem value="advanced-settings" className="border-white/20">
+            <AccordionTrigger className="text-sm font-medium hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Advanced Settings
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="space-y-4 pt-4">
+              
+              {/* Simulation Parameter Sweeps */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">Simulation Parameter Sweeps</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  <input 
+                    type="range" 
+                    className="w-full" 
+                    placeholder="Min Value"
+                  />
+                  <input 
+                    type="range" 
+                    className="w-full" 
+                    placeholder="Max Value"
+                  />
+                  <input 
+                    type="number" 
+                    className="w-full p-1 rounded bg-background/50 border border-white/20 text-xs" 
+                    placeholder="Steps"
+                  />
+                </div>
+              </div>
+
+              {/* ORS Export Selectors */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">ORS Export File Selectors</h4>
+                <div className="space-y-1">
+                  <label className="flex items-center gap-2 text-xs">
+                    <input type="checkbox" className="rounded" />
+                    Policy Recommendations
+                  </label>
+                  <label className="flex items-center gap-2 text-xs">
+                    <input type="checkbox" className="rounded" />
+                    Resource Allocation Matrix
+                  </label>
+                  <label className="flex items-center gap-2 text-xs">
+                    <input type="checkbox" className="rounded" />
+                    Timeline & Milestones
+                  </label>
+                  <label className="flex items-center gap-2 text-xs">
+                    <input type="checkbox" className="rounded" />
+                    Risk Assessment
+                  </label>
+                </div>
+              </div>
+
+              {/* Knowledge Graph Toggle */}
+              <div className="flex items-center justify-between p-3 bg-background/20 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <GitBranch className="h-4 w-4" />
+                  <span className="text-sm">Full Knowledge Graph</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-6 bg-white/20 rounded-full flex items-center justify-start px-1">
+                    <div className="w-4 h-4 bg-primary rounded-full transition-transform" />
+                  </div>
+                  <div className="w-8 h-6 bg-gradient-to-br from-primary/30 to-accent/30 rounded flex items-center justify-center">
+                    <div className="text-xs">3D</div>
+                  </div>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
     </motion.div>
   );
 };
