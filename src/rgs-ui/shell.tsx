@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, useNavigate, Link } from 'react-router-dom';
+import { Routes, Route, useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -22,7 +22,13 @@ import {
   Activity,
   Users,
   Package,
-  Heart
+  Heart,
+  Home,
+  Brain,
+  Gamepad2,
+  Monitor,
+  Lightbulb,
+  GraduationCap
 } from 'lucide-react';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -373,61 +379,98 @@ const RgsHome = () => {
 
 const RgsUIShell: React.FC = () => {
   const { flags, toggleFlag } = useFeatureFlags();
+  const location = useLocation();
+
+  const navigationItems = [
+    { path: '/', label: 'Home', icon: Home },
+    { path: '/think', label: 'Think', icon: Brain },
+    { path: '/act', label: 'Act', icon: Gamepad2 },
+    { path: '/monitor', label: 'Monitor', icon: Monitor },
+    { path: '/innovate', label: 'Innovate', icon: Lightbulb },
+    { path: '/learn', label: 'Learn', icon: GraduationCap },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Header with Settings */}
+      {/* Header with Navigation */}
       <header className="h-16 border-b border-white/10 backdrop-blur-md bg-black/20 flex items-center justify-between px-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-8">
           <Link 
             to="/" 
             className="text-xl font-bold text-primary hover:text-primary/80 transition-colors cursor-pointer"
           >
             RGS System
           </Link>
-          <span className="text-sm text-muted-foreground bg-primary/20 px-2 py-1 rounded">New UI</span>
+          
+          {/* Navigation Menu */}
+          <nav className="flex items-center gap-1">
+            {navigationItems.map((item) => {
+              const IconComponent = item.icon;
+              const isActive = location.pathname === item.path;
+              
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`
+                    flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                    ${isActive 
+                      ? 'bg-primary/20 text-primary border border-primary/30 shadow-lg' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+                    }
+                  `}
+                >
+                  <IconComponent className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
         
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <Settings className="h-4 w-4" />
-              Settings
-            </Button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>UI Settings</SheetTitle>
-            </SheetHeader>
-            <div className="space-y-6 mt-6">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="new-rgs-ui" className="text-sm font-medium">
-                  New RGS UI
-                </Label>
-                <Switch
-                  id="new-rgs-ui"
-                  checked={flags.newRgsUI}
-                  onCheckedChange={() => toggleFlag('newRgsUI')}
-                />
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground bg-primary/20 px-2 py-1 rounded">New UI</span>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <Settings className="h-4 w-4" />
+                Settings
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>UI Settings</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-6 mt-6">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="new-rgs-ui" className="text-sm font-medium">
+                    New RGS UI
+                  </Label>
+                  <Switch
+                    id="new-rgs-ui"
+                    checked={flags.newRgsUI}
+                    onCheckedChange={() => toggleFlag('newRgsUI')}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="advanced-settings" className="text-sm font-medium">
+                    Advanced Settings
+                  </Label>
+                  <Switch
+                    id="advanced-settings"
+                    checked={flags.newRgsAdvancedSettings}
+                    onCheckedChange={() => toggleFlag('newRgsAdvancedSettings')}
+                  />
+                </div>
+                <div className="pt-4 border-t border-border">
+                  <p className="text-xs text-muted-foreground">
+                    Phase 1: Core UI Shell & Feature Flag System
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="advanced-settings" className="text-sm font-medium">
-                  Advanced Settings
-                </Label>
-                <Switch
-                  id="advanced-settings"
-                  checked={flags.newRgsAdvancedSettings}
-                  onCheckedChange={() => toggleFlag('newRgsAdvancedSettings')}
-                />
-              </div>
-              <div className="pt-4 border-t border-border">
-                <p className="text-xs text-muted-foreground">
-                  Phase 1: Core UI Shell & Feature Flag System
-                </p>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+            </SheetContent>
+          </Sheet>
+        </div>
       </header>
 
       <Routes>
