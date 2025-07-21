@@ -18,7 +18,10 @@ import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useUIContent } from '@/hooks/use-ui-content';
 import { useDemo } from '@/hooks/use-demo';
+import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface NavbarProps {
   hidden?: boolean;
@@ -38,6 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
   const [notifications] = useState(3);
   const [isHovering, setIsHovering] = useState<string | null>(null);
   const { isDemoMode, toggleDemoMode } = useDemo();
+  const { flags, toggleFlag } = useFeatureFlags();
 
   // Listen for scroll events
   useEffect(() => {
@@ -299,6 +303,33 @@ const Navbar: React.FC<NavbarProps> = ({ hidden = false, onLogout }) => {
                   } />
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300">{t('profile')}</DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300">{t('settings')}</DropdownMenuItem>
+                  <DropdownMenuSeparator className={
+                    resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300'
+                  } />
+                  <div className="px-2 py-2 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="new-rgs-ui" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        New RGS UI
+                      </Label>
+                      <Switch
+                        id="new-rgs-ui"
+                        checked={flags.newRgsUI}
+                        onCheckedChange={() => toggleFlag('newRgsUI')}
+                      />
+                    </div>
+                    {flags.newRgsUI && (
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="advanced-settings" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Advanced Features
+                        </Label>
+                        <Switch
+                          id="advanced-settings"
+                          checked={flags.newRgsAdvancedSettings}
+                          onCheckedChange={() => toggleFlag('newRgsAdvancedSettings')}
+                        />
+                      </div>
+                    )}
+                  </div>
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300">{t('support')}</DropdownMenuItem>
                   <DropdownMenuSeparator className={
                     resolvedTheme === 'dark' ? 'bg-white/10' : 'bg-gray-300'
