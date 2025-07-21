@@ -131,6 +131,16 @@ const initialNodes: CLDNode[] = [
     id: 'population-a',
     type: 'default',
     position: { x: 100, y: 100 },
+    style: {
+      backgroundColor: '#10b981',
+      color: '#ffffff',
+      borderColor: '#059669',
+      border: '2px solid #059669',
+      fontSize: 14,
+      fontWeight: 'normal',
+      padding: '10px',
+      borderRadius: '8px',
+    },
     data: {
       label: 'Population A (1000)',
       value: 1000,
@@ -140,12 +150,27 @@ const initialNodes: CLDNode[] = [
       deBandMin: 800,
       deBandMax: 1200,
       srtEnabled: true,
+      backgroundColor: '#10b981',
+      textColor: '#ffffff',
+      borderColor: '#059669',
+      fontSize: 14,
+      fontWeight: 'normal',
     },
   },
   {
     id: 'school-capacity',
     type: 'default',
     position: { x: 400, y: 100 },
+    style: {
+      backgroundColor: '#3b82f6',
+      color: '#ffffff',
+      borderColor: '#1d4ed8',
+      border: '2px solid #1d4ed8',
+      fontSize: 14,
+      fontWeight: 'normal',
+      padding: '10px',
+      borderRadius: '8px',
+    },
     data: {
       label: 'School Capacity (500)',
       value: 500,
@@ -155,6 +180,11 @@ const initialNodes: CLDNode[] = [
       deBandMin: 400,
       deBandMax: 600,
       srtEnabled: false,
+      backgroundColor: '#3b82f6',
+      textColor: '#ffffff',
+      borderColor: '#1d4ed8',
+      fontSize: 14,
+      fontWeight: 'normal',
     },
   },
 ];
@@ -273,6 +303,16 @@ export const CLDStudio: React.FC = () => {
       id: `${template.id}-${Date.now()}`,
       type: 'default',
       position,
+      style: {
+        backgroundColor: template.color.includes('green') ? '#10b981' : template.color.includes('blue') ? '#3b82f6' : '#eab308',
+        color: '#ffffff',
+        borderColor: template.color.includes('green') ? '#059669' : template.color.includes('blue') ? '#1d4ed8' : '#ca8a04',
+        border: `2px solid ${template.color.includes('green') ? '#059669' : template.color.includes('blue') ? '#1d4ed8' : '#ca8a04'}`,
+        fontSize: 14,
+        fontWeight: 'normal',
+        padding: '10px',
+        borderRadius: '8px',
+      },
       data: {
         label: `${template.label} (${template.value})`,
         value: template.value,
@@ -280,6 +320,11 @@ export const CLDStudio: React.FC = () => {
         nodeType: template.type as 'stock',
         templateType: template.id as any,
         srtEnabled: false,
+        backgroundColor: template.color.includes('green') ? '#10b981' : template.color.includes('blue') ? '#3b82f6' : '#eab308',
+        textColor: '#ffffff',
+        borderColor: template.color.includes('green') ? '#059669' : template.color.includes('blue') ? '#1d4ed8' : '#ca8a04',
+        fontSize: 14,
+        fontWeight: 'normal',
       },
     };
 
@@ -300,9 +345,25 @@ export const CLDStudio: React.FC = () => {
 
   const updateNodeData = (nodeId: string, newData: Partial<CLDNode['data']>) => {
     setNodes((nds) =>
-      nds.map((node) =>
-        node.id === nodeId ? { ...node, data: { ...node.data, ...newData } } : node
-      )
+      nds.map((node) => {
+        if (node.id === nodeId) {
+          const updatedNode = { 
+            ...node, 
+            data: { ...node.data, ...newData },
+            style: {
+              ...node.style,
+              backgroundColor: newData.backgroundColor || node.data.backgroundColor || '#3b82f6',
+              color: newData.textColor || node.data.textColor || '#ffffff',
+              borderColor: newData.borderColor || node.data.borderColor || '#1e40af',
+              fontSize: newData.fontSize || node.data.fontSize || 14,
+              fontWeight: newData.fontWeight || node.data.fontWeight || 'normal',
+              border: `2px solid ${newData.borderColor || node.data.borderColor || '#1e40af'}`,
+            }
+          };
+          return updatedNode;
+        }
+        return node;
+      })
     );
     if (selectedNode?.id === nodeId) {
       setSelectedNode({ ...selectedNode, data: { ...selectedNode.data, ...newData } });
