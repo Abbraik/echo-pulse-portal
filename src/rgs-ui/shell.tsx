@@ -8,68 +8,12 @@ import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
 import { GlassCard } from '@/components/ui/glass-card';
+import RgsThinkZone from './think';
+import RgsActZone from './act';
+import RgsMonitorZone from './monitor';
+import RgsInnovateLearnZone from './innovate-learn';
 
-// Placeholder components for new RGS UI zones
-const RgsThink = () => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.15 }}
-    className="p-6"
-  >
-    <GlassCard className="p-8 text-center" variant="deep">
-      <h1 className="text-2xl font-semibold text-primary mb-4">New RGS Think Zone</h1>
-      <p className="text-muted-foreground">Sprint Progress • Tension Signals • Leverage Points</p>
-      <Button className="mt-6">Start Sprint</Button>
-    </GlassCard>
-  </motion.div>
-);
-
-const RgsAct = () => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.15 }}
-    className="p-6"
-  >
-    <GlassCard className="p-8 text-center" variant="deep">
-      <h1 className="text-2xl font-semibold text-primary mb-4">New RGS Act Zone</h1>
-      <p className="text-muted-foreground">Bundle Summary • Intervention Picker • Smart Roles</p>
-      <Button className="mt-6">Publish Bundle</Button>
-    </GlassCard>
-  </motion.div>
-);
-
-const RgsMonitor = () => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.15 }}
-    className="p-6"
-  >
-    <GlassCard className="p-8 text-center" variant="deep">
-      <h1 className="text-2xl font-semibold text-primary mb-4">New RGS Monitor Zone</h1>
-      <p className="text-muted-foreground">PulseBar • Loop List • DE-Band Badges</p>
-      <Button className="mt-6">Review TRI</Button>
-    </GlassCard>
-  </motion.div>
-);
-
-const RgsInnovateLearn = () => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.15 }}
-    className="p-6"
-  >
-    <GlassCard className="p-8 text-center" variant="deep">
-      <h1 className="text-2xl font-semibold text-primary mb-4">New RGS Innovate-Learn Zone</h1>
-      <p className="text-muted-foreground">Insight Feed • Quick-Run Simulation • Experiment Templates</p>
-      <Button className="mt-6">Run Simulation</Button>
-    </GlassCard>
-  </motion.div>
-);
-
+// Home component for new RGS UI
 const RgsHome = () => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
@@ -156,14 +100,13 @@ const RgsUIShell: React.FC = () => {
         </Sheet>
       </header>
 
-      {/* Routes */}
       <Routes>
         <Route path="/" element={<RgsHome />} />
-        <Route path="/think" element={<RgsThink />} />
-        <Route path="/act" element={<RgsAct />} />
-        <Route path="/monitor" element={<RgsMonitor />} />
-        <Route path="/innovate" element={<RgsInnovateLearn />} />
-        <Route path="/learn" element={<RgsInnovateLearn />} />
+        <Route path="/think" element={<RgsThinkZone />} />
+        <Route path="/act" element={<RgsActZone />} />
+        <Route path="/monitor" element={<RgsMonitorZone />} />
+        <Route path="/innovate" element={<RgsInnovateLearnZone />} />
+        <Route path="/learn" element={<RgsInnovateLearnZone />} />
       </Routes>
     </div>
   );
